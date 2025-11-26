@@ -1,0 +1,80 @@
+spring:
+  application:
+    name: freshly-app
+
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java,src/main/resources
+      poll-interval: 2s
+      quiet-period: 1s
+      exclude: static/**,public/**
+    livereload:
+      enabled: true
+
+  docker:
+    compose:
+      enabled: false
+
+  mongodb:
+    host: ${MONGO_HOST:localhost}
+    port: ${MONGO_PORT:27017}
+    database: ${MONGO_DB:freshly_db}
+    username: ${MONGO_USER:root}
+    password: ${MONGO_PASSWORD:root}
+    authentication-database: admin
+
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USER:vertyll}
+    password: ${MAIL_PASSWORD:vertyll}
+    properties:
+      mail:
+        smtp:
+          trust: "*"
+        auth: true
+        starttls:
+          enabled: true
+        connection-timeout: 5000
+        timeout: 3000
+        write-timeout: 5000
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_URL:http://localhost:8081}/realms/${KEYCLOAK_REALM:freshly-realm}
+      client:
+        registration.freshly:
+            client-id: ${KEYCLOAK_CLIENT_ID:freshly-app-client}
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+            scope:
+              - openid
+              - profile
+              - roles
+            authorization-grant-type: authorization_code
+            redirect-uri: ${APP_BASE_URL:http://localhost:8080}/login/oauth2/code/{registrationId}
+
+        provider.freshly:
+            authorization-uri: ${KEYCLOAK_URL:http://localhost:8081}/realms/${KEYCLOAK_REALM:freshly-realm}/protocol/openid-connect/auth
+            token-uri: ${KEYCLOAK_URL:http://localhost:8081}/realms/${KEYCLOAK_REALM:freshly-realm}/protocol/openid-connect/token
+            jwk-set-uri: ${KEYCLOAK_URL:http://localhost:8081}/realms/${KEYCLOAK_REALM:freshly-realm}/protocol/openid-connect/certs
+            user-info-uri: ${KEYCLOAK_URL:http://localhost:8081}/realms/${KEYCLOAK_REALM:freshly-realm}/protocol/openid-connect/userinfo
+            user-name-attribute: preferred_username
+
+application:
+  file:
+    uploads:
+      file-output-path: ${FILE_UPLOAD_PATH:./uploads}
+  frontend:
+    url: ${FRONTEND_URL:http://localhost:4200}
+
+server:
+  port: ${SERVER_PORT:8080}
+
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:INFO}
+    com.vertyll.freshly: ${LOG_LEVEL_APP:DEBUG}
+    org.springframework.security: ${LOG_LEVEL_SECURITY:DEBUG}

@@ -1,0 +1,83 @@
+services:
+  freshly_mongodb:
+    container_name: freshly_mongodb
+    image: mongo:${MONGO_VERSION:-6.0}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - freshly_network
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  freshly_keycloak:
+    container_name: freshly_keycloak
+    build:
+      context: ./docker/keycloak
+      dockerfile: Dockerfile
+    environment:
+      KC_DB: postgres
+      KC_DB_URL_HOST: freshly_keycloak_db
+      KC_DB_URL_DATABASE: ${POSTGRES_KC_DB}
+      KC_DB_USERNAME: ${POSTGRES_KC_USER}
+      KC_DB_PASSWORD: ${POSTGRES_KC_PASSWORD}
+      KC_DB_SCHEMA: public
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+    ports:
+      - "${KC_HTTP_PORT:-8081}:8080"
+    depends_on:
+      freshly_keycloak_db:
+        condition: service_healthy
+    networks:
+      - freshly_network
+
+  freshly_keycloak_db:
+    image: postgres:${POSTGRES_KC_VERSION:-17}
+    container_name: freshly_keycloak_db
+    restart: always
+    ports:
+      - "${POSTGRES_KC_DB_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_KC_DB:-keycloak_db}
+      POSTGRES_USER: ${POSTGRES_KC_USER:-keycloak_user}
+      POSTGRES_PASSWORD: ${POSTGRES_KC_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - freshly_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_KC_USER:-keycloak_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mail-dev:
+    image: maildev/maildev:${MAILDEV_VERSION:-latest}
+    container_name: mail-dev-freshly
+    restart: always
+    ports:
+      - "${MAIL_SMTP_PORT:-1025}:1025"
+      - "${MAIL_WEB_PORT:-1080}:1080"
+    networks:
+      - freshly_network
+
+volumes:
+  mongodb_data:
+  postgres_data:
+
+networks:
+  freshly_network:
+    driver: bridge

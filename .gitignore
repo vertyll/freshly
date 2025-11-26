@@ -1,0 +1,10 @@
+### Code editor files ###
+.idea
+.vscode
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Environment ###
+.env

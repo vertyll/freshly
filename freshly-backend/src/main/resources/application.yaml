@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: freshly-backend
+  profiles:
+    default: dev
+  spring:
+    servlet:
+      multipart:
+        max-file-size: ${MAX_FILE_SIZE:50MB}
+        max-request-size: ${MAX_REQUEST_SIZE:50MB}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info
+  endpoint:
+    info:
+      access: READ_ONLY
+    health:
+      access: READ_ONLY
+    metrics:
+      access: READ_ONLY
+
+server:
+  servlet:
+    context-path: /api/v1/
