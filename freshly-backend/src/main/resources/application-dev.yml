@@ -1,6 +1,6 @@
 spring:
   application:
-    name: freshly-app
+    name: freshly-backend
 
   devtools:
     restart:
