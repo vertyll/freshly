@@ -1,7 +1,7 @@
 services:
-  freshly_mongodb:
-    container_name: freshly_mongodb
-    image: mongo:${MONGO_VERSION:-7}
+  mongodb:
+    container_name: freshly-mongodb
+    image: mongo:${MONGO_VERSION:-8}
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-root}
@@ -9,23 +9,23 @@ services:
     ports:
       - "${MONGO_PORT:-27017}:27017"
     volumes:
-      - mongodb_data:/data/db
+      - mongodb-data:/data/db
     networks:
-      - freshly_network
+      - freshly
     healthcheck:
       test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  freshly_keycloak:
-    container_name: freshly_keycloak
+  keycloak:
+    container_name: freshly-keycloak
     build:
       context: ./docker/keycloak
       dockerfile: Dockerfile
     environment:
       KC_DB: postgres
-      KC_DB_URL_HOST: freshly_keycloak_db
+      KC_DB_URL_HOST: keycloak-db
       KC_DB_URL_DATABASE: ${POSTGRES_KC_DB:-keycloak_db}
       KC_DB_USERNAME: ${POSTGRES_KC_USER:-keycloak_user}
       KC_DB_PASSWORD: ${POSTGRES_KC_PASSWORD:-keycloak_pass}
@@ -39,10 +39,10 @@ services:
     ports:
       - "${KC_HTTP_PORT:-8081}:8080"
     depends_on:
-      freshly_keycloak_db:
+      keycloak-db:
         condition: service_healthy
     networks:
-      - freshly_network
+      - freshly
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e \"GET /health/ready HTTP/1.1\r\nhost: 127.0.0.1:8080\r\nConnection: close\r\n\r\n\" >&3;if [ $? -eq 0 ]; then echo \"Healthcheck Successful\";exit 0;else echo \"Healthcheck Failed\";exit 1;fi;"]
       interval: 30s
@@ -50,9 +50,9 @@ services:
       retries: 5
       start_period: 60s
 
-  freshly_keycloak_db:
-    image: postgres:${POSTGRES_KC_VERSION:-16}
-    container_name: freshly_keycloak_db
+  keycloak-db:
+    image: postgres:${POSTGRES_KC_VERSION:-17}
+    container_name: freshly-keycloak-postgres
     restart: always
     ports:
       - "${POSTGRES_KC_DB_PORT:-5432}:5432"
@@ -61,9 +61,9 @@ services:
       POSTGRES_USER: ${POSTGRES_KC_USER:-keycloak_user}
       POSTGRES_PASSWORD: ${POSTGRES_KC_PASSWORD:-keycloak_pass}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     networks:
-      - freshly_network
+      - freshly
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_KC_USER:-keycloak_user}"]
       interval: 10s
@@ -72,18 +72,54 @@ services:
 
   mail-dev:
     image: maildev/maildev:${MAILDEV_VERSION:-latest}
-    container_name: mail-dev-freshly
+    container_name: freshly-mail-dev
     restart: always
     ports:
       - "${MAIL_SMTP_PORT:-1025}:1025"
       - "${MAIL_WEB_PORT:-1080}:1080"
     networks:
-      - freshly_network
+      - freshly
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+      target: ${DOCKER_ENV:-development}
+      args:
+        JAVA_VERSION: ${JAVA_VERSION:-25}
+        GRADLE_VERSION: ${GRADLE_VERSION:-9.2.1}
+        BACKEND_PORT: ${BACKEND_PORT:-8080}
+        BACKEND_DEBUG_PORT: ${BACKEND_DEBUG_PORT:-5005}
+    container_name: freshly-backend
+    volumes:
+      - ./freshly-backend:/app
+      - gradle-cache:/home/gradle/.gradle
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+      - "${BACKEND_DEBUG_PORT:-5005}:5005"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_DATABASE: ${MONGO_INITDB_DATABASE:-freshly_db}
+      SPRING_DATA_MONGODB_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
+      SPRING_DATA_MONGODB_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-root}
+      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
+      SPRING_MAIL_HOST: mail-dev
+      SPRING_MAIL_PORT: ${MAIL_SMTP_PORT:-1025}
+      SERVER_PORT: ${BACKEND_PORT:-8080}
+    networks:
+      - freshly
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      mail-dev:
+        condition: service_started
 
 volumes:
-  mongodb_data:
-  postgres_data:
+  mongodb-data:
+  postgres-data:
+  gradle-cache:
 
 networks:
-  freshly_network:
+  freshly:
     driver: bridge
