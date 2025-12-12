@@ -32,9 +32,14 @@ dependencies {
 	// Internal dependencies
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 	implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+	implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
+	implementation("org.springframework.boot:spring-boot-starter-mail")
+	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+
+	// Thymeleaf and Spring Security integration
+	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
 
 	// MapStruct
     implementation("org.mapstruct:mapstruct:${mapstructVersion}")
@@ -58,6 +63,9 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-security-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-thymeleaf-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-mail-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server-test")
 
 	// Junit
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
