@@ -67,7 +67,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-mail-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server-test")
 
-	// Junit
+	// JUnit
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
