@@ -2,17 +2,17 @@ spring:
   application:
     name: freshly-backend
   profiles:
-    active: ${SPRING_PROFILE:dev}
+    active: dev
   servlet:
     multipart:
-      max-file-size: ${MAX_FILE_SIZE:50MB}
-      max-request-size: ${MAX_REQUEST_SIZE:50MB}
+      max-file-size: 50MB
+      max-request-size: 50MB
 
 management:
   endpoints:
     web:
       exposure:
-        include: ${MANAGEMENT_ENDPOINTS:health,metrics,info}
+        include: health,metrics,info
   endpoint:
     info:
       access: READ_ONLY

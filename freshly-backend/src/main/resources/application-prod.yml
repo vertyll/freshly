@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: freshly-backend
+
+  docker:
+    compose:
+      enabled: false
+
+  mongodb:
+    host: ${MONGO_HOST}
+    port: ${MONGO_PORT:27017}
+    database: ${MONGO_DATABASE}
+    username: ${MONGO_USERNAME}
+    password: ${MONGO_PASSWORD}
+    authentication-database: ${MONGO_AUTH_DATABASE:admin}
+
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          trust: "*"
+        auth: true
+        starttls:
+          enabled: true
+        connection-timeout: 5000
+        timeout: 3000
+        write-timeout: 5000
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI}
+      client:
+        registration:
+          freshly:
+            client-id: ${KEYCLOAK_CLIENT_ID}
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+            scope:
+              - openid
+              - profile
+              - roles
+            authorization-grant-type: authorization_code
+            redirect-uri: ${APP_BASE_URL}/login/oauth2/code/{registrationId}
+
+        provider:
+          freshly:
+            authorization-uri: ${KEYCLOAK_AUTHORIZATION_URI}
+            token-uri: ${KEYCLOAK_TOKEN_URI}
+            jwk-set-uri: ${KEYCLOAK_JWK_SET_URI}
+            user-info-uri: ${KEYCLOAK_USER_INFO_URI}
+            user-name-attribute: preferred_username
+
+application:
+  file:
+    uploads:
+      file-output-path: ${FILE_UPLOAD_PATH:/var/app/uploads}
+  frontend:
+    url: ${FRONTEND_URL}
+
+server:
+  port: ${SERVER_PORT:8080}
+
+logging:
+  level:
+    root: WARN
+    com.vertyll.freshly: INFO
+    org.springframework.security: INFO

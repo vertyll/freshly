@@ -1,11 +1,11 @@
 services:
   freshly_mongodb:
     container_name: freshly_mongodb
-    image: mongo:${MONGO_VERSION:-6.0}
+    image: mongo:${MONGO_VERSION:-7}
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-root}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-freshly_db}
     ports:
       - "${MONGO_PORT:-27017}:27017"
     volumes:
@@ -26,12 +26,12 @@ services:
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: freshly_keycloak_db
-      KC_DB_URL_DATABASE: ${POSTGRES_KC_DB}
-      KC_DB_USERNAME: ${POSTGRES_KC_USER}
-      KC_DB_PASSWORD: ${POSTGRES_KC_PASSWORD}
+      KC_DB_URL_DATABASE: ${POSTGRES_KC_DB:-keycloak_db}
+      KC_DB_USERNAME: ${POSTGRES_KC_USER:-keycloak_user}
+      KC_DB_PASSWORD: ${POSTGRES_KC_PASSWORD:-keycloak_pass}
       KC_DB_SCHEMA: public
-      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME}
-      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD:-admin}
       KC_PROXY_HEADERS: xforwarded
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME_STRICT_HTTPS: "false"
@@ -43,9 +43,15 @@ services:
         condition: service_healthy
     networks:
       - freshly_network
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e \"GET /health/ready HTTP/1.1\r\nhost: 127.0.0.1:8080\r\nConnection: close\r\n\r\n\" >&3;if [ $? -eq 0 ]; then echo \"Healthcheck Successful\";exit 0;else echo \"Healthcheck Failed\";exit 1;fi;"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
   freshly_keycloak_db:
-    image: postgres:${POSTGRES_KC_VERSION:-17}
+    image: postgres:${POSTGRES_KC_VERSION:-16}
     container_name: freshly_keycloak_db
     restart: always
     ports:
@@ -53,7 +59,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_KC_DB:-keycloak_db}
       POSTGRES_USER: ${POSTGRES_KC_USER:-keycloak_user}
-      POSTGRES_PASSWORD: ${POSTGRES_KC_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_KC_PASSWORD:-keycloak_pass}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
