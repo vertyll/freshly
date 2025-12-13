@@ -1,5 +1,5 @@
 ## Project Assumptions
-Application with air quality data from IoT sensors
+Application with air quality data from IoT sensors.
 
 ## Technology Stack
 
