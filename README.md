@@ -1,5 +1,5 @@
 ## Project Assumptions
-- in progress
+Application with air quality data from IoT sensors
 
 ## Technology Stack
 
