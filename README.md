@@ -4,12 +4,34 @@
 ## Technology Stack
 
 ### Back-end:
+- Spring Boot
+- Java
+- Gradle Kotlin DSL
+- MongoDB
+- JUnit
+- Mockito
+- Lombok
+- Spring Security
+- Spring Data MongoDB
+- Spring Web
+- Spring Mail
+- Flyway
+- OpenAPI (Swagger)
 
 ### Front-end:
 
 ### Authentication:
+- Keycloak
 
 ### Core back-end:
+- Gradle build system
+- the application has an exception handling mechanism
+- the application has a logging mechanism
+- the application has separate environments for dev and prod
+- the application has a dedicated configuration file
+- the application has Keycloak integration for authentication and authorization
+- the application written in Domain-Driven Design (DDD) style
+- and many other features that can be found in the application code
 
 ### Core front-end:
 
