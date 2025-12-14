@@ -35,9 +35,11 @@ Application with air quality data from IoT sensors.
 
 ### Core front-end:
 
-
 ### Other:
 - Docker for development environment
+- JSpecify for null-safety annotations
+- NullAway for null-safety checks
+- Error Prone for static code analysis
 
 > **Note:** During application development, SOLID principles, DRY, composition over inheritance, dependency injection, design patterns, architectural patterns were applied, tests were written, and other good programming practices were adopted.
 
