@@ -19,9 +19,11 @@ public class OauthConfig {
                 .requestInterceptor(loggingInterceptor())
                 .defaultStatusHandler(
                         status -> status.is4xxClientError() || status.is5xxServerError(),
-                        (request, response) -> {
-                            log.error("Keycloak error: {} - {}", response.getStatusCode(), response.getStatusText());
-                        }
+                        (_, response) -> log.error(
+                                "Keycloak error: {} - {}",
+                                response.getStatusCode(),
+                                response.getStatusText()
+                        )
                 )
                 .build();
     }
