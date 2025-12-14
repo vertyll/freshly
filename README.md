@@ -19,6 +19,7 @@ Application with air quality data from IoT sensors.
 - OpenAPI (Swagger)
 
 ### Front-end:
+- in progress
 
 ### Authentication:
 - Keycloak
