@@ -1,6 +1,7 @@
 package com.vertyll.freshly.common.response;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
@@ -21,7 +22,7 @@ public class ApiResponse<T> extends BaseResponse<T> {
                 ApiResponse.<T>builder()
                         .data(data)
                         .message(message)
-                        .timestamp(LocalDateTime.now())
+                        .timestamp(LocalDateTime.now(ZoneOffset.UTC))
                         .build();
 
         return new ResponseEntity<>(response, status);

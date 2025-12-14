@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
@@ -29,7 +30,7 @@ public class PaginatedApiResponse<T> extends BaseResponse<PageResponse<T>> {
         PaginatedApiResponse<T> response = PaginatedApiResponse.<T>builder()
                 .data(pageResponse)
                 .message(message)
-                .timestamp(LocalDateTime.now())
+                .timestamp(LocalDateTime.now(ZoneOffset.UTC))
                 .build();
 
         return new ResponseEntity<>(response, status);

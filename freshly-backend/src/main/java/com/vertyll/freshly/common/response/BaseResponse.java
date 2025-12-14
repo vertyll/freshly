@@ -1,6 +1,7 @@
 package com.vertyll.freshly.common.response;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -15,5 +16,5 @@ public abstract class BaseResponse<T> implements IResponse<T> {
     protected String message;
 
     @Builder.Default
-    protected LocalDateTime timestamp = LocalDateTime.now();
+    protected LocalDateTime timestamp = LocalDateTime.now(ZoneOffset.UTC);
 }

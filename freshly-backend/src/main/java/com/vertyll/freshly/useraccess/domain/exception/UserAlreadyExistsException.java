@@ -6,9 +6,8 @@ import java.util.UUID;
 public class UserAlreadyExistsException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = 1L;
-    private static final String MESSAGE_TEMPLATE = "User with ID %s already exists.";
 
     public UserAlreadyExistsException(UUID keycloakUserId) {
-        super(String.format(MESSAGE_TEMPLATE, keycloakUserId));
+        super(String.format("User with ID %s already exists.", keycloakUserId));
     }
 }
