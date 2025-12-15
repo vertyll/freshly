@@ -35,6 +35,7 @@ Application with air quality data from IoT sensors.
 - and many other features that can be found in the application code
 
 ### Core front-end:
+- in progress
 
 ### Other:
 - Docker for development environment
