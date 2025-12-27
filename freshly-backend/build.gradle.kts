@@ -41,6 +41,17 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-mail")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
+	// JWT
+	implementation("io.jsonwebtoken:jjwt-api:0.12.3")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
+
+	// Keycloak
+	implementation("org.keycloak:keycloak-admin-client:26.0.7")
+
+	// Apache HTTP Client (required by Keycloak admin client)
+	implementation("org.apache.httpcomponents.client5:httpclient5:5.6")
+
 	// Thymeleaf and Spring Security integration
 	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
 

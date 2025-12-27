@@ -13,6 +13,8 @@ spring:
     username: ${MONGO_USERNAME}
     password: ${MONGO_PASSWORD}
     authentication-database: ${MONGO_AUTH_DATABASE:admin}
+    representation:
+      uuid: STANDARD
 
   mail:
     host: ${MAIL_HOST}
@@ -36,23 +38,13 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URI}
-      client:
-        registration.freshly:
-            client-id: ${KEYCLOAK_CLIENT_ID}
-            client-secret: ${KEYCLOAK_CLIENT_SECRET}
-            scope:
-              - openid
-              - profile
-              - roles
-            authorization-grant-type: authorization_code
-            redirect-uri: ${APP_BASE_URL}/login/oauth2/code/{registrationId}
 
-        provider.freshly:
-            authorization-uri: ${KEYCLOAK_AUTHORIZATION_URI}
-            token-uri: ${KEYCLOAK_TOKEN_URI}
-            jwk-set-uri: ${KEYCLOAK_JWK_SET_URI}
-            user-info-uri: ${KEYCLOAK_USER_INFO_URI}
-            user-name-attribute: preferred_username
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration:
+      email-verification: ${JWT_EXPIRATION_EMAIL_VERIFICATION:86400000}
+      password-reset: ${JWT_EXPIRATION_PASSWORD_RESET:3600000}
 
 application:
   file:
@@ -62,6 +54,14 @@ application:
   frontend:
     url: ${FRONTEND_URL}
 
+  keycloak:
+    server-url: ${KEYCLOAK_SERVER_URL}
+    realm: ${KEYCLOAK_REALM}
+    admin-client-id: ${KEYCLOAK_ADMIN_CLIENT_ID}
+    admin-username: ${KEYCLOAK_ADMIN_USERNAME}
+    admin-password: ${KEYCLOAK_ADMIN_PASSWORD}
+    user-client-id: ${KEYCLOAK_USER_CLIENT_ID}
+
 server:
   port: ${SERVER_PORT:8080}
 
@@ -70,3 +70,4 @@ logging:
     root: WARN
     com.vertyll.freshly: INFO
     org.springframework.security: INFO
+    org.springframework.mail: INFO
