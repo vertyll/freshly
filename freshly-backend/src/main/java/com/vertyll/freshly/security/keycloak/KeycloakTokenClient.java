@@ -1,0 +1,129 @@
+package com.vertyll.freshly.security.keycloak;
+
+import com.vertyll.freshly.auth.api.dto.TokenResponseDto;
+import com.vertyll.freshly.auth.domain.exception.InvalidPasswordException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClient;
+
+import java.util.Map;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class KeycloakTokenClient {
+
+    private final RestClient restClient;
+    private final KeycloakProperties properties;
+
+    private String getTokenUrl() {
+        return properties.getServerUrl() + "/realms/" + properties.getRealm()
+                + "/protocol/openid-connect/token";
+    }
+
+    private String getLogoutUrl() {
+        return properties.getServerUrl() + "/realms/" + properties.getRealm()
+                + "/protocol/openid-connect/logout";
+    }
+
+    /**
+     * Get tokens using username/password (Resource Owner Password Credentials Grant)
+     */
+    public TokenResponseDto getToken(String username, String password) {
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("grant_type", "password");
+        formData.add("client_id", properties.getUserClientId());
+        formData.add("username", username);
+        formData.add("password", password);
+
+        try {
+            Map<String, Object> response = restClient.post()
+                    .uri(getTokenUrl())
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(formData)
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<>() {});
+
+            return mapToTokenResponse(response);
+
+        } catch (HttpClientErrorException.Unauthorized e) {
+            log.warn("Login failed for user: {}", username);
+            throw new InvalidPasswordException("Invalid username or password");
+        } catch (Exception e) {
+            log.error("Error during login for user: {}", username, e);
+            throw new RuntimeException("Login failed", e);
+        }
+    }
+
+    /**
+     * Refresh access token using refresh token
+     */
+    public TokenResponseDto refreshToken(String refreshToken) {
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("grant_type", "refresh_token");
+        formData.add("client_id", properties.getUserClientId());
+        formData.add("refresh_token", refreshToken);
+
+        try {
+            Map<String, Object> response = restClient.post()
+                    .uri(getTokenUrl())
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(formData)
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<>() {});
+
+            return mapToTokenResponse(response);
+
+        } catch (HttpClientErrorException.Unauthorized e) {
+            log.warn("Refresh token invalid or expired");
+            throw new InvalidPasswordException("Refresh token invalid or expired");
+        } catch (Exception e) {
+            log.error("Error during token refresh", e);
+            throw new RuntimeException("Token refresh failed", e);
+        }
+    }
+
+    /**
+     * Logout (revoke refresh token)
+     */
+    public void logout(String refreshToken) {
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("client_id", properties.getUserClientId());
+        formData.add("refresh_token", refreshToken);
+
+        try {
+            restClient.post()
+                    .uri(getLogoutUrl())
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(formData)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            log.info("User logged out successfully");
+
+        } catch (Exception e) {
+            log.error("Error during logout", e);
+            // Don't throw - logout should always succeed from user perspective
+        }
+    }
+
+    private TokenResponseDto mapToTokenResponse(Map<String, Object> response) {
+        if (response == null) {
+            throw new RuntimeException("Empty response from Keycloak");
+        }
+
+        return new TokenResponseDto(
+                (String) response.get("access_token"),
+                (String) response.get("refresh_token"),
+                (Integer) response.get("expires_in"),
+                (Integer) response.get("refresh_expires_in"),
+                (String) response.getOrDefault("token_type", "Bearer")
+        );
+    }
+}

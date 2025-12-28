@@ -173,4 +173,8 @@ public class KeycloakAdminClient {
             throw new RuntimeException("Failed to verify password", e);
         }
     }
+
+    public List<UserRepresentation> findUsersByEmail(String email) {
+        return getRealm().users().searchByEmail(email, true);
+    }
 }

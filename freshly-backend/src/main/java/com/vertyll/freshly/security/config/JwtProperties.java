@@ -7,8 +7,15 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public record JwtProperties(
         String secret,
+        RefreshToken refreshToken,
         Expiration expiration
 ) {
+    public record RefreshToken(
+            long expiration,
+            String cookieName
+    ) {
+    }
+
     public record Expiration(
             long emailVerification,
             long passwordReset

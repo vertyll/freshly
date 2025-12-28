@@ -45,6 +45,14 @@ security:
     expiration:
       email-verification: ${JWT_EXPIRATION_EMAIL_VERIFICATION:86400000}
       password-reset: ${JWT_EXPIRATION_PASSWORD_RESET:3600000}
+    refresh-token:
+      expiration: ${JWT_REFRESH_EXPIRATION:1800000}
+      cookie-name: "refresh_token"
+    cookie:
+      httpOnly: true
+      secure: true
+      sameSite: Strict
+      path: "/"
 
 application:
   file:

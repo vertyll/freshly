@@ -55,6 +55,14 @@ security:
     expiration:
       email-verification: 86400000
       password-reset: 3600000
+    refresh-token:
+      expiration: 1800000
+      cookie-name: "refresh_token"
+    cookie:
+      httpOnly: true
+      secure: false
+      sameSite: Strict
+      path: "/"
 
 application:
   file:

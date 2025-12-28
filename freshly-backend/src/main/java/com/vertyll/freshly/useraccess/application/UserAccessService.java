@@ -57,7 +57,7 @@ public class UserAccessService {
         SystemUser user = systemUserRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        user.deactivate(loggedInUserId);
+        user.deactivateSelf();
         systemUserRepository.save(user);
 
         log.info("User {} deactivated by {}", userId, loggedInUserId);

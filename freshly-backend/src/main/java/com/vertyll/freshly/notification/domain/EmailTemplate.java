@@ -5,8 +5,7 @@ import lombok.Getter;
 public enum EmailTemplate {
     USER_REGISTERED("user-registered", "Welcome to Freshly!"),
     EMAIL_VERIFICATION("email-verification", "Verify Your Email Address"),
-    PASSWORD_RESET("password-reset", "Reset Your Password"),
-    EMAIL_CHANGED("email-changed", "Email Address Changed");
+    PASSWORD_RESET("password-reset", "Reset Your Password");
 
     private final String templateName;
     @Getter

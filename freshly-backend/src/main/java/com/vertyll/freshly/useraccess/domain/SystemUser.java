@@ -45,6 +45,13 @@ public final class SystemUser {
         isActive = false;
     }
 
+    public void deactivateSelf() {
+        if (!isActive) {
+            throw new UserAlreadyInactiveException(keycloakUserId);
+        }
+        isActive = false;
+    }
+
     public void replaceRoles(Set<UserRoleEnum> newRoles) {
         Set<UserRoleEnum> copiedRoles = Set.copyOf(Objects.requireNonNull(newRoles, "Roles cannot be null"));
         if (copiedRoles.isEmpty()) {

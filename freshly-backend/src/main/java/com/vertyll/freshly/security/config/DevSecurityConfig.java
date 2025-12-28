@@ -30,7 +30,15 @@ public class DevSecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                        .requestMatchers("/auth/register", "/auth/verify-email").permitAll()
+                        .requestMatchers(
+                                "/auth/register",
+                                "/auth/login",
+                                "/auth/refresh",
+                                "/auth/logout",
+                                "/auth/verify-email",
+                                "/auth/forgot-password",
+                                "/auth/reset-password"
+                        ).permitAll()
                         .requestMatchers("/auth/change-password", "/auth/change-email").authenticated()
                         .requestMatchers("/users/**").authenticated()
                         .anyRequest().authenticated()
