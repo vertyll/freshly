@@ -17,8 +17,11 @@ public class NotificationService {
     private final EmailSender emailSender;
 
     public void sendEmail(SendEmailCommand command) {
-        log.info("Sending email to: {} using template: {}",
-                command.recipientEmail(), command.template());
+        log.info(
+                "Sending email to: {} using template: {}",
+                command.recipientEmail(),
+                command.template()
+        );
 
         Email recipient = new Email(command.recipientEmail());
 

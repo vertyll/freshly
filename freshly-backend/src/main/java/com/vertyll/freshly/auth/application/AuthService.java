@@ -1,6 +1,6 @@
 package com.vertyll.freshly.auth.application;
 
-import com.vertyll.freshly.auth.api.dto.TokenResponseDto;
+import com.vertyll.freshly.auth.api.dto.*;
 import com.vertyll.freshly.auth.domain.VerificationTokenService;
 import com.vertyll.freshly.auth.domain.event.UserRegisteredEvent;
 import com.vertyll.freshly.notification.application.NotificationService;
@@ -36,18 +36,16 @@ public class AuthService {
     private String frontendUrl;
 
     @Transactional
-    public UUID registerUser(
-            String username,
-            String email,
-            String password,
-            String firstName,
-            String lastName
-    ) {
+    public UUID registerUser(RegisterUserRequestDto request) {
 
-        log.info("Registering user: {}", username);
+        log.info("Registering user: {}", request.username());
 
         UUID keycloakUserId = keycloakAdminClient.createUser(
-                username, email, password, firstName, lastName
+                request.username(),
+                request.email(),
+                request.password(),
+                request.firstName(),
+                request.lastName()
         );
 
         try {
@@ -58,15 +56,24 @@ public class AuthService {
             );
 
             String verificationToken = verificationTokenService.generateEmailVerificationToken(
-                    keycloakUserId, email
+                    keycloakUserId,
+                    request.email()
             );
             String verificationLink = frontendUrl + "/verify-email?token=" + verificationToken;
 
-            notificationService.sendEmailVerification(email, username, verificationLink);
+            notificationService.sendEmailVerification(
+                    request.email(),
+                    request.username(),
+                    verificationLink
+            );
 
-            eventPublisher.publishEvent(new UserRegisteredEvent(keycloakUserId, username, email));
+            eventPublisher.publishEvent(new UserRegisteredEvent(
+                    keycloakUserId,
+                    request.username(),
+                    request.email()
+            ));
 
-            log.info("User registered successfully: {}", username);
+            log.info("User registered successfully: {}", request.username());
             return keycloakUserId;
 
         } catch (Exception e) {
@@ -90,11 +97,11 @@ public class AuthService {
         log.info("Email verified for user: {}", userId);
     }
 
-    public TokenResponseDto login(String username, String password) {
-        log.info("Processing login for user: {}", username);
+    public TokenResponseDto login(LoginRequestDto request) {
+        log.info("Processing login for user: {}", request.username());
 
         // Delegate to Keycloak token endpoint
-        return keycloakTokenClient.getToken(username, password);
+        return keycloakTokenClient.getToken(request.username(), request.password());
     }
 
     public TokenResponseDto refreshToken(String refreshToken) {
@@ -112,14 +119,14 @@ public class AuthService {
     }
 
     @Transactional
-    public void initiatePasswordReset(String email) {
-        log.info("Password reset initiated for email: {}", email);
+    public void initiatePasswordReset(ForgotPasswordRequestDto request) {
+        log.info("Password reset initiated for email: {}", request.email());
 
-        List<UserRepresentation> users = keycloakAdminClient.findUsersByEmail(email);
+        List<UserRepresentation> users = keycloakAdminClient.findUsersByEmail(request.email());
 
         if (users.isEmpty()) {
             // Security: Don't reveal if email exists
-            log.warn("Password reset requested for non-existent email: {}", email);
+            log.warn("Password reset requested for non-existent email: {}", request.email());
             return;
         }
 
@@ -127,47 +134,52 @@ public class AuthService {
         UUID userId = UUID.fromString(user.getId());
         String username = user.getUsername();
 
-        String resetToken = verificationTokenService.generatePasswordResetToken(userId, email);
+        String resetToken = verificationTokenService.generatePasswordResetToken(userId, request.email());
         String resetLink = frontendUrl + "/reset-password?token=" + resetToken;
 
-        notificationService.sendPasswordResetEmail(email, username, resetLink);
+        notificationService.sendPasswordResetEmail(request.email(), username, resetLink);
 
-        log.info("Password reset email sent to: {}", email);
+        log.info("Password reset email sent to: {}", request.email());
     }
 
     @Transactional
-    public void resetPassword(String token, String newPassword) {
+    public void resetPassword(ResetPasswordRequestDto request) {
         log.info("Processing password reset");
 
-        UUID userId = verificationTokenService.validatePasswordResetToken(token);
+        UUID userId = verificationTokenService.validatePasswordResetToken(request.token());
 
         // Change password in Keycloak
-        keycloakAdminClient.changePassword(userId, newPassword);
+        keycloakAdminClient.changePassword(userId, request.newPassword());
 
         log.info("Password reset successful for user: {}", userId);
     }
 
-    public void changePassword(UUID userId, String currentPassword, String newPassword) {
+    public void changePassword(UUID userId, ChangePasswordRequestDto request) {
         String username = keycloakAdminClient.getUsernameById(userId);
 
-        keycloakAdminClient.verifyPassword(username, currentPassword);
+        keycloakAdminClient.verifyPassword(username, request.currentPassword());
 
-        keycloakAdminClient.changePassword(userId, newPassword);
+        keycloakAdminClient.changePassword(userId, request.newPassword());
 
         log.info("Password changed successfully for user: {}", userId);
     }
 
     @Transactional
-    public void changeEmail(UUID userId, String newEmail) {
-        keycloakAdminClient.changeEmail(userId, newEmail);
+    public void changeEmail(UUID userId, ChangeEmailRequestDto request) {
+        keycloakAdminClient.changeEmail(userId, request.newEmail());
         userAccessService.deactivateUser(userId, userId);
 
         String verificationToken = verificationTokenService.generateEmailVerificationToken(
-                userId, newEmail
+                userId,
+                request.newEmail()
         );
         String verificationLink = frontendUrl + "/verify-email?token=" + verificationToken;
 
-        notificationService.sendEmailVerification(newEmail, "User", verificationLink);
+        notificationService.sendEmailVerification(
+                request.newEmail(),
+                "User",
+                verificationLink
+        );
 
         log.info("Email change initiated for user: {}", userId);
     }

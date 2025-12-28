@@ -3,6 +3,7 @@ package com.vertyll.freshly.auth.api;
 import com.vertyll.freshly.auth.api.dto.*;
 import com.vertyll.freshly.auth.application.AuthService;
 import com.vertyll.freshly.common.response.ApiResponse;
+import com.vertyll.freshly.security.annotation.RefreshTokenCookie;
 import com.vertyll.freshly.security.config.CookieProperties;
 import com.vertyll.freshly.security.config.JwtProperties;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,18 +36,9 @@ public class AuthController {
 
         log.info("Registering new user: {}", request.username());
 
-        UUID userId = authService.registerUser(
-                request.username(),
-                request.email(),
-                request.password(),
-                request.firstName(),
-                request.lastName()
-        );
+        UUID userId = authService.registerUser(request);
 
-        AuthResponseDto response = new AuthResponseDto(
-                userId,
-                "Registration successful. Please check your email to verify your account."
-        );
+        AuthResponseDto response = new AuthResponseDto(userId);
 
         return ApiResponse.buildResponse(response, "User registered successfully", HttpStatus.CREATED);
     }
@@ -71,7 +63,7 @@ public class AuthController {
     ) {
         log.info("User login attempt: {}", request.username());
 
-        TokenResponseDto tokens = authService.login(request.username(), request.password());
+        TokenResponseDto tokens = authService.login(request);
 
         setRefreshTokenCookie(response, tokens.refreshToken());
 
@@ -86,7 +78,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<AccessTokenResponseDto>> refreshToken(
-            @CookieValue(name = "refresh_token", required = false) String refreshToken,
+            @RefreshTokenCookie String refreshToken,
             HttpServletResponse response
     ) {
         log.info("Refreshing access token");
@@ -110,7 +102,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
-            @CookieValue(name = "refresh_token", required = false) String refreshToken,
+            @RefreshTokenCookie String refreshToken,
             HttpServletResponse response
     ) {
         log.info("User logout");
@@ -130,7 +122,7 @@ public class AuthController {
     ) {
         log.info("Password reset requested for email: {}", request.email());
 
-        authService.initiatePasswordReset(request.email());
+        authService.initiatePasswordReset(request);
 
         return ApiResponse.buildResponse(
                 null,
@@ -145,7 +137,7 @@ public class AuthController {
     ) {
         log.info("Resetting password with token");
 
-        authService.resetPassword(request.token(), request.newPassword());
+        authService.resetPassword(request);
 
         return ApiResponse.buildResponse(
                 null,
@@ -163,7 +155,7 @@ public class AuthController {
         UUID userId = UUID.fromString(jwt.getSubject());
         log.info("Changing password for user: {}", userId);
 
-        authService.changePassword(userId, request.currentPassword(), request.newPassword());
+        authService.changePassword(userId, request);
 
         return ApiResponse.buildResponse(
                 null,
@@ -181,7 +173,7 @@ public class AuthController {
         UUID userId = UUID.fromString(jwt.getSubject());
         log.info("Changing email for user: {}", userId);
 
-        authService.changeEmail(userId, request.newEmail());
+        authService.changeEmail(userId, request);
 
         return ApiResponse.buildResponse(
                 null,
