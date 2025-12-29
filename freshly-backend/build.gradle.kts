@@ -40,6 +40,10 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
 	implementation("org.springframework.boot:spring-boot-starter-mail")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+	
+	// AspectJ for custom security annotations
+	implementation("org.springframework:spring-aop")
+	implementation("org.aspectj:aspectjweaver")
 
 	// JWT
 	implementation("io.jsonwebtoken:jjwt-api:0.12.3")

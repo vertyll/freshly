@@ -1,28 +1,23 @@
 package com.vertyll.freshly.permission.application;
 
 import com.vertyll.freshly.permission.Permission;
-import com.vertyll.freshly.permission.domain.RolePermissionMapping;
-import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Service responsible for checking user permissions based on their Keycloak roles.
- * Uses caching to optimize performance.
+ * Delegates permission fetching to UserPermissionCache for caching support.
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PermissionService {
 
-    private final RolePermissionMappingRepository rolePermissionRepository;
+    private final UserPermissionCache permissionCache;
 
     /**
      * Check if the authenticated user has a specific permission.
@@ -37,7 +32,7 @@ public class PermissionService {
             return false;
         }
 
-        Set<Permission> userPermissions = getUserPermissions(authentication);
+        Set<Permission> userPermissions = permissionCache.getUserPermissions(authentication);
 
         boolean hasPermission = userPermissions.stream()
                 .anyMatch(p -> p.getValue().equals(permissionValue));
@@ -48,32 +43,24 @@ public class PermissionService {
 
     /**
      * Get all permissions for the authenticated user based on their roles.
-     * Results are cached per username for performance.
+     * This method delegates to the cache component.
      *
      * @param authentication Spring Security authentication object
      * @return Set of permissions
      */
-    @Cacheable(value = "user-permissions", key = "#authentication.name")
     public Set<Permission> getUserPermissions(Authentication authentication) {
-        Set<String> roles = extractRoles(authentication);
-
-        log.debug("Fetching permissions for user '{}' with roles: {}",
-                authentication.getName(), roles);
-
-        Set<Permission> permissions = rolePermissionRepository.findByKeycloakRoleIn(roles)
-                .stream()
-                .map(RolePermissionMapping::getPermission)
-                .collect(Collectors.toSet());
-
-        log.debug("User '{}' has permissions: {}", authentication.getName(), permissions);
-        return permissions;
+        return permissionCache.getUserPermissions(authentication);
     }
 
     /**
      * Check if user has any of the specified permissions.
+     *
+     * @param authentication   Spring Security authentication object
+     * @param permissionValues Variable number of permission values to check
+     * @return true if user has at least one of the specified permissions
      */
     public boolean hasAnyPermission(Authentication authentication, String... permissionValues) {
-        Set<Permission> userPermissions = getUserPermissions(authentication);
+        Set<Permission> userPermissions = permissionCache.getUserPermissions(authentication);
 
         for (String permissionValue : permissionValues) {
             if (userPermissions.stream().anyMatch(p -> p.getValue().equals(permissionValue))) {
@@ -81,32 +68,5 @@ public class PermissionService {
             }
         }
         return false;
-    }
-
-    /**
-     * Check if user has all of the specified permissions.
-     */
-    public boolean hasAllPermissions(Authentication authentication, String... permissionValues) {
-        Set<Permission> userPermissions = getUserPermissions(authentication);
-
-        for (String permissionValue : permissionValues) {
-            if (userPermissions.stream().noneMatch(p -> p.getValue().equals(permissionValue))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Extract Keycloak roles from Spring Security authentication.
-     * Removes "ROLE_" prefix that Spring adds.
-     */
-    private Set<String> extractRoles(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(authority -> authority.startsWith("ROLE_")
-                        ? authority.substring(5)
-                        : authority)
-                .collect(Collectors.toSet());
     }
 }
