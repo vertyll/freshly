@@ -22,6 +22,11 @@ public enum Permission {
     AUTH_CHANGE_PASSWORD("auth:change-password"),
     AUTH_CHANGE_EMAIL("auth:change-email"),
 
+    // Reports
+    REPORTS_READ("reports:read"),
+    REPORTS_GENERATE("reports:generate"),
+    REPORTS_DELETE("reports:delete"),
+
     // Settings
     SETTINGS_MANAGE("settings:manage");
 
