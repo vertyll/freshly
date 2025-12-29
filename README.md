@@ -31,6 +31,7 @@ Application with air quality data from IoT sensors.
 - the application has separate environments for dev and prod
 - the application has a dedicated configuration file
 - the application has Keycloak integration for authentication and authorization
+- the application has permission management based on keycloak roles
 - the application written in Domain-Driven Design (DDD) style
 - and many other features that can be found in the application code
 
