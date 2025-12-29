@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -62,6 +63,12 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleNoResourceFound(NoResourceFoundException ex) {
         logger.warn("Resource not found: {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "The requested resource was not found");
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ProblemDetail handleAuthorizationDenied(AuthorizationDeniedException ex) {
+        logger.warn("Authorization denied: {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "You do not have permission to access this resource");
     }
 
     @ExceptionHandler(Exception.class)

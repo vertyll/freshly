@@ -1,6 +1,7 @@
 package com.vertyll.freshly.useraccess.api;
 
 import com.vertyll.freshly.common.response.ApiResponse;
+import com.vertyll.freshly.security.annotation.RequirePermission;
 import com.vertyll.freshly.useraccess.api.dto.CreateUserRequestDto;
 import com.vertyll.freshly.useraccess.api.dto.UpdateUserRolesRequestDto;
 import com.vertyll.freshly.useraccess.api.dto.UserResponseDto;
@@ -29,6 +30,7 @@ public class UserController {
     private final UserDtoMapper userDtoMapper;
 
     @PostMapping
+    @RequirePermission("users:create")
     public ResponseEntity<ApiResponse<UserResponseDto>> createUser(
             @Valid @RequestBody CreateUserRequestDto request) {
 
@@ -48,6 +50,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
+    @RequirePermission("users:read")
     public ResponseEntity<ApiResponse<UserResponseDto>> getUserById(@PathVariable UUID userId) {
         log.info("Fetching user: {}", userId);
 
@@ -61,6 +64,7 @@ public class UserController {
     }
 
     @GetMapping
+    @RequirePermission("users:read")
     public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUsers() {
         log.info("Fetching all users");
 
@@ -74,6 +78,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/activate")
+    @RequirePermission("users:activate")
     public ResponseEntity<ApiResponse<Void>> activateUser(@PathVariable UUID userId) {
         log.info("Activating user: {}", userId);
 
@@ -87,6 +92,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/deactivate")
+    @RequirePermission("users:deactivate")
     public ResponseEntity<ApiResponse<Void>> deactivateUser(
             @PathVariable UUID userId,
             @AuthenticationPrincipal Jwt jwt) {
@@ -104,6 +110,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/roles")
+    @RequirePermission("users:manage-roles")
     public ResponseEntity<ApiResponse<Void>> updateUserRoles(
             @PathVariable UUID userId,
             @Valid @RequestBody UpdateUserRolesRequestDto request) {

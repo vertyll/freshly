@@ -1,5 +1,7 @@
 package com.vertyll.freshly.notification.domain;
 
+import org.jspecify.annotations.NonNull;
+
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -17,7 +19,7 @@ public record Email(String value) {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return value;
     }
 }

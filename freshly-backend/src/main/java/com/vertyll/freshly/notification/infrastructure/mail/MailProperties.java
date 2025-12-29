@@ -1,16 +1,15 @@
 package com.vertyll.freshly.notification.infrastructure.mail;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
-@Getter
-@Setter
 @ConfigurationProperties(prefix = "spring.mail")
-class MailProperties {
-    private String host;
-    private int port;
-    private String username;
-    private String password;
-    private String from;
+@Validated
+record MailProperties(
+        String host,
+        int port,
+        String username,
+        String password,
+        String from
+) {
 }

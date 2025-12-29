@@ -32,15 +32,18 @@ class SmtpEmailSender implements EmailSender {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(mailProperties.getFrom());
+            helper.setFrom(mailProperties.from());
             helper.setTo(notification.getRecipient().value());
             helper.setSubject(notification.getTemplate().getSubject());
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
 
-            log.debug("Email sent successfully: template={}, recipient={}",
-                    notification.getTemplate(), notification.getRecipient());
+            log.debug(
+                    "Email sent successfully: template={}, recipient={}",
+                    notification.getTemplate(),
+                    notification.getRecipient()
+            );
 
         } catch (MessagingException e) {
             log.error("Failed to send email: {}", e.getMessage());
