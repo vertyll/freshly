@@ -23,12 +23,12 @@ public class KeycloakTokenClient {
     private final KeycloakProperties properties;
 
     private String getTokenUrl() {
-        return properties.getServerUrl() + "/realms/" + properties.getRealm()
+        return properties.serverUrl() + "/realms/" + properties.realm()
                 + "/protocol/openid-connect/token";
     }
 
     private String getLogoutUrl() {
-        return properties.getServerUrl() + "/realms/" + properties.getRealm()
+        return properties.serverUrl() + "/realms/" + properties.realm()
                 + "/protocol/openid-connect/logout";
     }
 
@@ -38,7 +38,7 @@ public class KeycloakTokenClient {
     public TokenResponseDto getToken(String username, String password) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "password");
-        formData.add("client_id", properties.getUserClientId());
+        formData.add("client_id", properties.userClientId());
         formData.add("username", username);
         formData.add("password", password);
 
@@ -67,7 +67,7 @@ public class KeycloakTokenClient {
     public TokenResponseDto refreshToken(String refreshToken) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "refresh_token");
-        formData.add("client_id", properties.getUserClientId());
+        formData.add("client_id", properties.userClientId());
         formData.add("refresh_token", refreshToken);
 
         try {
@@ -94,7 +94,7 @@ public class KeycloakTokenClient {
      */
     public void logout(String refreshToken) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("client_id", properties.getUserClientId());
+        formData.add("client_id", properties.userClientId());
         formData.add("refresh_token", refreshToken);
 
         try {

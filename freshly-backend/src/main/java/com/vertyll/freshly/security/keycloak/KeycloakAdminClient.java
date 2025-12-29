@@ -35,7 +35,7 @@ public class KeycloakAdminClient {
     private final RestClient restClient;
 
     private RealmResource getRealm() {
-        return keycloak.realm(properties.getRealm());
+        return keycloak.realm(properties.realm());
     }
 
     public UUID createUser(String username, String email, String password, String firstName, String lastName) {
@@ -143,11 +143,11 @@ public class KeycloakAdminClient {
     public void verifyPassword(String username, String password) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "password");
-        formData.add("client_id", properties.getUserClientId());
+        formData.add("client_id", properties.userClientId());
         formData.add("username", username);
         formData.add("password", password);
 
-        String tokenUrl = properties.getServerUrl() + "/realms/" + properties.getRealm()
+        String tokenUrl = properties.serverUrl() + "/realms/" + properties.realm()
                 + "/protocol/openid-connect/token";
 
         try {

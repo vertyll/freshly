@@ -14,11 +14,11 @@ public class KeycloakConfig {
     @Bean
     public Keycloak keycloak(KeycloakProperties properties) {
         return KeycloakBuilder.builder()
-                .serverUrl(properties.getServerUrl())
+                .serverUrl(properties.serverUrl())
                 .realm("master")
-                .clientId(properties.getAdminClientId())
-                .username(properties.getAdminUsername())
-                .password(properties.getAdminPassword())
+                .clientId(properties.adminClientId())
+                .username(properties.adminUsername())
+                .password(properties.adminPassword())
                 .build();
     }
 
