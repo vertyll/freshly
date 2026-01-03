@@ -11,6 +11,7 @@ import com.vertyll.freshly.useraccess.domain.SystemUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,6 +29,7 @@ public class UserController {
 
     private final UserAccessService userAccessService;
     private final UserDtoMapper userDtoMapper;
+    private final MessageSource messageSource;
 
     @PostMapping
     @RequirePermission("users:create")
@@ -44,7 +46,8 @@ public class UserController {
 
         return ApiResponse.buildResponse(
                 userDtoMapper.toResponse(user),
-                "User created successfully",
+                "success.user.created",
+                messageSource,
                 HttpStatus.CREATED
         );
     }
@@ -58,7 +61,8 @@ public class UserController {
 
         return ApiResponse.buildResponse(
                 userDtoMapper.toResponse(user),
-                "User retrieved successfully",
+                "success.user.fetched",
+                messageSource,
                 HttpStatus.OK
         );
     }
@@ -72,7 +76,8 @@ public class UserController {
 
         return ApiResponse.buildResponse(
                 userDtoMapper.toResponseList(users),
-                "Users retrieved successfully",
+                "success.user.listFetched",
+                messageSource,
                 HttpStatus.OK
         );
     }
@@ -86,7 +91,8 @@ public class UserController {
 
         return ApiResponse.buildResponse(
                 null,
-                "User activated successfully",
+                "success.user.activated",
+                messageSource,
                 HttpStatus.OK
         );
     }
@@ -104,7 +110,8 @@ public class UserController {
 
         return ApiResponse.buildResponse(
                 null,
-                "User deactivated successfully",
+                "success.user.deactivated",
+                messageSource,
                 HttpStatus.OK
         );
     }
@@ -121,7 +128,8 @@ public class UserController {
 
         return ApiResponse.buildResponse(
                 null,
-                "User roles updated successfully",
+                "success.user.rolesUpdated",
+                messageSource,
                 HttpStatus.OK
         );
     }

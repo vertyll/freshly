@@ -9,5 +9,9 @@ public interface SystemUserRepository {
 
     Optional<SystemUser> findById(UUID id);
 
+    Optional<SystemUser> findByKeycloakUserId(UUID keycloakUserId);
+
     List<SystemUser> findAll();
+
+    void delete(UUID keycloakUserId);
 }

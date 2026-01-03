@@ -4,8 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public record ChangeEmailRequestDto(
-        @NotBlank(message = "New email is required")
-        @Email(message = "Email must be valid")
+        @NotBlank(message = "{validation.email.new.required}")
+        @Email(message = "{validation.email.invalid}")
         String newEmail
 ) {
 }

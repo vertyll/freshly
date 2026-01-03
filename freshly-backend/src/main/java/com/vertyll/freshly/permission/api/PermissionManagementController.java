@@ -8,6 +8,7 @@ import com.vertyll.freshly.permission.application.PermissionManagementService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +26,7 @@ import java.util.UUID;
 public class PermissionManagementController {
 
     private final PermissionManagementService permissionManagementService;
+    private final MessageSource messageSource;
 
     @GetMapping("/available")
     public ResponseEntity<ApiResponse<List<String>>> getAvailablePermissions() {
@@ -34,11 +36,7 @@ public class PermissionManagementController {
                 .map(Permission::getValue)
                 .toList();
 
-        return ApiResponse.buildResponse(
-                permissions,
-                "Available permissions retrieved successfully",
-                HttpStatus.OK
-        );
+        return ApiResponse.buildResponse(permissions, "success.permission.availableFetched", messageSource, HttpStatus.OK);
     }
 
     @GetMapping("/mappings")
@@ -47,11 +45,7 @@ public class PermissionManagementController {
 
         List<PermissionMappingResponseDto> mappings = permissionManagementService.getAllMappings();
 
-        return ApiResponse.buildResponse(
-                mappings,
-                "Mappings retrieved successfully",
-                HttpStatus.OK
-        );
+        return ApiResponse.buildResponse(mappings, "success.permission.mappingsFetched", messageSource, HttpStatus.OK);
     }
 
     @GetMapping("/mappings/role/{role}")
@@ -63,11 +57,7 @@ public class PermissionManagementController {
 
         List<PermissionMappingResponseDto> mappings = permissionManagementService.getMappingsByRole(role);
 
-        return ApiResponse.buildResponse(
-                mappings,
-                "Role permissions retrieved successfully",
-                HttpStatus.OK
-        );
+        return ApiResponse.buildResponse(mappings, "success.permission.mappingsByRoleFetched", messageSource, HttpStatus.OK);
     }
 
     @PostMapping("/mappings")
@@ -83,11 +73,7 @@ public class PermissionManagementController {
 
         PermissionMappingResponseDto mapping = permissionManagementService.createMapping(request);
 
-        return ApiResponse.buildResponse(
-                mapping,
-                "Permission mapping created successfully",
-                HttpStatus.CREATED
-        );
+        return ApiResponse.buildResponse(mapping, "success.permission.mappingCreated", messageSource, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/mappings/{mappingId}")
@@ -96,10 +82,6 @@ public class PermissionManagementController {
 
         permissionManagementService.deleteMapping(mappingId);
 
-        return ApiResponse.buildResponse(
-                null,
-                "Permission mapping deleted successfully",
-                HttpStatus.OK
-        );
+        return ApiResponse.buildResponse(null, "success.permission.mappingDeleted", messageSource, HttpStatus.OK);
     }
 }

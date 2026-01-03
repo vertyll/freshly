@@ -30,6 +30,7 @@ repositories {
 }
 
 val mapstructVersion = "1.6.3"
+val testcontainersVersion = "1.21.4"
 
 dependencies {
 	// Internal dependencies
@@ -88,6 +89,15 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-thymeleaf-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-mail-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server-test")
+
+	// Lombok for tests
+	testCompileOnly("org.projectlombok:lombok")
+	testAnnotationProcessor("org.projectlombok:lombok")
+
+	// Testcontainers
+	testImplementation("org.springframework.boot:spring-boot-testcontainers")
+	testImplementation("org.testcontainers:mongodb:$testcontainersVersion")
+	testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
 
 	// JUnit
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")

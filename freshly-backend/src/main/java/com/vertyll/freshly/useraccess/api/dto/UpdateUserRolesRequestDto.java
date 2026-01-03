@@ -7,8 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 
 public record UpdateUserRolesRequestDto(
-        @NotNull(message = "Roles cannot be null")
-        @NotEmpty(message = "Roles cannot be empty")
+        @NotNull(message = "{validation.user.roles.required}")
+        @NotEmpty(message = "{validation.user.roles.required}")
         Set<UserRoleEnum> roles
 ) {
 }

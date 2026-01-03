@@ -127,8 +127,17 @@ public class KeycloakAdminClient {
     }
 
     public void deleteUser(UUID userId) {
-        getRealm().users().delete(userId.toString());
-        log.info("User deleted from Keycloak: {}", userId);
+        try (Response response = getRealm().users().delete(userId.toString())) {
+            if (response.getStatus() >= 200 && response.getStatus() < 300) {
+                log.info("User deleted from Keycloak: {}", userId);
+            } else {
+                log.warn(
+                        "Delete user returned non-success status: status={}, userId={}",
+                        response.getStatus(),
+                        userId
+                );
+            }
+        }
     }
 
     public UserRepresentation getUser(UUID userId) {

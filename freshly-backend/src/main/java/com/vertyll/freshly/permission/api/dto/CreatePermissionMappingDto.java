@@ -3,10 +3,10 @@ package com.vertyll.freshly.permission.api.dto;
 import jakarta.validation.constraints.NotBlank;
 
 public record CreatePermissionMappingDto(
-        @NotBlank(message = "Keycloak role cannot be blank")
+        @NotBlank(message = "{validation.permission.keycloakRole.required}")
         String keycloakRole,
 
-        @NotBlank(message = "Permission cannot be blank")
+        @NotBlank(message = "{validation.permission.permission.required}")
         String permission
 ) {
 }

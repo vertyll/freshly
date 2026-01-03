@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ public class AuthController {
     private final AuthService authService;
     private final CookieProperties cookieProperties;
     private final JwtProperties jwtProperties;
+    private final MessageSource messageSource;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<AuthResponseDto>> register(
@@ -40,7 +42,7 @@ public class AuthController {
 
         AuthResponseDto response = new AuthResponseDto(userId);
 
-        return ApiResponse.buildResponse(response, "User registered successfully", HttpStatus.CREATED);
+        return ApiResponse.buildResponse(response, "success.auth.registered", messageSource, HttpStatus.CREATED);
     }
 
     @GetMapping("/verify-email")
@@ -49,11 +51,7 @@ public class AuthController {
 
         authService.verifyEmail(token);
 
-        return ApiResponse.buildResponse(
-                null,
-                "Email verified successfully. You can now log in.",
-                HttpStatus.OK
-        );
+        return ApiResponse.buildResponse(null, "success.auth.emailVerified", messageSource, HttpStatus.OK);
     }
 
     @PostMapping("/login")
@@ -73,7 +71,7 @@ public class AuthController {
                 tokens.tokenType()
         );
 
-        return ApiResponse.buildResponse(accessTokenResponse, "Login successful", HttpStatus.OK);
+        return ApiResponse.buildResponse(accessTokenResponse, "success.auth.loginSuccessful", messageSource, HttpStatus.OK);
     }
 
     @PostMapping("/refresh")
@@ -97,7 +95,7 @@ public class AuthController {
                 tokens.tokenType()
         );
 
-        return ApiResponse.buildResponse(accessTokenResponse, "Token refreshed successfully", HttpStatus.OK);
+        return ApiResponse.buildResponse(accessTokenResponse, "success.auth.tokenRefreshed", messageSource, HttpStatus.OK);
     }
 
     @PostMapping("/logout")
@@ -113,7 +111,7 @@ public class AuthController {
 
         clearRefreshTokenCookie(response);
 
-        return ApiResponse.buildResponse(null, "Logout successful", HttpStatus.OK);
+        return ApiResponse.buildResponse(null, "success.auth.logoutSuccessful", messageSource, HttpStatus.OK);
     }
 
     @PostMapping("/forgot-password")
@@ -126,7 +124,8 @@ public class AuthController {
 
         return ApiResponse.buildResponse(
                 null,
-                "If an account with this email exists, you will receive a password reset link.",
+                "success.auth.resetEmailSent",
+                messageSource,
                 HttpStatus.OK
         );
     }
@@ -141,7 +140,8 @@ public class AuthController {
 
         return ApiResponse.buildResponse(
                 null,
-                "Password reset successful. You can now log in with your new password.",
+                "success.auth.passwordReset",
+                messageSource,
                 HttpStatus.OK
         );
     }
@@ -159,7 +159,8 @@ public class AuthController {
 
         return ApiResponse.buildResponse(
                 null,
-                "Password changed successfully",
+                "success.auth.passwordChanged",
+                messageSource,
                 HttpStatus.OK
         );
     }
@@ -177,7 +178,8 @@ public class AuthController {
 
         return ApiResponse.buildResponse(
                 null,
-                "Email change initiated. Please check your new email to verify.",
+                "success.auth.emailChangeInitiated",
+                messageSource,
                 HttpStatus.OK
         );
     }

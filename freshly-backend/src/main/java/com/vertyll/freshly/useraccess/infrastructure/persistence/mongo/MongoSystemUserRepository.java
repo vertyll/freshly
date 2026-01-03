@@ -30,9 +30,21 @@ class MongoSystemUserRepository implements SystemUserRepository {
     }
 
     @Override
+    public Optional<SystemUser> findByKeycloakUserId(UUID keycloakUserId) {
+        return springDataRepository.findByKeycloakUserId(keycloakUserId)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public List<SystemUser> findAll() {
         return springDataRepository.findAll().stream()
                 .map(mapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public void delete(UUID keycloakUserId) {
+        springDataRepository.findByKeycloakUserId(keycloakUserId)
+                .ifPresent(springDataRepository::delete);
     }
 }
