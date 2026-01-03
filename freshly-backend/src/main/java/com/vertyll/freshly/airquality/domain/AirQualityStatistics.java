@@ -36,7 +36,7 @@ public record AirQualityStatistics(
         int badCount,
         int veryBadCount
 ) {
-    public String getMostCommonQualityLevel() {
+    public AirQualityLevel getMostCommonQualityLevel() {
         int max = Math.max(
                 veryGoodCount,
                 Math.max(
@@ -49,11 +49,11 @@ public record AirQualityStatistics(
                 )
         );
         
-        if (max == veryGoodCount) return "Bardzo dobry";
-        if (max == goodCount) return "Dobry";
-        if (max == moderateCount) return "Umiarkowany";
-        if (max == sufficientCount) return "Dostateczny";
-        if (max == badCount) return "Zły";
-        return "Bardzo zły";
+        if (max == veryGoodCount) return AirQualityLevel.VERY_GOOD;
+        if (max == goodCount) return AirQualityLevel.GOOD;
+        if (max == moderateCount) return AirQualityLevel.MODERATE;
+        if (max == sufficientCount) return AirQualityLevel.SUFFICIENT;
+        if (max == badCount) return AirQualityLevel.BAD;
+        return AirQualityLevel.VERY_BAD;
     }
 }

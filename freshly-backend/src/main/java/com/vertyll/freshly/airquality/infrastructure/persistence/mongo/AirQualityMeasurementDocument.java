@@ -1,5 +1,6 @@
 package com.vertyll.freshly.airquality.infrastructure.persistence.mongo;
 
+import com.vertyll.freshly.airquality.domain.AirQualityLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,12 +30,12 @@ class AirQualityMeasurementDocument {
     private String stationName;
     private LocalDateTime measurementDate;
 
-    // Index data
-    private String overallIndexLevel;
-    private String so2IndexLevel;
-    private String no2IndexLevel;
-    private String pm10IndexLevel;
-    private String pm25IndexLevel;
+    // Index data - MongoDB stores enum as string (enum name)
+    private AirQualityLevel overallIndexLevel;
+    private AirQualityLevel so2IndexLevel;
+    private AirQualityLevel no2IndexLevel;
+    private AirQualityLevel pm10IndexLevel;
+    private AirQualityLevel pm25IndexLevel;
 
     // Sensor readings
     private Double pm10Value;

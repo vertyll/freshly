@@ -7,10 +7,10 @@ public record StationRanking(
         int rank,
         Station station,
         Double averageScore,
-        String dominantQualityLevel,
+        AirQualityLevel dominantQualityLevel,
         int measurementCount
 ) {
     public boolean hasGoodAirQuality() {
-        return "Bardzo dobry".equalsIgnoreCase(dominantQualityLevel) || "Dobry".equalsIgnoreCase(dominantQualityLevel);
+        return dominantQualityLevel != null && dominantQualityLevel.isGood();
     }
 }

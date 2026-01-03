@@ -134,8 +134,8 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
                 .average()
                 .orElse(0.0);
 
-        // Count quality levels
-        Map<String, Long> qualityCounts = measurements.stream()
+        // Count quality levels (stored as enum in MongoDB)
+        Map<AirQualityLevel, Long> qualityCounts = measurements.stream()
                 .map(AirQualityMeasurementDocument::getOverallIndexLevel)
                 .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(level -> level, Collectors.counting()));
@@ -156,12 +156,12 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
                 no2Avg > 0 ? no2Avg : null,
                 coAvg > 0 ? coAvg : null,
                 o3Avg > 0 ? o3Avg : null,
-                qualityCounts.getOrDefault("Bardzo dobry", 0L).intValue(),
-                qualityCounts.getOrDefault("Dobry", 0L).intValue(),
-                qualityCounts.getOrDefault("Umiarkowany", 0L).intValue(),
-                qualityCounts.getOrDefault("Dostateczny", 0L).intValue(),
-                qualityCounts.getOrDefault("Zły", 0L).intValue(),
-                qualityCounts.getOrDefault("Bardzo zły", 0L).intValue()
+                qualityCounts.getOrDefault(AirQualityLevel.VERY_GOOD, 0L).intValue(),
+                qualityCounts.getOrDefault(AirQualityLevel.GOOD, 0L).intValue(),
+                qualityCounts.getOrDefault(AirQualityLevel.MODERATE, 0L).intValue(),
+                qualityCounts.getOrDefault(AirQualityLevel.SUFFICIENT, 0L).intValue(),
+                qualityCounts.getOrDefault(AirQualityLevel.BAD, 0L).intValue(),
+                qualityCounts.getOrDefault(AirQualityLevel.VERY_BAD, 0L).intValue()
         ));
     }
 
@@ -217,11 +217,21 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
             // Create Station object (simplified - in real scenario you'd fetch full station data)
             Station station = new Station(stationId, stationName, "", "", 0.0, 0.0);
 
+            // Convert dominant quality String to enum (MongoDB returns enum name as String)
+            AirQualityLevel dominantLevel = null;
+            if (dominantQuality != null) {
+                try {
+                    dominantLevel = AirQualityLevel.valueOf(dominantQuality);
+                } catch (IllegalArgumentException e) {
+                    log.warn("Unknown air quality level from database: {}", dominantQuality);
+                }
+            }
+
             rankings.add(new StationRanking(
                     rank++,
                     station,
                     avgScore,
-                    dominantQuality != null ? dominantQuality : "Brak danych",
+                    dominantLevel,
                     measurementCount != null ? measurementCount : 0
             ));
         }

@@ -18,10 +18,10 @@ public interface AirQualityDtoMapper {
     List<StationResponseDto> toStationResponseList(List<Station> stations);
 
     // AirQualityIndex mappings
-    @Mapping(target = "overallIndex", source = "stIndexLevel")
-    @Mapping(target = "so2Index", source = "so2IndexLevel")
-    @Mapping(target = "no2Index", source = "no2IndexLevel")
-    @Mapping(target = "pm10Index", source = "pm10IndexLevel")
+    @Mapping(target = "overallIndex", expression = "java(toApiValue(index.stIndexLevel()))")
+    @Mapping(target = "so2Index", expression = "java(toApiValue(index.so2IndexLevel()))")
+    @Mapping(target = "no2Index", expression = "java(toApiValue(index.no2IndexLevel()))")
+    @Mapping(target = "pm10Index", expression = "java(toApiValue(index.pm10IndexLevel()))")
     AirQualityIndexResponseDto toAirQualityIndexResponse(AirQualityIndex index);
 
     // SensorMeasurement mappings
@@ -32,6 +32,11 @@ public interface AirQualityDtoMapper {
     SensorMeasurementResponseDto.ReadingDto toReadingDto(SensorMeasurement.Reading reading);
 
     // AirQualityMeasurement mappings
+    @Mapping(target = "overallIndexLevel", expression = "java(toApiValue(measurement.getOverallIndexLevel()))")
+    @Mapping(target = "so2IndexLevel", expression = "java(toApiValue(measurement.getSo2IndexLevel()))")
+    @Mapping(target = "no2IndexLevel", expression = "java(toApiValue(measurement.getNo2IndexLevel()))")
+    @Mapping(target = "pm10IndexLevel", expression = "java(toApiValue(measurement.getPm10IndexLevel()))")
+    @Mapping(target = "pm25IndexLevel", expression = "java(toApiValue(measurement.getPm25IndexLevel()))")
     AirQualityMeasurementResponseDto toAirQualityMeasurementResponse(AirQualityMeasurement measurement);
 
     List<AirQualityMeasurementResponseDto> toAirQualityMeasurementResponseList(List<AirQualityMeasurement> measurements);
@@ -46,6 +51,7 @@ public interface AirQualityDtoMapper {
     @Mapping(target = "pm25", expression = "java(mapPm25Stats(stats))")
     @Mapping(target = "otherPollutants", expression = "java(mapOtherPollutants(stats))")
     @Mapping(target = "qualityDistribution", expression = "java(mapQualityDistribution(stats))")
+    @Mapping(target = "mostCommonQualityLevel", expression = "java(toApiValue(stats.getMostCommonQualityLevel()))")
     AirQualityStatisticsResponseDto toStatisticsResponse(AirQualityStatistics stats);
 
     default AirQualityStatisticsResponseDto.Pm10Statistics mapPm10Stats(AirQualityStatistics stats) {
@@ -74,7 +80,17 @@ public interface AirQualityDtoMapper {
     }
 
     // Ranking mappings
+    @Mapping(target = "dominantQualityLevel", expression = "java(toApiValue(ranking.dominantQualityLevel()))")
     StationRankingResponseDto toRankingResponse(StationRanking ranking);
 
     List<StationRankingResponseDto> toRankingResponseList(List<StationRanking> rankings);
+    
+    default String toApiValue(AirQualityLevel level) {
+        return level != null ? level.toApiValue() : null;
+    }
+
+    default String toApiValue(String polishName) {
+        AirQualityLevel level = AirQualityLevel.fromPolishName(polishName);
+        return level != null ? level.toApiValue() : null;
+    }
 }

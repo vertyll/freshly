@@ -22,11 +22,11 @@ public class AirQualityMeasurement {
     private LocalDateTime measurementDate;
 
     // Index data
-    private String overallIndexLevel;
-    private String so2IndexLevel;
-    private String no2IndexLevel;
-    private String pm10IndexLevel;
-    private String pm25IndexLevel;
+    private AirQualityLevel overallIndexLevel;
+    private AirQualityLevel so2IndexLevel;
+    private AirQualityLevel no2IndexLevel;
+    private AirQualityLevel pm10IndexLevel;
+    private AirQualityLevel pm25IndexLevel;
 
     // Sensor readings
     private Double pm10Value;
@@ -51,10 +51,11 @@ public class AirQualityMeasurement {
         measurement.stationId = stationId;
         measurement.stationName = stationName;
         measurement.measurementDate = index.calculationDate();
-        measurement.overallIndexLevel = index.stIndexLevel();
-        measurement.so2IndexLevel = index.so2IndexLevel();
-        measurement.no2IndexLevel = index.no2IndexLevel();
-        measurement.pm10IndexLevel = index.pm10IndexLevel();
+        // Convert Polish names from GIOS API to enum
+        measurement.overallIndexLevel = AirQualityLevel.fromPolishName(index.stIndexLevel());
+        measurement.so2IndexLevel = AirQualityLevel.fromPolishName(index.so2IndexLevel());
+        measurement.no2IndexLevel = AirQualityLevel.fromPolishName(index.no2IndexLevel());
+        measurement.pm10IndexLevel = AirQualityLevel.fromPolishName(index.pm10IndexLevel());
 
         measurement.pm10Value = sensorValues.get("PM10");
         measurement.pm25Value = sensorValues.get("PM2.5");
@@ -68,6 +69,6 @@ public class AirQualityMeasurement {
     }
 
     public boolean hasGoodAirQuality() {
-        return "Bardzo dobry".equalsIgnoreCase(overallIndexLevel) || "Dobry".equalsIgnoreCase(overallIndexLevel);
+        return overallIndexLevel != null && overallIndexLevel.isGood();
     }
 }
