@@ -2,12 +2,14 @@ package com.vertyll.freshly.airquality.api.mapper;
 
 import com.vertyll.freshly.airquality.api.dto.*;
 import com.vertyll.freshly.airquality.domain.*;
+import com.vertyll.freshly.common.mapper.MapStructConfig;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(config = MapStructConfig.class)
 public interface AirQualityDtoMapper {
 
     // Station mappings

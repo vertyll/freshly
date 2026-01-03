@@ -1,5 +1,6 @@
 package com.vertyll.freshly.useraccess.api.mapper;
 
+import com.vertyll.freshly.common.mapper.MapStructConfig;
 import com.vertyll.freshly.useraccess.api.dto.UserResponseDto;
 import com.vertyll.freshly.useraccess.domain.SystemUser;
 import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
+@Mapper(config = MapStructConfig.class)
 public interface UserDtoMapper {
 
     @Mapping(target = "id", source = "keycloakUserId")
