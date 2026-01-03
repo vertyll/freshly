@@ -109,7 +109,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
             }
             return Optional.ofNullable(dto).map(d -> mapToDomain(d, stationId));
         } catch (Exception e) {
-            log.error("Błąd parsowania indeksu jakości powietrza", e);
+            log.error("Błąd parsowania indeksu jakości powietrza ", e);
             return Optional.empty();
         }
     }
