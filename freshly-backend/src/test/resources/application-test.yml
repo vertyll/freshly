@@ -1,0 +1,79 @@
+spring:
+  docker:
+    compose:
+      enabled: false
+
+  mongodb:
+    host: localhost
+    port: 27017
+    database: test_db
+    username: test
+    password: test
+    authentication-database: admin
+    representation:
+      uuid: STANDARD
+
+  mail:
+    host: localhost
+    port: 1025
+    username: vertyll
+    password: vertyll
+    from: no-reply@freshly.local
+    properties:
+      mail:
+        smtp:
+          trust: "*"
+        auth: true
+        starttls:
+          enabled: true
+        connection-timeout: 5000
+        timeout: 3000
+        write-timeout: 5000
+
+  task:
+    scheduling:
+      enabled: false
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/freshly-realm-test
+
+security:
+  jwt:
+    secret: isN5Z1EinzeD2JyjXq6SZqoBd+QpOJMxZsBHwfhXHAA=
+    expiration:
+      email-verification: 3600000
+      password-reset: 1800000
+    refresh-token:
+      expiration: 1800000
+      cookie-name: "refresh_token"
+    cookie:
+      httpOnly: true
+      secure: false
+      sameSite: Strict
+      path: "/"
+
+external-service:
+  gios:
+    api-url: http://localhost:8080/mock-gios-api
+
+application:
+  file:
+    uploads:
+      file-output-path: ./test-uploads
+
+  frontend:
+    url: http://localhost:4200
+
+  keycloak:
+    server-url: http://localhost:8081
+    realm: freshly-realm-test
+    admin-client-id: admin-cli-test
+    admin-username: test-admin
+    admin-password: test-admin
+    user-client-id: freshly-app-client-test
+
+server:
+  port: 0
