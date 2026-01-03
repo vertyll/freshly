@@ -56,7 +56,8 @@ public class DevSecurityConfig {
                         ).permitAll()
 
                         // Swagger UI
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/air-quality/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
                         // All other endpoints require authentication
                         .anyRequest().authenticated()
