@@ -5,8 +5,9 @@ import java.time.LocalDateTime;
 public record AirQualityIndex(
         int stationId,
         LocalDateTime calculationDate,
-        String stIndexLevel, // Ogólny indeks jakości
+        String stIndexLevel, // Global index level
         String so2IndexLevel,
         String no2IndexLevel,
         String pm10IndexLevel
-) {}
+) {
+}

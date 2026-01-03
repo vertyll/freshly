@@ -5,9 +5,13 @@ import java.util.List;
 
 public record SensorMeasurement(
         int sensorId,
-        String paramCode, // np. "PM10", "NO2"
-        String paramName, // np. "pył zawieszony PM10"
+        String paramCode, // e.g. "PM10", "NO2"
+        String paramName, // e.g. "Pył zawieszony PM10"
         List<Reading> readings
 ) {
-    public record Reading(LocalDateTime date, Double value) {}
+    public record Reading(
+            LocalDateTime date,
+            Double value
+    ) {
+    }
 }

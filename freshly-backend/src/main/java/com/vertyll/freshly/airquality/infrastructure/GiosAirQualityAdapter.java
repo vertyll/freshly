@@ -8,15 +8,17 @@ import com.vertyll.freshly.airquality.domain.AirQualityIndex;
 import com.vertyll.freshly.airquality.domain.AirQualityProvider;
 import com.vertyll.freshly.airquality.domain.SensorMeasurement;
 import com.vertyll.freshly.airquality.domain.Station;
+import com.vertyll.freshly.common.config.ExternalServiceProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -26,11 +28,12 @@ class GiosAirQualityAdapter implements AirQualityProvider {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public GiosAirQualityAdapter(@Value("${gios.api-url}") String giosApiUrl) {
+    GiosAirQualityAdapter(ExternalServiceProperties externalServiceProperties) {
         this.restClient = RestClient.builder()
-                .baseUrl(giosApiUrl)
+                .baseUrl(externalServiceProperties.gios().apiUrl())
                 .defaultHeader("User-Agent", "Freshly-App/1.0")
                 .build();
+
         this.objectMapper = new ObjectMapper();
     }
 
@@ -49,12 +52,11 @@ class GiosAirQualityAdapter implements AirQualityProvider {
         try {
             root = objectMapper.readTree(response);
         } catch (Exception e) {
-            log.error("Błąd parsowania JSON z GIOŚ", e);
+            log.error("Error parsing stations response", e);
             return List.of();
         }
 
-        // Logowanie struktury odpowiedzi dla celów debugowania
-        log.debug("GIOŚ Stations response: {}", root);
+        log.debug("GIOŚ stations response: {}", root);
 
         // Próba znalezienia listy pod popularnymi kluczami w API GIOŚ
         JsonNode listNode = root.findPath("Lista stacji pomiarowych");
@@ -63,7 +65,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
         if (listNode.isMissingNode()) listNode = root.findPath("data");
 
         if (!listNode.isArray()) {
-            log.warn("Nie znaleziono listy stacji w odpowiedzi. Otrzymano: {}", root);
+            log.warn("Not found stations list in response");
             return List.of();
         }
 
@@ -73,7 +75,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
                     .map(this::mapToStation)
                     .toList();
         } catch (Exception e) {
-            log.error("Błąd podczas deserializacji listy stacji", e);
+            log.error("Error mapping stations", e);
             return List.of();
         }
     }
@@ -89,7 +91,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
 
         try {
             JsonNode root = objectMapper.readTree(response);
-            log.debug("GIOŚ Index response for station {}: {}", stationId, root);
+            log.debug("GIOŚ index response for station {}: {}", stationId, root);
 
             JsonNode indexNode = root.findPath("AqIndex");
             if (indexNode.isMissingNode()) indexNode = root.findPath("Indeks jakości powietrza");
@@ -107,9 +109,9 @@ class GiosAirQualityAdapter implements AirQualityProvider {
             if (dto == null || dto.id() == null) {
                 return Optional.empty();
             }
-            return Optional.ofNullable(dto).map(d -> mapToDomain(d, stationId));
+            return Optional.of(dto).map(d -> mapToDomain(d, stationId));
         } catch (Exception e) {
-            log.error("Błąd parsowania indeksu jakości powietrza ", e);
+            log.error("Error parsing air quality index for station {}", stationId, e);
             return Optional.empty();
         }
     }
@@ -147,7 +149,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
             if (response == null) return List.of();
 
             JsonNode root = objectMapper.readTree(response);
-            log.debug("GIOŚ Sensors response for station {}: {}", stationId, root);
+            log.debug("GIOŚ sensors response for station {}: {}", stationId, root);
 
             JsonNode listNode = root.findPath("Lista stanowisk pomiarowych dla podanej stacji");
             if (listNode.isMissingNode()) listNode = root.findPath("Lista stanowisk pomiarowych");
@@ -158,7 +160,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
                 return objectMapper.readerForListOf(GiosSensorDto.class).readValue(listNode);
             }
         } catch (Exception e) {
-            log.error("Błąd pobierania sensorów dla stacji {}", stationId, e);
+            log.error("Error fetching sensors for station {}", stationId, e);
         }
         return List.of();
     }
@@ -173,7 +175,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
             if (response == null) return List.of();
 
             JsonNode root = objectMapper.readTree(response);
-            log.debug("GIOŚ Data response for sensor {}: {}", sensorId, root);
+            log.debug("GIOŚ data response for sensor {}: {}", sensorId, root);
 
             JsonNode valuesNode = root.findPath("Lista danych pomiarowych"); // Klucz w nowym API
             if (valuesNode.isMissingNode()) valuesNode = root.findPath("values");
@@ -197,11 +199,11 @@ class GiosAirQualityAdapter implements AirQualityProvider {
                                 return null; // Ignorujemy błędne daty
                             }
                         })
-                        .filter(r -> r != null)
+                        .filter(Objects::nonNull)
                         .toList();
             }
         } catch (Exception e) {
-            log.error("Błąd pobierania danych dla sensora {}", sensorId, e);
+            log.error("Error fetching data for sensor {}", sensorId, e);
         }
         return List.of();
     }
@@ -219,7 +221,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
 
     private AirQualityIndex mapToDomain(GiosAQIndexDto dto, int stationId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime date = dto.stCalcDate() != null ? LocalDateTime.parse(dto.stCalcDate(), formatter) : LocalDateTime.now();
+        LocalDateTime date = dto.stCalcDate() != null ? LocalDateTime.parse(dto.stCalcDate(), formatter) : LocalDateTime.now(ZoneOffset.UTC);
 
         return new AirQualityIndex(
                 stationId,

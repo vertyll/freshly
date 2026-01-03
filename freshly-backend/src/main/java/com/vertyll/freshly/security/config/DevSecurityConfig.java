@@ -55,8 +55,10 @@ public class DevSecurityConfig {
                                 "/auth/reset-password"
                         ).permitAll()
 
-                        // Swagger UI
+                        // Public AirQuality endpoints
                         .requestMatchers("/air-quality/**").permitAll()
+
+                        // Swagger UI
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
                         // All other endpoints require authentication

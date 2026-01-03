@@ -64,8 +64,9 @@ security:
       sameSite: Strict
       path: "/"
 
-gios:
-  api-url: https://api.gios.gov.pl/pjp-api/v1/rest
+external-service:
+  gios:
+    api-url: https://api.gios.gov.pl/pjp-api/v1/rest
 
 application:
   file:
