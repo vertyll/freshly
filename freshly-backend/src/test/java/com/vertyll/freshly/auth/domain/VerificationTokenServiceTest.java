@@ -14,6 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
@@ -135,13 +137,14 @@ class VerificationTokenServiceTest {
     @Test
     void shouldThrowException_whenTokenIsExpired() {
         // Given - Manual JWT with expired date (past)
-        SecretKey key = Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8));
+        SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+        Instant now = Instant.now();
         String expiredToken = Jwts.builder()
                 .subject(UUID.randomUUID().toString())
                 .claim("email", "test@example.com")
                 .claim("type", "email_verification")
-                .issuedAt(new java.util.Date(System.currentTimeMillis() - 10000))
-                .expiration(new java.util.Date(System.currentTimeMillis() - 5000))
+                .issuedAt(Date.from(now.minusSeconds(10)))
+                .expiration(Date.from(now.minusSeconds(5)))
                 .signWith(key)
                 .compact();
 

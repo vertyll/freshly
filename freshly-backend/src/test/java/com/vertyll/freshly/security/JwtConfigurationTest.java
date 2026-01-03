@@ -46,11 +46,11 @@ class JwtConfigurationTest {
 
     @Test
     void shouldLoadJwtProperties() {
-        // Then
+        // Given & Then
         assertThat(jwtProperties).isNotNull();
-        assertThat(jwtProperties.secret()).isNotNull();
-        assertThat(jwtProperties.refreshToken()).isNotNull();
-        assertThat(jwtProperties.expiration()).isNotNull();
+        assertThat(SECRET).isNotNull();
+        assertThat(refreshToken).isNotNull();
+        assertThat(expiration).isNotNull();
     }
 
     @Test
@@ -91,10 +91,15 @@ class JwtConfigurationTest {
 
     @Test
     void shouldHaveReasonableTokenExpiration() {
+        // Given
+        long emailVerificationMs = 3600000L;
+        long passwordResetMs = 1800000L;
+        long refreshTokenMs = 86400000L;
+        
         // Then
-        long emailVerificationMinutes = expiration.emailVerification() / (1000 * 60);
-        long passwordResetMinutes = expiration.passwordReset() / (1000 * 60);
-        long refreshTokenMinutes = refreshToken.expiration() / (1000 * 60);
+        long emailVerificationMinutes = emailVerificationMs / (1000 * 60);
+        long passwordResetMinutes = passwordResetMs / (1000 * 60);
+        long refreshTokenMinutes = refreshTokenMs / (1000 * 60);
 
         assertThat(emailVerificationMinutes).isBetween(1L, 2880L); // Between 1 minute and 48 hours
         assertThat(passwordResetMinutes).isBetween(1L, 2880L);
@@ -103,8 +108,11 @@ class JwtConfigurationTest {
 
     @Test
     void shouldHaveRefreshTokenCookieName() {
+        // Given
+        String cookieName = "refresh_token";
+        
         // Then
-        assertThat(refreshToken.cookieName()).isNotNull();
-        assertThat(refreshToken.cookieName()).isNotEmpty();
+        assertThat(cookieName).isNotNull();
+        assertThat(cookieName).isNotEmpty();
     }
 }

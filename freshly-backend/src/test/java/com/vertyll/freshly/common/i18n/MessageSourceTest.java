@@ -1,24 +1,29 @@
 package com.vertyll.freshly.common.i18n;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class MessageSourceTest {
 
-    @Mock
     private MessageSource messageSource;
+
+    @BeforeEach
+    void setUp() {
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        messageSource.setBasename("i18n/messages");
+        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setFallbackToSystemLocale(false);
+        messageSource.setDefaultLocale(Locale.ENGLISH);
+        this.messageSource = messageSource;
+    }
 
     @Test
     @DisplayName("Should return English message for en-US locale")
@@ -26,9 +31,6 @@ class MessageSourceTest {
         // Given
         Locale locale = Locale.forLanguageTag("en-US");
         LocaleContextHolder.setLocale(locale);
-
-        when(messageSource.getMessage(eq("success.user.created"), eq(null), eq(locale)))
-                .thenReturn("User created successfully");
 
         // When
         String message = messageSource.getMessage(
@@ -48,9 +50,6 @@ class MessageSourceTest {
         Locale locale = Locale.forLanguageTag("pl");
         LocaleContextHolder.setLocale(locale);
 
-        when(messageSource.getMessage(eq("success.user.created"), eq(null), eq(locale)))
-                .thenReturn("Użytkownik utworzony pomyślnie");
-
         // When
         String message = messageSource.getMessage(
                 "success.user.created",
@@ -68,9 +67,6 @@ class MessageSourceTest {
         // Given
         Locale locale = Locale.forLanguageTag("en-US");
         LocaleContextHolder.setLocale(locale);
-
-        when(messageSource.getMessage(eq("error.user.notFound"), eq(null), eq(locale)))
-                .thenReturn("User not found");
 
         // When
         String message = messageSource.getMessage(
@@ -90,9 +86,6 @@ class MessageSourceTest {
         Locale locale = Locale.forLanguageTag("pl");
         LocaleContextHolder.setLocale(locale);
 
-        when(messageSource.getMessage(eq("error.user.notFound"), eq(null), eq(locale)))
-                .thenReturn("Nie znaleziono użytkownika");
-
         // When
         String message = messageSource.getMessage(
                 "error.user.notFound",
@@ -110,9 +103,6 @@ class MessageSourceTest {
         // Given
         Locale locale = Locale.forLanguageTag("de");
         LocaleContextHolder.setLocale(locale);
-
-        when(messageSource.getMessage(eq("success.user.created"), eq(null), eq(locale)))
-                .thenReturn("User created successfully");
 
         // When
         String message = messageSource.getMessage(
@@ -133,13 +123,11 @@ class MessageSourceTest {
         LocaleContextHolder.setLocale(locale);
         String nonExistentKey = "nonexistent.message.key";
 
-        when(messageSource.getMessage(eq(nonExistentKey), eq(null), eq(locale)))
-                .thenReturn(nonExistentKey);
-
         // When
         String message = messageSource.getMessage(
                 nonExistentKey,
                 null,
+                nonExistentKey,
                 locale
         );
 

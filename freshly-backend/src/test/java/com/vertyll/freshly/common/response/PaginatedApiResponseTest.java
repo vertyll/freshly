@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.List;
+import java.time.ZoneOffset;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -170,7 +171,7 @@ class PaginatedApiResponseTest {
         // Then
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getTimestamp()).isNotNull();
-        assertThat(response.getBody().getTimestamp()).isBeforeOrEqualTo(java.time.LocalDateTime.now());
+        assertThat(response.getBody().getTimestamp()).isBeforeOrEqualTo(java.time.LocalDateTime.now(ZoneOffset.UTC));
     }
 
     @Test
