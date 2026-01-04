@@ -40,6 +40,7 @@ val lombokMapstructBindingVersion = "0.2.0"
 val errorProneVersion = "2.36.0"
 val nullawayVersion = "0.12.14"
 val betaCheckerVersion = "1.0"
+val pmdVersion = "7.20.0"
 
 dependencies {
     // Implementation dependencies
@@ -192,7 +193,7 @@ tasks.withType<Test> {
 
 pmd {
     isConsoleOutput = true
-    toolVersion = "7.20.0"
+    toolVersion = pmdVersion
     ruleSets = listOf()
     ruleSetFiles = files("config/pmd/pmd-main-ruleset.xml")
     isIgnoreFailures = false
