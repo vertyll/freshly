@@ -57,7 +57,9 @@
     <rule ref="category/java/multithreading.xml" />
 
     <!-- Performance -->
-    <rule ref="category/java/performance.xml"/>
+    <rule ref="category/java/performance.xml">
+        <exclude name="RedundantFieldInitializer" />
+    </rule>
 
     <!-- Security -->
     <rule ref="category/java/security.xml"/>
