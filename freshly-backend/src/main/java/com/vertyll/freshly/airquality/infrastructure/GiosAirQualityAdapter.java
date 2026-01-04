@@ -62,6 +62,11 @@ class GiosAirQualityAdapter implements AirQualityProvider {
         if (listNode.isMissingNode()) listNode = root.findPath("lista");
         if (listNode.isMissingNode()) listNode = root.findPath("list");
         if (listNode.isMissingNode()) listNode = root.findPath("data");
+        
+        // Jeśli root sam jest tablicą, użyj go bezpośrednio
+        if (listNode.isMissingNode() && root.isArray()) {
+            listNode = root;
+        }
 
         if (!listNode.isArray()) {
             log.warn("Not found stations list in response");
@@ -238,7 +243,10 @@ class GiosAirQualityAdapter implements AirQualityProvider {
 
     private double parseCoordinate(String value) {
         try {
-            return value != null ? Double.parseDouble(value) : 0.0;
+            if (value == null) return 0.0;
+            // GIOŚ API może zwracać współrzędne z przecinkiem jako separatorem dziesiętnym
+            String normalized = value.replace(',', '.');
+            return Double.parseDouble(normalized);
         } catch (NumberFormatException _) {
             return 0.0;
         }
