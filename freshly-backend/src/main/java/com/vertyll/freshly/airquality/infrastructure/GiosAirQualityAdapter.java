@@ -22,7 +22,10 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-@SuppressWarnings("PMD.GodClass") // Adapter requires complex mapping logic for external API integration
+@SuppressWarnings({
+    "PMD.GodClass",  // Adapter requires complex mapping logic for external API integration
+    "PMD.AvoidCatchingGenericException"  // External API - Jackson can throw various unknown exceptions
+})
 class GiosAirQualityAdapter implements AirQualityProvider {
 
     private final RestClient restClient;

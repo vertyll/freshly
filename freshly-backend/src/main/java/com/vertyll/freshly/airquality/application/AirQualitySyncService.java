@@ -34,6 +34,7 @@ public class AirQualitySyncService {
      */
     @Scheduled(cron = "0 5 * * * *")
     @Transactional
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public void syncAirQualityData() {
         log.info("Starting scheduled air quality data synchronization");
         
@@ -62,6 +63,7 @@ public class AirQualitySyncService {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private boolean syncStationDataSafely(Station station) {
         try {
             syncStationData(station);
@@ -126,6 +128,7 @@ public class AirQualitySyncService {
     /**
      * Remove measurements older than 90 days to prevent database bloat
      */
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private void cleanupOldData() {
         LocalDateTime threshold = LocalDateTime.now(ZoneOffset.UTC).minusDays(90);
         try {

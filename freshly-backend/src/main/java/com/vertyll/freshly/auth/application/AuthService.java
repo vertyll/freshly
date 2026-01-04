@@ -36,6 +36,7 @@ public class AuthService {
     private String frontendUrl;
 
     @Transactional
+    @SuppressWarnings("PMD.AvoidCatchingGenericException") // Catch-all before compensation rollback
     public UUID registerUser(RegisterUserRequestDto request) {
 
         log.info("Registering user: {}", request.username());

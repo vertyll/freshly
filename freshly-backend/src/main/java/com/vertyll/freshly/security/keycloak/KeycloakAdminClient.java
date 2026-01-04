@@ -21,6 +21,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.util.Collections;
 import java.util.List;
@@ -157,33 +158,33 @@ public class KeycloakAdminClient {
         formData.add("client_id", properties.userClientId());
         formData.add("username", username);
         formData.add("password", password);
-
+        
         String tokenUrl = properties.serverUrl() + "/realms/" + properties.realm()
                 + "/protocol/openid-connect/token";
-
+        
         try {
             Map<String, Object> response = restClient.post()
                     .uri(tokenUrl)
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(formData)
                     .retrieve()
-                    .body(new ParameterizedTypeReference<>() {
-                    });
-
+                    .body(new ParameterizedTypeReference<>() {});
+        
             if (response == null || !response.containsKey("access_token")) {
                 log.warn("Password verification failed for user: {} - invalid response", username);
                 throw new InvalidPasswordException("Current password is incorrect");
             }
-
+        
             log.debug("Password verification successful for user: {}", username);
-
+        
         } catch (HttpClientErrorException.Unauthorized _) {
             log.warn("Password verification failed for user: {}", username);
             throw new InvalidPasswordException("Current password is incorrect");
-        } catch (InvalidPasswordException e) {
-            throw e;
-        } catch (RuntimeException e) {
-            log.error("Error verifying password for user: {}", username, e);
+        } catch (HttpClientErrorException e) {
+            log.error("HTTP error verifying password for user: {}", username, e);
+            throw new KeycloakClientException("Failed to verify password", e);
+        } catch (RestClientException e) {
+            log.error("Client error verifying password for user: {}", username, e);
             throw new KeycloakClientException("Failed to verify password", e);
         }
     }

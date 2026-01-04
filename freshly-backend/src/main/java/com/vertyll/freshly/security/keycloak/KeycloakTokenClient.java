@@ -12,6 +12,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.util.Map;
 
@@ -60,7 +61,7 @@ public class KeycloakTokenClient {
         } catch (HttpClientErrorException.Unauthorized _) {
             log.warn("Login failed for user: {}", username);
             throw new InvalidPasswordException("Invalid username or password");
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             log.error("Error during login for user: {}", username, e);
             throw new KeycloakClientException("Login failed", e);
         }
@@ -88,7 +89,7 @@ public class KeycloakTokenClient {
         } catch (HttpClientErrorException.Unauthorized _) {
             log.warn("Refresh token invalid or expired");
             throw new InvalidPasswordException("Refresh token invalid or expired");
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             log.error("Error during token refresh", e);
             throw new KeycloakClientException("Token refresh failed", e);
         }
@@ -97,6 +98,7 @@ public class KeycloakTokenClient {
     /**
      * Logout (revoke refresh token)
      */
+    @SuppressWarnings("PMD.AvoidCatchingGenericException") // Logout must always succeed
     public void logout(String refreshToken) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add(CLIENT_ID, properties.userClientId());

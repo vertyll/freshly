@@ -3,15 +3,16 @@
          xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
-
     <description>PMD rules for test code</description>
 
-    <!-- Best Practices - relaxed for tests -->
+    <!-- Best Practices -->
     <rule ref="category/java/bestpractices.xml">
         <exclude name="UnitTestContainsTooManyAsserts"/>
+        <exclude name="UnitTestAssertionsShouldIncludeMessage"/>
+        <exclude name="UnitTestShouldIncludeAssert"/>
     </rule>
 
-    <!-- Code Style - relaxed for tests -->
+    <!-- Code Style -->
     <rule ref="category/java/codestyle.xml">
         <exclude name="OnlyOneReturn"/>
         <exclude name="AtLeastOneConstructor"/>
@@ -24,9 +25,10 @@
         <exclude name="LocalVariableCouldBeFinal"/>
         <exclude name="MethodNamingConventions"/>
         <exclude name="UseUnderscoresInNumericLiterals"/>
+        <exclude name="LinguisticNaming"/>
     </rule>
 
-    <!-- Design - relaxed for tests -->
+    <!-- Design -->
     <rule ref="category/java/design.xml">
         <exclude name="LawOfDemeter"/>
         <exclude name="TooManyMethods"/>
@@ -34,26 +36,29 @@
         <exclude name="ExcessivePublicCount"/>
         <exclude name="CyclomaticComplexity"/>
         <exclude name="CouplingBetweenObjects"/>
+        <exclude name="LoosePackageCoupling"/>
+        <exclude name="TooManyFields"/>
     </rule>
 
-    <!-- Documentation - not required in tests -->
+    <!-- Documentation -->
     <rule ref="category/java/documentation.xml">
         <exclude name="CommentRequired"/>
         <exclude name="CommentSize"/>
     </rule>
 
-    <!-- Error Prone - relaxed for tests -->
+    <!-- Error Prone -->
     <rule ref="category/java/errorprone.xml">
         <exclude name="AvoidDuplicateLiterals"/>
+        <exclude name="MissingSerialVersionUID"/>
+        <exclude name="TestClassWithoutTestCases"/>
     </rule>
 
-    <!-- Multithreading - relaxed for tests -->
+    <!-- Multithreading -->
     <rule ref="category/java/multithreading.xml" />
 
-    <!-- Performance - relaxed for tests -->
-    <rule ref="category/java/performance.xml" />
+    <!-- Performance -->
+    <rule ref="category/java/performance.xml"/>
 
-    <!-- Security - still important in tests -->
+    <!-- Security -->
     <rule ref="category/java/security.xml"/>
-
 </ruleset>

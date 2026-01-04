@@ -17,6 +17,7 @@ public class UserRegisteredEventHandler {
 
     @Async
     @EventListener
+    @SuppressWarnings("PMD.AvoidCatchingGenericException") // Email failure shouldn't break registration
     public void handleUserRegistered(UserRegisteredEvent event) {
         log.info("Handling UserRegisteredEvent for user: {}", event.username());
 

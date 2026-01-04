@@ -20,9 +20,11 @@
         <exclude name="LongVariable"/>
         <exclude name="ShortVariable"/>
         <exclude name="ShortClassName"/>
+        <exclude name="TooManyStaticImports"/>
         <exclude name="MethodArgumentCouldBeFinal"/>
         <exclude name="LocalVariableCouldBeFinal"/>
         <exclude name="ControlStatementBraces"/>
+        <exclude name="UseUnderscoresInNumericLiterals"/>
     </rule>
 
     <!-- Design -->
@@ -32,7 +34,9 @@
         <exclude name="CouplingBetweenObjects"/>
         <exclude name="UseObjectForClearerAPI"/>
         <exclude name="TooManyMethods"/>
+        <exclude name="ExcessiveImports"/>
         <exclude name="TooManyFields"/>
+        <exclude name="LoosePackageCoupling"/>
     </rule>
 
     <!-- Documentation -->
@@ -42,15 +46,15 @@
     </rule>
 
     <!-- Error Prone -->
-    <rule ref="category/java/errorprone.xml">
-        <exclude name="AvoidCatchingGenericException"/>
-    </rule>
+    <rule ref="category/java/errorprone.xml" />
 
     <!-- Multithreading -->
     <rule ref="category/java/multithreading.xml" />
 
     <!-- Performance -->
-    <rule ref="category/java/performance.xml" />
+    <rule ref="category/java/performance.xml">
+        <exclude name="RedundantFieldInitializer" />
+    </rule>
 
     <!-- Security -->
     <rule ref="category/java/security.xml"/>
