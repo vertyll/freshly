@@ -5,6 +5,7 @@ plugins {
 	id("org.springframework.boot") version "4.0.1"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("net.ltgt.errorprone") version "4.3.0"
+    id("net.ltgt.nullaway") version "2.3.0"
 }
 
 group = "com.vertyll"
@@ -37,6 +38,7 @@ val httpclient5Version = "5.6"
 val lombokMapstructBindingVersion = "0.2.0"
 val errorProneVersion = "2.36.0"
 val nullawayVersion = "0.12.14"
+val betaCheckerVersion = "1.0"
 
 dependencies {
     // Implementation dependencies
@@ -62,6 +64,7 @@ dependencies {
     annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:$lombokMapstructBindingVersion")
     annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor("com.google.guava:guava-beta-checker:$betaCheckerVersion")
 
     // Runtime dependencies
     runtimeOnly("io.jsonwebtoken:jjwt-impl:$jjwtVersion")
@@ -72,8 +75,8 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 
     // Error Prone
-    "errorprone"("com.google.errorprone:error_prone_core:$errorProneVersion")
-    "errorprone"("com.uber.nullaway:nullaway:$nullawayVersion")
+    errorprone("com.google.errorprone:error_prone_core:$errorProneVersion")
+    errorprone("com.uber.nullaway:nullaway:$nullawayVersion")
 
     // Test implementation dependencies
     testImplementation("org.springframework.boot:spring-boot-starter-data-mongodb-test")
@@ -100,9 +103,9 @@ dependencies {
 tasks.withType<JavaCompile> {
 	options.compilerArgs.add("-parameters")
 
-	options.errorprone.isEnabled.set(true)
-
 	options.errorprone {
+        isEnabled.set(true)
+
 		check("NullAway", net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
 		option("NullAway:OnlyNullMarked", "true")
 		option("NullAway:CustomContractAnnotations", "org.springframework.lang.Contract")
