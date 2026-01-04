@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -15,10 +14,8 @@ import java.time.LocalDateTime;
  * MongoDB document for air quality measurements.
  */
 @Document(collection = "air_quality_measurements")
-@CompoundIndexes({
-        @CompoundIndex(name = "station_date_idx", def = "{'stationId': 1, 'measurementDate': -1}"),
-        @CompoundIndex(name = "date_idx", def = "{'measurementDate': -1}")
-})
+@CompoundIndex(name = "station_date_idx", def = "{'stationId': 1, 'measurementDate': -1}")
+@CompoundIndex(name = "date_idx", def = "{'measurementDate': -1}")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

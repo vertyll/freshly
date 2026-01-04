@@ -50,10 +50,11 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         logger.warn("Type mismatch error: {}", ex.getMessage());
 
+        Class<?> requiredType = ex.getRequiredType();
         String message = String.format(
                 "Parameter '%s' should be of type %s",
                 ex.getName(),
-                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown"
+                requiredType != null ? requiredType.getSimpleName() : "unknown"
         );
 
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);

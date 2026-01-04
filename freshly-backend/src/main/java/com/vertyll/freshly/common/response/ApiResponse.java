@@ -22,7 +22,7 @@ public class ApiResponse<T> extends BaseResponse<T> {
      * @deprecated Use buildResponse(T, String, MessageSource, HttpStatus) for i18n support
      */
     @Deprecated(since = "1.1")
-    public static <T> ResponseEntity<ApiResponse<T>> buildResponse(
+    public static <T> ResponseEntity<ApiResponse<T>> buildResponse( //NOSONAR - Deprecated method retained for backward compatibility
             @Nullable T data,
             String message,
             HttpStatus status

@@ -22,6 +22,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
 
+    private static final String FIELD_STATION_NAME = "stationName";
+    private static final String FIELD_PM10_AVG = "pm10Avg";
+    private static final String FIELD_PM25_AVG = "pm25Avg";
+
     private final SpringDataAirQualityMeasurementRepository springDataRepository;
     private final AirQualityMeasurementMapper mapper;
     private final MongoTemplate mongoTemplate;
@@ -171,14 +175,14 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("measurementDate").gte(from).lte(to)),
                 Aggregation.group("stationId")
-                        .first("stationName").as("stationName")
-                        .avg("pm10Value").as("pm10Avg")
-                        .avg("pm25Value").as("pm25Avg")
+                        .first(FIELD_STATION_NAME).as(FIELD_STATION_NAME)
+                        .avg("pm10Value").as(FIELD_PM10_AVG)
+                        .avg("pm25Value").as(FIELD_PM25_AVG)
                         .first("overallIndexLevel").as("dominantQuality")
                         .count().as("measurementCount"),
                 Aggregation.sort(org.springframework.data.domain.Sort.by(
-                        org.springframework.data.domain.Sort.Order.asc("pm10Avg"),
-                        org.springframework.data.domain.Sort.Order.asc("pm25Avg")
+                        org.springframework.data.domain.Sort.Order.asc(FIELD_PM10_AVG),
+                        org.springframework.data.domain.Sort.Order.asc(FIELD_PM25_AVG)
                 )),
                 Aggregation.limit(limit)
         );
@@ -198,9 +202,9 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
             @SuppressWarnings("unchecked")
             Map<String, Object> result = (Map<String, Object>) resultObj;
             Integer stationId = (Integer) result.get("_id");
-            String stationName = (String) result.get("stationName");
-            Double pm10Avg = (Double) result.get("pm10Avg");
-            Double pm25Avg = (Double) result.get("pm25Avg");
+            String stationName = (String) result.get(FIELD_STATION_NAME);
+            Double pm10Avg = (Double) result.get(FIELD_PM10_AVG);
+            Double pm25Avg = (Double) result.get(FIELD_PM25_AVG);
             String dominantQuality = (String) result.get("dominantQuality");
             Integer measurementCount = (Integer) result.get("measurementCount");
 
@@ -222,7 +226,7 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
             if (dominantQuality != null) {
                 try {
                     dominantLevel = AirQualityLevel.valueOf(dominantQuality);
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException _) {
                     log.warn("Unknown air quality level from database: {}", dominantQuality);
                 }
             }
@@ -247,7 +251,6 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
             LocalDateTime from,
             LocalDateTime to
     ) {
-        // TODO: Implement geographic bounds filtering
         // This would require stations to be embedded in measurements or a join
         // For now, return empty list - can be enhanced later
         log.warn("findByGeoBounds not yet implemented");

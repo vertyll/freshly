@@ -3,6 +3,7 @@ package com.vertyll.freshly.airquality.application;
 import com.vertyll.freshly.airquality.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class AirQualitySyncService {
 
     private final AirQualityProvider airQualityProvider;
     private final AirQualityHistoryRepository historyRepository;
+    private final ObjectProvider<AirQualitySyncService> selfProvider;
 
     /**
      * Synchronize data every hour (5 minutes after the hour to allow GIOŚ to update)
@@ -42,11 +44,9 @@ public class AirQualitySyncService {
             int failedCount = 0;
 
             for (Station station : stations) {
-                try {
-                    syncStationData(station);
+                if (syncStationDataSafely(station)) {
                     successCount++;
-                } catch (Exception e) {
-                    log.error("Failed to sync data for station {}: {}", station.id(), e.getMessage());
+                } else {
                     failedCount++;
                 }
             }
@@ -58,6 +58,16 @@ public class AirQualitySyncService {
             
         } catch (Exception e) {
             log.error("Error during air quality data synchronization", e);
+        }
+    }
+
+    private boolean syncStationDataSafely(Station station) {
+        try {
+            syncStationData(station);
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to sync data for station {}: {}", station.id(), e.getMessage());
+            return false;
         }
     }
 
@@ -127,9 +137,8 @@ public class AirQualitySyncService {
     /**
      * Manual sync trigger for testing or admin operations
      */
-    @Transactional
     public void triggerManualSync() {
         log.info("Manual sync triggered");
-        syncAirQualityData();
+        selfProvider.getObject().syncAirQualityData();
     }
 }

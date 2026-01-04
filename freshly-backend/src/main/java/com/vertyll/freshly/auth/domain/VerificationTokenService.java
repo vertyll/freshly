@@ -19,6 +19,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class VerificationTokenService {
 
+    private static final String EMAIL_CLAIM = "email";
+
     private final JwtProperties jwtProperties;
 
     private SecretKey getSigningKey() {
@@ -31,7 +33,7 @@ public class VerificationTokenService {
 
         return Jwts.builder()
                 .subject(userId.toString())
-                .claim("email", email)
+                .claim(EMAIL_CLAIM, email)
                 .claim("type", "email_verification")
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiration))
@@ -45,7 +47,7 @@ public class VerificationTokenService {
 
         return Jwts.builder()
                 .subject(userId.toString())
-                .claim("email", email)
+                .claim(EMAIL_CLAIM, email)
                 .claim("type", "password_reset")
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiration))
@@ -117,8 +119,8 @@ public class VerificationTokenService {
                     .parseSignedClaims(token)
                     .getPayload();
 
-            return claims.get("email", String.class);
-        } catch (JwtException e) {
+            return claims.get(EMAIL_CLAIM, String.class);
+        } catch (JwtException _) {
             return null;
         }
     }

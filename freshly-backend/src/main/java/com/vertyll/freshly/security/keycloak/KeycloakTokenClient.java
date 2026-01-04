@@ -2,6 +2,7 @@ package com.vertyll.freshly.security.keycloak;
 
 import com.vertyll.freshly.auth.api.dto.TokenResponseDto;
 import com.vertyll.freshly.auth.domain.exception.InvalidPasswordException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -18,6 +19,10 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class KeycloakTokenClient {
+
+    private static final String GRANT_TYPE = "grant_type";
+    private static final String CLIENT_ID = "client_id";
+    private static final String REFRESH_TOKEN = "refresh_token";
 
     private final RestClient restClient;
     private final KeycloakProperties properties;
@@ -37,8 +42,8 @@ public class KeycloakTokenClient {
      */
     public TokenResponseDto getToken(String username, String password) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("grant_type", "password");
-        formData.add("client_id", properties.userClientId());
+        formData.add(GRANT_TYPE, "password");
+        formData.add(CLIENT_ID, properties.userClientId());
         formData.add("username", username);
         formData.add("password", password);
 
@@ -52,12 +57,12 @@ public class KeycloakTokenClient {
 
             return mapToTokenResponse(response);
 
-        } catch (HttpClientErrorException.Unauthorized e) {
+        } catch (HttpClientErrorException.Unauthorized _) {
             log.warn("Login failed for user: {}", username);
             throw new InvalidPasswordException("Invalid username or password");
         } catch (Exception e) {
             log.error("Error during login for user: {}", username, e);
-            throw new RuntimeException("Login failed", e);
+            throw new KeycloakClientException("Login failed", e);
         }
     }
 
@@ -66,9 +71,9 @@ public class KeycloakTokenClient {
      */
     public TokenResponseDto refreshToken(String refreshToken) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("grant_type", "refresh_token");
-        formData.add("client_id", properties.userClientId());
-        formData.add("refresh_token", refreshToken);
+        formData.add(GRANT_TYPE, REFRESH_TOKEN);
+        formData.add(CLIENT_ID, properties.userClientId());
+        formData.add(REFRESH_TOKEN, refreshToken);
 
         try {
             Map<String, Object> response = restClient.post()
@@ -80,12 +85,12 @@ public class KeycloakTokenClient {
 
             return mapToTokenResponse(response);
 
-        } catch (HttpClientErrorException.Unauthorized e) {
+        } catch (HttpClientErrorException.Unauthorized _) {
             log.warn("Refresh token invalid or expired");
             throw new InvalidPasswordException("Refresh token invalid or expired");
         } catch (Exception e) {
             log.error("Error during token refresh", e);
-            throw new RuntimeException("Token refresh failed", e);
+            throw new KeycloakClientException("Token refresh failed", e);
         }
     }
 
@@ -94,8 +99,8 @@ public class KeycloakTokenClient {
      */
     public void logout(String refreshToken) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("client_id", properties.userClientId());
-        formData.add("refresh_token", refreshToken);
+        formData.add(CLIENT_ID, properties.userClientId());
+        formData.add(REFRESH_TOKEN, refreshToken);
 
         try {
             restClient.post()
@@ -115,12 +120,12 @@ public class KeycloakTokenClient {
 
     private TokenResponseDto mapToTokenResponse(Map<String, Object> response) {
         if (response == null) {
-            throw new RuntimeException("Empty response from Keycloak");
+            throw new KeycloakClientException("Empty response from Keycloak");
         }
 
         return new TokenResponseDto(
                 (String) response.get("access_token"),
-                (String) response.get("refresh_token"),
+                (String) response.get(REFRESH_TOKEN),
                 (Integer) response.get("expires_in"),
                 (Integer) response.get("refresh_expires_in"),
                 (String) response.getOrDefault("token_type", "Bearer")

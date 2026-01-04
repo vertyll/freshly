@@ -194,7 +194,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
                                         LocalDateTime.parse(v.date(), formatter),
                                         v.value()
                                 );
-                            } catch (Exception e) {
+                            } catch (Exception _) {
                                 return null; // Ignorujemy błędne daty
                             }
                         })
@@ -239,7 +239,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
     private double parseCoordinate(String value) {
         try {
             return value != null ? Double.parseDouble(value) : 0.0;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return 0.0;
         }
     }

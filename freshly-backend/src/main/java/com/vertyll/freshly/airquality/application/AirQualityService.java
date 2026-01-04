@@ -55,7 +55,7 @@ public class AirQualityService {
      * @param daysBack  Number of days to look back (default 7, max 90)
      */
     public List<AirQualityMeasurement> getHistoricalMeasurements(int stationId, int daysBack) {
-        int days = Math.min(Math.max(daysBack, 1), 90); // Clamp between 1-90
+        int days = Math.clamp(daysBack, 1, 90); // Clamp between 1-90
         LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC).minusDays(days);
         LocalDateTime to = LocalDateTime.now(ZoneOffset.UTC);
         return historyRepository.findByStationIdAndDateRange(stationId, from, to);
@@ -77,7 +77,7 @@ public class AirQualityService {
      * @return List of stations with distances, sorted by distance
      */
     public List<StationDistance> findNearestStations(double latitude, double longitude, double radiusKm) {
-        double radius = Math.min(Math.max(radiusKm, 1), 100); // Clamp between 1-100
+        double radius = Math.clamp(radiusKm, 1, 100); // Clamp between 1-100
 
         List<Station> allStations = airQualityProvider.findAllStations();
         List<StationDistance> stationsWithDistance = new ArrayList<>();
@@ -105,7 +105,7 @@ public class AirQualityService {
      * Calculate statistics for a station within time range
      */
     public Optional<AirQualityStatistics> getStatistics(int stationId, int daysBack) {
-        int days = Math.min(Math.max(daysBack, 1), 90);
+        int days = Math.clamp(daysBack, 1, 90);
         LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC).minusDays(days);
         LocalDateTime to = LocalDateTime.now(ZoneOffset.UTC);
 
@@ -119,8 +119,8 @@ public class AirQualityService {
      * @param limit    Max number of stations to return (default 10, max 50)
      */
     public List<StationRanking> getRanking(int daysBack, int limit) {
-        int days = Math.min(Math.max(daysBack, 1), 90);
-        int maxResults = Math.min(Math.max(limit, 5), 50);
+        int days = Math.clamp(daysBack, 1, 90);
+        int maxResults = Math.clamp(limit, 5, 50);
 
         LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC).minusDays(days);
         LocalDateTime to = LocalDateTime.now(ZoneOffset.UTC);

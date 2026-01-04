@@ -70,12 +70,12 @@ public class KeycloakAdminClient {
                         response.getStatus(),
                         response.getStatusInfo()
                 );
-                throw new RuntimeException("Failed to create user in Keycloak: " + response.getStatusInfo());
+                throw new KeycloakClientException("Failed to create user in Keycloak: " + response.getStatusInfo());
             }
 
             String locationHeader = response.getHeaderString("Location");
             if (locationHeader == null) {
-                throw new RuntimeException("Location header missing from Keycloak response");
+                throw new KeycloakClientException("Location header missing from Keycloak response");
             }
 
             String userId = locationHeader.substring(locationHeader.lastIndexOf('/') + 1);
@@ -83,7 +83,7 @@ public class KeycloakAdminClient {
             return UUID.fromString(userId);
         } catch (IllegalArgumentException e) {
             log.error("Invalid UUID format in Keycloak response", e);
-            throw new RuntimeException("Invalid user ID format from Keycloak", e);
+            throw new KeycloakClientException("Invalid user ID format from Keycloak", e);
         }
     }
 
@@ -174,12 +174,12 @@ public class KeycloakAdminClient {
 
             log.debug("Password verification successful for user: {}", username);
 
-        } catch (HttpClientErrorException.Unauthorized e) {
+        } catch (HttpClientErrorException.Unauthorized _) {
             log.warn("Password verification failed for user: {}", username);
             throw new InvalidPasswordException("Current password is incorrect");
         } catch (Exception e) {
             log.error("Error verifying password for user: {}", username, e);
-            throw new RuntimeException("Failed to verify password", e);
+            throw new KeycloakClientException("Failed to verify password", e);
         }
     }
 
