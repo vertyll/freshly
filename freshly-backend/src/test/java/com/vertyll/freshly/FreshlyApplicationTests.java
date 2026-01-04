@@ -6,9 +6,11 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@SuppressWarnings("PMD.UnitTestShouldIncludeAssert")
 class FreshlyApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// Test to ensure the Spring application context loads successfully
 	}
 }

@@ -13,6 +13,7 @@ import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Scheduled service that synchronizes air quality data from GIOŚ API to MongoDB.
@@ -80,7 +81,7 @@ public class AirQualitySyncService {
         }
 
         // Fetch air quality index
-        var indexOpt = airQualityProvider.findIndexByStationId(station.id());
+        Optional<AirQualityIndex> indexOpt = airQualityProvider.findIndexByStationId(station.id());
         if (indexOpt.isEmpty()) {
             log.debug("No index data for station {}", station.id());
             return;
@@ -104,6 +105,7 @@ public class AirQualitySyncService {
         log.debug("Saved measurement for station {}: {}", station.name(), index.stIndexLevel());
     }
 
+    @SuppressWarnings("PMD.UseConcurrentHashMap") // Local variable, no concurrent access
     private Map<String, Double> extractLatestSensorValues(List<SensorMeasurement> measurements) {
         Map<String, Double> values = new HashMap<>();
         

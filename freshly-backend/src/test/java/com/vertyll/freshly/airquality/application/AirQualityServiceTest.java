@@ -396,9 +396,12 @@ class AirQualityServiceTest {
 
             // Then
             assertThat(result).isSortedAccordingTo(Comparator.comparingDouble(StationDistance::distanceInKm));
-            if (result.size() >= 2) {
+            
+            final int minRequiredSizeForComparison = 2;
+            if (result.size() >= minRequiredSizeForComparison) {
                 assertThat(result.get(0).distanceInKm()).isLessThanOrEqualTo(result.get(1).distanceInKm());
             }
+            
             verify(airQualityProvider).findAllStations();
         }
     }

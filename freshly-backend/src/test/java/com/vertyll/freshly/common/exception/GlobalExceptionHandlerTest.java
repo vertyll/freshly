@@ -46,7 +46,7 @@ class GlobalExceptionHandlerTest {
         when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError1, fieldError2, fieldError3));
         
         MethodParameter methodParameter = new MethodParameter(
-                this.getClass().getMethod("dummyMethod"),
+                this.getClass().getDeclaredMethod("setUp"),
                 -1
         );
         MethodArgumentNotValidException exception = new MethodArgumentNotValidException(methodParameter, bindingResult);
@@ -75,7 +75,7 @@ class GlobalExceptionHandlerTest {
         when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError));
         
         MethodParameter methodParameter = new MethodParameter(
-                this.getClass().getMethod("dummyMethod"),
+                this.getClass().getDeclaredMethod("setUp"),
                 -1
         );
         MethodArgumentNotValidException exception = new MethodArgumentNotValidException(methodParameter, bindingResult);
@@ -201,10 +201,5 @@ class GlobalExceptionHandlerTest {
         // Then
         assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
         assertThat(problemDetail.getDetail()).isEqualTo("An unexpected error occurred. Please contact support.");
-    }
-
-    // Helper method for MethodParameter mock
-    public void dummyMethod() {
-        // Used only for getting Method reference in tests
     }
 }

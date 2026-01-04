@@ -84,6 +84,7 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
     }
 
     @Override
+    @SuppressWarnings("PMD.NPathComplexity") // Complex statistics aggregation logic
     public Optional<AirQualityStatistics> calculateStatistics(int stationId, LocalDateTime from, LocalDateTime to) {
         List<AirQualityMeasurementDocument> measurements = springDataRepository
                 .findByStationIdAndMeasurementDateBetweenOrderByMeasurementDateAsc(stationId, from, to);
@@ -194,6 +195,7 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
         return getStationRankings(rawResults);
     }
 
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // Domain objects must be created per iteration
     private static List<StationRanking> getStationRankings(AggregationResults<?> rawResults) {
         List<StationRanking> rankings = new ArrayList<>();
         int rank = 1;
@@ -232,12 +234,13 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
             }
 
             rankings.add(new StationRanking(
-                    rank++,
+                    rank,
                     station,
                     avgScore,
                     dominantLevel,
                     measurementCount != null ? measurementCount : 0
             ));
+            rank++;
         }
         return rankings;
     }

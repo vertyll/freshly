@@ -18,7 +18,7 @@ public class AirQualityControllerAdvice {
 
     private final MessageSource messageSource;
 
-    private static final Logger logger = LogManager.getLogger(AirQualityControllerAdvice.class);
+    private static final Logger LOGGER = LogManager.getLogger(AirQualityControllerAdvice.class);
 
     public AirQualityControllerAdvice(MessageSource messageSource) {
         this.messageSource = messageSource;
@@ -26,28 +26,28 @@ public class AirQualityControllerAdvice {
 
     @ExceptionHandler(StationNotFoundException.class)
     public ProblemDetail handleStationNotFound(StationNotFoundException ex) {
-        logger.warn("Station not found: {}", ex.getMessage());
+        LOGGER.warn("Station not found: {}", ex.getMessage());
         String message = messageSource.getMessage("error.airquality.stationNotFound", null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, message);
     }
 
     @ExceptionHandler(AirQualityDataNotFoundException.class)
     public ProblemDetail handleAirQualityDataNotFound(AirQualityDataNotFoundException ex) {
-        logger.warn("Air quality data not found: {}", ex.getMessage());
+        LOGGER.warn("Air quality data not found: {}", ex.getMessage());
         String message = messageSource.getMessage("error.airquality.dataNotFound", null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, message);
     }
 
     @ExceptionHandler(InvalidDateRangeException.class)
     public ProblemDetail handleInvalidDateRange(InvalidDateRangeException ex) {
-        logger.warn("Invalid date range: {}", ex.getMessage());
+        LOGGER.warn("Invalid date range: {}", ex.getMessage());
         String message = messageSource.getMessage("error.airquality.invalidDateRange", null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(GiosApiException.class)
     public ProblemDetail handleGiosApiException(GiosApiException ex) {
-        logger.error("GIOS API error: {}", ex.getMessage(), ex);
+        LOGGER.error("GIOS API error: {}", ex.getMessage(), ex);
         String message = messageSource.getMessage("error.airquality.giosApiUnavailable", null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, message);
     }

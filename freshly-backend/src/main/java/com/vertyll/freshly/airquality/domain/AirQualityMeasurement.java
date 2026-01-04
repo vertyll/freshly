@@ -47,7 +47,7 @@ public class AirQualityMeasurement {
             AirQualityIndex index,
             java.util.Map<String, Double> sensorValues
     ) {
-        var measurement = new AirQualityMeasurement();
+        AirQualityMeasurement measurement = new AirQualityMeasurement();
         measurement.stationId = stationId;
         measurement.stationName = stationName;
         measurement.measurementDate = index.calculationDate();

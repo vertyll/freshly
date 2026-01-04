@@ -2,6 +2,7 @@ import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
 	java
+    pmd
 	id("org.springframework.boot") version "4.0.1"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("net.ltgt.errorprone") version "4.3.0"
@@ -187,4 +188,18 @@ tasks.withType<Test> {
             println()
         }
     }))
+}
+
+pmd {
+    isConsoleOutput = true
+    toolVersion = "7.20.0"
+    ruleSets = listOf()
+    ruleSetFiles = files("config/pmd/pmd-main-ruleset.xml")
+    isIgnoreFailures = false
+}
+
+tasks.withType<Pmd> {
+    if (name == "pmdTest") {
+        ruleSetFiles = files("config/pmd/pmd-test-ruleset.xml")
+    }
 }

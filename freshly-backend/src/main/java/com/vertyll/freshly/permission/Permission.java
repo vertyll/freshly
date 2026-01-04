@@ -37,7 +37,7 @@ public enum Permission {
     }
 
     public static Permission fromValue(String value) {
-        for (Permission permission : Permission.values()) {
+        for (Permission permission : values()) {
             if (permission.value.equals(value)) {
                 return permission;
             }

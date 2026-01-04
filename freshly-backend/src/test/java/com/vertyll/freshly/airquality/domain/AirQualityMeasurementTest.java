@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
@@ -28,13 +27,14 @@ class AirQualityMeasurementTest {
                 "Dobry"
         );
 
-        Map<String, Double> sensorValues = new HashMap<>();
-        sensorValues.put("PM10", 25.5);
-        sensorValues.put("PM2.5", 15.2);
-        sensorValues.put("SO2", 8.5);
-        sensorValues.put("NO2", 12.3);
-        sensorValues.put("CO", 0.5);
-        sensorValues.put("O3", 45.2);
+        Map<String, Double> sensorValues = Map.of(
+            "PM10", 25.5,
+            "PM2.5", 15.2,
+            "SO2", 8.5,
+            "NO2", 12.3,
+            "CO", 0.5,
+            "O3", 45.2
+        );
 
         // When
         AirQualityMeasurement measurement = AirQualityMeasurement.create(stationId, stationName, index, sensorValues);
@@ -71,8 +71,7 @@ class AirQualityMeasurementTest {
                 "Dobry"
         );
 
-        Map<String, Double> sensorValues = new HashMap<>();
-        sensorValues.put("PM10", 25.5);
+        Map<String, Double> sensorValues = Map.of("PM10", 25.5);
         // Missing other sensor values
 
         // When
@@ -202,7 +201,7 @@ class AirQualityMeasurementTest {
                 "Dobry"
         );
 
-        Map<String, Double> emptySensorValues = new HashMap<>();
+        Map<String, Double> emptySensorValues = Map.of();
 
         // When
         AirQualityMeasurement measurement = AirQualityMeasurement.create(stationId, stationName, index, emptySensorValues);

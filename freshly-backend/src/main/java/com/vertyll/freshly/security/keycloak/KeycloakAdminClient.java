@@ -6,6 +6,8 @@ import com.vertyll.freshly.auth.domain.exception.UsernameAlreadyExistsException;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.HttpStatus;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
@@ -64,7 +66,7 @@ public class KeycloakAdminClient {
         user.setCredentials(Collections.singletonList(credential));
 
         try (Response response = usersResource.create(user)) {
-            if (response.getStatus() != 201) {
+            if (response.getStatus() != HttpStatus.CREATED.value()) {
                 log.error(
                         "Failed to create user in Keycloak: status={}, info={}",
                         response.getStatus(),
@@ -169,6 +171,7 @@ public class KeycloakAdminClient {
                     });
 
             if (response == null || !response.containsKey("access_token")) {
+                log.warn("Password verification failed for user: {} - invalid response", username);
                 throw new InvalidPasswordException("Current password is incorrect");
             }
 
@@ -177,7 +180,9 @@ public class KeycloakAdminClient {
         } catch (HttpClientErrorException.Unauthorized _) {
             log.warn("Password verification failed for user: {}", username);
             throw new InvalidPasswordException("Current password is incorrect");
-        } catch (Exception e) {
+        } catch (InvalidPasswordException e) {
+            throw e;
+        } catch (RuntimeException e) {
             log.error("Error verifying password for user: {}", username, e);
             throw new KeycloakClientException("Failed to verify password", e);
         }

@@ -126,21 +126,29 @@ class EmailNotificationTest {
     }
 
     @Test
+    @SuppressWarnings("PMD.UseConcurrentHashMap") // HashMap is safe here (no concurrent access in test)
     @DisplayName("Should create immutable copy of template variables")
     void shouldCreateImmutableCopyOfTemplateVariables() {
         // Given
         Email recipient = new Email("test@example.com");
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
+        
         Map<String, Object> variables = new java.util.HashMap<>();
         variables.put("username", "John");
 
         // When
         EmailNotification notification = new EmailNotification(recipient, template, variables);
+        
         variables.put("newKey", "newValue");
+
+        Map<String, Object> notificationVariables = notification.getTemplateVariables();
 
         // Then
         assertThat(notification.getTemplateVariables()).doesNotContainKey("newKey");
         assertThat(notification.getTemplateVariables()).hasSize(1);
+        
+        assertThatThrownBy(() -> notificationVariables.put("fail", "fail"))
+                .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test

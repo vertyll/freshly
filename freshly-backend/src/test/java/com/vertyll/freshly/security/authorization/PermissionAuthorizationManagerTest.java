@@ -16,6 +16,8 @@ import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,7 +43,7 @@ class PermissionAuthorizationManagerTest {
     @DisplayName("Should grant access when user has required permission on method")
     void shouldGrantAccessWhenUserHasRequiredPermissionOnMethod() throws NoSuchMethodException {
         // Given
-        Method method = TestClass.class.getMethod("methodWithPermission");
+        Method method = SecurityMockTarget.class.getMethod("methodWithPermission");
         when(methodInvocation.getMethod()).thenReturn(method);
         when(permissionService.hasPermission(authentication, "READ_DATA")).thenReturn(true);
 
@@ -60,7 +62,7 @@ class PermissionAuthorizationManagerTest {
     @DisplayName("Should deny access when user does not have required permission on method")
     void shouldDenyAccessWhenUserDoesNotHaveRequiredPermissionOnMethod() throws NoSuchMethodException {
         // Given
-        Method method = TestClass.class.getMethod("methodWithPermission");
+        Method method = SecurityMockTarget.class.getMethod("methodWithPermission");
         when(methodInvocation.getMethod()).thenReturn(method);
         when(permissionService.hasPermission(authentication, "READ_DATA")).thenReturn(false);
 
@@ -118,7 +120,7 @@ class PermissionAuthorizationManagerTest {
     @DisplayName("Should deny access when no annotation is found")
     void shouldDenyAccessWhenNoAnnotationIsFound() throws NoSuchMethodException {
         // Given
-        Method method = TestClass.class.getMethod("methodWithoutAnnotation");
+        Method method = SecurityMockTarget.class.getMethod("methodWithoutAnnotation");
         when(methodInvocation.getMethod()).thenReturn(method);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -136,7 +138,7 @@ class PermissionAuthorizationManagerTest {
     @DisplayName("Should handle null authentication gracefully")
     void shouldHandleNullAuthenticationGracefully() throws NoSuchMethodException {
         // Given
-        Method method = TestClass.class.getMethod("methodWithPermission");
+        Method method = SecurityMockTarget.class.getMethod("methodWithPermission");
         when(methodInvocation.getMethod()).thenReturn(method);
         when(permissionService.hasPermission(null, "READ_DATA")).thenReturn(false);
 
@@ -152,7 +154,7 @@ class PermissionAuthorizationManagerTest {
     }
 
     // Test classes
-    public static class TestClass {
+    public static class SecurityMockTarget {
         @RequirePermission("READ_DATA")
         public void methodWithPermission() {
             // Empty method used only for testing authorization annotations

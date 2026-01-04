@@ -1,5 +1,7 @@
 package com.vertyll.freshly.notification.domain;
 
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -25,7 +27,6 @@ public class EmailNotification {
             EmailTemplate template,
             Map<String, Object> templateVariables
     ) {
-
         this.id = UUID.randomUUID();
         this.recipient = Objects.requireNonNull(recipient, "Recipient cannot be null");
         this.template = Objects.requireNonNull(template, "Template cannot be null");
@@ -34,7 +35,7 @@ public class EmailNotification {
         this.status = EmailStatus.PENDING;
     }
 
-    // Reconstitution from database
+    @SuppressWarnings("java:S107")
     public static EmailNotification reconstitute(
             UUID id,
             Email recipient,
@@ -45,19 +46,20 @@ public class EmailNotification {
             LocalDateTime sentAt,
             String errorMessage
     ) {
-
-        return new EmailNotification(
-                id,
-                recipient,
-                template,
-                templateVariables,
-                createdAt,
-                status,
-                sentAt,
-                errorMessage
-        );
+        return EmailNotification.builder()
+                .id(id)
+                .recipient(recipient)
+                .template(template)
+                .templateVariables(templateVariables)
+                .createdAt(createdAt)
+                .status(status)
+                .sentAt(sentAt)
+                .errorMessage(errorMessage)
+                .build();
     }
 
+    @Builder(access = AccessLevel.PRIVATE)
+    @SuppressWarnings("java:S107")
     private EmailNotification(
             UUID id,
             Email recipient,
@@ -68,7 +70,6 @@ public class EmailNotification {
             LocalDateTime sentAt,
             String errorMessage
     ) {
-
         this.id = id;
         this.recipient = recipient;
         this.template = template;

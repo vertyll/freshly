@@ -244,7 +244,7 @@ class AirQualitySyncServiceTest {
         doThrow(new RuntimeException("Cleanup error")).when(historyRepository).deleteOlderThan(any(LocalDateTime.class));
 
         // When & Then
-        assertThatCode(() -> syncService.syncAirQualityData())
+        assertThatCode(syncService::syncAirQualityData)
                 .doesNotThrowAnyException();
 
         verify(historyRepository).deleteOlderThan(any(LocalDateTime.class));

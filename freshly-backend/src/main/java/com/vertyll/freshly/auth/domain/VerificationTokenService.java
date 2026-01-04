@@ -20,6 +20,9 @@ import java.util.UUID;
 public class VerificationTokenService {
 
     private static final String EMAIL_CLAIM = "email";
+    private static final String TYPE_CLAIM = "type";
+    private static final String EMAIL_VERIFICATION_TYPE = "email_verification";
+    private static final String PASSWORD_RESET_TYPE = "password_reset";
 
     private final JwtProperties jwtProperties;
 
@@ -34,7 +37,7 @@ public class VerificationTokenService {
         return Jwts.builder()
                 .subject(userId.toString())
                 .claim(EMAIL_CLAIM, email)
-                .claim("type", "email_verification")
+                .claim(TYPE_CLAIM, EMAIL_VERIFICATION_TYPE)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiration))
                 .signWith(getSigningKey())
@@ -48,7 +51,7 @@ public class VerificationTokenService {
         return Jwts.builder()
                 .subject(userId.toString())
                 .claim(EMAIL_CLAIM, email)
-                .claim("type", "password_reset")
+                .claim(TYPE_CLAIM, PASSWORD_RESET_TYPE)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiration))
                 .signWith(getSigningKey())
@@ -63,8 +66,8 @@ public class VerificationTokenService {
                     .parseSignedClaims(token)
                     .getPayload();
 
-            String type = claims.get("type", String.class);
-            if (!"email_verification".equals(type)) {
+            String type = claims.get(TYPE_CLAIM, String.class);
+            if (!EMAIL_VERIFICATION_TYPE.equals(type)) {
                 throw new InvalidVerificationTokenException("Invalid token type");
             }
 
@@ -91,8 +94,8 @@ public class VerificationTokenService {
                     .parseSignedClaims(token)
                     .getPayload();
 
-            String type = claims.get("type", String.class);
-            if (!"password_reset".equals(type)) {
+            String type = claims.get(TYPE_CLAIM, String.class);
+            if (!PASSWORD_RESET_TYPE.equals(type)) {
                 throw new InvalidVerificationTokenException("Invalid token type");
             }
 

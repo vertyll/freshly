@@ -60,14 +60,13 @@ class JwtConfigurationTest {
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
         Instant now = Instant.now();
-        Date issuedAt = Date.from(now);
-        Date expiresAt = Date.from(now.plusMillis(3600000L));
+        Instant expiry = now.plusMillis(3600000L);
 
         // When - Generate token
         String token = Jwts.builder()
                 .subject(userId)
-                .issuedAt(issuedAt)
-                .expiration(expiresAt)
+                .issuedAt(Date.from(now)) 
+                .expiration(Date.from(expiry))
                 .signWith(key)
                 .compact();
 
@@ -79,8 +78,9 @@ class JwtConfigurationTest {
                 .getPayload();
 
         assertThat(claims.getSubject()).isEqualTo(userId);
-        assertThat(claims.getIssuedAt()).isCloseTo(issuedAt, 1000); // Within 1 second
-        assertThat(claims.getExpiration()).isCloseTo(expiresAt, 1000);
+        
+        assertThat(claims.getIssuedAt()).isCloseTo(Date.from(now), 1000); 
+        assertThat(claims.getExpiration()).isCloseTo(Date.from(expiry), 1000);
     }
 
     @Test

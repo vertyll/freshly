@@ -18,11 +18,11 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger logger = LogManager.getLogger(GlobalExceptionHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleValidationExceptions(MethodArgumentNotValidException ex) {
-        logger.warn("Validation error: {}", ex.getMessage());
+        LOGGER.warn("Validation error: {}", ex.getMessage());
 
         Map<String, List<String>> errors = ex.getBindingResult()
                 .getFieldErrors()
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ProblemDetail handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        logger.warn("Type mismatch error: {}", ex.getMessage());
+        LOGGER.warn("Type mismatch error: {}", ex.getMessage());
 
         Class<?> requiredType = ex.getRequiredType();
         String message = String.format(
@@ -62,19 +62,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ProblemDetail handleNoResourceFound(NoResourceFoundException ex) {
-        logger.warn("Resource not found: {}", ex.getMessage());
+        LOGGER.warn("Resource not found: {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "The requested resource was not found");
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ProblemDetail handleAuthorizationDenied(AuthorizationDeniedException ex) {
-        logger.warn("Authorization denied: {}", ex.getMessage());
+        LOGGER.warn("Authorization denied: {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "You do not have permission to access this resource");
     }
 
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGenericException(Exception ex) {
-        logger.error("Unhandled exception", ex);
+        LOGGER.error("Unhandled exception", ex);
         return ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred. Please contact support."

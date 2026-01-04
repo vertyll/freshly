@@ -25,6 +25,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -150,7 +153,7 @@ class KeycloakAdminClientTest {
 
         // Then
         verify(userResource).resetPassword(argThat(credential ->
-                credential.getType().equals(CredentialRepresentation.PASSWORD) &&
+                CredentialRepresentation.PASSWORD.equals(credential.getType()) &&
                 credential.getValue().equals(newPassword) &&
                 !credential.isTemporary()
         ));

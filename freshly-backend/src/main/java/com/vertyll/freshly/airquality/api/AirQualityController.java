@@ -4,6 +4,11 @@ import com.vertyll.freshly.airquality.api.dto.*;
 import com.vertyll.freshly.airquality.api.mapper.AirQualityDtoMapper;
 import com.vertyll.freshly.airquality.application.AirQualityService;
 import com.vertyll.freshly.airquality.application.AirQualitySyncService;
+import com.vertyll.freshly.airquality.domain.AirQualityMeasurement;
+import com.vertyll.freshly.airquality.domain.SensorMeasurement;
+import com.vertyll.freshly.airquality.domain.Station;
+import com.vertyll.freshly.airquality.domain.StationDistance;
+import com.vertyll.freshly.airquality.domain.StationRanking;
 import com.vertyll.freshly.airquality.domain.exception.AirQualityDataNotFoundException;
 import com.vertyll.freshly.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +34,8 @@ public class AirQualityController {
      */
     @GetMapping("/stations")
     public ResponseEntity<ApiResponse<List<StationResponseDto>>> getStations() {
-        var stations = airQualityService.getAllStations();
-        var response = dtoMapper.toStationResponseList(stations);
+        List<Station> stations = airQualityService.getAllStations();
+        List<StationResponseDto> response = dtoMapper.toStationResponseList(stations);
         return ApiResponse.buildResponse(response, "success.airquality.stationsFetched", messageSource, HttpStatus.OK);
     }
 
@@ -41,7 +46,7 @@ public class AirQualityController {
     public ResponseEntity<ApiResponse<AirQualityIndexResponseDto>> getIndex(@PathVariable int stationId) {
         return airQualityService.getIndexForStation(stationId)
                 .map(index -> {
-                    var response = dtoMapper.toAirQualityIndexResponse(index);
+                    AirQualityIndexResponseDto response = dtoMapper.toAirQualityIndexResponse(index);
                     return ApiResponse.buildResponse(response, "success.airquality.indexFetched", messageSource, HttpStatus.OK);
                 })
                 .orElseThrow(() -> new AirQualityDataNotFoundException(stationId));
@@ -52,8 +57,8 @@ public class AirQualityController {
      */
     @GetMapping("/stations/{stationId}/sensors")
     public ResponseEntity<ApiResponse<List<SensorMeasurementResponseDto>>> getMeasurements(@PathVariable int stationId) {
-        var measurements = airQualityService.getMeasurementsForStation(stationId);
-        var response = dtoMapper.toSensorMeasurementResponseList(measurements);
+        List<SensorMeasurement> measurements = airQualityService.getMeasurementsForStation(stationId);
+        List<SensorMeasurementResponseDto> response = dtoMapper.toSensorMeasurementResponseList(measurements);
         return ApiResponse.buildResponse(response, "success.airquality.measurementsFetched", messageSource, HttpStatus.OK);
     }
 
@@ -65,7 +70,7 @@ public class AirQualityController {
     public ResponseEntity<ApiResponse<AirQualityMeasurementResponseDto>> getLatestMeasurement(@PathVariable int stationId) {
         return airQualityService.getLatestMeasurement(stationId)
                 .map(measurement -> {
-                    var response = dtoMapper.toAirQualityMeasurementResponse(measurement);
+                    AirQualityMeasurementResponseDto response = dtoMapper.toAirQualityMeasurementResponse(measurement);
                     return ApiResponse.buildResponse(response, "success.airquality.latestFetched", messageSource, HttpStatus.OK);
                 })
                 .orElseThrow(() -> new AirQualityDataNotFoundException(stationId));
@@ -82,8 +87,8 @@ public class AirQualityController {
             @PathVariable int stationId,
             @RequestParam(defaultValue = "7") int days
     ) {
-        var history = airQualityService.getHistoricalMeasurements(stationId, days);
-        var response = dtoMapper.toAirQualityMeasurementResponseList(history);
+        List<AirQualityMeasurement> history = airQualityService.getHistoricalMeasurements(stationId, days);
+        List<AirQualityMeasurementResponseDto> response = dtoMapper.toAirQualityMeasurementResponseList(history);
         return ApiResponse.buildResponse(response, "success.airquality.historyFetched", messageSource, HttpStatus.OK);
     }
 
@@ -110,8 +115,8 @@ public class AirQualityController {
             @RequestParam double longitude,
             @RequestParam(defaultValue = "10") double radius
     ) {
-        var stationsWithDistance = airQualityService.findNearestStations(latitude, longitude, radius);
-        var response = dtoMapper.toStationDistanceResponseList(stationsWithDistance);
+        List<StationDistance> stationsWithDistance = airQualityService.findNearestStations(latitude, longitude, radius);
+        List<StationDistanceResponseDto> response = dtoMapper.toStationDistanceResponseList(stationsWithDistance);
         return ApiResponse.buildResponse(response, "success.airquality.nearestFetched", messageSource, HttpStatus.OK);
     }
 
@@ -128,7 +133,7 @@ public class AirQualityController {
     ) {
         return airQualityService.getStatistics(stationId, days)
                 .map(stats -> {
-                    var response = dtoMapper.toStatisticsResponse(stats);
+                    AirQualityStatisticsResponseDto response = dtoMapper.toStatisticsResponse(stats);
                     return ApiResponse.buildResponse(response, "success.airquality.statisticsFetched", messageSource, HttpStatus.OK);
                 })
                 .orElseThrow(() -> new AirQualityDataNotFoundException(stationId));
@@ -145,8 +150,8 @@ public class AirQualityController {
             @RequestParam(defaultValue = "7") int days,
             @RequestParam(defaultValue = "10") int limit
     ) {
-        var rankings = airQualityService.getRanking(days, limit);
-        var response = dtoMapper.toRankingResponseList(rankings);
+        List<StationRanking> rankings = airQualityService.getRanking(days, limit);
+        List<StationRankingResponseDto> response = dtoMapper.toRankingResponseList(rankings);
         return ApiResponse.buildResponse(response, "success.airquality.rankingFetched", messageSource, HttpStatus.OK);
     }
 }

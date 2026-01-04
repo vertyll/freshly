@@ -9,6 +9,8 @@ import com.vertyll.freshly.security.config.CookieProperties;
 import com.vertyll.freshly.security.config.JwtProperties;
 import com.vertyll.freshly.security.resolver.RefreshTokenCookieArgumentResolver;
 import jakarta.servlet.http.Cookie;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -65,9 +67,11 @@ class AuthControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private LocalValidatorFactoryBean validator;
+
     @BeforeEach
     void setUp() {
-        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+        validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
 
         // Mock for RefreshTokenCookieArgumentResolver
@@ -79,10 +83,17 @@ class AuthControllerTest {
         AuthenticationPrincipalArgumentResolver authenticationPrincipalResolver = new AuthenticationPrincipalArgumentResolver();
 
         mockMvc = MockMvcBuilders.standaloneSetup(authController)
-                .setControllerAdvice(new AuthControllerAdvice(messageSource), new GlobalExceptionHandler())
-                .setCustomArgumentResolvers(refreshTokenResolver, authenticationPrincipalResolver)
-                .setValidator(validator)
-                .build();
+            .setControllerAdvice(new AuthControllerAdvice(messageSource), new GlobalExceptionHandler())
+            .setCustomArgumentResolvers(refreshTokenResolver, authenticationPrincipalResolver)
+            .setValidator(validator)
+            .build();
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (validator != null) {
+            validator.close();
+        }
     }
 
     @Nested

@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,7 +42,7 @@ class AnyPermissionAuthorizationManagerTest {
     @DisplayName("Should grant access when user has any of required permissions on method")
     void shouldGrantAccessWhenUserHasAnyOfRequiredPermissionsOnMethod() throws NoSuchMethodException {
         // Given
-        Method method = TestClass.class.getMethod("methodWithMultiplePermissions");
+        Method method = SecurityMockTarget.class.getMethod("methodWithMultiplePermissions");
         when(methodInvocation.getMethod()).thenReturn(method);
         String[] permissions = {"READ_DATA", "WRITE_DATA", "DELETE_DATA"};
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(true);
@@ -61,7 +62,7 @@ class AnyPermissionAuthorizationManagerTest {
     @DisplayName("Should deny access when user does not have any of required permissions on method")
     void shouldDenyAccessWhenUserDoesNotHaveAnyOfRequiredPermissionsOnMethod() throws NoSuchMethodException {
         // Given
-        Method method = TestClass.class.getMethod("methodWithMultiplePermissions");
+        Method method = SecurityMockTarget.class.getMethod("methodWithMultiplePermissions");
         when(methodInvocation.getMethod()).thenReturn(method);
         String[] permissions = {"READ_DATA", "WRITE_DATA", "DELETE_DATA"};
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(false);
@@ -115,14 +116,14 @@ class AnyPermissionAuthorizationManagerTest {
         assertThat(result).isNotNull();
         assertThat(result.isGranted()).isTrue();
         verify(permissionService).hasAnyPermission(authentication, methodPermissions);
-        verify(permissionService, never()).hasAnyPermission(authentication, new String[]{"ADMIN", "MODERATOR"});
+        verify(permissionService, never()).hasAnyPermission(authentication, "ADMIN", "MODERATOR");
     }
 
     @Test
     @DisplayName("Should deny access when no annotation is found")
     void shouldDenyAccessWhenNoAnnotationIsFound() throws NoSuchMethodException {
         // Given
-        Method method = TestClass.class.getMethod("methodWithoutAnnotation");
+        Method method = SecurityMockTarget.class.getMethod("methodWithoutAnnotation");
         when(methodInvocation.getMethod()).thenReturn(method);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -140,7 +141,7 @@ class AnyPermissionAuthorizationManagerTest {
     @DisplayName("Should handle single permission in annotation")
     void shouldHandleSinglePermissionInAnnotation() throws NoSuchMethodException {
         // Given
-        Method method = TestClass.class.getMethod("methodWithSinglePermission");
+        Method method = SecurityMockTarget.class.getMethod("methodWithSinglePermission");
         when(methodInvocation.getMethod()).thenReturn(method);
         String[] permissions = {"SINGLE_PERMISSION"};
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(true);
@@ -160,7 +161,7 @@ class AnyPermissionAuthorizationManagerTest {
     @DisplayName("Should handle null authentication gracefully")
     void shouldHandleNullAuthenticationGracefully() throws NoSuchMethodException {
         // Given
-        Method method = TestClass.class.getMethod("methodWithMultiplePermissions");
+        Method method = SecurityMockTarget.class.getMethod("methodWithMultiplePermissions");
         when(methodInvocation.getMethod()).thenReturn(method);
         String[] permissions = {"READ_DATA", "WRITE_DATA", "DELETE_DATA"};
         when(permissionService.hasAnyPermission(null, permissions)).thenReturn(false);
@@ -177,7 +178,7 @@ class AnyPermissionAuthorizationManagerTest {
     }
 
     // Test classes
-    public static class TestClass {
+    public static class SecurityMockTarget {
         @RequireAnyPermission({"READ_DATA", "WRITE_DATA", "DELETE_DATA"})
         public void methodWithMultiplePermissions() {
             // Empty method used only for testing authorization annotations

@@ -3,6 +3,8 @@ package com.vertyll.freshly.permission.domain;
 import com.vertyll.freshly.permission.Permission;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.UUID;
 
@@ -132,17 +134,18 @@ class RolePermissionMappingTest {
         // Values should not change
     }
 
-    @Test
+    @ParameterizedTest
+    @EnumSource(Permission.class)
     @DisplayName("Should handle all permission types")
-    void shouldHandleAllPermissionTypes() {
+    void shouldHandleAllPermissionTypes(Permission permission) {
         // Given
         String role = "admin";
 
-        // When & Then
-        for (Permission permission : Permission.values()) {
-            RolePermissionMapping mapping = new RolePermissionMapping(role, permission);
-            assertThat(mapping.getPermission()).isEqualTo(permission);
-        }
+        // When
+        RolePermissionMapping mapping = new RolePermissionMapping(role, permission);
+
+        // Then
+        assertThat(mapping.getPermission()).isEqualTo(permission);
     }
 
     @Test
