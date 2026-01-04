@@ -71,12 +71,13 @@ class UserPermissionCacheTest {
         Set<Permission> permissions = userPermissionCache.getUserPermissions(authentication);
 
         // Then
-        assertThat(permissions).hasSize(3);
-        assertThat(permissions).contains(
-                Permission.USERS_READ,
-                Permission.USERS_CREATE,
-                Permission.REPORTS_READ
-        );
+        assertThat(permissions)
+                .hasSize(3)
+                .contains(
+                        Permission.USERS_READ,
+                        Permission.USERS_CREATE,
+                        Permission.REPORTS_READ
+                );
         verify(rolePermissionRepository).findByKeycloakRoleIn(Set.of("admin", "user"));
     }
 
@@ -201,8 +202,9 @@ class UserPermissionCacheTest {
         Set<Permission> permissions = userPermissionCache.getUserPermissions(authentication);
 
         // Then
-        assertThat(permissions).hasSize(2);
-        assertThat(permissions).contains(Permission.USERS_READ, Permission.USERS_DELETE);
+        assertThat(permissions)
+                .hasSize(2)
+                .contains(Permission.USERS_READ, Permission.USERS_DELETE);
     }
 
     @Test
@@ -260,8 +262,9 @@ class UserPermissionCacheTest {
         Set<Permission> permissions = userPermissionCache.getUserPermissions(authentication);
 
         // Then
-        assertThat(permissions).hasSize(2);
-        assertThat(permissions).contains(Permission.USERS_READ, Permission.REPORTS_READ);
+        assertThat(permissions)
+                .hasSize(2)
+                .contains(Permission.USERS_READ, Permission.REPORTS_READ);
         verify(rolePermissionRepository).findByKeycloakRoleIn(Set.of("admin", "user"));
     }
 
@@ -286,7 +289,8 @@ class UserPermissionCacheTest {
         Set<Permission> permissions1 = userPermissionCache.getUserPermissions(authentication);
         Set<Permission> permissions2 = userPermissionCache.getUserPermissions(authentication);
 
-        assertThat(permissions1).isEqualTo(permissions2);
-        assertThat(permissions1).contains(Permission.USERS_READ);
+        assertThat(permissions1)
+                .isEqualTo(permissions2)
+                .contains(Permission.USERS_READ);
     }
 }

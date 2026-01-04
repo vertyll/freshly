@@ -100,7 +100,8 @@ class SystemUserTest {
     void shouldActivateInactiveUser() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user = new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER));
+        Set<UserRoleEnum> roles = Set.of(UserRoleEnum.USER);
+        SystemUser user = new SystemUser(keycloakUserId, false, roles);
 
         // When
         user.activate();
@@ -239,9 +240,10 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
+        Set<UserRoleEnum> emptyRoles = Set.of();
 
         // When & Then
-        assertThatThrownBy(() -> user.replaceRoles(Set.of()))
+        assertThatThrownBy(() -> user.replaceRoles(emptyRoles))
                 .isInstanceOf(UserRolesEmptyException.class);
     }
 

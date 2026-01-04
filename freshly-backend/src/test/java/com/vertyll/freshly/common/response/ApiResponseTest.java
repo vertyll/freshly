@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,7 +31,7 @@ class ApiResponseTest {
         Locale locale = Locale.forLanguageTag("en-US");
         LocaleContextHolder.setLocale(locale);
 
-        when(messageSource.getMessage(eq(messageKey), eq(null), eq(locale)))
+        when(messageSource.getMessage(messageKey, null, locale))
                 .thenReturn(localizedMessage);
 
         // When
@@ -61,7 +60,7 @@ class ApiResponseTest {
         Locale locale = Locale.forLanguageTag("pl");
         LocaleContextHolder.setLocale(locale);
 
-        when(messageSource.getMessage(eq(messageKey), eq(null), eq(locale)))
+        when(messageSource.getMessage(messageKey, null, locale))
                 .thenReturn(localizedMessage);
 
         // When
@@ -88,7 +87,7 @@ class ApiResponseTest {
         Locale locale = Locale.forLanguageTag("en-US");
         LocaleContextHolder.setLocale(locale);
 
-        when(messageSource.getMessage(eq(messageKey), eq(null), eq(locale)))
+        when(messageSource.getMessage(messageKey, null, locale))
                 .thenReturn(localizedMessage);
 
         // When

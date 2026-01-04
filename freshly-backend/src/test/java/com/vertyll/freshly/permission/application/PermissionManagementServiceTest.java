@@ -86,8 +86,9 @@ class PermissionManagementServiceTest {
         List<PermissionMappingResponseDto> result = service.getMappingsByRole(role);
 
         // Then
-        assertThat(result).hasSize(2);
-        assertThat(result).allMatch(dto -> dto.keycloakRole().equals(role));
+        assertThat(result)
+                .hasSize(2)
+                .allMatch(dto -> dto.keycloakRole().equals(role));
         verify(repository).findByKeycloakRole(role);
     }
 
@@ -300,9 +301,11 @@ class PermissionManagementServiceTest {
         List<PermissionMappingResponseDto> userMappings = service.getMappingsByRole(role2);
 
         // Then
-        assertThat(adminMappings).hasSize(2);
-        assertThat(adminMappings).allMatch(dto -> dto.keycloakRole().equals(role1));
-        assertThat(userMappings).hasSize(1);
-        assertThat(userMappings).allMatch(dto -> dto.keycloakRole().equals(role2));
+        assertThat(adminMappings)
+                .hasSize(2)
+                .allMatch(dto -> dto.keycloakRole().equals(role1));
+        assertThat(userMappings)
+                .hasSize(1)
+                .allMatch(dto -> dto.keycloakRole().equals(role2));
     }
 }

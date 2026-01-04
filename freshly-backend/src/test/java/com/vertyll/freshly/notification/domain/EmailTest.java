@@ -22,7 +22,7 @@ class EmailTest {
 
         // Then
         assertThat(email.value()).isEqualTo(emailValue);
-        assertThat(email.toString()).isEqualTo(emailValue);
+        assertThat(email).hasToString(emailValue);
     }
 
     @ParameterizedTest
@@ -59,8 +59,9 @@ class EmailTest {
         Email email2 = new Email("user@example.com");
 
         // When & Then
-        assertThat(email1).isEqualTo(email2);
-        assertThat(email1.hashCode()).isEqualTo(email2.hashCode());
+        assertThat(email1)
+                .isEqualTo(email2)
+                .hasSameHashCodeAs(email2);
     }
 
     @Test

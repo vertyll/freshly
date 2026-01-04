@@ -105,8 +105,9 @@ class PermissionServiceTest {
         Set<Permission> permissions = permissionService.getUserPermissions(authentication);
 
         // Then
-        assertThat(permissions).isEqualTo(expectedPermissions);
-        assertThat(permissions).hasSize(3);
+        assertThat(permissions)
+                .isEqualTo(expectedPermissions)
+                .hasSize(3);
         verify(permissionCache).getUserPermissions(authentication);
     }
 

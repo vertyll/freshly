@@ -295,7 +295,8 @@ class KeycloakAdminClientTest {
         List<UserRepresentation> users = keycloakAdminClient.findUsersByEmail(email);
 
         // Then
-        assertThat(users).hasSize(2);
-        assertThat(users).isEqualTo(expectedUsers);
+        assertThat(users)
+            .hasSize(2)
+            .isEqualTo(expectedUsers);
     }
 }

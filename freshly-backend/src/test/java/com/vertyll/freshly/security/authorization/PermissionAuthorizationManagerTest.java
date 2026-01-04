@@ -155,19 +155,23 @@ class PermissionAuthorizationManagerTest {
     public static class TestClass {
         @RequirePermission("READ_DATA")
         public void methodWithPermission() {
+            // Empty method used only for testing authorization annotations
         }
 
         public void methodWithoutAnnotation() {
+            // Empty method used only for testing authorization behavior when annotation is absent
         }
     }
 
     @RequirePermission("WRITE_DATA")
     public static class ClassWithPermission {
         public void methodWithoutAnnotation() {
+            // Empty method used only for testing class-level authorization annotations
         }
 
         @RequirePermission("DELETE_DATA")
         public void methodWithDifferentPermission() {
+            // Empty method used only for testing method-level vs class-level annotation priority
         }
     }
 }

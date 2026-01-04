@@ -18,6 +18,23 @@ services:
       timeout: 5s
       retries: 5
 
+  test-mongodb:
+    container_name: freshly-mongodb-test
+    image: mongo:${MONGO_VERSION:-8}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: test
+      MONGO_INITDB_ROOT_PASSWORD: test
+      MONGO_INITDB_DATABASE: test_db
+    ports:
+      - "${MONGO_TEST_PORT:-27018}:27017"
+    networks:
+      - freshly
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   mongo-express:
     image: mongo-express:${MONGO_EXPRESS_VERSION:-latest}
     container_name: freshly-mongo-express
@@ -135,6 +152,7 @@ services:
 
 volumes:
   mongodb-data:
+  mongodb-test-data:
   postgres-data:
   gradle-cache:
 

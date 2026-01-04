@@ -145,8 +145,10 @@ class UserAccessServiceTest {
         List<SystemUser> result = userAccessService.getAllUsers();
 
         // Then
-        assertThat(result).hasSize(2);
-        assertThat(result).containsExactly(user1, user2);
+        assertThat(result)
+            .hasSize(2)
+            .containsExactly(user1, user2);
+            
         verify(systemUserRepository).findAll();
     }
 

@@ -38,7 +38,7 @@ class MessageHelperTest {
         Locale currentLocale = Locale.forLanguageTag("en-US");
         LocaleContextHolder.setLocale(currentLocale);
 
-        when(messageSource.getMessage(eq(key), eq(null), eq(currentLocale)))
+        when(messageSource.getMessage(key, null, currentLocale))
                 .thenReturn(expectedMessage);
 
         // When
@@ -58,7 +58,7 @@ class MessageHelperTest {
         Locale currentLocale = Locale.forLanguageTag("en-US");
         LocaleContextHolder.setLocale(currentLocale);
 
-        when(messageSource.getMessage(eq(key), eq(args), eq(currentLocale)))
+        when(messageSource.getMessage(key, args, currentLocale))
                 .thenReturn(expectedMessage);
 
         // When
@@ -76,7 +76,7 @@ class MessageHelperTest {
         Locale specificLocale = Locale.forLanguageTag("pl");
         String expectedMessage = "Użytkownik utworzony pomyślnie";
 
-        when(messageSource.getMessage(eq(key), eq(null), eq(specificLocale)))
+        when(messageSource.getMessage(key, null, specificLocale))
                 .thenReturn(expectedMessage);
 
         // When
@@ -95,7 +95,7 @@ class MessageHelperTest {
         Locale specificLocale = Locale.forLanguageTag("pl");
         String expectedMessage = "Witaj Jan Kowalski";
 
-        when(messageSource.getMessage(eq(key), eq(args), eq(specificLocale)))
+        when(messageSource.getMessage(key, args, specificLocale))
                 .thenReturn(expectedMessage);
 
         // When
@@ -115,7 +115,7 @@ class MessageHelperTest {
         Locale currentLocale = Locale.forLanguageTag("en-US");
         LocaleContextHolder.setLocale(currentLocale);
 
-        when(messageSource.getMessage(eq(key), eq(args), eq(currentLocale)))
+        when(messageSource.getMessage(key, args, currentLocale))
                 .thenReturn(expectedMessage);
 
         // When

@@ -3,6 +3,8 @@ package com.vertyll.freshly.common.i18n;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -17,102 +19,33 @@ class MessageSourceTest {
 
     @BeforeEach
     void setUp() {
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasename("i18n/messages");
-        messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setFallbackToSystemLocale(false);
-        messageSource.setDefaultLocale(Locale.ENGLISH);
-        this.messageSource = messageSource;
+        ResourceBundleMessageSource source = new ResourceBundleMessageSource();
+        source.setBasename("i18n/messages");
+        source.setDefaultEncoding("UTF-8");
+        source.setFallbackToSystemLocale(false);
+        source.setDefaultLocale(Locale.ENGLISH);
+        this.messageSource = source;
     }
 
-    @Test
-    @DisplayName("Should return English message for en-US locale")
-    void shouldLoadEnglishMessage() {
+    @ParameterizedTest
+    @CsvSource({
+            "en-US, success.user.created, User created successfully",
+            "pl, success.user.created, Użytkownik utworzony pomyślnie",
+            "en-US, error.user.notFound, User not found",
+            "pl, error.user.notFound, Nie znaleziono użytkownika",
+            "de, success.user.created, User created successfully"
+    })
+    @DisplayName("Should load messages for different locales and keys")
+    void shouldLoadMessagesForLocaleAndKey(String localeTag, String messageKey, String expectedMessage) {
         // Given
-        Locale locale = Locale.forLanguageTag("en-US");
+        Locale locale = Locale.forLanguageTag(localeTag);
         LocaleContextHolder.setLocale(locale);
 
         // When
-        String message = messageSource.getMessage(
-                "success.user.created",
-                null,
-                locale
-        );
+        String message = messageSource.getMessage(messageKey, null, locale);
 
         // Then
-        assertThat(message).isEqualTo("User created successfully");
-    }
-
-    @Test
-    @DisplayName("Should return Polish message for pl locale")
-    void shouldLoadPolishMessage() {
-        // Given
-        Locale locale = Locale.forLanguageTag("pl");
-        LocaleContextHolder.setLocale(locale);
-
-        // When
-        String message = messageSource.getMessage(
-                "success.user.created",
-                null,
-                locale
-        );
-
-        // Then
-        assertThat(message).isEqualTo("Użytkownik utworzony pomyślnie");
-    }
-
-    @Test
-    @DisplayName("Should return English error message")
-    void shouldLoadErrorMessage_English() {
-        // Given
-        Locale locale = Locale.forLanguageTag("en-US");
-        LocaleContextHolder.setLocale(locale);
-
-        // When
-        String message = messageSource.getMessage(
-                "error.user.notFound",
-                null,
-                locale
-        );
-
-        // Then
-        assertThat(message).isEqualTo("User not found");
-    }
-
-    @Test
-    @DisplayName("Should return Polish error message")
-    void shouldLoadErrorMessage_Polish() {
-        // Given
-        Locale locale = Locale.forLanguageTag("pl");
-        LocaleContextHolder.setLocale(locale);
-
-        // When
-        String message = messageSource.getMessage(
-                "error.user.notFound",
-                null,
-                locale
-        );
-
-        // Then
-        assertThat(message).isEqualTo("Nie znaleziono użytkownika");
-    }
-
-    @Test
-    @DisplayName("Should fallback to English when locale not supported")
-    void shouldFallbackToEnglish_whenLocaleNotSupported() {
-        // Given
-        Locale locale = Locale.forLanguageTag("de");
-        LocaleContextHolder.setLocale(locale);
-
-        // When
-        String message = messageSource.getMessage(
-                "success.user.created",
-                null,
-                locale
-        );
-
-        // Then
-        assertThat(message).isEqualTo("User created successfully");
+        assertThat(message).isEqualTo(expectedMessage);
     }
 
     @Test

@@ -86,7 +86,7 @@ class JwtConfigurationTest {
     @Test
     void shouldHaveValidSecretKeyLength() {
         // Given & Then - HS256 requires at least 256 bits (32 bytes)
-        assertThat(SECRET.getBytes(StandardCharsets.UTF_8).length).isGreaterThanOrEqualTo(32);
+        assertThat(SECRET.getBytes(StandardCharsets.UTF_8)).hasSizeGreaterThanOrEqualTo(32);
     }
 
     @Test
@@ -112,7 +112,8 @@ class JwtConfigurationTest {
         String cookieName = "refresh_token";
         
         // Then
-        assertThat(cookieName).isNotNull();
-        assertThat(cookieName).isNotEmpty();
+        assertThat(cookieName)
+            .isNotNull()
+            .isNotEmpty();
     }
 }

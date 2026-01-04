@@ -55,8 +55,9 @@ class VerificationTokenServiceTest {
         String token = verificationTokenService.generateEmailVerificationToken(userId, email);
 
         // Then
-        assertThat(token).isNotNull();
-        assertThat(token).isNotEmpty();
+        assertThat(token)
+                .isNotNull()
+                .isNotEmpty();
 
         // Verify token structure
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
@@ -81,8 +82,9 @@ class VerificationTokenServiceTest {
         String token = verificationTokenService.generatePasswordResetToken(userId, email);
 
         // Then
-        assertThat(token).isNotNull();
-        assertThat(token).isNotEmpty();
+        assertThat(token)
+                .isNotNull()
+                .isNotEmpty();
 
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
         Claims claims = Jwts.parser()

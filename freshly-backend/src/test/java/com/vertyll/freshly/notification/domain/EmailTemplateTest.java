@@ -66,11 +66,12 @@ class EmailTemplateTest {
         EmailTemplate[] templates = EmailTemplate.values();
 
         // Then
-        assertThat(templates).hasSize(3);
-        assertThat(templates).containsExactlyInAnyOrder(
-            EmailTemplate.USER_REGISTERED,
-            EmailTemplate.EMAIL_VERIFICATION,
-            EmailTemplate.PASSWORD_RESET
-        );
+        assertThat(templates)
+                .hasSize(3)
+                .containsExactlyInAnyOrder(
+                    EmailTemplate.USER_REGISTERED,
+                    EmailTemplate.EMAIL_VERIFICATION,
+                    EmailTemplate.PASSWORD_RESET
+                );
     }
 }

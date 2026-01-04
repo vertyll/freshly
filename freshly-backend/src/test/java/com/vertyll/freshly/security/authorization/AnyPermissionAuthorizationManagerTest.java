@@ -115,7 +115,7 @@ class AnyPermissionAuthorizationManagerTest {
         assertThat(result).isNotNull();
         assertThat(result.isGranted()).isTrue();
         verify(permissionService).hasAnyPermission(authentication, methodPermissions);
-        verify(permissionService, never()).hasAnyPermission(eq(authentication), eq(new String[]{"ADMIN", "MODERATOR"}));
+        verify(permissionService, never()).hasAnyPermission(authentication, new String[]{"ADMIN", "MODERATOR"});
     }
 
     @Test
@@ -180,23 +180,28 @@ class AnyPermissionAuthorizationManagerTest {
     public static class TestClass {
         @RequireAnyPermission({"READ_DATA", "WRITE_DATA", "DELETE_DATA"})
         public void methodWithMultiplePermissions() {
+            // Empty method used only for testing authorization annotations
         }
 
         @RequireAnyPermission("SINGLE_PERMISSION")
         public void methodWithSinglePermission() {
+            // Empty method used only for testing authorization annotations
         }
 
         public void methodWithoutAnnotation() {
+            // Empty method used only for testing authorization behavior when annotation is absent
         }
     }
 
     @RequireAnyPermission({"ADMIN", "MODERATOR"})
     public static class ClassWithAnyPermission {
         public void methodWithoutAnnotation() {
+            // Empty method used only for testing class-level authorization annotations
         }
 
         @RequireAnyPermission({"USER", "GUEST"})
         public void methodWithDifferentPermissions() {
+            // Empty method used only for testing method-level vs class-level annotation priority
         }
     }
 }
