@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ class AirQualityMeasurementTest {
         // Given
         int stationId = 123;
         String stationName = "Station 1";
-        LocalDateTime calculationDate = LocalDateTime.now();
+        LocalDateTime calculationDate = LocalDateTime.now(ZoneOffset.UTC);
         AirQualityIndex index = new AirQualityIndex(
                 stationId,
                 calculationDate,
@@ -63,7 +64,7 @@ class AirQualityMeasurementTest {
         String stationName = "Station 1";
         AirQualityIndex index = new AirQualityIndex(
                 stationId,
-                LocalDateTime.now(),
+                LocalDateTime.now(ZoneOffset.UTC),
                 "Dobry",
                 "Dobry",
                 "Dobry",
@@ -147,7 +148,7 @@ class AirQualityMeasurementTest {
     void shouldSetAllMeasurementPropertiesCorrectly() {
         // Given
         AirQualityMeasurement measurement = new AirQualityMeasurement();
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
 
         // When
         measurement.setId("test-id");
@@ -194,7 +195,7 @@ class AirQualityMeasurementTest {
         String stationName = "Station 1";
         AirQualityIndex index = new AirQualityIndex(
                 stationId,
-                LocalDateTime.now(),
+                LocalDateTime.now(ZoneOffset.UTC),
                 "Dobry",
                 "Dobry",
                 "Dobry",

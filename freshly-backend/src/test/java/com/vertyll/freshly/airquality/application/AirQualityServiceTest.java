@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -78,7 +79,7 @@ class AirQualityServiceTest {
             int stationId = 123;
             AirQualityIndex index = new AirQualityIndex(
                     stationId,
-                    LocalDateTime.now(),
+                    LocalDateTime.now(ZoneOffset.UTC),
                     "Dobry",
                     "Dobry",
                     "Umiarkowany",
@@ -122,8 +123,8 @@ class AirQualityServiceTest {
         void shouldGetMeasurementsForStationSuccessfully() {
             // Given
             int stationId = 123;
-            SensorMeasurement.Reading reading1 = new SensorMeasurement.Reading(LocalDateTime.now(), 25.5);
-            SensorMeasurement.Reading reading2 = new SensorMeasurement.Reading(LocalDateTime.now().minusHours(1), 30.2);
+            SensorMeasurement.Reading reading1 = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
+            SensorMeasurement.Reading reading2 = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC).minusHours(1), 30.2);
             SensorMeasurement measurement = new SensorMeasurement(
                     1,
                     "PM10",
@@ -273,8 +274,8 @@ class AirQualityServiceTest {
         @DisplayName("Should get measurements in range successfully")
         void shouldGetMeasurementsInRangeSuccessfully() {
             // Given
-            LocalDateTime from = LocalDateTime.now().minusDays(7);
-            LocalDateTime to = LocalDateTime.now();
+            LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC).minusDays(7);
+            LocalDateTime to = LocalDateTime.now(ZoneOffset.UTC);
             List<AirQualityMeasurement> measurements = List.of(new AirQualityMeasurement());
 
             when(historyRepository.findByDateRange(from, to)).thenReturn(measurements);
@@ -415,8 +416,8 @@ class AirQualityServiceTest {
             AirQualityStatistics statistics = new AirQualityStatistics(
                     stationId,
                     "Station 1",
-                    LocalDateTime.now().minusDays(days),
-                    LocalDateTime.now(),
+                    LocalDateTime.now(ZoneOffset.UTC).minusDays(days),
+                    LocalDateTime.now(ZoneOffset.UTC),
                     100,
                     25.5, 10.0, 50.0,
                     15.2, 5.0, 30.0,

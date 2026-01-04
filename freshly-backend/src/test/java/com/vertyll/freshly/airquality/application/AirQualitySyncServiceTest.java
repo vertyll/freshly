@@ -81,7 +81,7 @@ class AirQualitySyncServiceTest {
                 "Dobry"
         );
 
-        SensorMeasurement.Reading reading = new SensorMeasurement.Reading(LocalDateTime.now(), 25.5);
+        SensorMeasurement.Reading reading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
         SensorMeasurement measurement = new SensorMeasurement(1, "PM10", "Pył zawieszony PM10", List.of(reading));
 
         when(airQualityProvider.findAllStations()).thenReturn(stations);
@@ -160,7 +160,7 @@ class AirQualitySyncServiceTest {
                 "Dobry"
         );
 
-        SensorMeasurement.Reading reading = new SensorMeasurement.Reading(LocalDateTime.now(), 25.5);
+        SensorMeasurement.Reading reading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
         SensorMeasurement measurement = new SensorMeasurement(1, "PM10", "Pył zawieszony PM10", List.of(reading));
 
         when(airQualityProvider.findAllStations()).thenReturn(stations);
@@ -197,8 +197,8 @@ class AirQualitySyncServiceTest {
                 "Dobry"
         );
 
-        SensorMeasurement.Reading pm10Reading = new SensorMeasurement.Reading(LocalDateTime.now(), 25.5);
-        SensorMeasurement.Reading pm25Reading = new SensorMeasurement.Reading(LocalDateTime.now(), 15.2);
+        SensorMeasurement.Reading pm10Reading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
+        SensorMeasurement.Reading pm25Reading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 15.2);
         SensorMeasurement pm10Measurement = new SensorMeasurement(1, "PM10", "PM10", List.of(pm10Reading));
         SensorMeasurement pm25Measurement = new SensorMeasurement(2, "PM2.5", "PM2.5", List.of(pm25Reading));
 
@@ -267,8 +267,8 @@ class AirQualitySyncServiceTest {
         );
 
         // Multiple readings with different timestamps - should pick the first non-null
-        SensorMeasurement.Reading reading1 = new SensorMeasurement.Reading(LocalDateTime.now(), 25.5);
-        SensorMeasurement.Reading reading2 = new SensorMeasurement.Reading(LocalDateTime.now().minusHours(1), 30.2);
+        SensorMeasurement.Reading reading1 = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
+        SensorMeasurement.Reading reading2 = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC).minusHours(1), 30.2);
         SensorMeasurement measurement = new SensorMeasurement(1, "PM10", "PM10", List.of(reading1, reading2));
 
         when(airQualityProvider.findAllStations()).thenReturn(stations);
@@ -339,8 +339,8 @@ class AirQualitySyncServiceTest {
                 "Dobry"
         );
 
-        SensorMeasurement.Reading nullReading = new SensorMeasurement.Reading(LocalDateTime.now(), null);
-        SensorMeasurement.Reading validReading = new SensorMeasurement.Reading(LocalDateTime.now(), 25.5);
+        SensorMeasurement.Reading nullReading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), null);
+        SensorMeasurement.Reading validReading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
         SensorMeasurement measurement = new SensorMeasurement(1, "PM10", "PM10", List.of(nullReading, validReading));
 
         when(airQualityProvider.findAllStations()).thenReturn(stations);
@@ -378,7 +378,7 @@ class AirQualitySyncServiceTest {
                 "Dobry"
         );
 
-        SensorMeasurement.Reading reading = new SensorMeasurement.Reading(LocalDateTime.now(), 25.5);
+        SensorMeasurement.Reading reading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
         SensorMeasurement measurement = new SensorMeasurement(1, "PM10", "PM10", List.of(reading));
 
         when(airQualityProvider.findAllStations()).thenReturn(stations);

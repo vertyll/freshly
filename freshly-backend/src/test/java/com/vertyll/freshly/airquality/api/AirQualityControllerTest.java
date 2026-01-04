@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 import static org.hamcrest.Matchers.*;
@@ -121,7 +122,7 @@ class AirQualityControllerTest {
             int stationId = 123;
             AirQualityIndex index = new AirQualityIndex(
                     stationId,
-                    LocalDateTime.now(),
+                    LocalDateTime.now(ZoneOffset.UTC),
                     "Dobry",
                     "Dobry",
                     "Umiarkowany",
@@ -129,7 +130,7 @@ class AirQualityControllerTest {
             );
             AirQualityIndexResponseDto responseDto = new AirQualityIndexResponseDto(
                     stationId,
-                    LocalDateTime.now(),
+                    LocalDateTime.now(ZoneOffset.UTC),
                     "Dobry",
                     "Dobry",
                     "Umiarkowany",
@@ -178,8 +179,8 @@ class AirQualityControllerTest {
         void shouldGetSensorMeasurementsSuccessfully() throws Exception {
             // Given
             int stationId = 123;
-            SensorMeasurement.Reading reading1 = new SensorMeasurement.Reading(LocalDateTime.now(), 25.5);
-            SensorMeasurement.Reading reading2 = new SensorMeasurement.Reading(LocalDateTime.now().minusHours(1), 30.2);
+            SensorMeasurement.Reading reading1 = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
+            SensorMeasurement.Reading reading2 = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC).minusHours(1), 30.2);
             SensorMeasurement measurement = new SensorMeasurement(
                     1,
                     "PM10",
@@ -249,7 +250,7 @@ class AirQualityControllerTest {
                     "id-123",
                     stationId,
                     "Station 1",
-                    LocalDateTime.now(),
+                    LocalDateTime.now(ZoneOffset.UTC),
                     "GOOD",
                     null,
                     null,
@@ -261,7 +262,7 @@ class AirQualityControllerTest {
                     null,
                     null,
                     null,
-                    LocalDateTime.now()
+                    LocalDateTime.now(ZoneOffset.UTC)
             );
 
             when(airQualityService.getLatestMeasurement(stationId)).thenReturn(Optional.of(measurement));
@@ -312,7 +313,7 @@ class AirQualityControllerTest {
                             "id-123",
                             stationId,
                             "Station 1",
-                            LocalDateTime.now(),
+                            LocalDateTime.now(ZoneOffset.UTC),
                             "GOOD",
                             null,
                             null,
@@ -324,7 +325,7 @@ class AirQualityControllerTest {
                             null,
                             null,
                             null,
-                            LocalDateTime.now()
+                            LocalDateTime.now(ZoneOffset.UTC)
                     )
             );
 
@@ -353,7 +354,7 @@ class AirQualityControllerTest {
                             "id-123",
                             stationId,
                             "Station 1",
-                            LocalDateTime.now(),
+                            LocalDateTime.now(ZoneOffset.UTC),
                             "GOOD",
                             null,
                             null,
@@ -365,7 +366,7 @@ class AirQualityControllerTest {
                             null,
                             null,
                             null,
-                            LocalDateTime.now()
+                            LocalDateTime.now(ZoneOffset.UTC)
                     )
             );
 
@@ -479,8 +480,8 @@ class AirQualityControllerTest {
             AirQualityStatistics statistics = new AirQualityStatistics(
                     stationId,
                     "Station 1",
-                    LocalDateTime.now().minusDays(7),
-                    LocalDateTime.now(),
+                    LocalDateTime.now(ZoneOffset.UTC).minusDays(7),
+                    LocalDateTime.now(ZoneOffset.UTC),
                     100,
                     25.5, 10.0, 50.0,
                     15.2, 5.0, 30.0,
@@ -490,8 +491,8 @@ class AirQualityControllerTest {
             AirQualityStatisticsResponseDto responseDto = new AirQualityStatisticsResponseDto(
                     stationId,
                     "Station 1",
-                    LocalDateTime.now().minusDays(7),
-                    LocalDateTime.now(),
+                    LocalDateTime.now(ZoneOffset.UTC).minusDays(7),
+                    LocalDateTime.now(ZoneOffset.UTC),
                     100,
                     new AirQualityStatisticsResponseDto.Pm10Statistics(25.5, 10.0, 50.0),
                     new AirQualityStatisticsResponseDto.Pm25Statistics(15.2, 5.0, 30.0),
