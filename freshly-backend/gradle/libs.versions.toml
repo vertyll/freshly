@@ -20,7 +20,6 @@ nullaway = "0.12.15"
 beta-checker = "1.0"
 jspecify = "1.0.0"
 google-java-format = "1.33.0"
-ktlint = "1.8.0"
 springdoc = "3.0.1"
 
 [libraries]
