@@ -9,8 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SuppressWarnings("PMD.UseUtilityClass") // Spring Boot application class must be instantiable
 public class FreshlyApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(FreshlyApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(FreshlyApplication.class, args);
+    }
 }

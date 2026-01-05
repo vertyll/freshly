@@ -1,9 +1,9 @@
 package com.vertyll.freshly.airquality.domain;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 class StationRankingTest {
 
@@ -18,7 +18,8 @@ class StationRankingTest {
         int measurementCount = 100;
 
         // When
-        StationRanking ranking = new StationRanking(rank, station, averageScore, dominantLevel, measurementCount);
+        StationRanking ranking =
+                new StationRanking(rank, station, averageScore, dominantLevel, measurementCount);
 
         // Then
         assertThat(ranking.rank()).isEqualTo(rank);
@@ -33,13 +34,8 @@ class StationRankingTest {
     void shouldDetectGoodAirQualityForVeryGoodLevel() {
         // Given
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
-        StationRanking ranking = new StationRanking(
-                1,
-                station,
-                15.0,
-                AirQualityLevel.VERY_GOOD,
-                100
-        );
+        StationRanking ranking =
+                new StationRanking(1, station, 15.0, AirQualityLevel.VERY_GOOD, 100);
 
         // When
         boolean result = ranking.hasGoodAirQuality();
@@ -53,13 +49,7 @@ class StationRankingTest {
     void shouldDetectGoodAirQualityForGoodLevel() {
         // Given
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
-        StationRanking ranking = new StationRanking(
-                1,
-                station,
-                25.0,
-                AirQualityLevel.GOOD,
-                100
-        );
+        StationRanking ranking = new StationRanking(1, station, 25.0, AirQualityLevel.GOOD, 100);
 
         // When
         boolean result = ranking.hasGoodAirQuality();
@@ -73,13 +63,8 @@ class StationRankingTest {
     void shouldDetectBadAirQualityForModerateLevel() {
         // Given
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
-        StationRanking ranking = new StationRanking(
-                1,
-                station,
-                45.0,
-                AirQualityLevel.MODERATE,
-                100
-        );
+        StationRanking ranking =
+                new StationRanking(1, station, 45.0, AirQualityLevel.MODERATE, 100);
 
         // When
         boolean result = ranking.hasGoodAirQuality();
@@ -93,13 +78,7 @@ class StationRankingTest {
     void shouldDetectBadAirQualityForBadLevel() {
         // Given
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
-        StationRanking ranking = new StationRanking(
-                1,
-                station,
-                75.0,
-                AirQualityLevel.BAD,
-                100
-        );
+        StationRanking ranking = new StationRanking(1, station, 75.0, AirQualityLevel.BAD, 100);
 
         // When
         boolean result = ranking.hasGoodAirQuality();
@@ -113,13 +92,8 @@ class StationRankingTest {
     void shouldDetectBadAirQualityForVeryBadLevel() {
         // Given
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
-        StationRanking ranking = new StationRanking(
-                1,
-                station,
-                120.0,
-                AirQualityLevel.VERY_BAD,
-                100
-        );
+        StationRanking ranking =
+                new StationRanking(1, station, 120.0, AirQualityLevel.VERY_BAD, 100);
 
         // When
         boolean result = ranking.hasGoodAirQuality();
@@ -133,13 +107,7 @@ class StationRankingTest {
     void shouldCreateRankingWithZeroMeasurements() {
         // Given
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
-        StationRanking ranking = new StationRanking(
-                1,
-                station,
-                0.0,
-                AirQualityLevel.VERY_GOOD,
-                0
-        );
+        StationRanking ranking = new StationRanking(1, station, 0.0, AirQualityLevel.VERY_GOOD, 0);
 
         // Then
         assertThat(ranking.measurementCount()).isZero();
@@ -151,13 +119,7 @@ class StationRankingTest {
     void shouldCreateRankingWithNullDominantQualityLevel() {
         // Given
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
-        StationRanking ranking = new StationRanking(
-                1,
-                station,
-                25.5,
-                null,
-                100
-        );
+        StationRanking ranking = new StationRanking(1, station, 25.5, null, 100);
 
         // Then
         assertThat(ranking.dominantQualityLevel()).isNull();
@@ -170,13 +132,8 @@ class StationRankingTest {
         // Given
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
         double highScore = 150.5;
-        StationRanking ranking = new StationRanking(
-                1,
-                station,
-                highScore,
-                AirQualityLevel.VERY_BAD,
-                100
-        );
+        StationRanking ranking =
+                new StationRanking(1, station, highScore, AirQualityLevel.VERY_BAD, 100);
 
         // Then
         assertThat(ranking.averageScore()).isEqualTo(highScore);

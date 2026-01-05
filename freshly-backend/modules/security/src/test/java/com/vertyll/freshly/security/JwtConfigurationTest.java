@@ -1,32 +1,38 @@
 package com.vertyll.freshly.security;
 
-import com.vertyll.freshly.security.config.JwtProperties;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
+
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Date;
+import java.util.UUID;
+
+import javax.crypto.SecretKey;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.Date;
-import java.util.UUID;
+import com.vertyll.freshly.security.config.JwtProperties;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.lenient;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
 @ExtendWith(MockitoExtension.class)
 class JwtConfigurationTest {
 
     private final JwtProperties jwtProperties = Mockito.mock(JwtProperties.class);
-    private final JwtProperties.RefreshToken refreshToken = Mockito.mock(JwtProperties.RefreshToken.class);
-    private final JwtProperties.Expiration expiration = Mockito.mock(JwtProperties.Expiration.class);
+    private final JwtProperties.RefreshToken refreshToken =
+            Mockito.mock(JwtProperties.RefreshToken.class);
+    private final JwtProperties.Expiration expiration =
+            Mockito.mock(JwtProperties.Expiration.class);
 
-    private static final String SECRET = "testSecretKeyForJwtTokensMinimum256BitsRequiredForHS256AlgorithmInTest==";
+    private static final String SECRET =
+            "testSecretKeyForJwtTokensMinimum256BitsRequiredForHS256AlgorithmInTest==";
 
     @BeforeEach
     void setUp() {
@@ -58,23 +64,20 @@ class JwtConfigurationTest {
         Instant expiry = now.plusMillis(3600000L);
 
         // When - Generate token
-        String token = Jwts.builder()
-                .subject(userId)
-                .issuedAt(Date.from(now)) 
-                .expiration(Date.from(expiry))
-                .signWith(key)
-                .compact();
+        String token =
+                Jwts.builder()
+                        .subject(userId)
+                        .issuedAt(Date.from(now))
+                        .expiration(Date.from(expiry))
+                        .signWith(key)
+                        .compact();
 
         // Then - Validate token
-        Claims claims = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
 
         assertThat(claims.getSubject()).isEqualTo(userId);
-        
-        assertThat(claims.getIssuedAt()).isCloseTo(Date.from(now), 1000); 
+
+        assertThat(claims.getIssuedAt()).isCloseTo(Date.from(now), 1000);
         assertThat(claims.getExpiration()).isCloseTo(Date.from(expiry), 1000);
     }
 
@@ -90,7 +93,7 @@ class JwtConfigurationTest {
         long emailVerificationMs = 3600000L;
         long passwordResetMs = 1800000L;
         long refreshTokenMs = 86400000L;
-        
+
         // Then
         long emailVerificationMinutes = emailVerificationMs / (1000 * 60);
         long passwordResetMinutes = passwordResetMs / (1000 * 60);
@@ -105,10 +108,8 @@ class JwtConfigurationTest {
     void shouldHaveRefreshTokenCookieName() {
         // Given
         String cookieName = "refresh_token";
-        
+
         // Then
-        assertThat(cookieName)
-            .isNotNull()
-            .isNotEmpty();
+        assertThat(cookieName).isNotNull().isNotEmpty();
     }
 }

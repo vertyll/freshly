@@ -1,17 +1,5 @@
 package com.vertyll.freshly.airquality.infrastructure;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import com.vertyll.freshly.airquality.domain.AirQualityIndex;
-import com.vertyll.freshly.airquality.domain.AirQualityProvider;
-import com.vertyll.freshly.airquality.domain.SensorMeasurement;
-import com.vertyll.freshly.airquality.domain.Station;
-import com.vertyll.freshly.airquality.infrastructure.GiosApiDtos.*;
-import com.vertyll.freshly.common.config.ExternalServiceProperties;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -20,11 +8,26 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
+
+import com.vertyll.freshly.airquality.domain.AirQualityIndex;
+import com.vertyll.freshly.airquality.domain.AirQualityProvider;
+import com.vertyll.freshly.airquality.domain.SensorMeasurement;
+import com.vertyll.freshly.airquality.domain.Station;
+import com.vertyll.freshly.airquality.infrastructure.GiosApiDtos.*;
+import com.vertyll.freshly.common.config.ExternalServiceProperties;
+
+import lombok.extern.slf4j.Slf4j;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+
 @Slf4j
 @Component
 @SuppressWarnings({
-    "PMD.GodClass",  // Adapter requires complex mapping logic for external API integration
-    "PMD.AvoidCatchingGenericException"  // External API - Jackson can throw various unknown exceptions
+    "PMD.GodClass", // Adapter requires complex mapping logic for external API integration
+    "PMD.AvoidCatchingGenericException" // External API - Jackson can throw various unknown
+    // exceptions
 })
 class GiosAirQualityAdapter implements AirQualityProvider {
 
@@ -32,20 +35,18 @@ class GiosAirQualityAdapter implements AirQualityProvider {
     private final ObjectMapper objectMapper;
 
     GiosAirQualityAdapter(ExternalServiceProperties externalServiceProperties) {
-        this.restClient = RestClient.builder()
-                .baseUrl(externalServiceProperties.gios().apiUrl())
-                .defaultHeader("User-Agent", "Freshly-App/1.0")
-                .build();
+        this.restClient =
+                RestClient.builder()
+                        .baseUrl(externalServiceProperties.gios().apiUrl())
+                        .defaultHeader("User-Agent", "Freshly-App/1.0")
+                        .build();
 
         this.objectMapper = new ObjectMapper();
     }
 
     @Override
     public List<Station> findAllStations() {
-        String response = restClient.get()
-                .uri("/station/findAll")
-                .retrieve()
-                .body(String.class);
+        String response = restClient.get().uri("/station/findAll").retrieve().body(String.class);
 
         if (response == null) {
             return List.of();
@@ -66,7 +67,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
         if (listNode.isMissingNode()) listNode = root.findPath("lista");
         if (listNode.isMissingNode()) listNode = root.findPath("list");
         if (listNode.isMissingNode()) listNode = root.findPath("data");
-        
+
         // Jeśli root sam jest tablicą, użyj go bezpośrednio
         if (listNode.isMissingNode() && root.isArray()) {
             listNode = root;
@@ -78,10 +79,9 @@ class GiosAirQualityAdapter implements AirQualityProvider {
         }
 
         try {
-            List<GiosStationDto> dtos = objectMapper.readerForListOf(GiosStationDto.class).readValue(listNode);
-            return dtos.stream()
-                    .map(this::mapToStation)
-                    .toList();
+            List<GiosStationDto> dtos =
+                    objectMapper.readerForListOf(GiosStationDto.class).readValue(listNode);
+            return dtos.stream().map(this::mapToStation).toList();
         } catch (Exception e) {
             log.error("Error mapping stations", e);
             return List.of();
@@ -90,10 +90,12 @@ class GiosAirQualityAdapter implements AirQualityProvider {
 
     @Override
     public Optional<AirQualityIndex> findIndexByStationId(int stationId) {
-        String response = restClient.get()
-                .uri("/aqindex/getIndex/{stationId}", stationId)
-                .retrieve()
-                .body(String.class);
+        String response =
+                restClient
+                        .get()
+                        .uri("/aqindex/getIndex/{stationId}", stationId)
+                        .retrieve()
+                        .body(String.class);
 
         if (response == null) return Optional.empty();
 
@@ -105,7 +107,8 @@ class GiosAirQualityAdapter implements AirQualityProvider {
             if (indexNode.isMissingNode()) indexNode = root.findPath("Indeks jakości powietrza");
             if (indexNode.isMissingNode()) indexNode = root;
 
-            // Zabezpieczenie: jeśli węzeł jest tablicą (czasami API tak zwraca), bierzemy pierwszy element
+            // Zabezpieczenie: jeśli węzeł jest tablicą (czasami API tak zwraca), bierzemy pierwszy
+            // element
             if (indexNode.isArray()) {
                 if (indexNode.isEmpty()) return Optional.empty();
                 indexNode = indexNode.get(0);
@@ -136,12 +139,12 @@ class GiosAirQualityAdapter implements AirQualityProvider {
 
             List<SensorMeasurement.Reading> readings = fetchDataForSensor(sensor.id());
 
-            measurements.add(new SensorMeasurement(
-                    sensor.id(),
-                    sensor.paramCode() != null ? sensor.paramCode() : "N/A",
-                    sensor.paramName() != null ? sensor.paramName() : "Nieznany parametr",
-                    readings
-            ));
+            measurements.add(
+                    new SensorMeasurement(
+                            sensor.id(),
+                            sensor.paramCode() != null ? sensor.paramCode() : "N/A",
+                            sensor.paramName() != null ? sensor.paramName() : "Nieznany parametr",
+                            readings));
         }
 
         return measurements;
@@ -149,10 +152,12 @@ class GiosAirQualityAdapter implements AirQualityProvider {
 
     private List<GiosSensorDto> fetchSensors(int stationId) {
         try {
-            String response = restClient.get()
-                    .uri("/station/sensors/{stationId}", stationId)
-                    .retrieve()
-                    .body(String.class);
+            String response =
+                    restClient
+                            .get()
+                            .uri("/station/sensors/{stationId}", stationId)
+                            .retrieve()
+                            .body(String.class);
 
             if (response == null) return List.of();
 
@@ -175,10 +180,12 @@ class GiosAirQualityAdapter implements AirQualityProvider {
 
     private List<SensorMeasurement.Reading> fetchDataForSensor(int sensorId) {
         try {
-            String response = restClient.get()
-                    .uri("/data/getData/{sensorId}", sensorId)
-                    .retrieve()
-                    .body(String.class);
+            String response =
+                    restClient
+                            .get()
+                            .uri("/data/getData/{sensorId}", sensorId)
+                            .retrieve()
+                            .body(String.class);
 
             if (response == null) return List.of();
 
@@ -192,21 +199,22 @@ class GiosAirQualityAdapter implements AirQualityProvider {
             if (valuesNode.isMissingNode()) valuesNode = root.findPath("data");
 
             if (valuesNode.isArray()) {
-                List<GiosDataValueDto> values = objectMapper.readerForListOf(GiosDataValueDto.class).readValue(valuesNode);
+                List<GiosDataValueDto> values =
+                        objectMapper.readerForListOf(GiosDataValueDto.class).readValue(valuesNode);
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
                 return values.stream()
                         .filter(v -> v.value() != null) // Filtrujemy nulle (częste w GIOŚ)
-                        .map(v -> {
-                            try {
-                                return new SensorMeasurement.Reading(
-                                        LocalDateTime.parse(v.date(), formatter),
-                                        v.value()
-                                );
-                            } catch (Exception _) {
-                                return null; // Ignorujemy błędne daty
-                            }
-                        })
+                        .map(
+                                v -> {
+                                    try {
+                                        return new SensorMeasurement.Reading(
+                                                LocalDateTime.parse(v.date(), formatter),
+                                                v.value());
+                                    } catch (Exception _) {
+                                        return null; // Ignorujemy błędne daty
+                                    }
+                                })
                         .filter(Objects::nonNull)
                         .toList();
             }
@@ -223,13 +231,15 @@ class GiosAirQualityAdapter implements AirQualityProvider {
                 dto.cityName() != null ? dto.cityName() : "",
                 dto.addressStreet(),
                 parseCoordinate(dto.gegrLat()),
-                parseCoordinate(dto.gegrLon())
-        );
+                parseCoordinate(dto.gegrLon()));
     }
 
     private AirQualityIndex mapToDomain(GiosAQIndexDto dto, int stationId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime date = dto.stCalcDate() != null ? LocalDateTime.parse(dto.stCalcDate(), formatter) : LocalDateTime.now(ZoneOffset.UTC);
+        LocalDateTime date =
+                dto.stCalcDate() != null
+                        ? LocalDateTime.parse(dto.stCalcDate(), formatter)
+                        : LocalDateTime.now(ZoneOffset.UTC);
 
         return new AirQualityIndex(
                 stationId,
@@ -237,8 +247,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
                 getLevelName(dto.stIndexLevel()),
                 getLevelName(dto.so2IndexLevel()),
                 getLevelName(dto.no2IndexLevel()),
-                getLevelName(dto.pm10IndexLevel())
-        );
+                getLevelName(dto.pm10IndexLevel()));
     }
 
     private String getLevelName(String levelName) {

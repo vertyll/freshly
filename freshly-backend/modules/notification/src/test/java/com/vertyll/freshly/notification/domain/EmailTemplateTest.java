@@ -1,8 +1,8 @@
 package com.vertyll.freshly.notification.domain;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 class EmailTemplateTest {
 
@@ -69,9 +69,8 @@ class EmailTemplateTest {
         assertThat(templates)
                 .hasSize(3)
                 .containsExactlyInAnyOrder(
-                    EmailTemplate.USER_REGISTERED,
-                    EmailTemplate.EMAIL_VERIFICATION,
-                    EmailTemplate.PASSWORD_RESET
-                );
+                        EmailTemplate.USER_REGISTERED,
+                        EmailTemplate.EMAIL_VERIFICATION,
+                        EmailTemplate.PASSWORD_RESET);
     }
 }

@@ -1,18 +1,21 @@
 package com.vertyll.freshly.auth.domain;
 
-import com.vertyll.freshly.auth.domain.exception.InvalidVerificationTokenException;
-import com.vertyll.freshly.security.config.JwtProperties;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import javax.crypto.SecretKey;
 import java.nio.charset.Charset;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
+
+import javax.crypto.SecretKey;
+
+import org.springframework.stereotype.Service;
+
+import com.vertyll.freshly.auth.domain.exception.InvalidVerificationTokenException;
+import com.vertyll.freshly.security.config.JwtProperties;
+
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -60,11 +63,12 @@ public class VerificationTokenService {
 
     public UUID validateEmailVerificationToken(String token) {
         try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+            Claims claims =
+                    Jwts.parser()
+                            .verifyWith(getSigningKey())
+                            .build()
+                            .parseSignedClaims(token)
+                            .getPayload();
 
             String type = claims.get(TYPE_CLAIM, String.class);
             if (!EMAIL_VERIFICATION_TYPE.equals(type)) {
@@ -76,7 +80,8 @@ public class VerificationTokenService {
 
         } catch (ExpiredJwtException e) {
             log.warn("Email verification token expired: {}", e.getMessage());
-            throw new InvalidVerificationTokenException("Verification token has expired. Please request a new one.");
+            throw new InvalidVerificationTokenException(
+                    "Verification token has expired. Please request a new one.");
         } catch (JwtException e) {
             log.warn("Invalid email verification token: {}", e.getMessage());
             throw new InvalidVerificationTokenException("Invalid verification token");
@@ -88,11 +93,12 @@ public class VerificationTokenService {
 
     public UUID validatePasswordResetToken(String token) {
         try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+            Claims claims =
+                    Jwts.parser()
+                            .verifyWith(getSigningKey())
+                            .build()
+                            .parseSignedClaims(token)
+                            .getPayload();
 
             String type = claims.get(TYPE_CLAIM, String.class);
             if (!PASSWORD_RESET_TYPE.equals(type)) {
@@ -104,7 +110,8 @@ public class VerificationTokenService {
 
         } catch (ExpiredJwtException e) {
             log.warn("Password reset token expired: {}", e.getMessage());
-            throw new InvalidVerificationTokenException("Password reset token has expired. Please request a new one.");
+            throw new InvalidVerificationTokenException(
+                    "Password reset token has expired. Please request a new one.");
         } catch (JwtException e) {
             log.warn("Invalid password reset token: {}", e.getMessage());
             throw new InvalidVerificationTokenException("Invalid password reset token");
@@ -116,11 +123,12 @@ public class VerificationTokenService {
 
     public String extractEmail(String token) {
         try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+            Claims claims =
+                    Jwts.parser()
+                            .verifyWith(getSigningKey())
+                            .build()
+                            .parseSignedClaims(token)
+                            .getPayload();
 
             return claims.get(EMAIL_CLAIM, String.class);
         } catch (JwtException _) {

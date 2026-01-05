@@ -1,21 +1,22 @@
 package com.vertyll.freshly.notification.domain;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.*;
-
 class EmailTest {
 
     @ParameterizedTest
-    @ValueSource(strings = {
-        "user@example.com",
-        "test.user@domain.com",
-        "user+tag@example.co.uk",
-        "user_name@sub-domain.example.com",
-        "123@example.com"
-    })
+    @ValueSource(
+            strings = {
+                "user@example.com",
+                "test.user@domain.com",
+                "user+tag@example.co.uk",
+                "user_name@sub-domain.example.com",
+                "123@example.com"
+            })
     void shouldCreateValidEmail(String emailValue) {
         // When
         Email email = new Email(emailValue);
@@ -26,30 +27,31 @@ class EmailTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-        "invalid",
-        "@example.com",
-        "user@",
-        "user @example.com",
-        "user@.com",
-        "user@domain",
-        "",
-        "user@@example.com",
-        "user@exam ple.com"
-    })
+    @ValueSource(
+            strings = {
+                "invalid",
+                "@example.com",
+                "user@",
+                "user @example.com",
+                "user@.com",
+                "user@domain",
+                "",
+                "user@@example.com",
+                "user@exam ple.com"
+            })
     void shouldThrowException_whenEmailIsInvalid(String invalidEmail) {
         // When & Then
         assertThatThrownBy(() -> new Email(invalidEmail))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Invalid email format");
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Invalid email format");
     }
 
     @Test
     void shouldThrowException_whenEmailIsNull() {
         // When & Then
         assertThatThrownBy(() -> new Email(null))
-            .isInstanceOf(NullPointerException.class)
-            .hasMessageContaining("Email cannot be null");
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("Email cannot be null");
     }
 
     @Test
@@ -59,9 +61,7 @@ class EmailTest {
         Email email2 = new Email("user@example.com");
 
         // When & Then
-        assertThat(email1)
-                .isEqualTo(email2)
-                .hasSameHashCodeAs(email2);
+        assertThat(email1).isEqualTo(email2).hasSameHashCodeAs(email2);
     }
 
     @Test

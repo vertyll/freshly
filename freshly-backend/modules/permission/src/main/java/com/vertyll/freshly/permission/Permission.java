@@ -3,8 +3,8 @@ package com.vertyll.freshly.permission;
 import lombok.Getter;
 
 /**
- * Defines all permissions in the system.
- * Permissions are granular capabilities that can be assigned to roles.
+ * Defines all permissions in the system. Permissions are granular capabilities that can be assigned
+ * to roles.
  */
 @Getter
 public enum Permission {

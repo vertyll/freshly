@@ -1,5 +1,12 @@
 package com.vertyll.freshly.common.i18n;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
+import java.util.Locale;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,18 +16,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
-import java.util.Locale;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class MessageHelperTest {
 
-    @Mock
-    private MessageSource messageSource;
+    @Mock private MessageSource messageSource;
 
     private MessageHelper messageHelper;
 
@@ -38,8 +37,7 @@ class MessageHelperTest {
         Locale currentLocale = Locale.forLanguageTag("en-US");
         LocaleContextHolder.setLocale(currentLocale);
 
-        when(messageSource.getMessage(key, null, currentLocale))
-                .thenReturn(expectedMessage);
+        when(messageSource.getMessage(key, null, currentLocale)).thenReturn(expectedMessage);
 
         // When
         String message = messageHelper.getMessage(key);
@@ -58,8 +56,7 @@ class MessageHelperTest {
         Locale currentLocale = Locale.forLanguageTag("en-US");
         LocaleContextHolder.setLocale(currentLocale);
 
-        when(messageSource.getMessage(key, args, currentLocale))
-                .thenReturn(expectedMessage);
+        when(messageSource.getMessage(key, args, currentLocale)).thenReturn(expectedMessage);
 
         // When
         String message = messageHelper.getMessage(key, args);
@@ -76,8 +73,7 @@ class MessageHelperTest {
         Locale specificLocale = Locale.forLanguageTag("pl");
         String expectedMessage = "Użytkownik utworzony pomyślnie";
 
-        when(messageSource.getMessage(key, null, specificLocale))
-                .thenReturn(expectedMessage);
+        when(messageSource.getMessage(key, null, specificLocale)).thenReturn(expectedMessage);
 
         // When
         String message = messageHelper.getMessage(key, specificLocale);
@@ -95,8 +91,7 @@ class MessageHelperTest {
         Locale specificLocale = Locale.forLanguageTag("pl");
         String expectedMessage = "Witaj Jan Kowalski";
 
-        when(messageSource.getMessage(key, args, specificLocale))
-                .thenReturn(expectedMessage);
+        when(messageSource.getMessage(key, args, specificLocale)).thenReturn(expectedMessage);
 
         // When
         String message = messageHelper.getMessage(key, args, specificLocale);
@@ -115,8 +110,7 @@ class MessageHelperTest {
         Locale currentLocale = Locale.forLanguageTag("en-US");
         LocaleContextHolder.setLocale(currentLocale);
 
-        when(messageSource.getMessage(key, args, currentLocale))
-                .thenReturn(expectedMessage);
+        when(messageSource.getMessage(key, args, currentLocale)).thenReturn(expectedMessage);
 
         // When
         String message = messageHelper.getMessage(key, args);

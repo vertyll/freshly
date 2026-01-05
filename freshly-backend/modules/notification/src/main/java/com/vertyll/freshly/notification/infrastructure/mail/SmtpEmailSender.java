@@ -1,18 +1,20 @@
 package com.vertyll.freshly.notification.infrastructure.mail;
 
-import com.vertyll.freshly.notification.domain.EmailNotification;
-import com.vertyll.freshly.notification.domain.EmailSender;
-import com.vertyll.freshly.notification.domain.exception.EmailSendingException;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+
+import com.vertyll.freshly.notification.domain.EmailNotification;
+import com.vertyll.freshly.notification.domain.EmailSender;
+import com.vertyll.freshly.notification.domain.exception.EmailSendingException;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -42,8 +44,7 @@ class SmtpEmailSender implements EmailSender {
             log.debug(
                     "Email sent successfully: template={}, recipient={}",
                     notification.getTemplate(),
-                    notification.getRecipient()
-            );
+                    notification.getRecipient());
 
         } catch (MessagingException e) {
             log.error("Failed to send email: {}", e.getMessage());
@@ -55,9 +56,6 @@ class SmtpEmailSender implements EmailSender {
         Context context = new Context();
         notification.getTemplateVariables().forEach(context::setVariable);
 
-        return templateEngine.process(
-                notification.getTemplate().getTemplateName(),
-                context
-        );
+        return templateEngine.process(notification.getTemplate().getTemplateName(), context);
     }
 }

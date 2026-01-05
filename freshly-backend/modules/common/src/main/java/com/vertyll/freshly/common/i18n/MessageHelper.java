@@ -1,32 +1,30 @@
 package com.vertyll.freshly.common.i18n;
 
+import java.util.Locale;
+
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.Locale;
-
 /**
- * Helper class for retrieving internationalized messages.
- * Simplifies access to MessageSource in services and components.
- * Usage in services:
- * <pre>
- * {@code
+ * Helper class for retrieving internationalized messages. Simplifies access to MessageSource in
+ * services and components. Usage in services:
+ *
+ * <pre>{@code
  * @Service
  * public class SomeService {
  *     private final MessageHelper messageHelper;
- *     
+ *
  *     public SomeService(MessageHelper messageHelper) {
  *         this.messageHelper = messageHelper;
  *     }
- *     
+ *
  *     public void someMethod() {
  *         String message = messageHelper.getMessage("error.user.notFound");
  *         // Use message...
  *     }
  * }
- * }
- * </pre>
+ * }</pre>
  */
 @Component
 public class MessageHelper {
@@ -39,7 +37,7 @@ public class MessageHelper {
 
     /**
      * Gets localized message for current request locale.
-     * 
+     *
      * @param key Message key from messages_*.properties
      * @return Localized message
      */
@@ -49,7 +47,7 @@ public class MessageHelper {
 
     /**
      * Gets localized message with parameters for current request locale.
-     * 
+     *
      * @param key Message key from messages_*.properties
      * @param args Arguments to replace placeholders in message
      * @return Localized message with substituted parameters
@@ -60,7 +58,7 @@ public class MessageHelper {
 
     /**
      * Gets localized message for specific locale.
-     * 
+     *
      * @param key Message key from messages_*.properties
      * @param locale Specific locale to use
      * @return Localized message for given locale
@@ -71,7 +69,7 @@ public class MessageHelper {
 
     /**
      * Gets localized message with parameters for specific locale.
-     * 
+     *
      * @param key Message key from messages_*.properties
      * @param args Arguments to replace placeholders in message
      * @param locale Specific locale to use

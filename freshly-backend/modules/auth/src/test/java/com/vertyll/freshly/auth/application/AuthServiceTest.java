@@ -1,13 +1,13 @@
 package com.vertyll.freshly.auth.application;
 
-import com.vertyll.freshly.auth.api.dto.*;
-import com.vertyll.freshly.auth.domain.VerificationTokenService;
-import com.vertyll.freshly.auth.domain.event.UserRegisteredEvent;
-import com.vertyll.freshly.auth.keycloak.KeycloakAdminClient;
-import com.vertyll.freshly.auth.keycloak.KeycloakTokenClient;
-import com.vertyll.freshly.notification.application.NotificationService;
-import com.vertyll.freshly.useraccess.application.UserAccessService;
-import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,37 +21,31 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import com.vertyll.freshly.auth.api.dto.*;
+import com.vertyll.freshly.auth.domain.VerificationTokenService;
+import com.vertyll.freshly.auth.domain.event.UserRegisteredEvent;
+import com.vertyll.freshly.auth.keycloak.KeycloakAdminClient;
+import com.vertyll.freshly.auth.keycloak.KeycloakTokenClient;
+import com.vertyll.freshly.notification.application.NotificationService;
+import com.vertyll.freshly.useraccess.application.UserAccessService;
+import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
-    @Mock
-    private KeycloakAdminClient keycloakAdminClient;
+    @Mock private KeycloakAdminClient keycloakAdminClient;
 
-    @Mock
-    private KeycloakTokenClient keycloakTokenClient;
+    @Mock private KeycloakTokenClient keycloakTokenClient;
 
-    @Mock
-    private UserAccessService userAccessService;
+    @Mock private UserAccessService userAccessService;
 
-    @Mock
-    private NotificationService notificationService;
+    @Mock private NotificationService notificationService;
 
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
+    @Mock private ApplicationEventPublisher eventPublisher;
 
-    @Mock
-    private VerificationTokenService verificationTokenService;
+    @Mock private VerificationTokenService verificationTokenService;
 
-    @InjectMocks
-    private AuthService authService;
+    @InjectMocks private AuthService authService;
 
     private static final String FRONTEND_URL = "http://localhost:4200";
 
@@ -68,29 +62,24 @@ class AuthServiceTest {
         @DisplayName("Should register user successfully")
         void shouldRegisterUserSuccessfully() {
             // Given
-            RegisterUserRequestDto request = new RegisterUserRequestDto(
-                    "testuser",
-                    "test@example.com",
-                    "password123",
-                    "John",
-                    "Doe"
-            );
+            RegisterUserRequestDto request =
+                    new RegisterUserRequestDto(
+                            "testuser", "test@example.com", "password123", "John", "Doe");
 
             UUID keycloakUserId = UUID.randomUUID();
             String verificationToken = "verification-token";
 
             when(keycloakAdminClient.createUser(
-                    request.username(),
-                    request.email(),
-                    request.password(),
-                    request.firstName(),
-                    request.lastName()
-            )).thenReturn(keycloakUserId);
+                            request.username(),
+                            request.email(),
+                            request.password(),
+                            request.firstName(),
+                            request.lastName()))
+                    .thenReturn(keycloakUserId);
 
             when(verificationTokenService.generateEmailVerificationToken(
-                    keycloakUserId,
-                    request.email()
-            )).thenReturn(verificationToken);
+                            keycloakUserId, request.email()))
+                    .thenReturn(verificationToken);
 
             // When
             UUID result = authService.registerUser(request);
@@ -98,32 +87,27 @@ class AuthServiceTest {
             // Then
             assertThat(result).isEqualTo(keycloakUserId);
 
-            verify(keycloakAdminClient).createUser(
-                    request.username(),
-                    request.email(),
-                    request.password(),
-                    request.firstName(),
-                    request.lastName()
-            );
+            verify(keycloakAdminClient)
+                    .createUser(
+                            request.username(),
+                            request.email(),
+                            request.password(),
+                            request.firstName(),
+                            request.lastName());
 
-            verify(userAccessService).createUser(
-                    keycloakUserId,
-                    false,
-                    Set.of(UserRoleEnum.USER)
-            );
+            verify(userAccessService).createUser(keycloakUserId, false, Set.of(UserRoleEnum.USER));
 
-            verify(verificationTokenService).generateEmailVerificationToken(
-                    keycloakUserId,
-                    request.email()
-            );
+            verify(verificationTokenService)
+                    .generateEmailVerificationToken(keycloakUserId, request.email());
 
-            verify(notificationService).sendEmailVerification(
-                    eq(request.email()),
-                    eq(request.username()),
-                    contains("verify-email?token=" + verificationToken)
-            );
+            verify(notificationService)
+                    .sendEmailVerification(
+                            eq(request.email()),
+                            eq(request.username()),
+                            contains("verify-email?token=" + verificationToken));
 
-            ArgumentCaptor<UserRegisteredEvent> eventCaptor = ArgumentCaptor.forClass(UserRegisteredEvent.class);
+            ArgumentCaptor<UserRegisteredEvent> eventCaptor =
+                    ArgumentCaptor.forClass(UserRegisteredEvent.class);
             verify(eventPublisher).publishEvent(eventCaptor.capture());
 
             UserRegisteredEvent event = eventCaptor.getValue();
@@ -136,26 +120,23 @@ class AuthServiceTest {
         @DisplayName("Should rollback Keycloak user on failure")
         void shouldRollbackKeycloakUserOnFailure() {
             // Given
-            RegisterUserRequestDto request = new RegisterUserRequestDto(
-                    "testuser",
-                    "test@example.com",
-                    "password123",
-                    "John",
-                    "Doe"
-            );
+            RegisterUserRequestDto request =
+                    new RegisterUserRequestDto(
+                            "testuser", "test@example.com", "password123", "John", "Doe");
 
             UUID keycloakUserId = UUID.randomUUID();
 
             when(keycloakAdminClient.createUser(
-                    request.username(),
-                    request.email(),
-                    request.password(),
-                    request.firstName(),
-                    request.lastName()
-            )).thenReturn(keycloakUserId);
+                            request.username(),
+                            request.email(),
+                            request.password(),
+                            request.firstName(),
+                            request.lastName()))
+                    .thenReturn(keycloakUserId);
 
             doThrow(new RuntimeException("Database error"))
-                    .when(userAccessService).createUser(any(), anyBoolean(), any());
+                    .when(userAccessService)
+                    .createUser(any(), anyBoolean(), any());
 
             // When & Then
             assertThatThrownBy(() -> authService.registerUser(request))
@@ -177,8 +158,7 @@ class AuthServiceTest {
             String token = "verification-token";
             UUID userId = UUID.randomUUID();
 
-            when(verificationTokenService.validateEmailVerificationToken(token))
-                    .thenReturn(userId);
+            when(verificationTokenService.validateEmailVerificationToken(token)).thenReturn(userId);
 
             // When
             authService.verifyEmail(token);
@@ -217,13 +197,8 @@ class AuthServiceTest {
         void shouldLoginUserSuccessfully() {
             // Given
             LoginRequestDto request = new LoginRequestDto("testuser", "password123");
-            TokenResponseDto expectedResponse = new TokenResponseDto(
-                    "access-token",
-                    "refresh-token",
-                    3600,
-                    86400,
-                    "Bearer"
-            );
+            TokenResponseDto expectedResponse =
+                    new TokenResponseDto("access-token", "refresh-token", 3600, 86400, "Bearer");
 
             when(keycloakTokenClient.getToken(request.username(), request.password()))
                     .thenReturn(expectedResponse);
@@ -246,16 +221,11 @@ class AuthServiceTest {
         void shouldRefreshTokenSuccessfully() {
             // Given
             String refreshToken = "refresh-token";
-            TokenResponseDto expectedResponse = new TokenResponseDto(
-                    "new-access-token",
-                    "new-refresh-token",
-                    3600,
-                    86400,
-                    "Bearer"
-            );
+            TokenResponseDto expectedResponse =
+                    new TokenResponseDto(
+                            "new-access-token", "new-refresh-token", 3600, 86400, "Bearer");
 
-            when(keycloakTokenClient.refreshToken(refreshToken))
-                    .thenReturn(expectedResponse);
+            when(keycloakTokenClient.refreshToken(refreshToken)).thenReturn(expectedResponse);
 
             // When
             TokenResponseDto result = authService.refreshToken(refreshToken);
@@ -301,8 +271,7 @@ class AuthServiceTest {
             user.setId(userId.toString());
             user.setUsername(username);
 
-            when(keycloakAdminClient.findUsersByEmail(request.email()))
-                    .thenReturn(List.of(user));
+            when(keycloakAdminClient.findUsersByEmail(request.email())).thenReturn(List.of(user));
 
             when(verificationTokenService.generatePasswordResetToken(userId, request.email()))
                     .thenReturn(resetToken);
@@ -313,21 +282,21 @@ class AuthServiceTest {
             // Then
             verify(keycloakAdminClient).findUsersByEmail(request.email());
             verify(verificationTokenService).generatePasswordResetToken(userId, request.email());
-            verify(notificationService).sendPasswordResetEmail(
-                    eq(request.email()),
-                    eq(username),
-                    contains("reset-password?token=" + resetToken)
-            );
+            verify(notificationService)
+                    .sendPasswordResetEmail(
+                            eq(request.email()),
+                            eq(username),
+                            contains("reset-password?token=" + resetToken));
         }
 
         @Test
         @DisplayName("Should not reveal non-existent email")
         void shouldNotRevealNonExistentEmail() {
             // Given
-            ForgotPasswordRequestDto request = new ForgotPasswordRequestDto("nonexistent@example.com");
+            ForgotPasswordRequestDto request =
+                    new ForgotPasswordRequestDto("nonexistent@example.com");
 
-            when(keycloakAdminClient.findUsersByEmail(request.email()))
-                    .thenReturn(List.of());
+            when(keycloakAdminClient.findUsersByEmail(request.email())).thenReturn(List.of());
 
             // When
             authService.initiatePasswordReset(request);
@@ -347,8 +316,7 @@ class AuthServiceTest {
             ResetPasswordRequestDto request = new ResetPasswordRequestDto(token, newPassword);
             UUID userId = UUID.randomUUID();
 
-            when(verificationTokenService.validatePasswordResetToken(token))
-                    .thenReturn(userId);
+            when(verificationTokenService.validatePasswordResetToken(token)).thenReturn(userId);
 
             // When
             authService.resetPassword(request);
@@ -369,10 +337,8 @@ class AuthServiceTest {
             // Given
             UUID userId = UUID.randomUUID();
             String username = "testuser";
-            ChangePasswordRequestDto request = new ChangePasswordRequestDto(
-                    "currentPassword",
-                    "newPassword123"
-            );
+            ChangePasswordRequestDto request =
+                    new ChangePasswordRequestDto("currentPassword", "newPassword123");
 
             when(keycloakAdminClient.getUsernameById(userId)).thenReturn(username);
 
@@ -391,14 +357,13 @@ class AuthServiceTest {
             // Given
             UUID userId = UUID.randomUUID();
             String username = "testuser";
-            ChangePasswordRequestDto request = new ChangePasswordRequestDto(
-                    "wrongPassword",
-                    "newPassword123"
-            );
+            ChangePasswordRequestDto request =
+                    new ChangePasswordRequestDto("wrongPassword", "newPassword123");
 
             when(keycloakAdminClient.getUsernameById(userId)).thenReturn(username);
             doThrow(new RuntimeException("Invalid password"))
-                    .when(keycloakAdminClient).verifyPassword(username, request.currentPassword());
+                    .when(keycloakAdminClient)
+                    .verifyPassword(username, request.currentPassword());
 
             // When & Then
             assertThatThrownBy(() -> authService.changePassword(userId, request))
@@ -434,11 +399,11 @@ class AuthServiceTest {
             verify(keycloakAdminClient).changeEmail(userId, newEmail);
             verify(userAccessService).deactivateUser(userId, userId);
             verify(verificationTokenService).generateEmailVerificationToken(userId, newEmail);
-            verify(notificationService).sendEmailVerification(
-                    eq(newEmail),
-                    eq("User"),
-                    contains("verify-email?token=" + verificationToken)
-            );
+            verify(notificationService)
+                    .sendEmailVerification(
+                            eq(newEmail),
+                            eq("User"),
+                            contains("verify-email?token=" + verificationToken));
         }
     }
 }

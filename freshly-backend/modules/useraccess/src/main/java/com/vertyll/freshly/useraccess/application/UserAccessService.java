@@ -1,17 +1,19 @@
 package com.vertyll.freshly.useraccess.application;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+
 import com.vertyll.freshly.useraccess.domain.SystemUser;
 import com.vertyll.freshly.useraccess.domain.SystemUserRepository;
 import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
 import com.vertyll.freshly.useraccess.domain.exception.UserAlreadyExistsException;
 import com.vertyll.freshly.useraccess.domain.exception.UserNotFoundException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +36,8 @@ public class UserAccessService {
 
     public SystemUser getUserById(UUID userId) {
         log.debug("Fetching user by id: {}", userId);
-        return systemUserRepository.findById(userId)
+        return systemUserRepository
+                .findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
@@ -44,8 +47,10 @@ public class UserAccessService {
     }
 
     public void activateUser(UUID userId) {
-        SystemUser user = systemUserRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        SystemUser user =
+                systemUserRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new UserNotFoundException(userId));
 
         user.activate();
         systemUserRepository.save(user);
@@ -54,8 +59,10 @@ public class UserAccessService {
     }
 
     public void deactivateUser(UUID userId, UUID loggedInUserId) {
-        SystemUser user = systemUserRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        SystemUser user =
+                systemUserRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new UserNotFoundException(userId));
 
         user.deactivateSelf();
         systemUserRepository.save(user);
@@ -64,8 +71,10 @@ public class UserAccessService {
     }
 
     public void replaceUserRoles(UUID userId, Set<UserRoleEnum> roles) {
-        SystemUser user = systemUserRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        SystemUser user =
+                systemUserRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new UserNotFoundException(userId));
 
         user.replaceRoles(roles);
         systemUserRepository.save(user);

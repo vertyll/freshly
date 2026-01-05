@@ -1,14 +1,10 @@
 package com.vertyll.freshly.auth.keycloak;
 
-import com.vertyll.freshly.auth.domain.exception.EmailAlreadyExistsException;
-import com.vertyll.freshly.auth.domain.exception.InvalidPasswordException;
-import com.vertyll.freshly.auth.domain.exception.UsernameAlreadyExistsException;
-import com.vertyll.freshly.auth.keycloak.exception.KeycloakClientException;
-import jakarta.ws.rs.core.Response;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
@@ -16,6 +12,7 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -24,10 +21,14 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import com.vertyll.freshly.auth.domain.exception.EmailAlreadyExistsException;
+import com.vertyll.freshly.auth.domain.exception.InvalidPasswordException;
+import com.vertyll.freshly.auth.domain.exception.UsernameAlreadyExistsException;
+import com.vertyll.freshly.auth.keycloak.exception.KeycloakClientException;
+
+import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -42,7 +43,8 @@ public class KeycloakAdminClient {
         return keycloak.realm(properties.realm());
     }
 
-    public UUID createUser(String username, String email, String password, String firstName, String lastName) {
+    public UUID createUser(
+            String username, String email, String password, String firstName, String lastName) {
         UsersResource usersResource = getRealm().users();
 
         if (!usersResource.searchByUsername(username, true).isEmpty()) {
@@ -72,9 +74,9 @@ public class KeycloakAdminClient {
                 log.error(
                         "Failed to create user in Keycloak: status={}, info={}",
                         response.getStatus(),
-                        response.getStatusInfo()
-                );
-                throw new KeycloakClientException("Failed to create user in Keycloak: " + response.getStatusInfo());
+                        response.getStatusInfo());
+                throw new KeycloakClientException(
+                        "Failed to create user in Keycloak: " + response.getStatusInfo());
             }
 
             String locationHeader = response.getHeaderString("Location");
@@ -108,7 +110,8 @@ public class KeycloakAdminClient {
         UserRepresentation user = userResource.toRepresentation();
 
         List<UserRepresentation> existingUsers = getRealm().users().searchByEmail(newEmail, true);
-        if (!existingUsers.isEmpty() && !existingUsers.getFirst().getId().equals(userId.toString())) {
+        if (!existingUsers.isEmpty()
+                && !existingUsers.getFirst().getId().equals(userId.toString())) {
             throw new EmailAlreadyExistsException(newEmail);
         }
 
@@ -138,8 +141,7 @@ public class KeycloakAdminClient {
                 log.warn(
                         "Delete user returned non-success status: status={}, userId={}",
                         response.getStatus(),
-                        userId
-                );
+                        userId);
             }
         }
     }
@@ -159,25 +161,30 @@ public class KeycloakAdminClient {
         formData.add("client_id", properties.userClientId());
         formData.add("username", username);
         formData.add("password", password);
-        
-        String tokenUrl = properties.serverUrl() + "/realms/" + properties.realm()
-                + "/protocol/openid-connect/token";
-        
+
+        String tokenUrl =
+                properties.serverUrl()
+                        + "/realms/"
+                        + properties.realm()
+                        + "/protocol/openid-connect/token";
+
         try {
-            Map<String, Object> response = restClient.post()
-                    .uri(tokenUrl)
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .body(formData)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<>() {});
-        
+            Map<String, Object> response =
+                    restClient
+                            .post()
+                            .uri(tokenUrl)
+                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                            .body(formData)
+                            .retrieve()
+                            .body(new ParameterizedTypeReference<>() {});
+
             if (response == null || !response.containsKey("access_token")) {
                 log.warn("Password verification failed for user: {} - invalid response", username);
                 throw new InvalidPasswordException("Current password is incorrect");
             }
-        
+
             log.debug("Password verification successful for user: {}", username);
-        
+
         } catch (HttpClientErrorException.Unauthorized _) {
             log.warn("Password verification failed for user: {}", username);
             throw new InvalidPasswordException("Current password is incorrect");

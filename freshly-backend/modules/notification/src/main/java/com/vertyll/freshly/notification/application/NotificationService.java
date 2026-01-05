@@ -1,13 +1,15 @@
 package com.vertyll.freshly.notification.application;
 
+import org.springframework.stereotype.Service;
+
 import com.vertyll.freshly.notification.application.dto.SendEmailCommand;
 import com.vertyll.freshly.notification.domain.Email;
 import com.vertyll.freshly.notification.domain.EmailNotification;
 import com.vertyll.freshly.notification.domain.EmailSender;
 import com.vertyll.freshly.notification.domain.exception.EmailSendingException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -20,16 +22,12 @@ public class NotificationService {
         log.info(
                 "Sending email to: {} using template: {}",
                 command.recipientEmail(),
-                command.template()
-        );
+                command.template());
 
         Email recipient = new Email(command.recipientEmail());
 
-        EmailNotification notification = new EmailNotification(
-                recipient,
-                command.template(),
-                command.templateVariables()
-        );
+        EmailNotification notification =
+                new EmailNotification(recipient, command.template(), command.templateVariables());
 
         try {
             emailSender.send(notification);
@@ -44,34 +42,30 @@ public class NotificationService {
     }
 
     public void sendEmailVerification(String email, String username, String verificationLink) {
-        sendEmail(new SendEmailCommand(
-                email,
-                com.vertyll.freshly.notification.domain.EmailTemplate.EMAIL_VERIFICATION,
-                java.util.Map.of(
-                        "username", username,
-                        "verificationLink", verificationLink
-                )
-        ));
+        sendEmail(
+                new SendEmailCommand(
+                        email,
+                        com.vertyll.freshly.notification.domain.EmailTemplate.EMAIL_VERIFICATION,
+                        java.util.Map.of(
+                                "username", username,
+                                "verificationLink", verificationLink)));
     }
 
     public void sendWelcomeEmail(String email, String username) {
-        sendEmail(new SendEmailCommand(
-                email,
-                com.vertyll.freshly.notification.domain.EmailTemplate.USER_REGISTERED,
-                java.util.Map.of(
-                        "username", username
-                )
-        ));
+        sendEmail(
+                new SendEmailCommand(
+                        email,
+                        com.vertyll.freshly.notification.domain.EmailTemplate.USER_REGISTERED,
+                        java.util.Map.of("username", username)));
     }
 
     public void sendPasswordResetEmail(String email, String username, String resetLink) {
-        sendEmail(new SendEmailCommand(
-                email,
-                com.vertyll.freshly.notification.domain.EmailTemplate.PASSWORD_RESET,
-                java.util.Map.of(
-                        "username", username,
-                        "resetLink", resetLink
-                )
-        ));
+        sendEmail(
+                new SendEmailCommand(
+                        email,
+                        com.vertyll.freshly.notification.domain.EmailTemplate.PASSWORD_RESET,
+                        java.util.Map.of(
+                                "username", username,
+                                "resetLink", resetLink)));
     }
 }

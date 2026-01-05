@@ -1,5 +1,11 @@
 package com.vertyll.freshly.common.response;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.ZoneOffset;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
@@ -7,12 +13,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.Arrays;
-import java.util.List;
-import java.time.ZoneOffset;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class PaginatedApiResponseTest {
 
@@ -25,11 +25,8 @@ class PaginatedApiResponseTest {
         String message = "Success";
 
         // When
-        ResponseEntity<PaginatedApiResponse<String>> response = PaginatedApiResponse.buildResponse(
-                page,
-                message,
-                HttpStatus.OK
-        );
+        ResponseEntity<PaginatedApiResponse<String>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -59,11 +56,8 @@ class PaginatedApiResponseTest {
         String message = "Page 2 of results";
 
         // When
-        ResponseEntity<PaginatedApiResponse<String>> response = PaginatedApiResponse.buildResponse(
-                page,
-                message,
-                HttpStatus.OK
-        );
+        ResponseEntity<PaginatedApiResponse<String>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
         assertThat(response.getBody()).isNotNull();
@@ -86,11 +80,8 @@ class PaginatedApiResponseTest {
         String message = "No results found";
 
         // When
-        ResponseEntity<PaginatedApiResponse<String>> response = PaginatedApiResponse.buildResponse(
-                page,
-                message,
-                HttpStatus.OK
-        );
+        ResponseEntity<PaginatedApiResponse<String>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
         assertThat(response.getBody()).isNotNull();
@@ -114,11 +105,8 @@ class PaginatedApiResponseTest {
         String message = "Last page";
 
         // When
-        ResponseEntity<PaginatedApiResponse<String>> response = PaginatedApiResponse.buildResponse(
-                page,
-                message,
-                HttpStatus.OK
-        );
+        ResponseEntity<PaginatedApiResponse<String>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
         assertThat(response.getBody()).isNotNull();
@@ -141,11 +129,8 @@ class PaginatedApiResponseTest {
         String message = "Created successfully";
 
         // When
-        ResponseEntity<PaginatedApiResponse<Integer>> response = PaginatedApiResponse.buildResponse(
-                page,
-                message,
-                HttpStatus.CREATED
-        );
+        ResponseEntity<PaginatedApiResponse<Integer>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.CREATED);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -162,16 +147,14 @@ class PaginatedApiResponseTest {
         String message = "Success";
 
         // When
-        ResponseEntity<PaginatedApiResponse<String>> response = PaginatedApiResponse.buildResponse(
-                page,
-                message,
-                HttpStatus.OK
-        );
+        ResponseEntity<PaginatedApiResponse<String>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getTimestamp()).isNotNull();
-        assertThat(response.getBody().getTimestamp()).isBeforeOrEqualTo(java.time.LocalDateTime.now(ZoneOffset.UTC));
+        assertThat(response.getBody().getTimestamp())
+                .isBeforeOrEqualTo(java.time.LocalDateTime.now(ZoneOffset.UTC));
     }
 
     @Test
@@ -183,11 +166,8 @@ class PaginatedApiResponseTest {
         String message = "Single item";
 
         // When
-        ResponseEntity<PaginatedApiResponse<String>> response = PaginatedApiResponse.buildResponse(
-                page,
-                message,
-                HttpStatus.OK
-        );
+        ResponseEntity<PaginatedApiResponse<String>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
         assertThat(response.getBody()).isNotNull();

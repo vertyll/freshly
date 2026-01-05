@@ -1,18 +1,18 @@
 package com.vertyll.freshly.airquality.infrastructure.persistence.mongo;
 
-import com.vertyll.freshly.airquality.domain.AirQualityLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+import com.vertyll.freshly.airquality.domain.AirQualityLevel;
 
-/**
- * MongoDB document for air quality measurements.
- */
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/** MongoDB document for air quality measurements. */
 @Document(collection = "air_quality_measurements")
 @CompoundIndex(name = "station_date_idx", def = "{'stationId': 1, 'measurementDate': -1}")
 @CompoundIndex(name = "date_idx", def = "{'measurementDate': -1}")
@@ -21,8 +21,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AirQualityMeasurementDocument {
 
-    @Id
-    private String id;
+    @Id private String id;
+
     private Integer stationId;
     private String stationName;
     private LocalDateTime measurementDate;

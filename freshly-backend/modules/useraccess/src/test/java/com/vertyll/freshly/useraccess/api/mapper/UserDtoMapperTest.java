@@ -1,18 +1,19 @@
 package com.vertyll.freshly.useraccess.api.mapper;
 
-import com.vertyll.freshly.useraccess.api.dto.UserResponseDto;
-import com.vertyll.freshly.useraccess.domain.SystemUser;
-import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
+
+import com.vertyll.freshly.useraccess.api.dto.UserResponseDto;
+import com.vertyll.freshly.useraccess.domain.SystemUser;
+import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
 
 class UserDtoMapperTest {
 
@@ -58,7 +59,8 @@ class UserDtoMapperTest {
     void shouldMapUserWithMultipleRolesToUserResponseDto() {
         // Given
         UUID userId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER, UserRoleEnum.ADMIN));
+        SystemUser user =
+                new SystemUser(userId, true, Set.of(UserRoleEnum.USER, UserRoleEnum.ADMIN));
 
         // When
         UserResponseDto result = mapper.toResponse(user);
@@ -162,8 +164,11 @@ class UserDtoMapperTest {
     void shouldMapMultipleUsersWithDifferentStates() {
         // Given
         SystemUser activeUser = new SystemUser(UUID.randomUUID(), true, Set.of(UserRoleEnum.USER));
-        SystemUser inactiveAdmin = new SystemUser(UUID.randomUUID(), false, Set.of(UserRoleEnum.ADMIN));
-        SystemUser activeMultiRole = new SystemUser(UUID.randomUUID(), true, Set.of(UserRoleEnum.USER, UserRoleEnum.ADMIN));
+        SystemUser inactiveAdmin =
+                new SystemUser(UUID.randomUUID(), false, Set.of(UserRoleEnum.ADMIN));
+        SystemUser activeMultiRole =
+                new SystemUser(
+                        UUID.randomUUID(), true, Set.of(UserRoleEnum.USER, UserRoleEnum.ADMIN));
         List<SystemUser> users = List.of(activeUser, inactiveAdmin, activeMultiRole);
 
         // When

@@ -6,10 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to secure endpoints with permission-based authorization.
- * Works with PermissionAuthorizationManager in Spring Security 7+.
- * <p>
- * Usage:
+ * Annotation to secure endpoints with permission-based authorization. Works with
+ * PermissionAuthorizationManager in Spring Security 7+.
+ *
+ * <p>Usage:
+ *
  * <pre>
  * {@code @RequirePermission("users:create")}
  * public ResponseEntity<?> createUser(...) { }
@@ -20,8 +21,8 @@ import java.lang.annotation.Target;
 public @interface RequirePermission {
 
     /**
-     * The permission value required to access the method.
-     * Should match a Permission enum value (e.g., "users:create").
+     * The permission value required to access the method. Should match a Permission enum value
+     * (e.g., "users:create").
      */
     String value();
 }

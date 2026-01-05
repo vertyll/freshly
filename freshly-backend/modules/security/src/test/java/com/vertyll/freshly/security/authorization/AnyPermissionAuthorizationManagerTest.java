@@ -1,7 +1,12 @@
 package com.vertyll.freshly.security.authorization;
 
-import com.vertyll.freshly.permission.application.PermissionService;
-import com.vertyll.freshly.security.annotation.RequireAnyPermission;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.lang.reflect.Method;
+import java.util.function.Supplier;
+
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,24 +17,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.core.Authentication;
 
-import java.lang.reflect.Method;
-import java.util.function.Supplier;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import com.vertyll.freshly.permission.application.PermissionService;
+import com.vertyll.freshly.security.annotation.RequireAnyPermission;
 
 @ExtendWith(MockitoExtension.class)
 class AnyPermissionAuthorizationManagerTest {
 
-    @Mock
-    private PermissionService permissionService;
+    @Mock private PermissionService permissionService;
 
-    @Mock
-    private MethodInvocation methodInvocation;
+    @Mock private MethodInvocation methodInvocation;
 
-    @Mock
-    private Authentication authentication;
+    @Mock private Authentication authentication;
 
     private AnyPermissionAuthorizationManager authorizationManager;
 
@@ -40,7 +38,8 @@ class AnyPermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should grant access when user has any of required permissions on method")
-    void shouldGrantAccessWhenUserHasAnyOfRequiredPermissionsOnMethod() throws NoSuchMethodException {
+    void shouldGrantAccessWhenUserHasAnyOfRequiredPermissionsOnMethod()
+            throws NoSuchMethodException {
         // Given
         Method method = SecurityMockTarget.class.getMethod("methodWithMultiplePermissions");
         when(methodInvocation.getMethod()).thenReturn(method);
@@ -60,7 +59,8 @@ class AnyPermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should deny access when user does not have any of required permissions on method")
-    void shouldDenyAccessWhenUserDoesNotHaveAnyOfRequiredPermissionsOnMethod() throws NoSuchMethodException {
+    void shouldDenyAccessWhenUserDoesNotHaveAnyOfRequiredPermissionsOnMethod()
+            throws NoSuchMethodException {
         // Given
         Method method = SecurityMockTarget.class.getMethod("methodWithMultiplePermissions");
         when(methodInvocation.getMethod()).thenReturn(method);
@@ -80,7 +80,8 @@ class AnyPermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should check class-level annotation when method annotation is absent")
-    void shouldCheckClassLevelAnnotationWhenMethodAnnotationIsAbsent() throws NoSuchMethodException {
+    void shouldCheckClassLevelAnnotationWhenMethodAnnotationIsAbsent()
+            throws NoSuchMethodException {
         // Given
         Method method = ClassWithAnyPermission.class.getMethod("methodWithoutAnnotation");
         when(methodInvocation.getMethod()).thenReturn(method);
@@ -100,12 +101,14 @@ class AnyPermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should prioritize method-level annotation over class-level annotation")
-    void shouldPrioritizeMethodLevelAnnotationOverClassLevelAnnotation() throws NoSuchMethodException {
+    void shouldPrioritizeMethodLevelAnnotationOverClassLevelAnnotation()
+            throws NoSuchMethodException {
         // Given
         Method method = ClassWithAnyPermission.class.getMethod("methodWithDifferentPermissions");
         when(methodInvocation.getMethod()).thenReturn(method);
         String[] methodPermissions = {"USER", "GUEST"};
-        when(permissionService.hasAnyPermission(authentication, methodPermissions)).thenReturn(true);
+        when(permissionService.hasAnyPermission(authentication, methodPermissions))
+                .thenReturn(true);
 
         Supplier<Authentication> authSupplier = () -> authentication;
 

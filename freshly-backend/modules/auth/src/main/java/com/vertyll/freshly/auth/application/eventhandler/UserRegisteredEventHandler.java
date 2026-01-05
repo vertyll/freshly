@@ -1,12 +1,14 @@
 package com.vertyll.freshly.auth.application.eventhandler;
 
-import com.vertyll.freshly.auth.domain.event.UserRegisteredEvent;
-import com.vertyll.freshly.notification.application.NotificationService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
+import com.vertyll.freshly.auth.domain.event.UserRegisteredEvent;
+import com.vertyll.freshly.notification.application.NotificationService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -17,7 +19,8 @@ public class UserRegisteredEventHandler {
 
     @Async
     @EventListener
-    @SuppressWarnings("PMD.AvoidCatchingGenericException") // Email failure shouldn't break registration
+    @SuppressWarnings(
+            "PMD.AvoidCatchingGenericException") // Email failure shouldn't break registration
     public void handleUserRegistered(UserRegisteredEvent event) {
         log.info("Handling UserRegisteredEvent for user: {}", event.username());
 

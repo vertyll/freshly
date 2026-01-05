@@ -1,5 +1,7 @@
 package com.vertyll.freshly.security.exception;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class SecurityExceptionHandlerTest {
@@ -26,33 +26,32 @@ class SecurityExceptionHandlerTest {
     @DisplayName("Should handle AuthorizationDeniedException")
     void shouldHandleAuthorizationDeniedException() {
         // Given
-        AuthorizationDeniedException exception = new AuthorizationDeniedException(
-                "Access denied",
-                new AuthorizationDecision(false)
-        );
+        AuthorizationDeniedException exception =
+                new AuthorizationDeniedException("Access denied", new AuthorizationDecision(false));
 
         // When
         ProblemDetail problemDetail = exceptionHandler.handleAuthorizationDenied(exception);
 
         // Then
         assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
-        assertThat(problemDetail.getDetail()).isEqualTo("You do not have permission to access this resource");
+        assertThat(problemDetail.getDetail())
+                .isEqualTo("You do not have permission to access this resource");
     }
 
     @Test
     @DisplayName("Should handle AuthorizationDeniedException with custom message")
     void shouldHandleAuthorizationDeniedExceptionWithCustomMessage() {
         // Given
-        AuthorizationDeniedException exception = new AuthorizationDeniedException(
-                "Insufficient privileges",
-                new AuthorizationDecision(false)
-        );
+        AuthorizationDeniedException exception =
+                new AuthorizationDeniedException(
+                        "Insufficient privileges", new AuthorizationDecision(false));
 
         // When
         ProblemDetail problemDetail = exceptionHandler.handleAuthorizationDenied(exception);
 
         // Then
         assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
-        assertThat(problemDetail.getDetail()).isEqualTo("You do not have permission to access this resource");
+        assertThat(problemDetail.getDetail())
+                .isEqualTo("You do not have permission to access this resource");
     }
 }

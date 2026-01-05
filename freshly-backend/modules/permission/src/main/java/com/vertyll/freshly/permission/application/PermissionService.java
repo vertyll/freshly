@@ -1,16 +1,18 @@
 package com.vertyll.freshly.permission.application;
 
-import com.vertyll.freshly.permission.Permission;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Set;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
+import com.vertyll.freshly.permission.Permission;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * Service responsible for checking user permissions based on their Keycloak roles.
- * Delegates permission fetching to UserPermissionCache for caching support.
+ * Service responsible for checking user permissions based on their Keycloak roles. Delegates
+ * permission fetching to UserPermissionCache for caching support.
  */
 @Slf4j
 @Service
@@ -22,7 +24,7 @@ public class PermissionService {
     /**
      * Check if the authenticated user has a specific permission.
      *
-     * @param authentication  Spring Security authentication object
+     * @param authentication Spring Security authentication object
      * @param permissionValue Permission string value (e.g., "users:create")
      * @return true if user has the permission
      */
@@ -34,16 +36,16 @@ public class PermissionService {
 
         Set<Permission> userPermissions = permissionCache.getUserPermissions(authentication);
 
-        boolean hasPermission = userPermissions.stream()
-                .anyMatch(p -> p.getValue().equals(permissionValue));
+        boolean hasPermission =
+                userPermissions.stream().anyMatch(p -> p.getValue().equals(permissionValue));
 
         log.debug("Permission check for '{}': {}", permissionValue, hasPermission);
         return hasPermission;
     }
 
     /**
-     * Get all permissions for the authenticated user based on their roles.
-     * This method delegates to the cache component.
+     * Get all permissions for the authenticated user based on their roles. This method delegates to
+     * the cache component.
      *
      * @param authentication Spring Security authentication object
      * @return Set of permissions
@@ -55,7 +57,7 @@ public class PermissionService {
     /**
      * Check if user has any of the specified permissions.
      *
-     * @param authentication   Spring Security authentication object
+     * @param authentication Spring Security authentication object
      * @param permissionValues Variable number of permission values to check
      * @return true if user has at least one of the specified permissions
      */

@@ -1,6 +1,10 @@
 package com.vertyll.freshly.permission.application;
 
-import com.vertyll.freshly.permission.Permission;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,19 +13,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import com.vertyll.freshly.permission.Permission;
 
 @ExtendWith(MockitoExtension.class)
 class PermissionServiceTest {
 
-    @Mock
-    private UserPermissionCache permissionCache;
+    @Mock private UserPermissionCache permissionCache;
 
-    @Mock
-    private Authentication authentication;
+    @Mock private Authentication authentication;
 
     private PermissionService permissionService;
 
@@ -35,10 +34,7 @@ class PermissionServiceTest {
     void shouldReturnTrueWhenUserHasRequiredPermission() {
         // Given
         when(authentication.isAuthenticated()).thenReturn(true);
-        Set<Permission> userPermissions = Set.of(
-                Permission.USERS_READ,
-                Permission.USERS_CREATE
-        );
+        Set<Permission> userPermissions = Set.of(Permission.USERS_READ, Permission.USERS_CREATE);
         when(permissionCache.getUserPermissions(authentication)).thenReturn(userPermissions);
 
         // When
@@ -94,20 +90,15 @@ class PermissionServiceTest {
     @DisplayName("Should return user permissions from cache")
     void shouldReturnUserPermissionsFromCache() {
         // Given
-        Set<Permission> expectedPermissions = Set.of(
-                Permission.USERS_READ,
-                Permission.USERS_CREATE,
-                Permission.USERS_UPDATE
-        );
+        Set<Permission> expectedPermissions =
+                Set.of(Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_UPDATE);
         when(permissionCache.getUserPermissions(authentication)).thenReturn(expectedPermissions);
 
         // When
         Set<Permission> permissions = permissionService.getUserPermissions(authentication);
 
         // Then
-        assertThat(permissions)
-                .isEqualTo(expectedPermissions)
-                .hasSize(3);
+        assertThat(permissions).isEqualTo(expectedPermissions).hasSize(3);
         verify(permissionCache).getUserPermissions(authentication);
     }
 
@@ -115,19 +106,13 @@ class PermissionServiceTest {
     @DisplayName("Should return true when user has any of the required permissions")
     void shouldReturnTrueWhenUserHasAnyOfRequiredPermissions() {
         // Given
-        Set<Permission> userPermissions = Set.of(
-                Permission.USERS_READ,
-                Permission.REPORTS_READ
-        );
+        Set<Permission> userPermissions = Set.of(Permission.USERS_READ, Permission.REPORTS_READ);
         when(permissionCache.getUserPermissions(authentication)).thenReturn(userPermissions);
 
         // When
-        boolean hasAnyPermission = permissionService.hasAnyPermission(
-                authentication,
-                "users:create",
-                "users:read",
-                "users:delete"
-        );
+        boolean hasAnyPermission =
+                permissionService.hasAnyPermission(
+                        authentication, "users:create", "users:read", "users:delete");
 
         // Then
         assertThat(hasAnyPermission).isTrue();
@@ -142,12 +127,9 @@ class PermissionServiceTest {
         when(permissionCache.getUserPermissions(authentication)).thenReturn(userPermissions);
 
         // When
-        boolean hasAnyPermission = permissionService.hasAnyPermission(
-                authentication,
-                "users:create",
-                "users:read",
-                "users:delete"
-        );
+        boolean hasAnyPermission =
+                permissionService.hasAnyPermission(
+                        authentication, "users:create", "users:read", "users:delete");
 
         // Then
         assertThat(hasAnyPermission).isFalse();
@@ -202,11 +184,8 @@ class PermissionServiceTest {
     void shouldReturnTrueWhenUserHasAllRequiredPermissions() {
         // Given
         when(authentication.isAuthenticated()).thenReturn(true);
-        Set<Permission> userPermissions = Set.of(
-                Permission.USERS_READ,
-                Permission.USERS_CREATE,
-                Permission.USERS_UPDATE
-        );
+        Set<Permission> userPermissions =
+                Set.of(Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_UPDATE);
         when(permissionCache.getUserPermissions(authentication)).thenReturn(userPermissions);
 
         // When

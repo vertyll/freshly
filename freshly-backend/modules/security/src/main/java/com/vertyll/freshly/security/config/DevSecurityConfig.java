@@ -1,6 +1,10 @@
 package com.vertyll.freshly.security.config;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -17,10 +21,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
@@ -30,45 +31,50 @@ public class DevSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity http,
-            CorsConfigurationSource corsConfigurationSource
-    ) {
+            HttpSecurity http, CorsConfigurationSource corsConfigurationSource) {
 
-        return http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+        return http.cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .authorizeHttpRequests(auth -> auth
-                        // Actuator
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(
+                        auth ->
+                                auth
+                                        // Actuator
+                                        .requestMatchers("/actuator/health", "/actuator/info")
+                                        .permitAll()
 
-                        // Auth public endpoints
-                        .requestMatchers(
-                                "/auth/register",
-                                "/auth/login",
-                                "/auth/refresh",
-                                "/auth/logout",
-                                "/auth/verify-email",
-                                "/auth/forgot-password",
-                                "/auth/reset-password"
-                        ).permitAll()
+                                        // Auth public endpoints
+                                        .requestMatchers(
+                                                "/auth/register",
+                                                "/auth/login",
+                                                "/auth/refresh",
+                                                "/auth/logout",
+                                                "/auth/verify-email",
+                                                "/auth/forgot-password",
+                                                "/auth/reset-password")
+                                        .permitAll()
 
-                        // Public AirQuality endpoints
-                        .requestMatchers("/air-quality/**").permitAll()
+                                        // Public AirQuality endpoints
+                                        .requestMatchers("/air-quality/**")
+                                        .permitAll()
 
-                        // Swagger UI
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                                        // Swagger UI
+                                        .requestMatchers(
+                                                "/v3/api-docs/**",
+                                                "/swagger-ui/**",
+                                                "/swagger-ui.html")
+                                        .permitAll()
 
-                        // All other endpoints require authentication
-                        .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                        )
-                )
+                                        // All other endpoints require authentication
+                                        .anyRequest()
+                                        .authenticated())
+                .oauth2ResourceServer(
+                        oauth2 ->
+                                oauth2.jwt(
+                                        jwt ->
+                                                jwt.jwtAuthenticationConverter(
+                                                        jwtAuthenticationConverter())))
                 .build();
     }
 
@@ -80,11 +86,13 @@ public class DevSecurityConfig {
         return jwtConverter;
     }
 
-    static class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
+    static class KeycloakRealmRoleConverter
+            implements Converter<Jwt, Collection<GrantedAuthority>> {
         @Override
         public Collection<GrantedAuthority> convert(Jwt jwt) {
             @SuppressWarnings("unchecked")
-            final Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
+            final Map<String, Object> realmAccess =
+                    (Map<String, Object>) jwt.getClaims().get("realm_access");
 
             if (realmAccess == null || realmAccess.isEmpty()) {
                 return List.of();

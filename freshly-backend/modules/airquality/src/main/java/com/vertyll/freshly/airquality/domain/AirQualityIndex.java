@@ -8,6 +8,4 @@ public record AirQualityIndex(
         String stIndexLevel, // Global index level
         String so2IndexLevel,
         String no2IndexLevel,
-        String pm10IndexLevel
-) {
-}
+        String pm10IndexLevel) {}

@@ -1,10 +1,7 @@
 package com.vertyll.freshly.security.resolver;
 
-import com.vertyll.freshly.security.annotation.RefreshTokenCookie;
-import com.vertyll.freshly.security.config.JwtProperties;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
+import java.util.Arrays;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;
@@ -14,7 +11,12 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import java.util.Arrays;
+import com.vertyll.freshly.security.annotation.RefreshTokenCookie;
+import com.vertyll.freshly.security.config.JwtProperties;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -32,8 +34,7 @@ public class RefreshTokenCookieArgumentResolver implements HandlerMethodArgument
             @NonNull MethodParameter parameter,
             @Nullable ModelAndViewContainer mavContainer,
             NativeWebRequest webRequest,
-            @Nullable WebDataBinderFactory binderFactory
-    ) {
+            @Nullable WebDataBinderFactory binderFactory) {
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 
         if (request == null || request.getCookies() == null) {

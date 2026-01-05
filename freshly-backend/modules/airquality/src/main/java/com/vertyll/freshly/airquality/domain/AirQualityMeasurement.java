@@ -1,15 +1,15 @@
 package com.vertyll.freshly.airquality.domain;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-
 /**
- * Domain aggregate representing historical air quality measurement.
- * This allows us to store and analyze air quality data over time.
+ * Domain aggregate representing historical air quality measurement. This allows us to store and
+ * analyze air quality data over time.
  */
 @Data
 @NoArgsConstructor
@@ -38,15 +38,12 @@ public class AirQualityMeasurement {
 
     private LocalDateTime createdAt;
 
-    /**
-     * Factory method to create measurement from index and sensor data
-     */
+    /** Factory method to create measurement from index and sensor data */
     public static AirQualityMeasurement create(
             int stationId,
             String stationName,
             AirQualityIndex index,
-            java.util.Map<String, Double> sensorValues
-    ) {
+            java.util.Map<String, Double> sensorValues) {
         AirQualityMeasurement measurement = new AirQualityMeasurement();
         measurement.stationId = stationId;
         measurement.stationName = stationName;

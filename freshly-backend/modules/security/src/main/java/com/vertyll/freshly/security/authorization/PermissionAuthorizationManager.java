@@ -1,9 +1,8 @@
 package com.vertyll.freshly.security.authorization;
 
-import com.vertyll.freshly.security.annotation.RequirePermission;
-import com.vertyll.freshly.permission.application.PermissionService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.lang.reflect.Method;
+import java.util.function.Supplier;
+
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
@@ -11,12 +10,13 @@ import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
-import java.util.function.Supplier;
+import com.vertyll.freshly.permission.application.PermissionService;
+import com.vertyll.freshly.security.annotation.RequirePermission;
 
-/**
- * Authorization manager for @RequirePermission annotation.
- */
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+/** Authorization manager for @RequirePermission annotation. */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -25,7 +25,8 @@ public class PermissionAuthorizationManager implements AuthorizationManager<Meth
     private final PermissionService permissionService;
 
     @Override
-    public AuthorizationResult authorize(Supplier<? extends Authentication> authentication, MethodInvocation methodInvocation) {
+    public AuthorizationResult authorize(
+            Supplier<? extends Authentication> authentication, MethodInvocation methodInvocation) {
         Method method = methodInvocation.getMethod();
 
         // Check method-level annotation first
@@ -37,13 +38,13 @@ public class PermissionAuthorizationManager implements AuthorizationManager<Meth
                     "Permission check for method {}: {} = {}",
                     method.getName(),
                     permission,
-                    granted
-            );
+                    granted);
             return new AuthorizationDecision(granted);
         }
 
         // Check class-level annotation
-        RequirePermission classAnnotation = method.getDeclaringClass().getAnnotation(RequirePermission.class);
+        RequirePermission classAnnotation =
+                method.getDeclaringClass().getAnnotation(RequirePermission.class);
         if (classAnnotation != null) {
             String permission = classAnnotation.value();
             boolean granted = permissionService.hasPermission(authentication.get(), permission);
@@ -51,8 +52,7 @@ public class PermissionAuthorizationManager implements AuthorizationManager<Meth
                     "Permission check for class {}: {} = {}",
                     method.getDeclaringClass().getSimpleName(),
                     permission,
-                    granted
-            );
+                    granted);
             return new AuthorizationDecision(granted);
         }
 

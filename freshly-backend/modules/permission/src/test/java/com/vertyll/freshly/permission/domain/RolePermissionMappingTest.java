@@ -1,14 +1,15 @@
 package com.vertyll.freshly.permission.domain;
 
-import com.vertyll.freshly.permission.Permission;
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.UUID;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.*;
+import com.vertyll.freshly.permission.Permission;
 
 class RolePermissionMappingTest {
 

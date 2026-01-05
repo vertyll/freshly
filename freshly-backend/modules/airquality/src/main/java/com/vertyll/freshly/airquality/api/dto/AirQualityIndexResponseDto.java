@@ -8,6 +8,4 @@ public record AirQualityIndexResponseDto(
         String overallIndex,
         String so2Index,
         String no2Index,
-        String pm10Index
-) {
-}
+        String pm10Index) {}

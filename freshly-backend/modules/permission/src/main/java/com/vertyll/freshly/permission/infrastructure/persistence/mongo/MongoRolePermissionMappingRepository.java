@@ -1,14 +1,16 @@
 package com.vertyll.freshly.permission.infrastructure.persistence.mongo;
 
-import com.vertyll.freshly.permission.Permission;
-import com.vertyll.freshly.permission.domain.RolePermissionMapping;
-import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import org.springframework.stereotype.Repository;
+
+import com.vertyll.freshly.permission.Permission;
+import com.vertyll.freshly.permission.domain.RolePermissionMapping;
+import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository("rolePermissionMappingRepository")
 @RequiredArgsConstructor
@@ -45,9 +47,7 @@ class MongoRolePermissionMappingRepository implements RolePermissionMappingRepos
 
     @Override
     public List<RolePermissionMapping> findAll() {
-        return springDataRepository.findAll().stream()
-                .map(mapper::toDomain)
-                .toList();
+        return springDataRepository.findAll().stream().map(mapper::toDomain).toList();
     }
 
     @Override

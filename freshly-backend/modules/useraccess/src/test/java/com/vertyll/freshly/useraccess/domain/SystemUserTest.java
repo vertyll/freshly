@@ -1,13 +1,14 @@
 package com.vertyll.freshly.useraccess.domain;
 
-import com.vertyll.freshly.useraccess.domain.exception.*;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.Set;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import com.vertyll.freshly.useraccess.domain.exception.*;
 
 class SystemUserTest {
 
@@ -39,7 +40,8 @@ class SystemUserTest {
         SystemUser user = new SystemUser(keycloakUserId, true, roles);
 
         // Then
-        assertThat(user.getRoles()).containsExactlyInAnyOrder(UserRoleEnum.USER, UserRoleEnum.ADMIN);
+        assertThat(user.getRoles())
+                .containsExactlyInAnyOrder(UserRoleEnum.USER, UserRoleEnum.ADMIN);
     }
 
     @Test
@@ -187,8 +189,7 @@ class SystemUserTest {
         SystemUser user = new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER));
 
         // When & Then
-        assertThatThrownBy(user::deactivateSelf)
-                .isInstanceOf(UserAlreadyInactiveException.class);
+        assertThatThrownBy(user::deactivateSelf).isInstanceOf(UserAlreadyInactiveException.class);
     }
 
     @Test
@@ -218,7 +219,8 @@ class SystemUserTest {
         user.replaceRoles(newRoles);
 
         // Then
-        assertThat(user.getRoles()).containsExactlyInAnyOrder(UserRoleEnum.USER, UserRoleEnum.ADMIN);
+        assertThat(user.getRoles())
+                .containsExactlyInAnyOrder(UserRoleEnum.USER, UserRoleEnum.ADMIN);
     }
 
     @Test

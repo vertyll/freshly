@@ -5,6 +5,4 @@ public record StationRankingResponseDto(
         StationResponseDto station,
         Double averageScore,
         String dominantQualityLevel,
-        int measurementCount
-) {
-}
+        int measurementCount) {}

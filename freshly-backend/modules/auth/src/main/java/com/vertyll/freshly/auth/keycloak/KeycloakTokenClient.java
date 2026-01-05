@@ -1,11 +1,7 @@
 package com.vertyll.freshly.auth.keycloak;
 
-import com.vertyll.freshly.auth.api.dto.TokenResponseDto;
-import com.vertyll.freshly.auth.domain.exception.InvalidPasswordException;
+import java.util.Map;
 
-import com.vertyll.freshly.auth.keycloak.exception.KeycloakClientException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -15,7 +11,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
-import java.util.Map;
+import com.vertyll.freshly.auth.api.dto.TokenResponseDto;
+import com.vertyll.freshly.auth.domain.exception.InvalidPasswordException;
+import com.vertyll.freshly.auth.keycloak.exception.KeycloakClientException;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -30,18 +31,20 @@ public class KeycloakTokenClient {
     private final KeycloakProperties properties;
 
     private String getTokenUrl() {
-        return properties.serverUrl() + "/realms/" + properties.realm()
+        return properties.serverUrl()
+                + "/realms/"
+                + properties.realm()
                 + "/protocol/openid-connect/token";
     }
 
     private String getLogoutUrl() {
-        return properties.serverUrl() + "/realms/" + properties.realm()
+        return properties.serverUrl()
+                + "/realms/"
+                + properties.realm()
                 + "/protocol/openid-connect/logout";
     }
 
-    /**
-     * Get tokens using username/password (Resource Owner Password Credentials Grant)
-     */
+    /** Get tokens using username/password (Resource Owner Password Credentials Grant) */
     public TokenResponseDto getToken(String username, String password) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add(GRANT_TYPE, "password");
@@ -50,12 +53,14 @@ public class KeycloakTokenClient {
         formData.add("password", password);
 
         try {
-            Map<String, Object> response = restClient.post()
-                    .uri(getTokenUrl())
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .body(formData)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<>() {});
+            Map<String, Object> response =
+                    restClient
+                            .post()
+                            .uri(getTokenUrl())
+                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                            .body(formData)
+                            .retrieve()
+                            .body(new ParameterizedTypeReference<>() {});
 
             return mapToTokenResponse(response);
 
@@ -68,9 +73,7 @@ public class KeycloakTokenClient {
         }
     }
 
-    /**
-     * Refresh access token using refresh token
-     */
+    /** Refresh access token using refresh token */
     public TokenResponseDto refreshToken(String refreshToken) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add(GRANT_TYPE, REFRESH_TOKEN);
@@ -78,12 +81,14 @@ public class KeycloakTokenClient {
         formData.add(REFRESH_TOKEN, refreshToken);
 
         try {
-            Map<String, Object> response = restClient.post()
-                    .uri(getTokenUrl())
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .body(formData)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<>() {});
+            Map<String, Object> response =
+                    restClient
+                            .post()
+                            .uri(getTokenUrl())
+                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                            .body(formData)
+                            .retrieve()
+                            .body(new ParameterizedTypeReference<>() {});
 
             return mapToTokenResponse(response);
 
@@ -96,9 +101,7 @@ public class KeycloakTokenClient {
         }
     }
 
-    /**
-     * Logout (revoke refresh token)
-     */
+    /** Logout (revoke refresh token) */
     @SuppressWarnings("PMD.AvoidCatchingGenericException") // Logout must always succeed
     public void logout(String refreshToken) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -106,7 +109,8 @@ public class KeycloakTokenClient {
         formData.add(REFRESH_TOKEN, refreshToken);
 
         try {
-            restClient.post()
+            restClient
+                    .post()
                     .uri(getLogoutUrl())
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(formData)
@@ -131,7 +135,6 @@ public class KeycloakTokenClient {
                 (String) response.get(REFRESH_TOKEN),
                 (Integer) response.get("expires_in"),
                 (Integer) response.get("refresh_expires_in"),
-                (String) response.getOrDefault("token_type", "Bearer")
-        );
+                (String) response.getOrDefault("token_type", "Bearer"));
     }
 }

@@ -1,14 +1,15 @@
 package com.vertyll.freshly.auth.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vertyll.freshly.auth.api.dto.*;
-import com.vertyll.freshly.auth.application.AuthService;
-import com.vertyll.freshly.auth.domain.exception.InvalidPasswordException;
-import com.vertyll.freshly.common.exception.GlobalExceptionHandler;
-import com.vertyll.freshly.security.config.CookieProperties;
-import com.vertyll.freshly.security.config.JwtProperties;
-import com.vertyll.freshly.security.resolver.RefreshTokenCookieArgumentResolver;
-import jakarta.servlet.http.Cookie;
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.time.Instant;
+import java.util.Collections;
+import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,40 +31,34 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import java.time.Instant;
-import java.util.Collections;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.UUID;
+import com.vertyll.freshly.auth.api.dto.*;
+import com.vertyll.freshly.auth.application.AuthService;
+import com.vertyll.freshly.auth.domain.exception.InvalidPasswordException;
+import com.vertyll.freshly.common.exception.GlobalExceptionHandler;
+import com.vertyll.freshly.security.config.CookieProperties;
+import com.vertyll.freshly.security.config.JwtProperties;
+import com.vertyll.freshly.security.resolver.RefreshTokenCookieArgumentResolver;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import jakarta.servlet.http.Cookie;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
     private MockMvc mockMvc;
 
-    @Mock
-    private AuthService authService;
+    @Mock private AuthService authService;
 
-    @Mock
-    private CookieProperties cookieProperties;
+    @Mock private CookieProperties cookieProperties;
 
-    @Mock
-    private JwtProperties jwtProperties;
+    @Mock private JwtProperties jwtProperties;
 
-    @Mock
-    private MessageSource messageSource;
+    @Mock private MessageSource messageSource;
 
-    @Mock
-    private JwtProperties.RefreshToken refreshTokenProperties;
+    @Mock private JwtProperties.RefreshToken refreshTokenProperties;
 
-    @InjectMocks
-    private AuthController authController;
+    @InjectMocks private AuthController authController;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -78,15 +73,21 @@ class AuthControllerTest {
         lenient().when(jwtProperties.refreshToken()).thenReturn(refreshTokenProperties);
         lenient().when(refreshTokenProperties.cookieName()).thenReturn("refresh_token");
 
-        RefreshTokenCookieArgumentResolver refreshTokenResolver = new RefreshTokenCookieArgumentResolver(jwtProperties);
+        RefreshTokenCookieArgumentResolver refreshTokenResolver =
+                new RefreshTokenCookieArgumentResolver(jwtProperties);
 
-        AuthenticationPrincipalArgumentResolver authenticationPrincipalResolver = new AuthenticationPrincipalArgumentResolver();
+        AuthenticationPrincipalArgumentResolver authenticationPrincipalResolver =
+                new AuthenticationPrincipalArgumentResolver();
 
-        mockMvc = MockMvcBuilders.standaloneSetup(authController)
-            .setControllerAdvice(new AuthControllerAdvice(messageSource), new GlobalExceptionHandler())
-            .setCustomArgumentResolvers(refreshTokenResolver, authenticationPrincipalResolver)
-            .setValidator(validator)
-            .build();
+        mockMvc =
+                MockMvcBuilders.standaloneSetup(authController)
+                        .setControllerAdvice(
+                                new AuthControllerAdvice(messageSource),
+                                new GlobalExceptionHandler())
+                        .setCustomArgumentResolvers(
+                                refreshTokenResolver, authenticationPrincipalResolver)
+                        .setValidator(validator)
+                        .build();
     }
 
     @AfterEach
@@ -104,26 +105,22 @@ class AuthControllerTest {
         @DisplayName("Should register user successfully")
         void shouldRegisterUserSuccessfully() throws Exception {
             // Given
-            RegisterUserRequestDto request = new RegisterUserRequestDto(
-                    "testuser",
-                    "test@example.com",
-                    "Password123!",
-                    "John",
-                    "Doe"
-            );
+            RegisterUserRequestDto request =
+                    new RegisterUserRequestDto(
+                            "testuser", "test@example.com", "Password123!", "John", "Doe");
 
             UUID userId = UUID.randomUUID();
 
-            when(authService.registerUser(any(RegisterUserRequestDto.class)))
-                    .thenReturn(userId);
+            when(authService.registerUser(any(RegisterUserRequestDto.class))).thenReturn(userId);
 
             when(messageSource.getMessage(eq("success.auth.registered"), any(), any()))
                     .thenReturn("User registered successfully");
 
             // When & Then
-            mockMvc.perform(post("/auth/register")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                            post("/auth/register")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.data.userId").value(userId.toString()))
@@ -136,18 +133,15 @@ class AuthControllerTest {
         @DisplayName("Should fail with invalid request data")
         void shouldFailWithInvalidRequestData() throws Exception {
             // Given - invalid email
-            RegisterUserRequestDto request = new RegisterUserRequestDto(
-                    "testuser",
-                    "invalid-email",
-                    "Password123!",
-                    "John",
-                    "Doe"
-            );
+            RegisterUserRequestDto request =
+                    new RegisterUserRequestDto(
+                            "testuser", "invalid-email", "Password123!", "John", "Doe");
 
             // When & Then
-            mockMvc.perform(post("/auth/register")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                            post("/auth/register")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
                     .andExpect(status().isBadRequest());
 
@@ -158,7 +152,8 @@ class AuthControllerTest {
         @DisplayName("Should fail with missing required fields")
         void shouldFailWithMissingRequiredFields() throws Exception {
             // Given - missing email
-            String invalidRequest = """
+            String invalidRequest =
+                    """
                     {
                         "username": "testuser",
                         "password": "Password123!",
@@ -168,9 +163,10 @@ class AuthControllerTest {
                     """;
 
             // When & Then
-            mockMvc.perform(post("/auth/register")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(invalidRequest))
+            mockMvc.perform(
+                            post("/auth/register")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(invalidRequest))
                     .andDo(print())
                     .andExpect(status().isBadRequest());
 
@@ -194,8 +190,7 @@ class AuthControllerTest {
             doNothing().when(authService).verifyEmail(token);
 
             // When & Then
-            mockMvc.perform(get("/auth/verify-email")
-                            .param("token", token))
+            mockMvc.perform(get("/auth/verify-email").param("token", token))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value("Email verified successfully"));
 
@@ -206,8 +201,7 @@ class AuthControllerTest {
         @DisplayName("Should fail without token parameter")
         void shouldFailWithoutTokenParameter() throws Exception {
             // When & Then
-            mockMvc.perform(get("/auth/verify-email"))
-                    .andExpect(status().isInternalServerError());
+            mockMvc.perform(get("/auth/verify-email")).andExpect(status().isInternalServerError());
 
             verify(authService, never()).verifyEmail(any());
         }
@@ -222,16 +216,10 @@ class AuthControllerTest {
         void shouldLoginUserSuccessfully() throws Exception {
             // Given
             LoginRequestDto request = new LoginRequestDto("testuser", "password123");
-            TokenResponseDto tokenResponse = new TokenResponseDto(
-                    "access-token",
-                    "refresh-token",
-                    3600,
-                    86400,
-                    "Bearer"
-            );
+            TokenResponseDto tokenResponse =
+                    new TokenResponseDto("access-token", "refresh-token", 3600, 86400, "Bearer");
 
-            when(authService.login(any(LoginRequestDto.class)))
-                    .thenReturn(tokenResponse);
+            when(authService.login(any(LoginRequestDto.class))).thenReturn(tokenResponse);
 
             when(refreshTokenProperties.expiration()).thenReturn(86400000L);
             when(cookieProperties.httpOnly()).thenReturn(true);
@@ -243,9 +231,10 @@ class AuthControllerTest {
                     .thenReturn("Login successful");
 
             // When & Then
-            mockMvc.perform(post("/auth/login")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                            post("/auth/login")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.access_token").value("access-token"))
@@ -271,9 +260,10 @@ class AuthControllerTest {
                     .thenReturn("Invalid credentials");
 
             // When & Then
-            mockMvc.perform(post("/auth/login")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                            post("/auth/login")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
                     .andExpect(status().isUnauthorized());
 
@@ -290,16 +280,11 @@ class AuthControllerTest {
         void shouldRefreshTokenSuccessfully() throws Exception {
             // Given
             String refreshToken = "refresh-token";
-            TokenResponseDto tokenResponse = new TokenResponseDto(
-                    "new-access-token",
-                    "new-refresh-token",
-                    3600,
-                    86400,
-                    "Bearer"
-            );
+            TokenResponseDto tokenResponse =
+                    new TokenResponseDto(
+                            "new-access-token", "new-refresh-token", 3600, 86400, "Bearer");
 
-            when(authService.refreshToken(refreshToken))
-                    .thenReturn(tokenResponse);
+            when(authService.refreshToken(refreshToken)).thenReturn(tokenResponse);
 
             when(refreshTokenProperties.expiration()).thenReturn(86400000L);
             when(cookieProperties.httpOnly()).thenReturn(true);
@@ -311,8 +296,7 @@ class AuthControllerTest {
                     .thenReturn("Token refreshed successfully");
 
             // When & Then
-            mockMvc.perform(post("/auth/refresh")
-                            .cookie(new Cookie("refresh_token", refreshToken)))
+            mockMvc.perform(post("/auth/refresh").cookie(new Cookie("refresh_token", refreshToken)))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.access_token").value("new-access-token"))
@@ -357,8 +341,7 @@ class AuthControllerTest {
             doNothing().when(authService).logout(refreshToken);
 
             // When & Then
-            mockMvc.perform(post("/auth/logout")
-                            .cookie(new Cookie("refresh_token", refreshToken)))
+            mockMvc.perform(post("/auth/logout").cookie(new Cookie("refresh_token", refreshToken)))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value("Logout successful"))
@@ -403,12 +386,15 @@ class AuthControllerTest {
             when(messageSource.getMessage(eq("success.auth.resetEmailSent"), any(), any()))
                     .thenReturn("Password reset email sent");
 
-            doNothing().when(authService).initiatePasswordReset(any(ForgotPasswordRequestDto.class));
+            doNothing()
+                    .when(authService)
+                    .initiatePasswordReset(any(ForgotPasswordRequestDto.class));
 
             // When & Then
-            mockMvc.perform(post("/auth/forgot-password")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                            post("/auth/forgot-password")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value("Password reset email sent"));
@@ -423,9 +409,10 @@ class AuthControllerTest {
             ForgotPasswordRequestDto request = new ForgotPasswordRequestDto("invalid-email");
 
             // When & Then
-            mockMvc.perform(post("/auth/forgot-password")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                            post("/auth/forgot-password")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
                     .andExpect(status().isBadRequest());
 
@@ -441,10 +428,8 @@ class AuthControllerTest {
         @DisplayName("Should reset password successfully")
         void shouldResetPasswordSuccessfully() throws Exception {
             // Given
-            ResetPasswordRequestDto request = new ResetPasswordRequestDto(
-                    "reset-token",
-                    "NewPassword123!"
-            );
+            ResetPasswordRequestDto request =
+                    new ResetPasswordRequestDto("reset-token", "NewPassword123!");
 
             when(messageSource.getMessage(eq("success.auth.passwordReset"), any(), any()))
                     .thenReturn("Password reset successfully");
@@ -452,9 +437,10 @@ class AuthControllerTest {
             doNothing().when(authService).resetPassword(any(ResetPasswordRequestDto.class));
 
             // When & Then
-            mockMvc.perform(post("/auth/reset-password")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                            post("/auth/reset-password")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value("Password reset successfully"));
@@ -471,20 +457,20 @@ class AuthControllerTest {
         @DisplayName("Should change password successfully")
         void shouldChangePasswordSuccessfully() throws Exception {
             // Given
-            ChangePasswordRequestDto request = new ChangePasswordRequestDto(
-                    "currentPassword123",
-                    "NewPassword123!"
-            );
+            ChangePasswordRequestDto request =
+                    new ChangePasswordRequestDto("currentPassword123", "NewPassword123!");
 
             UUID userId = UUID.randomUUID();
-            Jwt jwt = Jwt.withTokenValue("token")
-                    .header("alg", "none")
-                    .subject(userId.toString())
-                    .issuedAt(Instant.now())
-                    .expiresAt(Instant.now().plusSeconds(3600))
-                    .build();
+            Jwt jwt =
+                    Jwt.withTokenValue("token")
+                            .header("alg", "none")
+                            .subject(userId.toString())
+                            .issuedAt(Instant.now())
+                            .expiresAt(Instant.now().plusSeconds(3600))
+                            .build();
 
-            JwtAuthenticationToken authentication = new JwtAuthenticationToken(jwt, Collections.emptyList());
+            JwtAuthenticationToken authentication =
+                    new JwtAuthenticationToken(jwt, Collections.emptyList());
             SecurityContext securityContext = mock(SecurityContext.class);
             when(securityContext.getAuthentication()).thenReturn(authentication);
             SecurityContextHolder.setContext(securityContext);
@@ -492,17 +478,21 @@ class AuthControllerTest {
             when(messageSource.getMessage(eq("success.auth.passwordChanged"), any(), any()))
                     .thenReturn("Password changed successfully");
 
-            doNothing().when(authService).changePassword(any(UUID.class), any(ChangePasswordRequestDto.class));
+            doNothing()
+                    .when(authService)
+                    .changePassword(any(UUID.class), any(ChangePasswordRequestDto.class));
 
             // When & Then
-            mockMvc.perform(put("/auth/change-password")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                            put("/auth/change-password")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value("Password changed successfully"));
 
-            verify(authService).changePassword(any(UUID.class), any(ChangePasswordRequestDto.class));
+            verify(authService)
+                    .changePassword(any(UUID.class), any(ChangePasswordRequestDto.class));
         }
     }
 
@@ -517,14 +507,16 @@ class AuthControllerTest {
             ChangeEmailRequestDto request = new ChangeEmailRequestDto("newemail@example.com");
 
             UUID userId = UUID.randomUUID();
-            Jwt jwt = Jwt.withTokenValue("token")
-                    .header("alg", "none")
-                    .subject(userId.toString())
-                    .issuedAt(Instant.now())
-                    .expiresAt(Instant.now().plusSeconds(3600))
-                    .build();
+            Jwt jwt =
+                    Jwt.withTokenValue("token")
+                            .header("alg", "none")
+                            .subject(userId.toString())
+                            .issuedAt(Instant.now())
+                            .expiresAt(Instant.now().plusSeconds(3600))
+                            .build();
 
-            JwtAuthenticationToken authentication = new JwtAuthenticationToken(jwt, Collections.emptyList());
+            JwtAuthenticationToken authentication =
+                    new JwtAuthenticationToken(jwt, Collections.emptyList());
             SecurityContext securityContext = mock(SecurityContext.class);
             when(securityContext.getAuthentication()).thenReturn(authentication);
             SecurityContextHolder.setContext(securityContext);
@@ -532,12 +524,15 @@ class AuthControllerTest {
             when(messageSource.getMessage(eq("success.auth.emailChangeInitiated"), any(), any()))
                     .thenReturn("Email change initiated");
 
-            doNothing().when(authService).changeEmail(any(UUID.class), any(ChangeEmailRequestDto.class));
+            doNothing()
+                    .when(authService)
+                    .changeEmail(any(UUID.class), any(ChangeEmailRequestDto.class));
 
             // When & Then
-            mockMvc.perform(put("/auth/change-email")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                            put("/auth/change-email")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value("Email change initiated"));
@@ -552,9 +547,10 @@ class AuthControllerTest {
             ChangeEmailRequestDto request = new ChangeEmailRequestDto("invalid-email");
 
             // When & Then
-            mockMvc.perform(put("/auth/change-email")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                            put("/auth/change-email")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
                     .andExpect(status().isBadRequest());
 

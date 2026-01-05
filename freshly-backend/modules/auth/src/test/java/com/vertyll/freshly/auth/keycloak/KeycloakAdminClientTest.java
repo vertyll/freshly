@@ -1,8 +1,16 @@
 package com.vertyll.freshly.auth.keycloak;
 
-import com.vertyll.freshly.auth.domain.exception.EmailAlreadyExistsException;
-import com.vertyll.freshly.auth.domain.exception.UsernameAlreadyExistsException;
-import jakarta.ws.rs.core.Response;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.*;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,43 +27,29 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClient;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import com.vertyll.freshly.auth.domain.exception.EmailAlreadyExistsException;
+import com.vertyll.freshly.auth.domain.exception.UsernameAlreadyExistsException;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.*;
+import jakarta.ws.rs.core.Response;
 
 @ExtendWith(MockitoExtension.class)
 class KeycloakAdminClientTest {
 
-    @Mock
-    private Keycloak keycloak;
+    @Mock private Keycloak keycloak;
 
-    @Mock
-    private KeycloakProperties properties;
+    @Mock private KeycloakProperties properties;
 
-    @Mock
-    private RestClient restClient;
+    @Mock private RestClient restClient;
 
-    @Mock
-    private RealmResource realmResource;
+    @Mock private RealmResource realmResource;
 
-    @Mock
-    private UsersResource usersResource;
+    @Mock private UsersResource usersResource;
 
-    @Mock
-    private UserResource userResource;
+    @Mock private UserResource userResource;
 
-    @Mock
-    private Response response;
+    @Mock private Response response;
 
-    @Captor
-    private ArgumentCaptor<UserRepresentation> userCaptor;
+    @Captor private ArgumentCaptor<UserRepresentation> userCaptor;
 
     private KeycloakAdminClient keycloakAdminClient;
 
@@ -85,10 +79,12 @@ class KeycloakAdminClientTest {
         when(usersResource.searchByEmail(email, true)).thenReturn(Collections.emptyList());
         when(usersResource.create(any(UserRepresentation.class))).thenReturn(response);
         when(response.getStatus()).thenReturn(201);
-        when(response.getHeaderString("Location")).thenReturn("http://localhost:8080/users/" + expectedUserId);
+        when(response.getHeaderString("Location"))
+                .thenReturn("http://localhost:8080/users/" + expectedUserId);
 
         // When
-        UUID userId = keycloakAdminClient.createUser(username, email, password, firstName, lastName);
+        UUID userId =
+                keycloakAdminClient.createUser(username, email, password, firstName, lastName);
 
         // Then
         assertThat(userId).isEqualTo(expectedUserId);
@@ -112,9 +108,10 @@ class KeycloakAdminClientTest {
         when(usersResource.searchByUsername(username, true)).thenReturn(List.of(existingUser));
 
         // When & Then
-        assertThatThrownBy(() -> keycloakAdminClient.createUser(
-                username, "test@example.com", "password", "John", "Doe"
-        ))
+        assertThatThrownBy(
+                        () ->
+                                keycloakAdminClient.createUser(
+                                        username, "test@example.com", "password", "John", "Doe"))
                 .isInstanceOf(UsernameAlreadyExistsException.class);
 
         verify(usersResource, never()).create(any());
@@ -126,13 +123,15 @@ class KeycloakAdminClientTest {
         // Given
         String email = "existing@example.com";
         UserRepresentation existingUser = new UserRepresentation();
-        when(usersResource.searchByUsername(anyString(), anyBoolean())).thenReturn(Collections.emptyList());
+        when(usersResource.searchByUsername(anyString(), anyBoolean()))
+                .thenReturn(Collections.emptyList());
         when(usersResource.searchByEmail(email, true)).thenReturn(List.of(existingUser));
 
         // When & Then
-        assertThatThrownBy(() -> keycloakAdminClient.createUser(
-                "testuser", email, "password", "John", "Doe"
-        ))
+        assertThatThrownBy(
+                        () ->
+                                keycloakAdminClient.createUser(
+                                        "testuser", email, "password", "John", "Doe"))
                 .isInstanceOf(EmailAlreadyExistsException.class);
 
         verify(usersResource, never()).create(any());
@@ -152,11 +151,14 @@ class KeycloakAdminClientTest {
         keycloakAdminClient.changePassword(userId, newPassword);
 
         // Then
-        verify(userResource).resetPassword(argThat(credential ->
-                CredentialRepresentation.PASSWORD.equals(credential.getType()) &&
-                credential.getValue().equals(newPassword) &&
-                !credential.isTemporary()
-        ));
+        verify(userResource)
+                .resetPassword(
+                        argThat(
+                                credential ->
+                                        CredentialRepresentation.PASSWORD.equals(
+                                                        credential.getType())
+                                                && credential.getValue().equals(newPassword)
+                                                && !credential.isTemporary()));
     }
 
     @Test
@@ -177,10 +179,12 @@ class KeycloakAdminClientTest {
         keycloakAdminClient.changeEmail(userId, newEmail);
 
         // Then
-        verify(userResource).update(argThat(updatedUser ->
-                updatedUser.getEmail().equals(newEmail) &&
-                !updatedUser.isEmailVerified()
-        ));
+        verify(userResource)
+                .update(
+                        argThat(
+                                updatedUser ->
+                                        updatedUser.getEmail().equals(newEmail)
+                                                && !updatedUser.isEmailVerified()));
     }
 
     @Test
@@ -223,10 +227,11 @@ class KeycloakAdminClientTest {
         keycloakAdminClient.activateUser(userId);
 
         // Then
-        verify(userResource).update(argThat(updatedUser ->
-                updatedUser.isEnabled() &&
-                updatedUser.isEmailVerified()
-        ));
+        verify(userResource)
+                .update(
+                        argThat(
+                                updatedUser ->
+                                        updatedUser.isEnabled() && updatedUser.isEmailVerified()));
     }
 
     @Test
@@ -298,8 +303,6 @@ class KeycloakAdminClientTest {
         List<UserRepresentation> users = keycloakAdminClient.findUsersByEmail(email);
 
         // Then
-        assertThat(users)
-            .hasSize(2)
-            .isEqualTo(expectedUsers);
+        assertThat(users).hasSize(2).isEqualTo(expectedUsers);
     }
 }

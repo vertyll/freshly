@@ -24,7 +24,6 @@ class KeycloakConfig {
 
     @Bean
     public RestClient keycloakRestClient() {
-        return RestClient.builder()
-                .build();
+        return RestClient.builder().build();
     }
 }

@@ -8,8 +8,8 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class FreshlyApplicationTests {
 
-	@Test
-	void contextLoads() {
-		// Test to ensure the Spring application context loads successfully
-	}
+    @Test
+    void contextLoads() {
+        // Test to ensure the Spring application context loads successfully
+    }
 }

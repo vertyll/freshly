@@ -1,7 +1,8 @@
 package com.vertyll.freshly.airquality.infrastructure.persistence.mongo;
 
-import com.vertyll.freshly.airquality.domain.AirQualityMeasurement;
 import org.springframework.stereotype.Component;
+
+import com.vertyll.freshly.airquality.domain.AirQualityMeasurement;
 
 @Component
 class AirQualityMeasurementMapper {
@@ -23,8 +24,7 @@ class AirQualityMeasurementMapper {
                 domain.getNo2Value(),
                 domain.getCoValue(),
                 domain.getO3Value(),
-                domain.getCreatedAt()
-        );
+                domain.getCreatedAt());
     }
 
     public AirQualityMeasurement toDomain(AirQualityMeasurementDocument document) {
@@ -44,7 +44,6 @@ class AirQualityMeasurementMapper {
                 document.getNo2Value(),
                 document.getCoValue(),
                 document.getO3Value(),
-                document.getCreatedAt()
-        );
+                document.getCreatedAt());
     }
 }

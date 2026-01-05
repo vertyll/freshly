@@ -5,11 +5,4 @@ import org.springframework.validation.annotation.Validated;
 
 @ConfigurationProperties(prefix = "spring.mail")
 @Validated
-record MailProperties(
-        String host,
-        int port,
-        String username,
-        String password,
-        String from
-) {
-}
+record MailProperties(String host, int port, String username, String password, String from) {}

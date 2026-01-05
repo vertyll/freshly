@@ -9,13 +9,15 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @Profile("test")
-@SuppressWarnings({"PMD.TestClassWithoutTestCases", "PMD.UnitTestShouldUseTestAnnotation"}) // Configuration for test profile
+@SuppressWarnings({
+    "PMD.TestClassWithoutTestCases",
+    "PMD.UnitTestShouldUseTestAnnotation"
+}) // Configuration for test profile
 public class TestSecurityConfig {
 
     @Bean
     public SecurityFilterChain testSecurityFilterChain(HttpSecurity http) {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
+        return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .build();
     }

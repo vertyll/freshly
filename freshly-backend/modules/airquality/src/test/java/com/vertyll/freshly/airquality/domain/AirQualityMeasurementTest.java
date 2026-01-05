@@ -1,13 +1,13 @@
 package com.vertyll.freshly.airquality.domain;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class AirQualityMeasurementTest {
 
@@ -18,26 +18,27 @@ class AirQualityMeasurementTest {
         int stationId = 123;
         String stationName = "Station 1";
         LocalDateTime calculationDate = LocalDateTime.now(ZoneOffset.UTC);
-        AirQualityIndex index = new AirQualityIndex(
-                stationId,
-                calculationDate,
-                "Dobry",
-                "Bardzo dobry",
-                "Umiarkowany",
-                "Dobry"
-        );
+        AirQualityIndex index =
+                new AirQualityIndex(
+                        stationId,
+                        calculationDate,
+                        "Dobry",
+                        "Bardzo dobry",
+                        "Umiarkowany",
+                        "Dobry");
 
-        Map<String, Double> sensorValues = Map.of(
-            "PM10", 25.5,
-            "PM2.5", 15.2,
-            "SO2", 8.5,
-            "NO2", 12.3,
-            "CO", 0.5,
-            "O3", 45.2
-        );
+        Map<String, Double> sensorValues =
+                Map.of(
+                        "PM10", 25.5,
+                        "PM2.5", 15.2,
+                        "SO2", 8.5,
+                        "NO2", 12.3,
+                        "CO", 0.5,
+                        "O3", 45.2);
 
         // When
-        AirQualityMeasurement measurement = AirQualityMeasurement.create(stationId, stationName, index, sensorValues);
+        AirQualityMeasurement measurement =
+                AirQualityMeasurement.create(stationId, stationName, index, sensorValues);
 
         // Then
         assertThat(measurement.getStationId()).isEqualTo(stationId);
@@ -62,20 +63,21 @@ class AirQualityMeasurementTest {
         // Given
         int stationId = 123;
         String stationName = "Station 1";
-        AirQualityIndex index = new AirQualityIndex(
-                stationId,
-                LocalDateTime.now(ZoneOffset.UTC),
-                "Dobry",
-                "Dobry",
-                "Dobry",
-                "Dobry"
-        );
+        AirQualityIndex index =
+                new AirQualityIndex(
+                        stationId,
+                        LocalDateTime.now(ZoneOffset.UTC),
+                        "Dobry",
+                        "Dobry",
+                        "Dobry",
+                        "Dobry");
 
         Map<String, Double> sensorValues = Map.of("PM10", 25.5);
         // Missing other sensor values
 
         // When
-        AirQualityMeasurement measurement = AirQualityMeasurement.create(stationId, stationName, index, sensorValues);
+        AirQualityMeasurement measurement =
+                AirQualityMeasurement.create(stationId, stationName, index, sensorValues);
 
         // Then
         assertThat(measurement.getPm10Value()).isEqualTo(25.5);
@@ -192,19 +194,20 @@ class AirQualityMeasurementTest {
         // Given
         int stationId = 123;
         String stationName = "Station 1";
-        AirQualityIndex index = new AirQualityIndex(
-                stationId,
-                LocalDateTime.now(ZoneOffset.UTC),
-                "Dobry",
-                "Dobry",
-                "Dobry",
-                "Dobry"
-        );
+        AirQualityIndex index =
+                new AirQualityIndex(
+                        stationId,
+                        LocalDateTime.now(ZoneOffset.UTC),
+                        "Dobry",
+                        "Dobry",
+                        "Dobry",
+                        "Dobry");
 
         Map<String, Double> emptySensorValues = Map.of();
 
         // When
-        AirQualityMeasurement measurement = AirQualityMeasurement.create(stationId, stationName, index, emptySensorValues);
+        AirQualityMeasurement measurement =
+                AirQualityMeasurement.create(stationId, stationName, index, emptySensorValues);
 
         // Then
         assertThat(measurement.getStationId()).isEqualTo(stationId);

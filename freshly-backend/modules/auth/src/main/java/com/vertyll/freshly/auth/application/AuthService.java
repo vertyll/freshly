@@ -1,5 +1,15 @@
 package com.vertyll.freshly.auth.application;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.vertyll.freshly.auth.api.dto.*;
 import com.vertyll.freshly.auth.domain.VerificationTokenService;
 import com.vertyll.freshly.auth.domain.event.UserRegisteredEvent;
@@ -8,17 +18,9 @@ import com.vertyll.freshly.auth.keycloak.KeycloakTokenClient;
 import com.vertyll.freshly.notification.application.NotificationService;
 import com.vertyll.freshly.useraccess.application.UserAccessService;
 import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -41,38 +43,30 @@ public class AuthService {
 
         log.info("Registering user: {}", request.username());
 
-        UUID keycloakUserId = keycloakAdminClient.createUser(
-                request.username(),
-                request.email(),
-                request.password(),
-                request.firstName(),
-                request.lastName()
-        );
+        UUID keycloakUserId =
+                keycloakAdminClient.createUser(
+                        request.username(),
+                        request.email(),
+                        request.password(),
+                        request.firstName(),
+                        request.lastName());
 
         try {
             userAccessService.createUser(
                     keycloakUserId,
                     false, // Inactive until email verified
-                    Set.of(UserRoleEnum.USER)
-            );
+                    Set.of(UserRoleEnum.USER));
 
-            String verificationToken = verificationTokenService.generateEmailVerificationToken(
-                    keycloakUserId,
-                    request.email()
-            );
+            String verificationToken =
+                    verificationTokenService.generateEmailVerificationToken(
+                            keycloakUserId, request.email());
             String verificationLink = frontendUrl + "/verify-email?token=" + verificationToken;
 
             notificationService.sendEmailVerification(
-                    request.email(),
-                    request.username(),
-                    verificationLink
-            );
+                    request.email(), request.username(), verificationLink);
 
-            eventPublisher.publishEvent(new UserRegisteredEvent(
-                    keycloakUserId,
-                    request.username(),
-                    request.email()
-            ));
+            eventPublisher.publishEvent(
+                    new UserRegisteredEvent(keycloakUserId, request.username(), request.email()));
 
             log.info("User registered successfully: {}", request.username());
             return keycloakUserId;
@@ -82,7 +76,8 @@ public class AuthService {
             try {
                 keycloakAdminClient.deleteUser(keycloakUserId);
             } catch (Exception rollbackException) {
-                log.error("Failed to rollback Keycloak user: {}", keycloakUserId, rollbackException);
+                log.error(
+                        "Failed to rollback Keycloak user: {}", keycloakUserId, rollbackException);
             }
             throw e;
         }
@@ -135,7 +130,8 @@ public class AuthService {
         UUID userId = UUID.fromString(user.getId());
         String username = user.getUsername();
 
-        String resetToken = verificationTokenService.generatePasswordResetToken(userId, request.email());
+        String resetToken =
+                verificationTokenService.generatePasswordResetToken(userId, request.email());
         String resetLink = frontendUrl + "/reset-password?token=" + resetToken;
 
         notificationService.sendPasswordResetEmail(request.email(), username, resetLink);
@@ -170,17 +166,11 @@ public class AuthService {
         keycloakAdminClient.changeEmail(userId, request.newEmail());
         userAccessService.deactivateUser(userId, userId);
 
-        String verificationToken = verificationTokenService.generateEmailVerificationToken(
-                userId,
-                request.newEmail()
-        );
+        String verificationToken =
+                verificationTokenService.generateEmailVerificationToken(userId, request.newEmail());
         String verificationLink = frontendUrl + "/verify-email?token=" + verificationToken;
 
-        notificationService.sendEmailVerification(
-                request.newEmail(),
-                "User",
-                verificationLink
-        );
+        notificationService.sendEmailVerification(request.newEmail(), "User", verificationLink);
 
         log.info("Email change initiated for user: {}", userId);
     }

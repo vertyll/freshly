@@ -1,13 +1,15 @@
 package com.vertyll.freshly.useraccess.infrastructure.persistence.mongo;
 
-import com.vertyll.freshly.useraccess.domain.SystemUser;
-import com.vertyll.freshly.useraccess.domain.SystemUserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.stereotype.Repository;
+
+import com.vertyll.freshly.useraccess.domain.SystemUser;
+import com.vertyll.freshly.useraccess.domain.SystemUserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository("systemUserRepository")
 @RequiredArgsConstructor
@@ -25,26 +27,23 @@ class MongoSystemUserRepository implements SystemUserRepository {
 
     @Override
     public Optional<SystemUser> findById(UUID id) {
-        return springDataRepository.findById(id)
-                .map(mapper::toDomain);
+        return springDataRepository.findById(id).map(mapper::toDomain);
     }
 
     @Override
     public Optional<SystemUser> findByKeycloakUserId(UUID keycloakUserId) {
-        return springDataRepository.findByKeycloakUserId(keycloakUserId)
-                .map(mapper::toDomain);
+        return springDataRepository.findByKeycloakUserId(keycloakUserId).map(mapper::toDomain);
     }
 
     @Override
     public List<SystemUser> findAll() {
-        return springDataRepository.findAll().stream()
-                .map(mapper::toDomain)
-                .toList();
+        return springDataRepository.findAll().stream().map(mapper::toDomain).toList();
     }
 
     @Override
     public void delete(UUID keycloakUserId) {
-        springDataRepository.findByKeycloakUserId(keycloakUserId)
+        springDataRepository
+                .findByKeycloakUserId(keycloakUserId)
                 .ifPresent(springDataRepository::delete);
     }
 }

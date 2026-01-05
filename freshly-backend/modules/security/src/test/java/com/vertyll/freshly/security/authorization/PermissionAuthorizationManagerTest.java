@@ -1,7 +1,13 @@
 package com.vertyll.freshly.security.authorization;
 
-import com.vertyll.freshly.permission.application.PermissionService;
-import com.vertyll.freshly.security.annotation.RequirePermission;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
+import java.lang.reflect.Method;
+import java.util.function.Supplier;
+
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,25 +18,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.core.Authentication;
 
-import java.lang.reflect.Method;
-import java.util.function.Supplier;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import com.vertyll.freshly.permission.application.PermissionService;
+import com.vertyll.freshly.security.annotation.RequirePermission;
 
 @ExtendWith(MockitoExtension.class)
 class PermissionAuthorizationManagerTest {
 
-    @Mock
-    private PermissionService permissionService;
+    @Mock private PermissionService permissionService;
 
-    @Mock
-    private MethodInvocation methodInvocation;
+    @Mock private MethodInvocation methodInvocation;
 
-    @Mock
-    private Authentication authentication;
+    @Mock private Authentication authentication;
 
     private PermissionAuthorizationManager authorizationManager;
 
@@ -60,7 +58,8 @@ class PermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should deny access when user does not have required permission on method")
-    void shouldDenyAccessWhenUserDoesNotHaveRequiredPermissionOnMethod() throws NoSuchMethodException {
+    void shouldDenyAccessWhenUserDoesNotHaveRequiredPermissionOnMethod()
+            throws NoSuchMethodException {
         // Given
         Method method = SecurityMockTarget.class.getMethod("methodWithPermission");
         when(methodInvocation.getMethod()).thenReturn(method);
@@ -79,7 +78,8 @@ class PermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should check class-level annotation when method annotation is absent")
-    void shouldCheckClassLevelAnnotationWhenMethodAnnotationIsAbsent() throws NoSuchMethodException {
+    void shouldCheckClassLevelAnnotationWhenMethodAnnotationIsAbsent()
+            throws NoSuchMethodException {
         // Given
         Method method = ClassWithPermission.class.getMethod("methodWithoutAnnotation");
         when(methodInvocation.getMethod()).thenReturn(method);
@@ -98,7 +98,8 @@ class PermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should prioritize method-level annotation over class-level annotation")
-    void shouldPrioritizeMethodLevelAnnotationOverClassLevelAnnotation() throws NoSuchMethodException {
+    void shouldPrioritizeMethodLevelAnnotationOverClassLevelAnnotation()
+            throws NoSuchMethodException {
         // Given
         Method method = ClassWithPermission.class.getMethod("methodWithDifferentPermission");
         when(methodInvocation.getMethod()).thenReturn(method);

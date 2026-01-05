@@ -1,10 +1,15 @@
 package com.vertyll.freshly.auth.domain;
 
-import com.vertyll.freshly.auth.domain.exception.InvalidVerificationTokenException;
-import com.vertyll.freshly.security.config.JwtProperties;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
+
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Date;
+import java.util.UUID;
+
+import javax.crypto.SecretKey;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,28 +17,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.Date;
-import java.util.UUID;
+import com.vertyll.freshly.auth.domain.exception.InvalidVerificationTokenException;
+import com.vertyll.freshly.security.config.JwtProperties;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.lenient;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
 @ExtendWith(MockitoExtension.class)
 class VerificationTokenServiceTest {
 
-    @Mock
-    private JwtProperties jwtProperties;
+    @Mock private JwtProperties jwtProperties;
 
-    @Mock
-    private JwtProperties.Expiration expiration;
+    @Mock private JwtProperties.Expiration expiration;
 
-    @InjectMocks
-    private VerificationTokenService verificationTokenService;
+    @InjectMocks private VerificationTokenService verificationTokenService;
 
-    private static final String SECRET = "testSecretKeyForJwtTokensMinimum256BitsRequiredForHS256AlgorithmInTest==";
+    private static final String SECRET =
+            "testSecretKeyForJwtTokensMinimum256BitsRequiredForHS256AlgorithmInTest==";
     private static final long EMAIL_VERIFICATION_EXPIRATION = 3600000L;
     private static final long PASSWORD_RESET_EXPIRATION = 1800000L;
 
@@ -55,17 +56,11 @@ class VerificationTokenServiceTest {
         String token = verificationTokenService.generateEmailVerificationToken(userId, email);
 
         // Then
-        assertThat(token)
-                .isNotNull()
-                .isNotEmpty();
+        assertThat(token).isNotNull().isNotEmpty();
 
         // Verify token structure
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
-        Claims claims = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
 
         assertThat(claims.getSubject()).isEqualTo(userId.toString());
         assertThat(claims.get("email", String.class)).isEqualTo(email);
@@ -82,16 +77,10 @@ class VerificationTokenServiceTest {
         String token = verificationTokenService.generatePasswordResetToken(userId, email);
 
         // Then
-        assertThat(token)
-                .isNotNull()
-                .isNotEmpty();
+        assertThat(token).isNotNull().isNotEmpty();
 
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
-        Claims claims = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
 
         assertThat(claims.getSubject()).isEqualTo(userId.toString());
         assertThat(claims.get("email", String.class)).isEqualTo(email);
@@ -132,7 +121,8 @@ class VerificationTokenServiceTest {
         String invalidToken = "invalid.token.here";
 
         // When & Then
-        assertThatThrownBy(() -> verificationTokenService.validateEmailVerificationToken(invalidToken))
+        assertThatThrownBy(
+                        () -> verificationTokenService.validateEmailVerificationToken(invalidToken))
                 .isInstanceOf(InvalidVerificationTokenException.class);
     }
 
@@ -141,17 +131,19 @@ class VerificationTokenServiceTest {
         // Given - Manual JWT with expired date (past)
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
         Instant now = Instant.now();
-        String expiredToken = Jwts.builder()
-                .subject(UUID.randomUUID().toString())
-                .claim("email", "test@example.com")
-                .claim("type", "email_verification")
-                .issuedAt(Date.from(now.minusSeconds(10)))
-                .expiration(Date.from(now.minusSeconds(5)))
-                .signWith(key)
-                .compact();
+        String expiredToken =
+                Jwts.builder()
+                        .subject(UUID.randomUUID().toString())
+                        .claim("email", "test@example.com")
+                        .claim("type", "email_verification")
+                        .issuedAt(Date.from(now.minusSeconds(10)))
+                        .expiration(Date.from(now.minusSeconds(5)))
+                        .signWith(key)
+                        .compact();
 
         // When & Then
-        assertThatThrownBy(() -> verificationTokenService.validateEmailVerificationToken(expiredToken))
+        assertThatThrownBy(
+                        () -> verificationTokenService.validateEmailVerificationToken(expiredToken))
                 .isInstanceOf(InvalidVerificationTokenException.class)
                 .hasMessageContaining("expired");
     }

@@ -1,15 +1,14 @@
 package com.vertyll.freshly.permission.domain;
 
-import com.vertyll.freshly.permission.Permission;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Domain entity representing the mapping between Keycloak roles and system permissions.
- */
+import com.vertyll.freshly.permission.Permission;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+/** Domain entity representing the mapping between Keycloak roles and system permissions. */
 @Getter
 @AllArgsConstructor
 public final class RolePermissionMapping {
@@ -22,7 +21,8 @@ public final class RolePermissionMapping {
         this(UUID.randomUUID(), keycloakRole, permission);
     }
 
-    public static RolePermissionMapping reconstitute(UUID id, String keycloakRole, Permission permission) {
+    public static RolePermissionMapping reconstitute(
+            UUID id, String keycloakRole, Permission permission) {
         Objects.requireNonNull(id, "ID cannot be null");
         Objects.requireNonNull(keycloakRole, "Keycloak role cannot be null");
         Objects.requireNonNull(permission, "Permission cannot be null");

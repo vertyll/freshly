@@ -1,14 +1,13 @@
 package com.vertyll.freshly.useraccess.api;
 
-import com.vertyll.freshly.useraccess.api.dto.CreateUserRequestDto;
-import com.vertyll.freshly.useraccess.api.dto.UpdateUserRolesRequestDto;
-import com.vertyll.freshly.useraccess.api.dto.UserResponseDto;
-import com.vertyll.freshly.useraccess.api.mapper.UserDtoMapper;
-import com.vertyll.freshly.useraccess.application.UserAccessService;
-import com.vertyll.freshly.useraccess.domain.SystemUser;
-import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
-import com.vertyll.freshly.useraccess.domain.exception.UserAlreadyExistsException;
-import com.vertyll.freshly.useraccess.domain.exception.UserNotFoundException;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,28 +19,26 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import com.vertyll.freshly.useraccess.api.dto.CreateUserRequestDto;
+import com.vertyll.freshly.useraccess.api.dto.UpdateUserRolesRequestDto;
+import com.vertyll.freshly.useraccess.api.dto.UserResponseDto;
+import com.vertyll.freshly.useraccess.api.mapper.UserDtoMapper;
+import com.vertyll.freshly.useraccess.application.UserAccessService;
+import com.vertyll.freshly.useraccess.domain.SystemUser;
+import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
+import com.vertyll.freshly.useraccess.domain.exception.UserAlreadyExistsException;
+import com.vertyll.freshly.useraccess.domain.exception.UserNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
-    @Mock
-    private UserAccessService userAccessService;
+    @Mock private UserAccessService userAccessService;
 
-    @Mock
-    private UserDtoMapper userDtoMapper;
+    @Mock private UserDtoMapper userDtoMapper;
 
-    @Mock
-    private MessageSource messageSource;
+    @Mock private MessageSource messageSource;
 
-    @Mock
-    private Jwt jwt;
+    @Mock private Jwt jwt;
 
     private UserController userController;
 
@@ -57,11 +54,8 @@ class UserControllerTest {
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn("Success");
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        CreateUserRequestDto request = new CreateUserRequestDto(
-                keycloakUserId,
-                true,
-                Set.of(UserRoleEnum.USER)
-        );
+        CreateUserRequestDto request =
+                new CreateUserRequestDto(keycloakUserId, true, Set.of(UserRoleEnum.USER));
 
         SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
         UserResponseDto responseDto = new UserResponseDto(keycloakUserId, true, Set.of("USER"));
@@ -85,11 +79,8 @@ class UserControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn("Success");
         UUID keycloakUserId = UUID.randomUUID();
-        CreateUserRequestDto request = new CreateUserRequestDto(
-                keycloakUserId,
-                false,
-                Set.of(UserRoleEnum.USER)
-        );
+        CreateUserRequestDto request =
+                new CreateUserRequestDto(keycloakUserId, false, Set.of(UserRoleEnum.USER));
 
         SystemUser user = new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER));
         UserResponseDto responseDto = new UserResponseDto(keycloakUserId, false, Set.of("USER"));
@@ -116,7 +107,8 @@ class UserControllerTest {
         CreateUserRequestDto request = new CreateUserRequestDto(keycloakUserId, true, roles);
 
         SystemUser user = new SystemUser(keycloakUserId, true, roles);
-        UserResponseDto responseDto = new UserResponseDto(keycloakUserId, true, Set.of("USER", "ADMIN"));
+        UserResponseDto responseDto =
+                new UserResponseDto(keycloakUserId, true, Set.of("USER", "ADMIN"));
 
         when(userAccessService.createUser(keycloakUserId, true, roles)).thenReturn(user);
         when(userDtoMapper.toResponse(user)).thenReturn(responseDto);
@@ -133,11 +125,8 @@ class UserControllerTest {
     void shouldThrowExceptionWhenCreatingDuplicateUser() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        CreateUserRequestDto request = new CreateUserRequestDto(
-                keycloakUserId,
-                true,
-                Set.of(UserRoleEnum.USER)
-        );
+        CreateUserRequestDto request =
+                new CreateUserRequestDto(keycloakUserId, true, Set.of(UserRoleEnum.USER));
 
         when(userAccessService.createUser(keycloakUserId, true, Set.of(UserRoleEnum.USER)))
                 .thenThrow(new UserAlreadyExistsException(keycloakUserId));
@@ -173,8 +162,7 @@ class UserControllerTest {
     void shouldThrowExceptionWhenUserNotFound() {
         // Given
         UUID userId = UUID.randomUUID();
-        when(userAccessService.getUserById(userId))
-                .thenThrow(new UserNotFoundException(userId));
+        when(userAccessService.getUserById(userId)).thenThrow(new UserNotFoundException(userId));
 
         // When & Then
         assertThatThrownBy(() -> userController.getUserById(userId))
@@ -191,7 +179,8 @@ class UserControllerTest {
         List<SystemUser> users = List.of(user1, user2);
 
         UserResponseDto dto1 = new UserResponseDto(user1.getKeycloakUserId(), true, Set.of("USER"));
-        UserResponseDto dto2 = new UserResponseDto(user2.getKeycloakUserId(), false, Set.of("ADMIN"));
+        UserResponseDto dto2 =
+                new UserResponseDto(user2.getKeycloakUserId(), false, Set.of("ADMIN"));
         List<UserResponseDto> responseDtos = List.of(dto1, dto2);
 
         when(userAccessService.getAllUsers()).thenReturn(users);
@@ -242,8 +231,7 @@ class UserControllerTest {
     void shouldThrowExceptionWhenActivatingNonExistentUser() {
         // Given
         UUID userId = UUID.randomUUID();
-        doThrow(new UserNotFoundException(userId))
-                .when(userAccessService).activateUser(userId);
+        doThrow(new UserNotFoundException(userId)).when(userAccessService).activateUser(userId);
 
         // When & Then
         assertThatThrownBy(() -> userController.activateUser(userId))
@@ -278,7 +266,8 @@ class UserControllerTest {
 
         when(jwt.getSubject()).thenReturn(loggedInUserId.toString());
         doThrow(new UserNotFoundException(userId))
-                .when(userAccessService).deactivateUser(userId, loggedInUserId);
+                .when(userAccessService)
+                .deactivateUser(userId, loggedInUserId);
 
         // When & Then
         assertThatThrownBy(() -> userController.deactivateUser(userId, jwt))
@@ -332,7 +321,8 @@ class UserControllerTest {
         UpdateUserRolesRequestDto request = new UpdateUserRolesRequestDto(newRoles);
 
         doThrow(new UserNotFoundException(userId))
-                .when(userAccessService).replaceUserRoles(userId, newRoles);
+                .when(userAccessService)
+                .replaceUserRoles(userId, newRoles);
 
         // When & Then
         assertThatThrownBy(() -> userController.updateUserRoles(userId, request))
@@ -363,11 +353,8 @@ class UserControllerTest {
     void shouldUseMessageSourceForResponses() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        CreateUserRequestDto request = new CreateUserRequestDto(
-                keycloakUserId,
-                true,
-                Set.of(UserRoleEnum.USER)
-        );
+        CreateUserRequestDto request =
+                new CreateUserRequestDto(keycloakUserId, true, Set.of(UserRoleEnum.USER));
 
         SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
         UserResponseDto responseDto = new UserResponseDto(keycloakUserId, true, Set.of("USER"));
@@ -389,11 +376,8 @@ class UserControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn("Success");
         UUID keycloakUserId = UUID.randomUUID();
-        CreateUserRequestDto request = new CreateUserRequestDto(
-                keycloakUserId,
-                true,
-                Set.of(UserRoleEnum.ADMIN)
-        );
+        CreateUserRequestDto request =
+                new CreateUserRequestDto(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN));
 
         SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN));
         UserResponseDto responseDto = new UserResponseDto(keycloakUserId, true, Set.of("ADMIN"));

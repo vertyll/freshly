@@ -1,5 +1,9 @@
 package com.vertyll.freshly.common.config;
 
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Locale;
+
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,20 +11,16 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Locale;
-
 /**
- * Configuration for internationalization (i18n) support.
- * Supports en-US and pl locales for API responses, emails, and validation messages.
+ * Configuration for internationalization (i18n) support. Supports en-US and pl locales for API
+ * responses, emails, and validation messages.
  */
 @Configuration
 public class I18nConfig {
 
     /**
-     * Configures MessageSource for loading localized messages from properties files.
-     * Message files: i18n/messages_en.properties, i18n/messages_pl.properties
+     * Configures MessageSource for loading localized messages from properties files. Message files:
+     * i18n/messages_en.properties, i18n/messages_pl.properties
      */
     @Bean
     public MessageSource messageSource() {
@@ -35,8 +35,8 @@ public class I18nConfig {
     }
 
     /**
-     * Configures LocaleResolver to determine user's locale from Accept-Language header.
-     * Falls back to en-US if header is missing or unsupported.
+     * Configures LocaleResolver to determine user's locale from Accept-Language header. Falls back
+     * to en-US if header is missing or unsupported.
      */
     @Bean
     public LocaleResolver localeResolver() {

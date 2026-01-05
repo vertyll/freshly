@@ -18,6 +18,4 @@ public record AirQualityMeasurementResponseDto(
         Double no2Value,
         Double coValue,
         Double o3Value,
-        LocalDateTime createdAt
-) {
-}
+        LocalDateTime createdAt) {}

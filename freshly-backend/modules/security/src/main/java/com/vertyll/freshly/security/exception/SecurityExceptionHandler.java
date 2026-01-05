@@ -17,8 +17,6 @@ public class SecurityExceptionHandler {
     public ProblemDetail handleAuthorizationDenied(AuthorizationDeniedException ex) {
         LOGGER.warn("Authorization denied: {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(
-                HttpStatus.FORBIDDEN,
-                "You do not have permission to access this resource"
-        );
+                HttpStatus.FORBIDDEN, "You do not have permission to access this resource");
     }
 }

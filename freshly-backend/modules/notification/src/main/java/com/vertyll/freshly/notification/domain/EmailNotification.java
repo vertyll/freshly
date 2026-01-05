@@ -1,14 +1,14 @@
 package com.vertyll.freshly.notification.domain;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 public class EmailNotification {
@@ -23,14 +23,14 @@ public class EmailNotification {
     private String errorMessage;
 
     public EmailNotification(
-            Email recipient,
-            EmailTemplate template,
-            Map<String, Object> templateVariables
-    ) {
+            Email recipient, EmailTemplate template, Map<String, Object> templateVariables) {
         this.id = UUID.randomUUID();
         this.recipient = Objects.requireNonNull(recipient, "Recipient cannot be null");
         this.template = Objects.requireNonNull(template, "Template cannot be null");
-        this.templateVariables = Map.copyOf(Objects.requireNonNull(templateVariables, "Template variables cannot be null"));
+        this.templateVariables =
+                Map.copyOf(
+                        Objects.requireNonNull(
+                                templateVariables, "Template variables cannot be null"));
         this.createdAt = LocalDateTime.now(ZoneOffset.UTC);
         this.status = EmailStatus.PENDING;
     }
@@ -44,8 +44,7 @@ public class EmailNotification {
             LocalDateTime createdAt,
             EmailStatus status,
             LocalDateTime sentAt,
-            String errorMessage
-    ) {
+            String errorMessage) {
         return EmailNotification.builder()
                 .id(id)
                 .recipient(recipient)
@@ -68,8 +67,7 @@ public class EmailNotification {
             LocalDateTime createdAt,
             EmailStatus status,
             LocalDateTime sentAt,
-            String errorMessage
-    ) {
+            String errorMessage) {
         this.id = id;
         this.recipient = recipient;
         this.template = template;

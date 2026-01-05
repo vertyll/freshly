@@ -6,11 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to secure endpoints requiring any of the specified permissions.
- * User needs at least one of the listed permissions to access the method.
- * Works with AnyPermissionAuthorizationManager in Spring Security 7+.
- * <p>
- * Usage:
+ * Annotation to secure endpoints requiring any of the specified permissions. User needs at least
+ * one of the listed permissions to access the method. Works with AnyPermissionAuthorizationManager
+ * in Spring Security 7+.
+ *
+ * <p>Usage:
+ *
  * <pre>
  * {@code @RequireAnyPermission({"users:read", "users:create"})}
  * public ResponseEntity<?> getUsers(...) { }
@@ -20,8 +21,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequireAnyPermission {
 
-    /**
-     * Array of permission values. User needs at least one of these.
-     */
+    /** Array of permission values. User needs at least one of these. */
     String[] value();
 }

@@ -1,5 +1,8 @@
 package com.vertyll.freshly.common.exception;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -11,9 +14,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -23,23 +23,21 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleValidationExceptions(MethodArgumentNotValidException ex) {
         LOGGER.warn("Validation error: {}", ex.getMessage());
 
-        Map<String, List<String>> errors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .collect(Collectors.groupingBy(
-                        FieldError::getField,
-                        Collectors.mapping(
-                                error -> error.getDefaultMessage() != null
-                                        ? error.getDefaultMessage()
-                                        : "Invalid value",
-                                Collectors.toList()
-                        )
-                ));
+        Map<String, List<String>> errors =
+                ex.getBindingResult().getFieldErrors().stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        FieldError::getField,
+                                        Collectors.mapping(
+                                                error ->
+                                                        error.getDefaultMessage() != null
+                                                                ? error.getDefaultMessage()
+                                                                : "Invalid value",
+                                                Collectors.toList())));
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST,
-                "Validation failed for one or more fields"
-        );
+        ProblemDetail problemDetail =
+                ProblemDetail.forStatusAndDetail(
+                        HttpStatus.BAD_REQUEST, "Validation failed for one or more fields");
         problemDetail.setProperty("errors", errors);
 
         return problemDetail;
@@ -50,11 +48,11 @@ public class GlobalExceptionHandler {
         LOGGER.warn("Type mismatch error: {}", ex.getMessage());
 
         Class<?> requiredType = ex.getRequiredType();
-        String message = String.format(
-                "Parameter '%s' should be of type %s",
-                ex.getName(),
-                requiredType != null ? requiredType.getSimpleName() : "unknown"
-        );
+        String message =
+                String.format(
+                        "Parameter '%s' should be of type %s",
+                        ex.getName(),
+                        requiredType != null ? requiredType.getSimpleName() : "unknown");
 
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
@@ -62,7 +60,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public ProblemDetail handleNoResourceFound(NoResourceFoundException ex) {
         LOGGER.warn("Resource not found: {}", ex.getMessage());
-        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "The requested resource was not found");
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND, "The requested resource was not found");
     }
 
     @ExceptionHandler(Exception.class)
@@ -70,7 +69,6 @@ public class GlobalExceptionHandler {
         LOGGER.error("Unhandled exception", ex);
         return ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred. Please contact support."
-        );
+                "An unexpected error occurred. Please contact support.");
     }
 }

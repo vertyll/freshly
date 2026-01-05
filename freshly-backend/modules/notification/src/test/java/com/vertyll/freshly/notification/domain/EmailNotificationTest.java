@@ -1,14 +1,14 @@
 package com.vertyll.freshly.notification.domain;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class EmailNotificationTest {
 
@@ -126,19 +126,20 @@ class EmailNotificationTest {
     }
 
     @Test
-    @SuppressWarnings("PMD.UseConcurrentHashMap") // HashMap is safe here (no concurrent access in test)
+    @SuppressWarnings(
+            "PMD.UseConcurrentHashMap") // HashMap is safe here (no concurrent access in test)
     @DisplayName("Should create immutable copy of template variables")
     void shouldCreateImmutableCopyOfTemplateVariables() {
         // Given
         Email recipient = new Email("test@example.com");
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
-        
+
         Map<String, Object> variables = new java.util.HashMap<>();
         variables.put("username", "John");
 
         // When
         EmailNotification notification = new EmailNotification(recipient, template, variables);
-        
+
         variables.put("newKey", "newValue");
 
         Map<String, Object> notificationVariables = notification.getTemplateVariables();
@@ -146,7 +147,7 @@ class EmailNotificationTest {
         // Then
         assertThat(notification.getTemplateVariables()).doesNotContainKey("newKey");
         assertThat(notification.getTemplateVariables()).hasSize(1);
-        
+
         assertThatThrownBy(() -> notificationVariables.put("fail", "fail"))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
@@ -158,15 +159,16 @@ class EmailNotificationTest {
         UUID id = UUID.randomUUID();
         Email recipient = new Email("test@example.com");
         EmailTemplate template = EmailTemplate.PASSWORD_RESET;
-        Map<String, Object> variables = Map.of("username", "John", "resetLink", "https://example.com/reset");
+        Map<String, Object> variables =
+                Map.of("username", "John", "resetLink", "https://example.com/reset");
         LocalDateTime createdAt = LocalDateTime.now(ZoneOffset.UTC).minusHours(1);
         EmailNotification.EmailStatus status = EmailNotification.EmailStatus.SENT;
         LocalDateTime sentAt = LocalDateTime.now(ZoneOffset.UTC);
 
         // When
-        EmailNotification notification = EmailNotification.reconstitute(
-                id, recipient, template, variables, createdAt, status, sentAt, null
-        );
+        EmailNotification notification =
+                EmailNotification.reconstitute(
+                        id, recipient, template, variables, createdAt, status, sentAt, null);
 
         // Then
         assertThat(notification.getId()).isEqualTo(id);
@@ -192,9 +194,9 @@ class EmailNotificationTest {
         String errorMessage = "Connection timeout";
 
         // When
-        EmailNotification notification = EmailNotification.reconstitute(
-                id, recipient, template, variables, createdAt, status, null, errorMessage
-        );
+        EmailNotification notification =
+                EmailNotification.reconstitute(
+                        id, recipient, template, variables, createdAt, status, null, errorMessage);
 
         // Then
         assertThat(notification.getStatus()).isEqualTo(EmailNotification.EmailStatus.FAILED);

@@ -1,5 +1,15 @@
 package com.vertyll.freshly.useraccess.api;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
+
 import com.vertyll.freshly.common.response.ApiResponse;
 import com.vertyll.freshly.security.annotation.RequirePermission;
 import com.vertyll.freshly.useraccess.api.dto.CreateUserRequestDto;
@@ -8,18 +18,10 @@ import com.vertyll.freshly.useraccess.api.dto.UserResponseDto;
 import com.vertyll.freshly.useraccess.api.mapper.UserDtoMapper;
 import com.vertyll.freshly.useraccess.application.UserAccessService;
 import com.vertyll.freshly.useraccess.domain.SystemUser;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -38,18 +40,15 @@ public class UserController {
 
         log.info("Creating user with keycloak id: {}", request.keycloakUserId());
 
-        SystemUser user = userAccessService.createUser(
-                request.keycloakUserId(),
-                request.isActive(),
-                request.roles()
-        );
+        SystemUser user =
+                userAccessService.createUser(
+                        request.keycloakUserId(), request.isActive(), request.roles());
 
         return ApiResponse.buildResponse(
                 userDtoMapper.toResponse(user),
                 "success.user.created",
                 messageSource,
-                HttpStatus.CREATED
-        );
+                HttpStatus.CREATED);
     }
 
     @GetMapping("/{userId}")
@@ -63,8 +62,7 @@ public class UserController {
                 userDtoMapper.toResponse(user),
                 "success.user.fetched",
                 messageSource,
-                HttpStatus.OK
-        );
+                HttpStatus.OK);
     }
 
     @GetMapping
@@ -78,8 +76,7 @@ public class UserController {
                 userDtoMapper.toResponseList(users),
                 "success.user.listFetched",
                 messageSource,
-                HttpStatus.OK
-        );
+                HttpStatus.OK);
     }
 
     @PatchMapping("/{userId}/activate")
@@ -90,18 +87,13 @@ public class UserController {
         userAccessService.activateUser(userId);
 
         return ApiResponse.buildResponse(
-                null,
-                "success.user.activated",
-                messageSource,
-                HttpStatus.OK
-        );
+                null, "success.user.activated", messageSource, HttpStatus.OK);
     }
 
     @PatchMapping("/{userId}/deactivate")
     @RequirePermission("users:deactivate")
     public ResponseEntity<ApiResponse<Void>> deactivateUser(
-            @PathVariable UUID userId,
-            @AuthenticationPrincipal Jwt jwt) {
+            @PathVariable UUID userId, @AuthenticationPrincipal Jwt jwt) {
 
         log.info("Deactivating user: {}", userId);
 
@@ -109,28 +101,19 @@ public class UserController {
         userAccessService.deactivateUser(userId, loggedInUserId);
 
         return ApiResponse.buildResponse(
-                null,
-                "success.user.deactivated",
-                messageSource,
-                HttpStatus.OK
-        );
+                null, "success.user.deactivated", messageSource, HttpStatus.OK);
     }
 
     @PutMapping("/{userId}/roles")
     @RequirePermission("users:manage-roles")
     public ResponseEntity<ApiResponse<Void>> updateUserRoles(
-            @PathVariable UUID userId,
-            @Valid @RequestBody UpdateUserRolesRequestDto request) {
+            @PathVariable UUID userId, @Valid @RequestBody UpdateUserRolesRequestDto request) {
 
         log.info("Updating roles for user: {}", userId);
 
         userAccessService.replaceUserRoles(userId, request.roles());
 
         return ApiResponse.buildResponse(
-                null,
-                "success.user.rolesUpdated",
-                messageSource,
-                HttpStatus.OK
-        );
+                null, "success.user.rolesUpdated", messageSource, HttpStatus.OK);
     }
 }
