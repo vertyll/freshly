@@ -1,0 +1,115 @@
+[versions]
+spring-boot = "4.0.1"
+spring-dependency-management = "1.1.7"
+errorprone-plugin = "4.3.0"
+nullaway-plugin = "2.3.0"
+
+mapstruct = "1.6.3"
+testcontainers = "1.21.4"
+jjwt = "0.12.3"
+keycloak = "26.0.7"
+httpclient5 = "5.6"
+lombok-mapstruct-binding = "0.2.0"
+errorprone = "2.36.0"
+nullaway = "0.12.14"
+beta-checker = "1.0"
+pmd = "7.20.0"
+
+[libraries]
+# Spring Boot Starters
+spring-boot-starter-data-mongodb = { module = "org.springframework.boot:spring-boot-starter-data-mongodb" }
+spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+spring-boot-starter-security-oauth2-resource-server = { module = "org.springframework.boot:spring-boot-starter-security-oauth2-resource-server" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
+spring-boot-starter-thymeleaf = { module = "org.springframework.boot:spring-boot-starter-thymeleaf" }
+spring-boot-devtools = { module = "org.springframework.boot:spring-boot-devtools" }
+spring-boot-docker-compose = { module = "org.springframework.boot:spring-boot-docker-compose" }
+
+# Spring Test Starters
+spring-boot-starter-data-mongodb-test = { module = "org.springframework.boot:spring-boot-starter-data-mongodb-test" }
+spring-boot-starter-security-test = { module = "org.springframework.boot:spring-boot-starter-security-test" }
+spring-boot-starter-validation-test = { module = "org.springframework.boot:spring-boot-starter-validation-test" }
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+spring-boot-starter-thymeleaf-test = { module = "org.springframework.boot:spring-boot-starter-thymeleaf-test" }
+spring-boot-starter-mail-test = { module = "org.springframework.boot:spring-boot-starter-mail-test" }
+spring-boot-starter-security-oauth2-resource-server-test = { module = "org.springframework.boot:spring-boot-starter-security-oauth2-resource-server-test" }
+spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
+
+# Spring Framework
+spring-aop = { module = "org.springframework:spring-aop" }
+
+# AspectJ
+aspectj-aspectjweaver = { module = "org.aspectj:aspectjweaver" }
+
+# JWT
+jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
+jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
+jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
+
+# Keycloak
+keycloak-admin-client = { module = "org.keycloak:keycloak-admin-client", version.ref = "keycloak" }
+
+# Apache HTTP Client
+httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpclient5" }
+
+# Thymeleaf
+thymeleaf-extras-springsecurity6 = { module = "org.thymeleaf.extras:thymeleaf-extras-springsecurity6" }
+
+# MapStruct
+mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
+mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+
+# Lombok
+lombok = { module = "org.projectlombok:lombok" }
+lombok-mapstruct-binding = { module = "org.projectlombok:lombok-mapstruct-binding", version.ref = "lombok-mapstruct-binding" }
+
+# Guava
+guava-beta-checker = { module = "com.google.guava:guava-beta-checker", version.ref = "beta-checker" }
+
+# Error Prone & NullAway
+errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
+nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
+
+# Testcontainers
+testcontainers-mongodb = { module = "org.testcontainers:mongodb", version.ref = "testcontainers" }
+testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
+
+# JUnit
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+errorprone = { id = "net.ltgt.errorprone", version.ref = "errorprone-plugin" }
+nullaway = { id = "net.ltgt.nullaway", version.ref = "nullaway-plugin" }
+
+[bundles]
+spring-boot-starters = [
+    "spring-boot-starter-data-mongodb",
+    "spring-boot-starter-security",
+    "spring-boot-starter-security-oauth2-resource-server",
+    "spring-boot-starter-validation",
+    "spring-boot-starter-webmvc",
+    "spring-boot-starter-mail",
+    "spring-boot-starter-thymeleaf",
+    "spring-aop",
+    "aspectj-aspectjweaver",
+    "thymeleaf-extras-springsecurity6"
+]
+
+jjwt = ["jjwt-api", "jjwt-impl", "jjwt-jackson"]
+
+test-starters = [
+    "spring-boot-starter-data-mongodb-test",
+    "spring-boot-starter-security-test",
+    "spring-boot-starter-validation-test",
+    "spring-boot-starter-webmvc-test",
+    "spring-boot-starter-thymeleaf-test",
+    "spring-boot-starter-mail-test",
+    "spring-boot-starter-security-oauth2-resource-server-test",
+    "spring-boot-testcontainers"
+]
+
+testcontainers = ["testcontainers-mongodb", "testcontainers-junit-jupiter"]

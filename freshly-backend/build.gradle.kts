@@ -1,12 +1,12 @@
 import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
-	java
+    java
     pmd
-	id("org.springframework.boot") version "4.0.1"
-	id("io.spring.dependency-management") version "1.1.7"
-	id("net.ltgt.errorprone") version "4.3.0"
-    id("net.ltgt.nullaway") version "2.3.0"
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.errorprone)
+    alias(libs.plugins.nullaway)
 }
 
 group = "com.vertyll"
@@ -14,113 +14,84 @@ version = "0.0.1-SNAPSHOT"
 description = "Spring Boot project"
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(25)
-	}
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 configurations {
-	compileOnly {
-		extendsFrom(configurations.annotationProcessor.get())
-	}
+    compileOnly {
+        extendsFrom(configurations.annotationProcessor.get())
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
-val mapstructVersion = "1.6.3"
-val testcontainersVersion = "1.21.4"
-val jjwtVersion = "0.12.3"
-val keycloakVersion = "26.0.7"
-val httpclient5Version = "5.6"
-val lombokMapstructBindingVersion = "0.2.0"
-val errorProneVersion = "2.36.0"
-val nullawayVersion = "0.12.14"
-val betaCheckerVersion = "1.0"
-val pmdVersion = "7.20.0"
-
 dependencies {
-    // Implementation dependencies
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.springframework.boot:spring-boot-starter-mail")
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("org.springframework:spring-aop")
-    implementation("org.aspectj:aspectjweaver")
-    implementation("io.jsonwebtoken:jjwt-api:$jjwtVersion")
-    implementation("org.keycloak:keycloak-admin-client:$keycloakVersion")
-    implementation("org.apache.httpcomponents.client5:httpclient5:$httpclient5Version")
-    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
-    implementation("org.mapstruct:mapstruct:$mapstructVersion")
+    // Implementation
+    implementation(libs.bundles.spring.boot.starters)
+    implementation(libs.jjwt.api)
+    implementation(libs.keycloak.admin.client)
+    implementation(libs.httpclient5)
+    implementation(libs.mapstruct)
 
-    // Compile-only dependencies
-    compileOnly("org.projectlombok:lombok")
+    // Compile Only
+    compileOnly(libs.lombok)
 
-    // Annotation processors
-    annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
-    annotationProcessor("org.projectlombok:lombok-mapstruct-binding:$lombokMapstructBindingVersion")
-    annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("com.google.guava:guava-beta-checker:$betaCheckerVersion")
+    // Annotation Processor
+    annotationProcessor(libs.mapstruct.processor)
+    annotationProcessor(libs.lombok.mapstruct.binding)
+    annotationProcessor(libs.lombok)
+    annotationProcessor(libs.guava.beta.checker)
 
-    // Runtime dependencies
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:$jjwtVersion")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jjwtVersion")
-    runtimeOnly("org.springframework.boot:spring-boot-devtools")
+    // Runtime Only
+    runtimeOnly(libs.bundles.jjwt)
+    runtimeOnly(libs.spring.boot.devtools)
 
-    // Development-only dependencies
-    developmentOnly("org.springframework.boot:spring-boot-docker-compose")
+    // Development Only
+    developmentOnly(libs.spring.boot.docker.compose)
 
     // Error Prone
-    errorprone("com.google.errorprone:error_prone_core:$errorProneVersion")
-    errorprone("com.uber.nullaway:nullaway:$nullawayVersion")
+    errorprone(libs.errorprone.core)
+    errorprone(libs.nullaway)
 
-    // Test implementation dependencies
-    testImplementation("org.springframework.boot:spring-boot-starter-data-mongodb-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-thymeleaf-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-mail-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server-test")
-    testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("org.testcontainers:mongodb:$testcontainersVersion")
-    testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
+    // Test Implementation
+    testImplementation(libs.bundles.test.starters)
+    testImplementation(libs.bundles.testcontainers)
 
-    // Test compile-only dependencies
-    testCompileOnly("org.projectlombok:lombok")
+    // Test Compile Only
+    testCompileOnly(libs.lombok)
 
-    // Test annotation processors
-    testAnnotationProcessor("org.projectlombok:lombok")
+    // Test Annotation Processor
+    testAnnotationProcessor(libs.lombok)
 
-    // Test runtime dependencies
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    // Test Runtime Only
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.withType<JavaCompile> {
-	options.compilerArgs.add("-parameters")
+    options.compilerArgs.add("-parameters")
 
-	options.errorprone {
+    options.errorprone {
         isEnabled.set(true)
 
-		check("NullAway", net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
-		option("NullAway:OnlyNullMarked", "true")
-		option("NullAway:CustomContractAnnotations", "org.springframework.lang.Contract")
-		option("NullAway:JSpecifyMode", "true")
+        check("NullAway", net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
+        option("NullAway:OnlyNullMarked", "true")
+        option("NullAway:CustomContractAnnotations", "org.springframework.lang.Contract")
+        option("NullAway:JSpecifyMode", "true")
 
-		excludedPaths.set(".*/build/generated/.*")
-	}
+        excludedPaths.set(".*/build/generated/.*")
+    }
 }
 
 tasks.withType<Test> {
-	useJUnitPlatform()
-	
-	testLogging {
+    useJUnitPlatform()
+
+    testLogging {
         events("passed", "skipped", "failed", "standardOut", "standardError")
         showStandardStreams = false
         showExceptions = true
@@ -128,7 +99,7 @@ tasks.withType<Test> {
         showStackTraces = true
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         displayGranularity = 2
-        
+
         showStandardStreams = false
         showCauses = true
         showStackTraces = true
@@ -141,7 +112,7 @@ tasks.withType<Test> {
     val ANSI_BLUE = "\u001B[34m"
     val ANSI_CYAN = "\u001B[36m"
     val ANSI_BOLD = "\u001B[1m"
-    
+
     val CHECK_MARK = "✓"
     val CROSS_MARK = "✗"
     val SKIP_MARK = "⊘"
@@ -164,7 +135,7 @@ tasks.withType<Test> {
             val failed = result.failedTestCount
             val skipped = result.skippedTestCount
             val duration = result.endTime - result.startTime
-            
+
             println()
             println("$ANSI_BOLD═══════════════════════════════════════════════════════════════$ANSI_RESET")
             println("$ANSI_BOLD                        TEST RESULTS                        $ANSI_RESET")
@@ -177,7 +148,7 @@ tasks.withType<Test> {
             println()
             println("  Duration: $ANSI_CYAN${duration}ms$ANSI_RESET")
             println()
-            
+
             val statusColor = when (result.resultType) {
                 TestResult.ResultType.SUCCESS -> ANSI_GREEN
                 TestResult.ResultType.FAILURE -> ANSI_RED
@@ -193,7 +164,7 @@ tasks.withType<Test> {
 
 pmd {
     isConsoleOutput = true
-    toolVersion = pmdVersion
+    toolVersion = libs.versions.pmd.get()
     ruleSets = listOf()
     ruleSetFiles = files("config/pmd/pmd-main-ruleset.xml")
     isIgnoreFailures = false
