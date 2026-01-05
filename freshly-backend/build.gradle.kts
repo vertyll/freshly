@@ -24,12 +24,14 @@ allprojects {
 }
 
 subprojects {
-    apply(plugin = "java")
-    apply(plugin = "pmd")
-    apply(plugin = "io.spring.dependency-management")
-    apply(plugin = "com.diffplug.spotless")
-    apply(plugin = "net.ltgt.errorprone")
-    apply(plugin = "net.ltgt.nullaway")
+    apply {
+        plugin("java")
+        plugin("pmd")
+        plugin("io.spring.dependency-management")
+        plugin("com.diffplug.spotless")
+        plugin("net.ltgt.errorprone")
+        plugin("net.ltgt.nullaway")
+    }
 
     java {
         toolchain {
