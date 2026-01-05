@@ -1,19 +1,27 @@
 [versions]
+# Plugins
 spring-boot = "4.0.1"
 spring-dependency-management = "1.1.7"
+spotless = "8.1.0"
 errorprone-plugin = "4.3.0"
 nullaway-plugin = "2.3.0"
+pmd = "7.20.0"
 
+# Dependencies
 mapstruct = "1.6.3"
-testcontainers = "1.21.4"
+testcontainers = "1.21.3"
 jjwt = "0.12.3"
+guava = "33.5.0-jre"
 keycloak = "26.0.7"
 httpclient5 = "5.6"
 lombok-mapstruct-binding = "0.2.0"
 errorprone = "2.36.0"
 nullaway = "0.12.14"
 beta-checker = "1.0"
-pmd = "7.20.0"
+jspecify = "1.0.0"
+google-java-format = "1.33.0"
+ktlint = "1.8.0"
+springdoc = "2.3.0"
 
 [libraries]
 # Spring Boot Starters
@@ -57,6 +65,9 @@ httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", versio
 # Thymeleaf
 thymeleaf-extras-springsecurity6 = { module = "org.thymeleaf.extras:thymeleaf-extras-springsecurity6" }
 
+# Apache Commons
+commons-lang3 = { module = "org.apache.commons:commons-lang3" }
+
 # MapStruct
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
@@ -66,7 +77,14 @@ lombok = { module = "org.projectlombok:lombok" }
 lombok-mapstruct-binding = { module = "org.projectlombok:lombok-mapstruct-binding", version.ref = "lombok-mapstruct-binding" }
 
 # Guava
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 guava-beta-checker = { module = "com.google.guava:guava-beta-checker", version.ref = "beta-checker" }
+
+# JSpecify
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+
+# OpenAPI/Swagger
+springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 
 # Error Prone & NullAway
 errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
@@ -79,27 +97,58 @@ testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", ve
 # JUnit
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 
+# BOMs
+spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
+
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 errorprone = { id = "net.ltgt.errorprone", version.ref = "errorprone-plugin" }
 nullaway = { id = "net.ltgt.nullaway", version.ref = "nullaway-plugin" }
 
 [bundles]
-spring-boot-starters = [
+spring-boot-starters-common = [
     "spring-boot-starter-data-mongodb",
-    "spring-boot-starter-security",
-    "spring-boot-starter-security-oauth2-resource-server",
     "spring-boot-starter-validation",
-    "spring-boot-starter-webmvc",
+    "spring-boot-starter-webmvc"
+]
+
+spring-boot-starters-security = [
+    "spring-boot-starter-security"
+]
+
+spring-boot-starters-mail = [
     "spring-boot-starter-mail",
     "spring-boot-starter-thymeleaf",
-    "spring-aop",
-    "aspectj-aspectjweaver",
     "thymeleaf-extras-springsecurity6"
 ]
 
-jjwt = ["jjwt-api", "jjwt-impl", "jjwt-jackson"]
+spring-boot-test-common = [
+    "spring-boot-starter-webmvc-test",
+    "spring-boot-starter-data-mongodb-test",
+    "spring-boot-starter-validation-test"
+]
+
+spring-boot-test-mail = [
+    "spring-boot-starter-mail-test",
+    "spring-boot-starter-thymeleaf-test"
+]
+
+spring-boot-starters-oauth = [
+    "spring-boot-starter-security-oauth2-resource-server"
+]
+
+spring-boot-starters-aop = [
+    "spring-aop",
+    "aspectj-aspectjweaver"
+]
+
+jjwt = [
+    "jjwt-api",
+    "jjwt-impl",
+    "jjwt-jackson"
+]
 
 test-starters = [
     "spring-boot-starter-data-mongodb-test",
@@ -112,4 +161,12 @@ test-starters = [
     "spring-boot-testcontainers"
 ]
 
-testcontainers = ["testcontainers-mongodb", "testcontainers-junit-jupiter"]
+testcontainers = [
+    "testcontainers-mongodb",
+    "testcontainers-junit-jupiter"
+]
+
+mapstruct-processors = [
+    "mapstruct-processor",
+    "lombok-mapstruct-binding"
+]
