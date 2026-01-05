@@ -10,18 +10,18 @@ pmd = "7.20.0"
 # Dependencies
 mapstruct = "1.6.3"
 testcontainers = "1.21.3"
-jjwt = "0.12.3"
+jjwt = "0.13.0"
 guava = "33.5.0-jre"
 keycloak = "26.0.7"
 httpclient5 = "5.6"
 lombok-mapstruct-binding = "0.2.0"
-errorprone = "2.36.0"
-nullaway = "0.12.14"
+errorprone = "2.45.0"
+nullaway = "0.12.15"
 beta-checker = "1.0"
 jspecify = "1.0.0"
 google-java-format = "1.33.0"
 ktlint = "1.8.0"
-springdoc = "2.3.0"
+springdoc = "3.0.1"
 
 [libraries]
 # Spring Boot Starters
