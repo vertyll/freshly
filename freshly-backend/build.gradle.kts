@@ -90,26 +90,26 @@ subprojects {
             displayGranularity = 2
         }
 
-        val ANSI_RESET = "\u001B[0m"
-        val ANSI_GREEN = "\u001B[32m"
-        val ANSI_RED = "\u001B[31m"
-        val ANSI_YELLOW = "\u001B[33m"
-        val ANSI_CYAN = "\u001B[36m"
-        val ANSI_BOLD = "\u001B[1m"
+        val ansiReset = "\u001B[0m"
+        val ansiGreen = "\u001B[32m"
+        val ansiRed = "\u001B[31m"
+        val ansiYellow = "\u001B[33m"
+        val ansiCyan = "\u001B[36m"
+        val ansiBold = "\u001B[1m"
 
-        val CHECK_MARK = "✓"
-        val CROSS_MARK = "✗"
-        val SKIP_MARK = "⊘"
+        val checkMark = "✓"
+        val crossMark = "✗"
+        val skipMark = "⊘"
 
         afterTest(KotlinClosure2({ desc: TestDescriptor, result: TestResult ->
             val indicator = when (result.resultType) {
-                TestResult.ResultType.SUCCESS -> "$ANSI_GREEN$CHECK_MARK$ANSI_RESET"
-                TestResult.ResultType.FAILURE -> "$ANSI_RED$CROSS_MARK$ANSI_RESET"
-                TestResult.ResultType.SKIPPED -> "$ANSI_YELLOW$SKIP_MARK$ANSI_RESET"
+                TestResult.ResultType.SUCCESS -> "$ansiGreen$checkMark$ansiReset"
+                TestResult.ResultType.FAILURE -> "$ansiRed$crossMark$ansiReset"
+                TestResult.ResultType.SKIPPED -> "$ansiYellow$skipMark$ansiReset"
                 else -> "?"
             }
             val duration = result.endTime - result.startTime
-            println("  $indicator ${desc.className} > ${desc.name} ${ANSI_CYAN}(${duration}ms)$ANSI_RESET")
+            println("  $indicator ${desc.className} > ${desc.name} $ansiCyan(${duration}ms)$ansiReset")
         }))
 
         afterSuite(KotlinClosure2({ desc: TestDescriptor, result: TestResult ->
@@ -121,26 +121,26 @@ subprojects {
                 val duration = result.endTime - result.startTime
 
                 println()
-                println("$ANSI_BOLD═══════════════════════════════════════════════════════════════$ANSI_RESET")
-                println("$ANSI_BOLD                        TEST RESULTS                        $ANSI_RESET")
-                println("$ANSI_BOLD═══════════════════════════════════════════════════════════════$ANSI_RESET")
+                println("$ansiBold═══════════════════════════════════════════════════════════════$ansiReset")
+                println("$ansiBold                        TEST RESULTS                        $ansiReset")
+                println("$ansiBold═══════════════════════════════════════════════════════════════$ansiReset")
                 println()
-                println("  Total:   $ANSI_BOLD$total$ANSI_RESET tests")
-                println("  Passed:  $ANSI_GREEN$ANSI_BOLD$passed$ANSI_RESET $ANSI_GREEN$CHECK_MARK$ANSI_RESET")
-                println("  Failed:  $ANSI_RED$ANSI_BOLD$failed$ANSI_RESET ${if (failed > 0) "$ANSI_RED$CROSS_MARK$ANSI_RESET" else ""}")
-                println("  Skipped: $ANSI_YELLOW$ANSI_BOLD$skipped$ANSI_RESET ${if (skipped > 0) "$ANSI_YELLOW$SKIP_MARK$ANSI_RESET" else ""}")
+                println("  Total:   $ansiBold$total$ansiReset tests")
+                println("  Passed:  $ansiGreen$ansiBold$passed$ansiReset $ansiGreen$checkMark$ansiReset")
+                println("  Failed:  $ansiRed$ansiBold$failed$ansiReset ${if (failed > 0) "$ansiRed$crossMark$ansiReset" else ""}")
+                println("  Skipped: $ansiYellow$ansiBold$skipped$ansiReset ${if (skipped > 0) "$ansiYellow$skipMark$ansiReset" else ""}")
                 println()
-                println("  Duration: $ANSI_CYAN${duration}ms$ANSI_RESET")
+                println("  Duration: $ansiCyan${duration}ms$ansiReset")
                 println()
 
                 val statusColor = when (result.resultType) {
-                    TestResult.ResultType.SUCCESS -> ANSI_GREEN
-                    TestResult.ResultType.FAILURE -> ANSI_RED
-                    else -> ANSI_YELLOW
+                    TestResult.ResultType.SUCCESS -> ansiGreen
+                    TestResult.ResultType.FAILURE -> ansiRed
+                    else -> ansiYellow
                 }
-                println("  Status: $statusColor$ANSI_BOLD${result.resultType}$ANSI_RESET")
+                println("  Status: $statusColor$ansiBold${result.resultType}$ansiReset")
                 println()
-                println("$ANSI_BOLD═══════════════════════════════════════════════════════════════$ANSI_RESET")
+                println("$ansiBold═══════════════════════════════════════════════════════════════$ansiReset")
                 println()
             }
         }))
