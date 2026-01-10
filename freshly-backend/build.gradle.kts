@@ -66,6 +66,10 @@ subprojects {
         // SpotBugs
         add("spotbugsPlugins", rootProject.libs.findsecbugs)
 
+        // Test Compile Only
+        testCompileOnly(rootProject.libs.jspecify)
+        testCompileOnly(rootProject.libs.spotbugs.annotations)
+
         // Test Runtime Only
         testRuntimeOnly(rootProject.libs.junit.platform.launcher)
     }
@@ -80,15 +84,19 @@ subprojects {
     }
 
     tasks.withType<com.github.spotbugs.snom.SpotBugsTask>().configureEach {
+        val projectName = project.name
+        val taskName = name
+        val buildDir = project.layout.buildDirectory.get()
+
         reports.maybeCreate("html").apply {
             required.set(true)
-            outputLocation.set(file("${project.layout.buildDirectory.get()}/reports/spotbugs/${project.name}-${name}.html"))
+            outputLocation.set(file("${buildDir}/reports/spotbugs/${projectName}-${taskName}.html"))
             setStylesheet("fancy-hist.xsl")
         }
 
         reports.maybeCreate("xml").apply {
             required.set(true)
-            outputLocation.set(file("${project.layout.buildDirectory.get()}/reports/spotbugs/${project.name}-${name}.xml"))
+            outputLocation.set(file("${buildDir}/reports/spotbugs/${projectName}-${taskName}.xml"))
         }
 
         doLast {
@@ -107,7 +115,7 @@ subprojects {
                 }
 
                 println("\n$ansiBold═══════════════════════════════════════════════════════════════$ansiReset")
-                println("$ansiBold  SpotBugs: ${project.name} - $name")
+                println("$ansiBold  SpotBugs: $projectName - $taskName")
                 println("$ansiBold═══════════════════════════════════════════════════════════════$ansiReset")
 
                 if (bugCount == 0) {
