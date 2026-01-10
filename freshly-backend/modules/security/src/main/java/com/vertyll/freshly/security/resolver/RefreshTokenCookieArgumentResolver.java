@@ -14,10 +14,14 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import com.vertyll.freshly.security.annotation.RefreshTokenCookie;
 import com.vertyll.freshly.security.config.JwtProperties;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
+@SuppressFBWarnings(
+        value = "COOKIE_USAGE",
+        justification = "Refresh token is read server-side from a Secure, HttpOnly cookie")
 @Component
 @RequiredArgsConstructor
 public class RefreshTokenCookieArgumentResolver implements HandlerMethodArgumentResolver {

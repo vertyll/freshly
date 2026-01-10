@@ -1,5 +1,9 @@
 package com.vertyll.freshly.airquality.domain;
 
+import java.text.Normalizer;
+import java.util.Locale;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 
 /**
@@ -8,6 +12,9 @@ import lombok.Getter;
  * name (e.g., "VERY_GOOD"), and the API returns the same. The polishName is only used for parsing
  * data from GIOŚ API.
  */
+@SuppressFBWarnings(
+        value = "IMPROPER_UNICODE",
+        justification = "Unicode-safe normalization (NFC) and Locale.ROOT are explicitly used")
 public enum AirQualityLevel {
     VERY_GOOD("Bardzo dobry", 0),
     GOOD("Dobry", 1),
@@ -45,8 +52,11 @@ public enum AirQualityLevel {
         if (polishName == null) {
             return null;
         }
+
+        String normalizedInput = normalize(polishName);
+
         for (AirQualityLevel level : values()) {
-            if (level.polishName.equalsIgnoreCase(polishName)) {
+            if (normalize(level.polishName).equals(normalizedInput)) {
                 return level;
             }
         }
@@ -66,5 +76,9 @@ public enum AirQualityLevel {
     /** Checks if this level is worse than the specified level. */
     public boolean isWorseThan(AirQualityLevel other) {
         return this.severity > other.severity;
+    }
+
+    private static String normalize(String value) {
+        return Normalizer.normalize(value, Normalizer.Form.NFC).toLowerCase(Locale.ROOT).trim();
     }
 }

@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.spotless) apply false
     alias(libs.plugins.errorprone) apply false
     alias(libs.plugins.nullaway) apply false
+    alias(libs.plugins.spotbugs) apply false
 }
 
 group = "com.vertyll"
@@ -31,6 +32,7 @@ subprojects {
         plugin("com.diffplug.spotless")
         plugin("net.ltgt.errorprone")
         plugin("net.ltgt.nullaway")
+        plugin("com.github.spotbugs")
     }
 
     java {
@@ -51,6 +53,9 @@ subprojects {
         // Compile Only
         compileOnly(rootProject.libs.jspecify)
 
+        // SpotBugs Annotations
+        compileOnly(rootProject.libs.spotbugs.annotations)
+
         // Annotation Processor
         annotationProcessor(rootProject.libs.guava.beta.checker)
 
@@ -58,8 +63,80 @@ subprojects {
         add("errorprone", rootProject.libs.errorprone.core)
         add("errorprone", rootProject.libs.nullaway)
 
+        // SpotBugs
+        add("spotbugsPlugins", rootProject.libs.findsecbugs)
+
         // Test Runtime Only
         testRuntimeOnly(rootProject.libs.junit.platform.launcher)
+    }
+
+    configure<com.github.spotbugs.snom.SpotBugsExtension> {
+        ignoreFailures.set(false)
+        effort.set(com.github.spotbugs.snom.Effort.MAX)
+        reportLevel.set(com.github.spotbugs.snom.Confidence.LOW)
+        showProgress.set(true)
+
+        excludeFilter.set(rootProject.file("config/spotbugs/exclude-filter.xml"))
+    }
+
+    tasks.withType<com.github.spotbugs.snom.SpotBugsTask>().configureEach {
+        reports.maybeCreate("html").apply {
+            required.set(true)
+            outputLocation.set(file("${project.layout.buildDirectory.get()}/reports/spotbugs/${project.name}-${name}.html"))
+            setStylesheet("fancy-hist.xsl")
+        }
+
+        reports.maybeCreate("xml").apply {
+            required.set(true)
+            outputLocation.set(file("${project.layout.buildDirectory.get()}/reports/spotbugs/${project.name}-${name}.xml"))
+        }
+
+        doLast {
+            val ansiReset = "\u001B[0m"
+            val ansiGreen = "\u001B[32m"
+            val ansiRed = "\u001B[31m"
+            val ansiBold = "\u001B[1m"
+
+            val xmlReport = reports.maybeCreate("xml").outputLocation.get().asFile
+            val htmlReport = reports.maybeCreate("html").outputLocation.get().asFile
+
+            if (xmlReport.exists()) {
+                val xml = xmlReport.readText()
+                val bugCount = xml.substringAfter("<BugInstance", "").let {
+                    if (it.isEmpty()) 0 else xml.split("<BugInstance").size - 1
+                }
+
+                println("\n$ansiBold═══════════════════════════════════════════════════════════════$ansiReset")
+                println("$ansiBold  SpotBugs: ${project.name} - $name")
+                println("$ansiBold═══════════════════════════════════════════════════════════════$ansiReset")
+
+                if (bugCount == 0) {
+                    println("  ${ansiGreen}✓ No bugs found!$ansiReset")
+                } else {
+                    println("  ${ansiRed}✗ Found $bugCount bug(s)$ansiReset")
+
+                    val categories = mutableMapOf<String, Int>()
+                    xml.split("<BugInstance").drop(1).forEach { bugXml ->
+                        val category = bugXml.substringAfter("category=\"", "").substringBefore("\"", "UNKNOWN")
+                        categories[category] = categories.getOrDefault(category, 0) + 1
+                    }
+
+                    println("\n  Categories:")
+                    categories.forEach { (category, count) ->
+                        println("    • $category: $count")
+                    }
+
+                    if (htmlReport.exists()) {
+                        println("\n  Detailed report: file://${htmlReport.absolutePath}")
+                    }
+                }
+                println("$ansiBold═══════════════════════════════════════════════════════════════$ansiReset\n")
+            }
+        }
+    }
+
+    tasks.named("check") {
+        dependsOn("spotbugsMain")
     }
 
     tasks.withType<JavaCompile> {
@@ -225,4 +302,57 @@ tasks.register("testAll") {
 
     dependsOn(subprojects.map { it.tasks.withType<Test>() })
     finalizedBy("testReport")
+}
+
+tasks.register("spotbugsAll") {
+    group = "verification"
+    description = "Run SpotBugs analysis on all modules"
+
+    dependsOn(subprojects.map { it.tasks.withType<com.github.spotbugs.snom.SpotBugsTask>() })
+
+    doLast {
+        val ansiReset = "\u001B[0m"
+        val ansiGreen = "\u001B[32m"
+        val ansiRed = "\u001B[31m"
+        val ansiBold = "\u001B[1m"
+
+        println("\n$ansiBold═══════════════════════════════════════════════════════════════$ansiReset")
+        println("$ansiBold                   SPOTBUGS SUMMARY                        $ansiReset")
+        println("$ansiBold═══════════════════════════════════════════════════════════════$ansiReset\n")
+
+        var totalBugs = 0
+        val moduleResults = mutableListOf<Triple<String, Int, String>>()
+
+        subprojects.forEach { project ->
+            val reportDir = project.layout.buildDirectory.get().dir("reports/spotbugs").asFile
+            if (reportDir.exists()) {
+                reportDir.listFiles()?.filter { it.extension == "xml" }?.forEach { xmlFile ->
+                    val xml = xmlFile.readText()
+                    val bugCount = xml.substringAfter("<BugInstance", "").let {
+                        if (it.isEmpty()) 0 else xml.split("<BugInstance").size - 1
+                    }
+                    totalBugs += bugCount
+
+                    val htmlReport = xmlFile.resolveSibling(xmlFile.nameWithoutExtension + ".html")
+                    moduleResults.add(Triple(project.name, bugCount, htmlReport.absolutePath))
+                }
+            }
+        }
+
+        moduleResults.forEach { (name, count, reportPath) ->
+            val status = if (count == 0) "${ansiGreen}✓$ansiReset" else "${ansiRed}✗$ansiReset"
+            println("  $status $name: $count bug(s)")
+            if (count > 0) {
+                println("     file://$reportPath")
+            }
+        }
+
+        println("\n  ${ansiBold}Total bugs found: $totalBugs$ansiReset")
+
+        if (totalBugs == 0) {
+            println("  ${ansiGreen}All modules passed SpotBugs analysis!$ansiReset")
+        }
+
+        println("\n$ansiBold═══════════════════════════════════════════════════════════════$ansiReset\n")
+    }
 }
