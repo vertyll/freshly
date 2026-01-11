@@ -15,7 +15,6 @@ Application with air quality data from IoT sensors.
 - Spring Data MongoDB
 - Spring Web
 - Spring Mail
-- Flyway
 - OpenAPI (Swagger)
 
 ### Front-end:
@@ -40,9 +39,12 @@ Application with air quality data from IoT sensors.
 
 ### Other:
 - Docker for development environment
+- PMD for static code analysis
+- SpotBugs for static code analysis
 - JSpecify for null-safety annotations
 - NullAway for null-safety checks
 - Error Prone for static code analysis
+- Spotless for code formatting
 
 > **Note:** During application development, SOLID principles, DRY, composition over inheritance, dependency injection, design patterns, architectural patterns were applied, tests were written, and other good programming practices were adopted.
 
