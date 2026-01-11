@@ -132,6 +132,7 @@ class AirQualityMeasurementTest {
 
     @Test
     @DisplayName("Should handle null overall index level")
+    @SuppressWarnings("NullAway")
     void shouldHandleNullOverallIndexLevel() {
         // Given
         AirQualityMeasurement measurement = new AirQualityMeasurement();

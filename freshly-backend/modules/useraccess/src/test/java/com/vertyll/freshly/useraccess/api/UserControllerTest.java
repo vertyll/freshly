@@ -32,17 +32,26 @@ import com.vertyll.freshly.useraccess.domain.exception.UserNotFoundException;
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
-    @Mock private UserAccessService userAccessService;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private UserAccessService userAccessService;
 
-    @Mock private UserDtoMapper userDtoMapper;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private UserDtoMapper userDtoMapper;
 
-    @Mock private MessageSource messageSource;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private MessageSource messageSource;
 
-    @Mock private Jwt jwt;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private Jwt jwt;
 
     private UserController userController;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         userController = new UserController(userAccessService, userDtoMapper, messageSource);
     }

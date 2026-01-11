@@ -23,17 +23,26 @@ import com.vertyll.freshly.airquality.domain.*;
 @ExtendWith(MockitoExtension.class)
 class AirQualitySyncServiceTest {
 
-    @Mock private AirQualityProvider airQualityProvider;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private AirQualityProvider airQualityProvider;
 
-    @Mock private AirQualityHistoryRepository historyRepository;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private AirQualityHistoryRepository historyRepository;
 
-    @Mock private ObjectProvider<AirQualitySyncService> selfProvider;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private ObjectProvider<AirQualitySyncService> selfProvider;
 
-    @Captor private ArgumentCaptor<AirQualityMeasurement> measurementCaptor;
+    @Captor
+    @SuppressWarnings("NullAway.Init")
+    private ArgumentCaptor<AirQualityMeasurement> measurementCaptor;
 
     private AirQualitySyncService syncService;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         syncService =
                 new AirQualitySyncService(airQualityProvider, historyRepository, selfProvider);
@@ -339,6 +348,7 @@ class AirQualitySyncServiceTest {
 
     @Test
     @DisplayName("Should skip null sensor readings")
+    @SuppressWarnings("NullAway")
     void shouldSkipNullSensorReadings() {
         // Given
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);

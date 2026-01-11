@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -58,9 +59,10 @@ class GlobalExceptionHandlerTest {
 
         @SuppressWarnings("unchecked")
         Map<String, List<String>> errors =
-                (Map<String, List<String>>) problemDetail.getProperties().get("errors");
+                (Map<String, List<String>>)
+                        Objects.requireNonNull(problemDetail.getProperties()).get("errors");
         assertThat(errors).isNotNull();
-        assertThat(errors.get("username"))
+        assertThat(Objects.requireNonNull(errors).get("username"))
                 .containsExactlyInAnyOrder("Username is required", "Username must be unique");
         assertThat(errors.get("email")).containsExactly("Email is invalid");
     }
@@ -69,6 +71,7 @@ class GlobalExceptionHandlerTest {
     @DisplayName("Should handle MethodArgumentNotValidException with null message")
     void shouldHandleMethodArgumentNotValidExceptionWithNullMessage() throws NoSuchMethodException {
         // Given
+        @SuppressWarnings("NullAway")
         FieldError fieldError = new FieldError("userDto", "age", null);
 
         BindingResult bindingResult = mock(BindingResult.class);
@@ -85,15 +88,17 @@ class GlobalExceptionHandlerTest {
         // Then
         @SuppressWarnings("unchecked")
         Map<String, List<String>> errors =
-                (Map<String, List<String>>) problemDetail.getProperties().get("errors");
+                (Map<String, List<String>>)
+                        Objects.requireNonNull(problemDetail.getProperties()).get("errors");
         assertThat(errors).isNotNull();
-        assertThat(errors.get("age")).containsExactly("Invalid value");
+        assertThat(Objects.requireNonNull(errors).get("age")).containsExactly("Invalid value");
     }
 
     @Test
     @DisplayName("Should handle MethodArgumentTypeMismatchException")
     void shouldHandleMethodArgumentTypeMismatchException() {
         // Given
+        @SuppressWarnings("NullAway")
         MethodArgumentTypeMismatchException exception =
                 new MethodArgumentTypeMismatchException("abc", Integer.class, "id", null, null);
 
@@ -109,6 +114,7 @@ class GlobalExceptionHandlerTest {
     @DisplayName("Should handle MethodArgumentTypeMismatchException with null type")
     void shouldHandleMethodArgumentTypeMismatchExceptionWithNullType() {
         // Given
+        @SuppressWarnings("NullAway")
         MethodArgumentTypeMismatchException exception =
                 new MethodArgumentTypeMismatchException("abc", null, "id", null, null);
 

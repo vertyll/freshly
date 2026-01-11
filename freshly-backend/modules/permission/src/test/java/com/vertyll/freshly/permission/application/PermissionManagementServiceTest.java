@@ -25,13 +25,18 @@ import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
 @ExtendWith(MockitoExtension.class)
 class PermissionManagementServiceTest {
 
-    @Mock private RolePermissionMappingRepository repository;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private RolePermissionMappingRepository repository;
 
-    @Captor private ArgumentCaptor<RolePermissionMapping> mappingCaptor;
+    @Captor
+    @SuppressWarnings("NullAway.Init")
+    private ArgumentCaptor<RolePermissionMapping> mappingCaptor;
 
     private PermissionManagementService service;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         service = new PermissionManagementService(repository);
     }

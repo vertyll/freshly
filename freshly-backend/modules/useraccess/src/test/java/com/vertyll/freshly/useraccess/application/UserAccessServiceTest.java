@@ -27,13 +27,18 @@ import com.vertyll.freshly.useraccess.domain.exception.UserNotFoundException;
 @ExtendWith(MockitoExtension.class)
 class UserAccessServiceTest {
 
-    @Mock private SystemUserRepository systemUserRepository;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private SystemUserRepository systemUserRepository;
 
-    @Captor private ArgumentCaptor<SystemUser> userCaptor;
+    @Captor
+    @SuppressWarnings("NullAway.Init")
+    private ArgumentCaptor<SystemUser> userCaptor;
 
     private UserAccessService userAccessService;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         userAccessService = new UserAccessService(systemUserRepository);
     }

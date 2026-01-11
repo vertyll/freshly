@@ -18,13 +18,18 @@ import com.vertyll.freshly.permission.Permission;
 @ExtendWith(MockitoExtension.class)
 class PermissionServiceTest {
 
-    @Mock private UserPermissionCache permissionCache;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private UserPermissionCache permissionCache;
 
-    @Mock private Authentication authentication;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private Authentication authentication;
 
     private PermissionService permissionService;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         permissionService = new PermissionService(permissionCache);
     }
@@ -63,6 +68,7 @@ class PermissionServiceTest {
 
     @Test
     @DisplayName("Should return false when authentication is null")
+    @SuppressWarnings("NullAway")
     void shouldReturnFalseWhenAuthenticationIsNull() {
         // When
         boolean hasPermission = permissionService.hasPermission(null, "users:read");
@@ -201,6 +207,7 @@ class PermissionServiceTest {
 
     @Test
     @DisplayName("Should return false for hasAnyPermission when authentication is null")
+    @SuppressWarnings("NullAway")
     void shouldReturnFalseForHasAnyPermissionWhenAuthenticationIsNull() {
         // When
         when(permissionCache.getUserPermissions(null)).thenReturn(Set.of());

@@ -65,6 +65,7 @@ class RolePermissionMappingTest {
 
     @Test
     @DisplayName("Should throw exception when reconstituting with null id")
+    @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenReconstitutingWithNullId() {
         // Given
         String role = "admin";
@@ -78,6 +79,7 @@ class RolePermissionMappingTest {
 
     @Test
     @DisplayName("Should throw exception when reconstituting with null keycloak role")
+    @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenReconstitutingWithNullKeycloakRole() {
         // Given
         UUID id = UUID.randomUUID();
@@ -91,6 +93,7 @@ class RolePermissionMappingTest {
 
     @Test
     @DisplayName("Should throw exception when reconstituting with null permission")
+    @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenReconstitutingWithNullPermission() {
         // Given
         UUID id = UUID.randomUUID();

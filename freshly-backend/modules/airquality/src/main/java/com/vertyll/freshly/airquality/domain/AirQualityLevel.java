@@ -3,6 +3,8 @@ package com.vertyll.freshly.airquality.domain;
 import java.text.Normalizer;
 import java.util.Locale;
 
+import org.jspecify.annotations.Nullable;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 
@@ -48,7 +50,8 @@ public enum AirQualityLevel {
      * Parses Polish name from GIOŚ API to enum value. Returns null if the name is not recognized.
      * This is only used when receiving data from external GIOŚ API.
      */
-    public static AirQualityLevel fromPolishName(String polishName) {
+    @Nullable
+    public static AirQualityLevel fromPolishName(@Nullable String polishName) {
         if (polishName == null) {
             return null;
         }

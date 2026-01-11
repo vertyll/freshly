@@ -3,6 +3,8 @@ package com.vertyll.freshly.airquality.domain;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import org.jspecify.annotations.Nullable;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,27 +18,27 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AirQualityMeasurement {
 
-    private String id; // MongoDB ID
+    @Nullable private String id; // MongoDB ID
     private int stationId;
-    private String stationName;
-    private LocalDateTime measurementDate;
+    @Nullable private String stationName;
+    @Nullable private LocalDateTime measurementDate;
 
     // Index data
-    private AirQualityLevel overallIndexLevel;
-    private AirQualityLevel so2IndexLevel;
-    private AirQualityLevel no2IndexLevel;
-    private AirQualityLevel pm10IndexLevel;
-    private AirQualityLevel pm25IndexLevel;
+    @Nullable private AirQualityLevel overallIndexLevel;
+    @Nullable private AirQualityLevel so2IndexLevel;
+    @Nullable private AirQualityLevel no2IndexLevel;
+    @Nullable private AirQualityLevel pm10IndexLevel;
+    @Nullable private AirQualityLevel pm25IndexLevel;
 
     // Sensor readings
-    private Double pm10Value;
-    private Double pm25Value;
-    private Double so2Value;
-    private Double no2Value;
-    private Double coValue;
-    private Double o3Value;
+    @Nullable private Double pm10Value;
+    @Nullable private Double pm25Value;
+    @Nullable private Double so2Value;
+    @Nullable private Double no2Value;
+    @Nullable private Double coValue;
+    @Nullable private Double o3Value;
 
-    private LocalDateTime createdAt;
+    @Nullable private LocalDateTime createdAt;
 
     /** Factory method to create measurement from index and sensor data */
     public static AirQualityMeasurement create(

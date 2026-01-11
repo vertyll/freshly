@@ -30,19 +30,30 @@ import jakarta.mail.internet.MimeMessage;
 @ExtendWith(MockitoExtension.class)
 class SmtpEmailSenderTest {
 
-    @Mock private JavaMailSender mailSender;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private JavaMailSender mailSender;
 
-    @Mock private TemplateEngine templateEngine;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private TemplateEngine templateEngine;
 
-    @Mock private MailProperties mailProperties;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private MailProperties mailProperties;
 
-    @Mock private MimeMessage mimeMessage;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private MimeMessage mimeMessage;
 
-    @Captor private ArgumentCaptor<Context> contextCaptor;
+    @Captor
+    @SuppressWarnings("NullAway.Init")
+    private ArgumentCaptor<Context> contextCaptor;
 
     private SmtpEmailSender smtpEmailSender;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         smtpEmailSender = new SmtpEmailSender(mailSender, templateEngine, mailProperties);
     }

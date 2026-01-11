@@ -24,11 +24,14 @@ import com.vertyll.freshly.airquality.domain.exception.StationNotFoundException;
 @ExtendWith(MockitoExtension.class)
 class AirQualityControllerAdviceTest {
 
-    @Mock private MessageSource messageSource;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private MessageSource messageSource;
 
     private AirQualityControllerAdvice controllerAdvice;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         controllerAdvice = new AirQualityControllerAdvice(messageSource);
     }

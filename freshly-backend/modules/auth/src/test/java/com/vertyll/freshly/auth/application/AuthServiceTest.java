@@ -50,6 +50,7 @@ class AuthServiceTest {
     private static final String FRONTEND_URL = "http://localhost:4200";
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         ReflectionTestUtils.setField(authService, "frontendUrl", FRONTEND_URL);
     }

@@ -39,6 +39,7 @@ class VerificationTokenServiceTest {
     private static final long PASSWORD_RESET_EXPIRATION = 1800000L;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         lenient().when(jwtProperties.secret()).thenReturn(SECRET);
         lenient().when(jwtProperties.expiration()).thenReturn(expiration);

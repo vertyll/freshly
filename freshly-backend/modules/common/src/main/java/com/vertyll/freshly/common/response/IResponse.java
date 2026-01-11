@@ -2,10 +2,12 @@ package com.vertyll.freshly.common.response;
 
 import java.time.LocalDateTime;
 
-public interface IResponse<T> {
-    T getData();
+import org.jspecify.annotations.Nullable;
 
-    String getMessage();
+public interface IResponse<T> {
+    @Nullable T getData();
+
+    @Nullable String getMessage();
 
     LocalDateTime getTimestamp();
 }

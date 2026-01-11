@@ -54,6 +54,7 @@ class KeycloakAdminClientTest {
     private KeycloakAdminClient keycloakAdminClient;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         lenient().when(properties.realm()).thenReturn("test-realm");
         lenient().when(properties.userClientId()).thenReturn("test-client");

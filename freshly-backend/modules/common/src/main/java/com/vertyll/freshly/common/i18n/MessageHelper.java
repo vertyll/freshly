@@ -2,6 +2,7 @@ package com.vertyll.freshly.common.i18n;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
@@ -52,7 +53,7 @@ public class MessageHelper {
      * @param args Arguments to replace placeholders in message
      * @return Localized message with substituted parameters
      */
-    public String getMessage(String key, Object... args) {
+    public String getMessage(String key, Object @Nullable ... args) {
         return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
     }
 
@@ -75,7 +76,7 @@ public class MessageHelper {
      * @param locale Specific locale to use
      * @return Localized message with substituted parameters for given locale
      */
-    public String getMessage(String key, Object[] args, Locale locale) {
+    public String getMessage(String key, Object @Nullable [] args, Locale locale) {
         return messageSource.getMessage(key, args, locale);
     }
 }

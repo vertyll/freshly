@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.util.Locale;
+import java.util.Objects;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,9 @@ import org.springframework.http.ResponseEntity;
 @ExtendWith(MockitoExtension.class)
 class ApiResponseTest {
 
-    @Mock private MessageSource messageSource;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private MessageSource messageSource;
 
     @Test
     @DisplayName("Should build response with localized message")
@@ -38,10 +41,10 @@ class ApiResponseTest {
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getData()).isEqualTo(data);
-        assertThat(response.getBody().getMessage()).isEqualTo(localizedMessage);
-        assertThat(response.getBody().getTimestamp()).isNotNull();
+        ApiResponse<String> body = Objects.requireNonNull(response.getBody());
+        assertThat(body.getData()).isEqualTo(data);
+        assertThat(body.getMessage()).isEqualTo(localizedMessage);
+        assertThat(body.getTimestamp()).isNotNull();
     }
 
     @Test
@@ -62,9 +65,9 @@ class ApiResponseTest {
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getData()).isEqualTo(data);
-        assertThat(response.getBody().getMessage()).isEqualTo(localizedMessage);
+        ApiResponse<String> body = Objects.requireNonNull(response.getBody());
+        assertThat(body.getData()).isEqualTo(data);
+        assertThat(body.getMessage()).isEqualTo(localizedMessage);
     }
 
     @Test
@@ -84,8 +87,8 @@ class ApiResponseTest {
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getData()).isNull();
-        assertThat(response.getBody().getMessage()).isEqualTo(localizedMessage);
+        ApiResponse<Void> body = Objects.requireNonNull(response.getBody());
+        assertThat(body.getData()).isNull();
+        assertThat(body.getMessage()).isEqualTo(localizedMessage);
     }
 }

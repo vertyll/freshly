@@ -47,6 +47,7 @@ class EmailTest {
     }
 
     @Test
+    @SuppressWarnings("NullAway")
     void shouldThrowException_whenEmailIsNull() {
         // When & Then
         assertThatThrownBy(() -> new Email(null))

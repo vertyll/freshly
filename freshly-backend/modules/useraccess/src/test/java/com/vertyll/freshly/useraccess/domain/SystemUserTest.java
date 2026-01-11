@@ -46,6 +46,7 @@ class SystemUserTest {
 
     @Test
     @DisplayName("Should throw exception when keycloak user id is null")
+    @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenKeycloakUserIdIsNull() {
         // Given
         Set<UserRoleEnum> roles = Set.of(UserRoleEnum.USER);
@@ -58,6 +59,7 @@ class SystemUserTest {
 
     @Test
     @DisplayName("Should throw exception when roles are null")
+    @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenRolesAreNull() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
@@ -225,6 +227,7 @@ class SystemUserTest {
 
     @Test
     @DisplayName("Should throw exception when replacing roles with null")
+    @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenReplacingRolesWithNull() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();

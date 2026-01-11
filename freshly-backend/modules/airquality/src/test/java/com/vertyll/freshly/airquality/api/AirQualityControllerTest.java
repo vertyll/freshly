@@ -37,17 +37,26 @@ class AirQualityControllerTest {
 
     private MockMvc mockMvc;
 
-    @Mock private AirQualityService airQualityService;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private AirQualityService airQualityService;
 
-    @Mock private AirQualitySyncService syncService;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private AirQualitySyncService syncService;
 
-    @Mock private AirQualityDtoMapper dtoMapper;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private AirQualityDtoMapper dtoMapper;
 
-    @Mock private MessageSource messageSource;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private MessageSource messageSource;
 
     @InjectMocks private AirQualityController airQualityController;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn("Success");
 

@@ -24,15 +24,22 @@ import com.vertyll.freshly.security.annotation.RequirePermission;
 @ExtendWith(MockitoExtension.class)
 class PermissionAuthorizationManagerTest {
 
-    @Mock private PermissionService permissionService;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private PermissionService permissionService;
 
-    @Mock private MethodInvocation methodInvocation;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private MethodInvocation methodInvocation;
 
-    @Mock private Authentication authentication;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private Authentication authentication;
 
     private PermissionAuthorizationManager authorizationManager;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         authorizationManager = new PermissionAuthorizationManager(permissionService);
     }
@@ -137,6 +144,7 @@ class PermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should handle null authentication gracefully")
+    @SuppressWarnings("NullAway")
     void shouldHandleNullAuthenticationGracefully() throws NoSuchMethodException {
         // Given
         Method method = SecurityMockTarget.class.getMethod("methodWithPermission");

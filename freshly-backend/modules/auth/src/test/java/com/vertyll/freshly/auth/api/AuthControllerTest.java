@@ -65,6 +65,7 @@ class AuthControllerTest {
     private LocalValidatorFactoryBean validator;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();

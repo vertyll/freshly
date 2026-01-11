@@ -21,11 +21,17 @@ import com.vertyll.freshly.airquality.domain.*;
 @ExtendWith(MockitoExtension.class)
 class AirQualityServiceTest {
 
-    @Mock private AirQualityProvider airQualityProvider;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private AirQualityProvider airQualityProvider;
 
-    @Mock private AirQualityHistoryRepository historyRepository;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private AirQualityHistoryRepository historyRepository;
 
-    @InjectMocks private AirQualityService airQualityService;
+    @InjectMocks
+    @SuppressWarnings("NullAway.Init")
+    private AirQualityService airQualityService;
 
     @Nested
     @DisplayName("Get All Stations Tests")

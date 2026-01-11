@@ -24,13 +24,18 @@ import com.vertyll.freshly.notification.domain.exception.EmailSendingException;
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
 
-    @Mock private EmailSender emailSender;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private EmailSender emailSender;
 
-    @Captor private ArgumentCaptor<EmailNotification> notificationCaptor;
+    @Captor
+    @SuppressWarnings("NullAway.Init")
+    private ArgumentCaptor<EmailNotification> notificationCaptor;
 
     private NotificationService notificationService;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         notificationService = new NotificationService(emailSender);
     }

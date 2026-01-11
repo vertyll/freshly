@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.jspecify.annotations.Nullable;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,8 +21,8 @@ public class EmailNotification {
     private final Map<String, Object> templateVariables;
     private final LocalDateTime createdAt;
     private EmailStatus status;
-    private LocalDateTime sentAt;
-    private String errorMessage;
+    @Nullable private LocalDateTime sentAt;
+    @Nullable private String errorMessage;
 
     public EmailNotification(
             Email recipient, EmailTemplate template, Map<String, Object> templateVariables) {
@@ -86,7 +88,7 @@ public class EmailNotification {
         this.sentAt = LocalDateTime.now(ZoneOffset.UTC);
     }
 
-    public void markAsFailed(String errorMessage) {
+    public void markAsFailed(@Nullable String errorMessage) {
         this.status = EmailStatus.FAILED;
         this.errorMessage = errorMessage;
     }

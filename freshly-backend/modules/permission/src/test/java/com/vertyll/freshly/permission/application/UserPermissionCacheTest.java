@@ -25,13 +25,18 @@ import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
 @ExtendWith(MockitoExtension.class)
 class UserPermissionCacheTest {
 
-    @Mock private RolePermissionMappingRepository rolePermissionRepository;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private RolePermissionMappingRepository rolePermissionRepository;
 
-    @Mock private Authentication authentication;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private Authentication authentication;
 
     private UserPermissionCache userPermissionCache;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         userPermissionCache = new UserPermissionCache(rolePermissionRepository);
     }

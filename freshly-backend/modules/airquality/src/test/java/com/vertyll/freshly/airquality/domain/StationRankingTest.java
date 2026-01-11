@@ -116,6 +116,7 @@ class StationRankingTest {
 
     @Test
     @DisplayName("Should create ranking with null dominant quality level")
+    @SuppressWarnings("NullAway")
     void shouldCreateRankingWithNullDominantQualityLevel() {
         // Given
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);

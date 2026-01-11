@@ -36,6 +36,7 @@ class EmailNotificationTest {
 
     @Test
     @DisplayName("Should throw exception when recipient is null")
+    @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenRecipientIsNull() {
         // Given
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
@@ -49,6 +50,7 @@ class EmailNotificationTest {
 
     @Test
     @DisplayName("Should throw exception when template is null")
+    @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenTemplateIsNull() {
         // Given
         Email recipient = new Email("test@example.com");
@@ -62,6 +64,7 @@ class EmailNotificationTest {
 
     @Test
     @DisplayName("Should throw exception when template variables are null")
+    @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenTemplateVariablesAreNull() {
         // Given
         Email recipient = new Email("test@example.com");
@@ -154,6 +157,7 @@ class EmailNotificationTest {
 
     @Test
     @DisplayName("Should reconstitute notification from database")
+    @SuppressWarnings("NullAway")
     void shouldReconstituteNotificationFromDatabase() {
         // Given
         UUID id = UUID.randomUUID();
@@ -183,6 +187,7 @@ class EmailNotificationTest {
 
     @Test
     @DisplayName("Should reconstitute failed notification from database")
+    @SuppressWarnings("NullAway")
     void shouldReconstituteFailedNotificationFromDatabase() {
         // Given
         UUID id = UUID.randomUUID();

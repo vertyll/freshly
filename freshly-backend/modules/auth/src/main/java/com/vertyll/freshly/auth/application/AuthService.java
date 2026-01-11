@@ -35,6 +35,7 @@ public class AuthService {
     private final VerificationTokenService verificationTokenService;
 
     @Value("${application.frontend.url}")
+    @SuppressWarnings("NullAway.Init")
     private String frontendUrl;
 
     @Transactional

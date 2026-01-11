@@ -62,6 +62,10 @@ public class KeycloakTokenClient {
                             .retrieve()
                             .body(new ParameterizedTypeReference<>() {});
 
+            if (response == null) {
+                throw new KeycloakClientException("Empty response from Keycloak");
+            }
+
             return mapToTokenResponse(response);
 
         } catch (HttpClientErrorException.Unauthorized _) {
@@ -89,6 +93,10 @@ public class KeycloakTokenClient {
                             .body(formData)
                             .retrieve()
                             .body(new ParameterizedTypeReference<>() {});
+
+            if (response == null) {
+                throw new KeycloakClientException("Empty response from Keycloak");
+            }
 
             return mapToTokenResponse(response);
 
@@ -126,15 +134,26 @@ public class KeycloakTokenClient {
     }
 
     private TokenResponseDto mapToTokenResponse(Map<String, Object> response) {
-        if (response == null) {
-            throw new KeycloakClientException("Empty response from Keycloak");
-        }
-
         return new TokenResponseDto(
                 (String) response.get("access_token"),
                 (String) response.get(REFRESH_TOKEN),
-                (Integer) response.get("expires_in"),
-                (Integer) response.get("refresh_expires_in"),
+                getNumber(response, "expires_in"),
+                getNumber(response, "refresh_expires_in"),
                 (String) response.getOrDefault("token_type", "Bearer"));
+    }
+
+    private Integer getNumber(Map<String, Object> response, String key) {
+        Object value = response.get(key);
+        if (value instanceof Integer i) {
+            return i;
+        }
+        if (value instanceof String s) {
+            try {
+                return Integer.parseInt(s);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        }
+        return 0;
     }
 }

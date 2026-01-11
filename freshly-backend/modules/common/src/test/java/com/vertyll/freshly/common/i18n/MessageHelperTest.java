@@ -24,6 +24,7 @@ class MessageHelperTest {
     private MessageHelper messageHelper;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         messageHelper = new MessageHelper(messageSource);
     }
@@ -132,6 +133,7 @@ class MessageHelperTest {
                 .thenReturn(expectedMessage);
 
         // When
+        @SuppressWarnings("NullAway")
         String message = messageHelper.getMessage(key, (Object[]) null);
 
         // Then

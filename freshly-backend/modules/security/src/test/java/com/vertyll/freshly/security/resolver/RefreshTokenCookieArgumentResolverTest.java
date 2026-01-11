@@ -21,19 +21,30 @@ import jakarta.servlet.http.HttpServletRequest;
 @ExtendWith(MockitoExtension.class)
 class RefreshTokenCookieArgumentResolverTest {
 
-    @Mock private JwtProperties jwtProperties;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private JwtProperties jwtProperties;
 
-    @Mock private JwtProperties.RefreshToken refreshToken;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private JwtProperties.RefreshToken refreshToken;
 
-    @Mock private MethodParameter methodParameter;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private MethodParameter methodParameter;
 
-    @Mock private NativeWebRequest webRequest;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private NativeWebRequest webRequest;
 
-    @Mock private HttpServletRequest httpServletRequest;
+    @Mock
+    @SuppressWarnings("NullAway.Init")
+    private HttpServletRequest httpServletRequest;
 
     private RefreshTokenCookieArgumentResolver resolver;
 
     @BeforeEach
+    @SuppressWarnings("NullAway.Init")
     void setUp() {
         lenient().when(jwtProperties.refreshToken()).thenReturn(refreshToken);
         lenient().when(refreshToken.cookieName()).thenReturn("refresh_token");

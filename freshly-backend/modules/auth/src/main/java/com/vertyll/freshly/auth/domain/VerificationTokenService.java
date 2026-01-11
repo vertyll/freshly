@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import com.vertyll.freshly.auth.domain.exception.InvalidVerificationTokenException;
@@ -121,6 +122,7 @@ public class VerificationTokenService {
         }
     }
 
+    @Nullable
     public String extractEmail(String token) {
         try {
             Claims claims =
