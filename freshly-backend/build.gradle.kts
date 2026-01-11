@@ -158,12 +158,21 @@ subprojects {
             option("NullAway:CustomContractAnnotations", "org.springframework.lang.Contract")
             option("NullAway:JSpecifyMode", "true")
 
+            option("NullAway:ExcludedFieldAnnotations", "lombok.Generated")
+            option("NullAway:TreatGeneratedAsUnannotated", "true")
+
+            option("NullAway:AcknowledgeRestrictiveAnnotations", "true")
+            option("NullAway:CheckOptionalEmptiness", "true")
+            option("NullAway:HandleTestAssertionLibraries", "true")
+
             excludedPaths.set(".*/build/generated/.*")
         }
     }
 
     tasks.withType<Test> {
         useJUnitPlatform()
+
+        maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
 
         testLogging {
             events("passed", "skipped", "failed", "standardOut", "standardError")
@@ -239,7 +248,7 @@ subprojects {
             googleJavaFormat(rootProject.libs.versions.google.java.format.get()).aosp()
 
             removeUnusedImports()
-            importOrder("java", "javax", "org", "com", "com.vertyll")
+            importOrder("java", "javax", "org", "com", "lombok", "com.vertyll")
 
             trimTrailingWhitespace()
             endWithNewline()
@@ -282,24 +291,26 @@ tasks.register<TestReport>("testReport") {
         println("\nAggregated test report generated:")
         println("   file://${reportFile.absolutePath}\n")
 
-        val os = System.getProperty("os.name").lowercase()
-        try {
-            when {
-                os.contains("mac") -> {
-                    Runtime.getRuntime().exec(arrayOf("open", reportFile.absolutePath))
+        if (project.hasProperty("openReport")) {
+            val os = System.getProperty("os.name").lowercase()
+            try {
+                when {
+                    os.contains("mac") -> {
+                        Runtime.getRuntime().exec(arrayOf("open", reportFile.absolutePath))
+                    }
+                    os.contains("nix") || os.contains("nux") -> {
+                        Runtime.getRuntime().exec(arrayOf("xdg-open", reportFile.absolutePath))
+                    }
+                    os.contains("win") -> {
+                        Runtime.getRuntime().exec(arrayOf("cmd", "/c", "start", reportFile.absolutePath))
+                    }
                 }
-
-                os.contains("nix") || os.contains("nux") -> {
-                    Runtime.getRuntime().exec(arrayOf("xdg-open", reportFile.absolutePath))
-                }
-
-                os.contains("win") -> {
-                    Runtime.getRuntime().exec(arrayOf("cmd", "/c", "start", reportFile.absolutePath))
-                }
+                println("Opening report in browser...\n")
+            } catch (e: Exception) {
+                println("Could not open browser automatically: ${e.message}\n")
             }
-            println("Opening report in browser...\n")
-        } catch (e: Exception) {
-            println("Could not open browser automatically: ${e.message}\n")
+        } else {
+            println("Add -PopenReport to open in browser automatically\n")
         }
     }
 }
