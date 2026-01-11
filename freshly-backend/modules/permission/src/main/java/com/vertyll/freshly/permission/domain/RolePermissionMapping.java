@@ -3,10 +3,10 @@ package com.vertyll.freshly.permission.domain;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.vertyll.freshly.permission.Permission;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import com.vertyll.freshly.permission.Permission;
 
 /** Domain entity representing the mapping between Keycloak roles and system permissions. */
 @Getter

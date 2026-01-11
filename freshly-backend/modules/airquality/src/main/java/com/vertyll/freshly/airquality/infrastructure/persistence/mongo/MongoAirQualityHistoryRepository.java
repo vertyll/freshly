@@ -10,10 +10,10 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 
-import com.vertyll.freshly.airquality.domain.*;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import com.vertyll.freshly.airquality.domain.*;
 
 /**
  * MongoDB implementation of AirQualityHistoryRepository. Adapts Spring Data repository to domain

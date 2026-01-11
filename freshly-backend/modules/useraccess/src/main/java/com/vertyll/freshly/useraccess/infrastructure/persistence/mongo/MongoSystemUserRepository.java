@@ -6,10 +6,10 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
+import lombok.RequiredArgsConstructor;
+
 import com.vertyll.freshly.useraccess.domain.SystemUser;
 import com.vertyll.freshly.useraccess.domain.SystemUserRepository;
-
-import lombok.RequiredArgsConstructor;
 
 @Repository("systemUserRepository")
 @RequiredArgsConstructor

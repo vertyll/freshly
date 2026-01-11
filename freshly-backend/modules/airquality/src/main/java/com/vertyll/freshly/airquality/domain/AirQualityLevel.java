@@ -5,8 +5,9 @@ import java.util.Locale;
 
 import org.jspecify.annotations.Nullable;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Enum representing air quality levels as defined by GIOŚ (Polish Air Quality Monitoring System).

@@ -11,12 +11,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.vertyll.freshly.auth.api.dto.TokenResponseDto;
 import com.vertyll.freshly.auth.domain.exception.InvalidPasswordException;
 import com.vertyll.freshly.auth.keycloak.exception.KeycloakClientException;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -150,7 +150,7 @@ public class KeycloakTokenClient {
         if (value instanceof String s) {
             try {
                 return Integer.parseInt(s);
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException _) {
                 return 0;
             }
         }

@@ -9,12 +9,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.permission.domain.RolePermissionMapping;
 import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Component responsible for caching user permissions. Separated from PermissionService to

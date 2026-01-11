@@ -7,14 +7,15 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.vertyll.freshly.notification.domain.EmailNotification;
 import com.vertyll.freshly.notification.domain.EmailSender;
 import com.vertyll.freshly.notification.domain.exception.EmailSendingException;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component

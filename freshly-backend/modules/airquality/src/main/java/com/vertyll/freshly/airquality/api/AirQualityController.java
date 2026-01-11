@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import lombok.RequiredArgsConstructor;
+
 import com.vertyll.freshly.airquality.api.dto.*;
 import com.vertyll.freshly.airquality.api.mapper.AirQualityDtoMapper;
 import com.vertyll.freshly.airquality.application.AirQualityService;
@@ -18,8 +20,6 @@ import com.vertyll.freshly.airquality.domain.StationDistance;
 import com.vertyll.freshly.airquality.domain.StationRanking;
 import com.vertyll.freshly.airquality.domain.exception.AirQualityDataNotFoundException;
 import com.vertyll.freshly.common.response.ApiResponse;
-
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/air-quality")

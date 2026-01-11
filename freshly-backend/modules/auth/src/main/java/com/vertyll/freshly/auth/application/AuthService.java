@@ -10,6 +10,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.vertyll.freshly.auth.api.dto.*;
 import com.vertyll.freshly.auth.domain.VerificationTokenService;
 import com.vertyll.freshly.auth.domain.event.UserRegisteredEvent;
@@ -18,9 +21,6 @@ import com.vertyll.freshly.auth.keycloak.KeycloakTokenClient;
 import com.vertyll.freshly.notification.application.NotificationService;
 import com.vertyll.freshly.useraccess.application.UserAccessService;
 import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service

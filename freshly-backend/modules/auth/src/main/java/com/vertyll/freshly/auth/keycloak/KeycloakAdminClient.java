@@ -21,14 +21,15 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.vertyll.freshly.auth.domain.exception.EmailAlreadyExistsException;
 import com.vertyll.freshly.auth.domain.exception.InvalidPasswordException;
 import com.vertyll.freshly.auth.domain.exception.UsernameAlreadyExistsException;
 import com.vertyll.freshly.auth.keycloak.exception.KeycloakClientException;
 
 import jakarta.ws.rs.core.Response;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component

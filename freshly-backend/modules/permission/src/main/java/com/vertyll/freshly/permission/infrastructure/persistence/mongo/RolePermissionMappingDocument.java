@@ -6,11 +6,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.vertyll.freshly.permission.Permission;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import com.vertyll.freshly.permission.Permission;
 
 @Document(collection = "role_permission_mapping")
 @CompoundIndex(

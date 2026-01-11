@@ -6,14 +6,14 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.vertyll.freshly.useraccess.domain.SystemUser;
 import com.vertyll.freshly.useraccess.domain.SystemUserRepository;
 import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
 import com.vertyll.freshly.useraccess.domain.exception.UserAlreadyExistsException;
 import com.vertyll.freshly.useraccess.domain.exception.UserNotFoundException;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor

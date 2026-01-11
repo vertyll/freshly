@@ -11,11 +11,11 @@ import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import com.vertyll.freshly.permission.application.PermissionService;
-import com.vertyll.freshly.security.annotation.RequireAnyPermission;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import com.vertyll.freshly.permission.application.PermissionService;
+import com.vertyll.freshly.security.annotation.RequireAnyPermission;
 
 /** Authorization manager for @RequireAnyPermission annotation. */
 @Slf4j

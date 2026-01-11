@@ -11,6 +11,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.vertyll.freshly.airquality.domain.AirQualityIndex;
 import com.vertyll.freshly.airquality.domain.AirQualityProvider;
 import com.vertyll.freshly.airquality.domain.SensorMeasurement;
@@ -18,7 +20,6 @@ import com.vertyll.freshly.airquality.domain.Station;
 import com.vertyll.freshly.airquality.infrastructure.GiosApiDtos.*;
 import com.vertyll.freshly.common.config.ExternalServiceProperties;
 
-import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 

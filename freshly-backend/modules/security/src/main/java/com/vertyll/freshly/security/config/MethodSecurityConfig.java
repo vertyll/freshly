@@ -10,12 +10,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
+import lombok.RequiredArgsConstructor;
+
 import com.vertyll.freshly.security.annotation.RequireAnyPermission;
 import com.vertyll.freshly.security.annotation.RequirePermission;
 import com.vertyll.freshly.security.authorization.AnyPermissionAuthorizationManager;
 import com.vertyll.freshly.security.authorization.PermissionAuthorizationManager;
-
-import lombok.RequiredArgsConstructor;
 
 /**
  * Configuration for method-level security with custom permission annotations. Required for Spring

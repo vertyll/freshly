@@ -11,13 +11,14 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import lombok.RequiredArgsConstructor;
+
 import com.vertyll.freshly.security.annotation.RefreshTokenCookie;
 import com.vertyll.freshly.security.config.JwtProperties;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 
 @SuppressFBWarnings(
         value = "COOKIE_USAGE",

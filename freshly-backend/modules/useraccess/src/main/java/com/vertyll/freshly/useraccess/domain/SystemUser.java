@@ -2,9 +2,9 @@ package com.vertyll.freshly.useraccess.domain;
 
 import java.util.*;
 
-import com.vertyll.freshly.useraccess.domain.exception.*;
-
 import lombok.Getter;
+
+import com.vertyll.freshly.useraccess.domain.exception.*;
 
 @Getter
 public final class SystemUser {

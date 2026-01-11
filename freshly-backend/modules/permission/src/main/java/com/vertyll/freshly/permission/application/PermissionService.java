@@ -5,10 +5,10 @@ import java.util.Set;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import com.vertyll.freshly.permission.Permission;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import com.vertyll.freshly.permission.Permission;
 
 /**
  * Service responsible for checking user permissions based on their Keycloak roles. Delegates

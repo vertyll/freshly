@@ -6,11 +6,11 @@ import java.util.UUID;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
 
 @Document(collection = "system_user")
 @Data

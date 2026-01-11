@@ -9,10 +9,10 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.vertyll.freshly.airquality.domain.*;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import com.vertyll.freshly.airquality.domain.*;
 
 @Service
 @RequiredArgsConstructor

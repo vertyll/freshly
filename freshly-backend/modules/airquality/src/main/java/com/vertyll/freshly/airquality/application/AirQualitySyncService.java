@@ -12,10 +12,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vertyll.freshly.airquality.domain.*;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import com.vertyll.freshly.airquality.domain.*;
 
 /**
  * Scheduled service that synchronizes air quality data from GIOŚ API to MongoDB. Runs periodically

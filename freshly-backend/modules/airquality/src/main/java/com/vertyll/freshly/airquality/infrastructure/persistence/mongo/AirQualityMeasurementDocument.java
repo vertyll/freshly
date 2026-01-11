@@ -6,11 +6,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.vertyll.freshly.airquality.domain.AirQualityLevel;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import com.vertyll.freshly.airquality.domain.AirQualityLevel;
 
 /** MongoDB document for air quality measurements. */
 @Document(collection = "air_quality_measurements")

@@ -10,6 +10,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.vertyll.freshly.common.response.ApiResponse;
 import com.vertyll.freshly.security.annotation.RequirePermission;
 import com.vertyll.freshly.useraccess.api.dto.CreateUserRequestDto;
@@ -20,8 +23,6 @@ import com.vertyll.freshly.useraccess.application.UserAccessService;
 import com.vertyll.freshly.useraccess.domain.SystemUser;
 
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/users")

@@ -2,14 +2,14 @@ package com.vertyll.freshly.notification.application;
 
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.vertyll.freshly.notification.application.dto.SendEmailCommand;
 import com.vertyll.freshly.notification.domain.Email;
 import com.vertyll.freshly.notification.domain.EmailNotification;
 import com.vertyll.freshly.notification.domain.EmailSender;
 import com.vertyll.freshly.notification.domain.exception.EmailSendingException;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service

@@ -10,13 +10,14 @@ import javax.crypto.SecretKey;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.vertyll.freshly.auth.domain.exception.InvalidVerificationTokenException;
 import com.vertyll.freshly.security.config.JwtProperties;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service

@@ -6,11 +6,11 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
+import lombok.RequiredArgsConstructor;
+
 import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.permission.domain.RolePermissionMapping;
 import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
-
-import lombok.RequiredArgsConstructor;
 
 @Repository("rolePermissionMappingRepository")
 @RequiredArgsConstructor
