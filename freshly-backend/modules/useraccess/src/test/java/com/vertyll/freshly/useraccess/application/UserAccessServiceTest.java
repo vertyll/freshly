@@ -151,7 +151,6 @@ class UserAccessServiceTest {
 
         // Then
         assertThat(result).hasSize(2).containsExactly(user1, user2);
-
         verify(systemUserRepository).findAll();
     }
 
@@ -174,7 +173,8 @@ class UserAccessServiceTest {
     void shouldActivateUser() {
         // Given
         UUID userId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, false, Set.of(UserRoleEnum.USER));
+        SystemUser user = SystemUser.reconstitute(userId, false, Set.of(UserRoleEnum.USER), 5L);
+
         when(systemUserRepository.findById(userId)).thenReturn(Optional.of(user));
         when(systemUserRepository.save(any(SystemUser.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -187,6 +187,7 @@ class UserAccessServiceTest {
         verify(systemUserRepository).save(userCaptor.capture());
         SystemUser savedUser = userCaptor.getValue();
         assertThat(savedUser.isActive()).isTrue();
+        assertThat(savedUser.getVersion()).isEqualTo(5L);
     }
 
     @Test
@@ -210,7 +211,8 @@ class UserAccessServiceTest {
         // Given
         UUID userId = UUID.randomUUID();
         UUID loggedInUserId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user = SystemUser.reconstitute(userId, true, Set.of(UserRoleEnum.USER), 5L);
+
         when(systemUserRepository.findById(userId)).thenReturn(Optional.of(user));
         when(systemUserRepository.save(any(SystemUser.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -223,6 +225,7 @@ class UserAccessServiceTest {
         verify(systemUserRepository).save(userCaptor.capture());
         SystemUser savedUser = userCaptor.getValue();
         assertThat(savedUser.isActive()).isFalse();
+        assertThat(savedUser.getVersion()).isEqualTo(5L);
     }
 
     @Test
@@ -247,7 +250,8 @@ class UserAccessServiceTest {
         // Given
         UUID userId = UUID.randomUUID();
         Set<UserRoleEnum> newRoles = Set.of(UserRoleEnum.ADMIN);
-        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user = SystemUser.reconstitute(userId, true, Set.of(UserRoleEnum.USER), 5L);
+
         when(systemUserRepository.findById(userId)).thenReturn(Optional.of(user));
         when(systemUserRepository.save(any(SystemUser.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -260,6 +264,7 @@ class UserAccessServiceTest {
         verify(systemUserRepository).save(userCaptor.capture());
         SystemUser savedUser = userCaptor.getValue();
         assertThat(savedUser.getRoles()).containsExactly(UserRoleEnum.ADMIN);
+        assertThat(savedUser.getVersion()).isEqualTo(5L);
     }
 
     @Test
@@ -268,7 +273,8 @@ class UserAccessServiceTest {
         // Given
         UUID userId = UUID.randomUUID();
         Set<UserRoleEnum> newRoles = Set.of(UserRoleEnum.USER, UserRoleEnum.ADMIN);
-        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user = SystemUser.reconstitute(userId, true, Set.of(UserRoleEnum.USER), 5L);
+
         when(systemUserRepository.findById(userId)).thenReturn(Optional.of(user));
         when(systemUserRepository.save(any(SystemUser.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -281,6 +287,7 @@ class UserAccessServiceTest {
         SystemUser savedUser = userCaptor.getValue();
         assertThat(savedUser.getRoles())
                 .containsExactlyInAnyOrder(UserRoleEnum.USER, UserRoleEnum.ADMIN);
+        assertThat(savedUser.getVersion()).isEqualTo(5L);
     }
 
     @Test
@@ -290,7 +297,6 @@ class UserAccessServiceTest {
         UUID userId = UUID.randomUUID();
         Set<UserRoleEnum> newRoles = Set.of(UserRoleEnum.ADMIN);
         when(systemUserRepository.findById(userId)).thenReturn(Optional.empty());
-
         // When & Then
         assertThatThrownBy(() -> userAccessService.replaceUserRoles(userId, newRoles))
                 .isInstanceOf(UserNotFoundException.class);
@@ -323,7 +329,8 @@ class UserAccessServiceTest {
     void shouldPersistUserStateAfterActivation() {
         // Given
         UUID userId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, false, Set.of(UserRoleEnum.USER));
+        SystemUser user = SystemUser.reconstitute(userId, false, Set.of(UserRoleEnum.USER), 5L);
+
         when(systemUserRepository.findById(userId)).thenReturn(Optional.of(user));
         when(systemUserRepository.save(any(SystemUser.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -341,7 +348,8 @@ class UserAccessServiceTest {
         // Given
         UUID userId = UUID.randomUUID();
         UUID loggedInUserId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user = SystemUser.reconstitute(userId, true, Set.of(UserRoleEnum.USER), 5L);
+
         when(systemUserRepository.findById(userId)).thenReturn(Optional.of(user));
         when(systemUserRepository.save(any(SystemUser.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -359,7 +367,8 @@ class UserAccessServiceTest {
         // Given
         UUID userId = UUID.randomUUID();
         Set<UserRoleEnum> newRoles = Set.of(UserRoleEnum.ADMIN);
-        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user = SystemUser.reconstitute(userId, true, Set.of(UserRoleEnum.USER), 5L);
+
         when(systemUserRepository.findById(userId)).thenReturn(Optional.of(user));
         when(systemUserRepository.save(any(SystemUser.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));

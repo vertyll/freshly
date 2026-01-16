@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -74,5 +75,16 @@ class UserControllerAdvice {
                 messageSource.getMessage(
                         "error.user.rolesEmpty", null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ProblemDetail handleOptimisticLockingFailure(OptimisticLockingFailureException ex) {
+        LOGGER.warn("Optimistic locking failure: {}", ex.getMessage());
+        String message =
+                messageSource.getMessage(
+                        "error.common.optimisticLockingFailure",
+                        null,
+                        LocaleContextHolder.getLocale());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
     }
 }

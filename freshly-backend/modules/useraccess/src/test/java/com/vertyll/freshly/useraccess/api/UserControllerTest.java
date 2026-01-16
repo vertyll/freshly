@@ -61,13 +61,13 @@ class UserControllerTest {
     void shouldCreateUserSuccessfully() {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn("Success");
-        // Given
         UUID keycloakUserId = UUID.randomUUID();
         CreateUserRequestDto request =
                 new CreateUserRequestDto(keycloakUserId, true, Set.of(UserRoleEnum.USER));
 
         SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
-        UserResponseDto responseDto = new UserResponseDto(keycloakUserId, true, Set.of("USER"));
+        UserResponseDto responseDto =
+                new UserResponseDto(keycloakUserId, true, Set.of("USER"), null);
 
         when(userAccessService.createUser(keycloakUserId, true, Set.of(UserRoleEnum.USER)))
                 .thenReturn(user);
@@ -92,7 +92,8 @@ class UserControllerTest {
                 new CreateUserRequestDto(keycloakUserId, false, Set.of(UserRoleEnum.USER));
 
         SystemUser user = new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER));
-        UserResponseDto responseDto = new UserResponseDto(keycloakUserId, false, Set.of("USER"));
+        UserResponseDto responseDto =
+                new UserResponseDto(keycloakUserId, false, Set.of("USER"), null);
 
         when(userAccessService.createUser(keycloakUserId, false, Set.of(UserRoleEnum.USER)))
                 .thenReturn(user);
@@ -117,7 +118,7 @@ class UserControllerTest {
 
         SystemUser user = new SystemUser(keycloakUserId, true, roles);
         UserResponseDto responseDto =
-                new UserResponseDto(keycloakUserId, true, Set.of("USER", "ADMIN"));
+                new UserResponseDto(keycloakUserId, true, Set.of("USER", "ADMIN"), null);
 
         when(userAccessService.createUser(keycloakUserId, true, roles)).thenReturn(user);
         when(userDtoMapper.toResponse(user)).thenReturn(responseDto);
@@ -152,7 +153,7 @@ class UserControllerTest {
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn("Success");
         UUID userId = UUID.randomUUID();
         SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER));
-        UserResponseDto responseDto = new UserResponseDto(userId, true, Set.of("USER"));
+        UserResponseDto responseDto = new UserResponseDto(userId, true, Set.of("USER"), null);
 
         when(userAccessService.getUserById(userId)).thenReturn(user);
         when(userDtoMapper.toResponse(user)).thenReturn(responseDto);
@@ -187,9 +188,10 @@ class UserControllerTest {
         SystemUser user2 = new SystemUser(UUID.randomUUID(), false, Set.of(UserRoleEnum.ADMIN));
         List<SystemUser> users = List.of(user1, user2);
 
-        UserResponseDto dto1 = new UserResponseDto(user1.getKeycloakUserId(), true, Set.of("USER"));
+        UserResponseDto dto1 =
+                new UserResponseDto(user1.getKeycloakUserId(), true, Set.of("USER"), null);
         UserResponseDto dto2 =
-                new UserResponseDto(user2.getKeycloakUserId(), false, Set.of("ADMIN"));
+                new UserResponseDto(user2.getKeycloakUserId(), false, Set.of("ADMIN"), null);
         List<UserResponseDto> responseDtos = List.of(dto1, dto2);
 
         when(userAccessService.getAllUsers()).thenReturn(users);
@@ -366,7 +368,8 @@ class UserControllerTest {
                 new CreateUserRequestDto(keycloakUserId, true, Set.of(UserRoleEnum.USER));
 
         SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
-        UserResponseDto responseDto = new UserResponseDto(keycloakUserId, true, Set.of("USER"));
+        UserResponseDto responseDto =
+                new UserResponseDto(keycloakUserId, true, Set.of("USER"), null);
 
         when(userAccessService.createUser(keycloakUserId, true, Set.of(UserRoleEnum.USER)))
                 .thenReturn(user);
@@ -389,7 +392,8 @@ class UserControllerTest {
                 new CreateUserRequestDto(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN));
 
         SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN));
-        UserResponseDto responseDto = new UserResponseDto(keycloakUserId, true, Set.of("ADMIN"));
+        UserResponseDto responseDto =
+                new UserResponseDto(keycloakUserId, true, Set.of("ADMIN"), null);
 
         when(userAccessService.createUser(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN)))
                 .thenReturn(user);

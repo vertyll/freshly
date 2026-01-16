@@ -3,7 +3,9 @@ package com.vertyll.freshly.useraccess.infrastructure.persistence.mongo;
 import java.util.Set;
 import java.util.UUID;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
@@ -22,4 +24,6 @@ public class SystemUserDocument {
 
     private boolean isActive;
     private Set<UserRoleEnum> roles;
+
+    @Version @Nullable private Long version;
 }

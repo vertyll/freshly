@@ -189,7 +189,7 @@ class UserDtoMapperTest {
     void shouldHandleReconstituedUser() {
         // Given
         UUID userId = UUID.randomUUID();
-        SystemUser user = SystemUser.reconstitute(userId, false, Set.of(UserRoleEnum.ADMIN));
+        SystemUser user = SystemUser.reconstitute(userId, false, Set.of(UserRoleEnum.ADMIN), 1L);
 
         // When
         UserResponseDto result = mapper.toResponse(user);
@@ -198,5 +198,6 @@ class UserDtoMapperTest {
         assertThat(result.id()).isEqualTo(userId);
         assertThat(result.isActive()).isFalse();
         assertThat(result.roles()).containsExactly("ADMIN");
+        assertThat(result.version()).isEqualTo(1L);
     }
 }

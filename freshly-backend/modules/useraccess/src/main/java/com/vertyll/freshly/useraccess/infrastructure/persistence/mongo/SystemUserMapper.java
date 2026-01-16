@@ -8,11 +8,15 @@ import com.vertyll.freshly.useraccess.domain.SystemUser;
 class SystemUserMapper {
 
     public SystemUserDocument toDocument(SystemUser user) {
-        return new SystemUserDocument(user.getKeycloakUserId(), user.isActive(), user.getRoles());
+        return new SystemUserDocument(
+                user.getKeycloakUserId(), user.isActive(), user.getRoles(), null);
     }
 
     public SystemUser toDomain(SystemUserDocument document) {
         return SystemUser.reconstitute(
-                document.getKeycloakUserId(), document.isActive(), document.getRoles());
+                document.getKeycloakUserId(),
+                document.isActive(),
+                document.getRoles(),
+                document.getVersion());
     }
 }

@@ -2,6 +2,8 @@ package com.vertyll.freshly.useraccess.domain;
 
 import java.util.*;
 
+import org.jspecify.annotations.Nullable;
+
 import lombok.Getter;
 
 import com.vertyll.freshly.useraccess.domain.exception.*;
@@ -12,8 +14,17 @@ public final class SystemUser {
     private final UUID keycloakUserId;
     private boolean isActive;
     private Set<UserRoleEnum> roles;
+    @Nullable private final Long version;
 
     public SystemUser(UUID keycloakUserId, boolean isActive, Set<UserRoleEnum> roles) {
+        this(keycloakUserId, isActive, roles, null);
+    }
+
+    private SystemUser(
+            UUID keycloakUserId,
+            boolean isActive,
+            Set<UserRoleEnum> roles,
+            @Nullable Long version) {
         this.keycloakUserId =
                 Objects.requireNonNull(keycloakUserId, "Keycloak user ID cannot be null");
         this.roles = Set.copyOf(Objects.requireNonNull(roles, "Roles cannot be null"));
@@ -21,14 +32,12 @@ public final class SystemUser {
             throw new UserRolesEmptyException();
         }
         this.isActive = isActive;
+        this.version = version;
     }
 
     public static SystemUser reconstitute(
-            UUID keycloakUserId, boolean isActive, Set<UserRoleEnum> roles) {
-        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
-        user.isActive = isActive;
-        user.roles = Set.copyOf(roles);
-        return user;
+            UUID keycloakUserId, boolean isActive, Set<UserRoleEnum> roles, Long version) {
+        return new SystemUser(keycloakUserId, isActive, roles, version);
     }
 
     public void activate() {

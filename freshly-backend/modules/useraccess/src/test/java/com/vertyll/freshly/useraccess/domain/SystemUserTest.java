@@ -91,7 +91,7 @@ class SystemUserTest {
         Set<UserRoleEnum> roles = Set.of(UserRoleEnum.ADMIN);
 
         // When
-        SystemUser user = SystemUser.reconstitute(keycloakUserId, isActive, roles);
+        SystemUser user = SystemUser.reconstitute(keycloakUserId, isActive, roles, 1L);
 
         // Then
         assertThat(user.getKeycloakUserId()).isEqualTo(keycloakUserId);
