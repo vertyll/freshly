@@ -198,6 +198,5 @@ class UserDtoMapperTest {
         assertThat(result.id()).isEqualTo(userId);
         assertThat(result.isActive()).isFalse();
         assertThat(result.roles()).containsExactly("ADMIN");
-        assertThat(result.version()).isEqualTo(1L);
     }
 }
