@@ -20,8 +20,9 @@ class MessageSourceTest {
     @BeforeEach
     void setUp() {
         ResourceBundleMessageSource source = new ResourceBundleMessageSource();
-        source.setBasename("i18n/messages");
+        source.setBasenames("i18n/messages", "i18n/ValidationMessages");
         source.setDefaultEncoding("UTF-8");
+        source.setUseCodeAsDefaultMessage(true);
         source.setFallbackToSystemLocale(false);
         source.setDefaultLocale(Locale.ENGLISH);
         this.messageSource = source;
@@ -30,7 +31,7 @@ class MessageSourceTest {
     @ParameterizedTest
     @CsvSource({
         "en-US, success.user.created, User created successfully",
-        "pl, success.user.created, Użytkownik utworzony pomyślnie",
+        "pl, success.user.created, Użytkownik został pomyślnie utworzony",
         "en-US, error.user.notFound, User not found",
         "pl, error.user.notFound, Nie znaleziono użytkownika",
         "de, success.user.created, User created successfully"
