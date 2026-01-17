@@ -1,7 +1,11 @@
 package com.vertyll.freshly.permission.api.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import com.vertyll.freshly.common.enums.UserRoleEnum;
+import com.vertyll.freshly.permission.Permission;
+
+import jakarta.validation.constraints.NotNull;
 
 public record CreatePermissionMappingDto(
-        @NotBlank(message = "{validation.permission.keycloakRole.required}") String keycloakRole,
-        @NotBlank(message = "{validation.permission.permission.required}") String permission) {}
+        @NotNull(message = "{validation.permission.keycloakRole.required}")
+                UserRoleEnum keycloakRole,
+        @NotNull(message = "{validation.permission.permission.required}") Permission permission) {}

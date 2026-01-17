@@ -92,8 +92,7 @@ class PermissionManagementServiceTest {
     void shouldCreateNewPermissionMapping() {
         // Given
         CreatePermissionMappingDto request =
-                new CreatePermissionMappingDto(
-                        UserRoleEnum.ADMIN.name(), Permission.USERS_CREATE.getValue());
+                new CreatePermissionMappingDto(UserRoleEnum.ADMIN, Permission.USERS_CREATE);
 
         when(repository.existsByKeycloakRoleAndPermission(
                         UserRoleEnum.ADMIN, Permission.USERS_CREATE))
@@ -113,8 +112,7 @@ class PermissionManagementServiceTest {
 
         verify(repository)
                 // Corrected the repository method call to convert keycloakRole to UserRoleEnum
-                .existsByKeycloakRoleAndPermission(
-                        UserRoleEnum.valueOf(request.keycloakRole()), Permission.USERS_CREATE);
+                .existsByKeycloakRoleAndPermission(request.keycloakRole(), Permission.USERS_CREATE);
         verify(repository).save(mappingCaptor.capture());
 
         RolePermissionMapping capturedMapping = mappingCaptor.getValue();
@@ -127,11 +125,10 @@ class PermissionManagementServiceTest {
     void shouldThrowExceptionWhenMappingAlreadyExists() {
         // Given
         CreatePermissionMappingDto request =
-                new CreatePermissionMappingDto(
-                        UserRoleEnum.ADMIN.name(), Permission.USERS_CREATE.getValue());
+                new CreatePermissionMappingDto(UserRoleEnum.ADMIN, Permission.USERS_CREATE);
 
         when(repository.existsByKeycloakRoleAndPermission(
-                        UserRoleEnum.valueOf(request.keycloakRole()), Permission.USERS_CREATE))
+                        request.keycloakRole(), Permission.USERS_CREATE))
                 .thenReturn(true);
 
         // When & Then
@@ -186,28 +183,13 @@ class PermissionManagementServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw exception for invalid permission value")
-    void shouldThrowExceptionForInvalidPermissionValue() {
-        // Given
-        CreatePermissionMappingDto request =
-                new CreatePermissionMappingDto(UserRoleEnum.ADMIN.name(), "INVALID_PERMISSION");
-
-        // When & Then
-        assertThatThrownBy(() -> service.createMapping(request))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Unknown permission");
-    }
-
-    @Test
     @DisplayName("Should create multiple mappings for the same role")
     void shouldCreateMultipleMappingsForTheSameRole() {
         // Given
         CreatePermissionMappingDto request1 =
-                new CreatePermissionMappingDto(
-                        UserRoleEnum.ADMIN.name(), Permission.USERS_READ.getValue());
+                new CreatePermissionMappingDto(UserRoleEnum.ADMIN, Permission.USERS_READ);
         CreatePermissionMappingDto request2 =
-                new CreatePermissionMappingDto(
-                        UserRoleEnum.ADMIN.name(), Permission.USERS_CREATE.getValue());
+                new CreatePermissionMappingDto(UserRoleEnum.ADMIN, Permission.USERS_CREATE);
 
         when(repository.existsByKeycloakRoleAndPermission(
                         UserRoleEnum.ADMIN, Permission.USERS_READ))

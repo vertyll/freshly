@@ -33,8 +33,8 @@ public class PermissionManagementService {
 
     @CacheEvict(value = "user-permissions", allEntries = true)
     public PermissionMappingResponseDto createMapping(CreatePermissionMappingDto request) {
-        Permission permission = Permission.fromValue(request.permission());
-        UserRoleEnum role = UserRoleEnum.fromValue(request.keycloakRole());
+        Permission permission = request.permission();
+        UserRoleEnum role = request.keycloakRole();
 
         if (repository.existsByKeycloakRoleAndPermission(role, permission)) {
             throw new IllegalArgumentException(

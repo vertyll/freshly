@@ -7,12 +7,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import tools.jackson.databind.exc.InvalidFormatException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -21,6 +24,7 @@ public class GlobalExceptionHandler {
 
     private static final String VALIDATION_FAILED = "Validation failed for one or more fields";
     private static final String INVALID_VALUE = "Invalid value";
+    private static final String INVALID_INPUT_FORMAT = "Invalid input format";
     private static final String RESOURCE_NOT_FOUND = "The requested resource was not found";
     private static final String UNEXPECTED_ERROR =
             "An unexpected error occurred. Please contact support.";
@@ -49,6 +53,26 @@ public class GlobalExceptionHandler {
         problemDetail.setProperty(ERRORS_PROPERTY, errors);
 
         return problemDetail;
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ProblemDetail handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        LOGGER.warn("Message not readable error: {}", ex.getMessage());
+
+        String message = INVALID_INPUT_FORMAT;
+
+        if (ex.getCause() instanceof InvalidFormatException ife
+                && ife.getTargetType() != null
+                && ife.getTargetType().isEnum()) {
+            message =
+                    String.format(
+                            "Invalid value '%s' for type %s. Accepted values: %s",
+                            ife.getValue(),
+                            ife.getTargetType().getSimpleName(),
+                            Arrays.toString(ife.getTargetType().getEnumConstants()));
+        }
+
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
