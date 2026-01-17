@@ -12,8 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
-import com.vertyll.freshly.permission.Permission;
 
 @Document(collection = "role_permission_mapping")
 @CompoundIndex(

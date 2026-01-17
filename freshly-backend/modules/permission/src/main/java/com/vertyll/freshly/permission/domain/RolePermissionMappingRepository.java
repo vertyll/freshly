@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
-import com.vertyll.freshly.permission.Permission;
 
 public interface RolePermissionMappingRepository {
 

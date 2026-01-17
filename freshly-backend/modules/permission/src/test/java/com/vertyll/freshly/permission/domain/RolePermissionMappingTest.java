@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
-import com.vertyll.freshly.permission.Permission;
 
 class RolePermissionMappingTest {
     private static final String ID_CANNOT_BE_NULL = "ID cannot be null";

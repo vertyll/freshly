@@ -1,4 +1,4 @@
-package com.vertyll.freshly.security.annotation;
+package com.vertyll.freshly.common.annotation;
 
 import java.lang.annotation.*;
 

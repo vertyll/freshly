@@ -1,7 +1,7 @@
 package com.vertyll.freshly.permission.api.dto;
 
+import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
-import com.vertyll.freshly.permission.Permission;
 
 import jakarta.validation.constraints.NotNull;
 

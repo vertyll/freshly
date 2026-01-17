@@ -28,7 +28,17 @@ public enum UserRoleEnum {
 
     UserRoleEnum(String value) {
         this.value = value;
-        this.roleWithPrefix = ROLE_PREFIX + value.toLowerCase(Locale.ROOT);
+        this.roleWithPrefix = ROLE_PREFIX + value.toLowerCase(Locale.ENGLISH);
+    }
+
+    /**
+     * Returns the authority string for Spring Security. This is an alias for getRoleWithPrefix() to
+     * match Spring Security conventions.
+     *
+     * @return the role with "ROLE_" prefix in lowercase (e.g., "ROLE_admin")
+     */
+    public String getAuthority() {
+        return roleWithPrefix;
     }
 
     public static UserRoleEnum fromValue(@Nullable String value) {

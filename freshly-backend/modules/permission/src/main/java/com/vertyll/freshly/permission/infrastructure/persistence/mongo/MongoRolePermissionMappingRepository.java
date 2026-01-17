@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
 
+import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
-import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.permission.domain.RolePermissionMapping;
 import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
 

@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 
-import com.vertyll.freshly.permission.Permission;
+import com.vertyll.freshly.common.enums.Permission;
 
 @ExtendWith(MockitoExtension.class)
 class PermissionServiceTest {

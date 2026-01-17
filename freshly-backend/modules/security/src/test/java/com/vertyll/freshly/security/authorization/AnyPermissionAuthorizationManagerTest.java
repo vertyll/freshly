@@ -17,9 +17,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.core.Authentication;
 
-import com.vertyll.freshly.permission.Permission;
+import com.vertyll.freshly.common.annotation.RequireAnyPermission;
+import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.permission.application.PermissionService;
-import com.vertyll.freshly.security.annotation.RequireAnyPermission;
 
 @ExtendWith(MockitoExtension.class)
 class AnyPermissionAuthorizationManagerTest {

@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.vertyll.freshly.common.annotation.RequirePermission;
+import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.common.response.ApiResponse;
-import com.vertyll.freshly.permission.Permission;
-import com.vertyll.freshly.security.annotation.RequirePermission;
 import com.vertyll.freshly.useraccess.api.dto.CreateUserRequestDto;
 import com.vertyll.freshly.useraccess.api.dto.UpdateUserRolesRequestDto;
 import com.vertyll.freshly.useraccess.api.dto.UserResponseDto;

@@ -12,15 +12,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 
 import lombok.RequiredArgsConstructor;
 
-import com.vertyll.freshly.security.annotation.RequireAnyPermission;
-import com.vertyll.freshly.security.annotation.RequirePermission;
-import com.vertyll.freshly.security.authorization.AnyPermissionAuthorizationManager;
-import com.vertyll.freshly.security.authorization.PermissionAuthorizationManager;
+import com.vertyll.freshly.common.annotation.*;
+import com.vertyll.freshly.security.authorization.*;
 
-/**
- * Configuration for method-level security with custom permission annotations. Required for Spring
- * Security 7.0+ which changed how custom annotations work.
- */
+/** Configuration for method-level security with custom permission and role annotations. */
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
@@ -28,38 +23,57 @@ public class MethodSecurityConfig {
 
     private final PermissionAuthorizationManager permissionAuthorizationManager;
     private final AnyPermissionAuthorizationManager anyPermissionAuthorizationManager;
+    private final RoleAuthorizationManager roleAuthorizationManager;
+    private final AnyRoleAuthorizationManager anyRoleAuthorizationManager;
+    private final AllRolesAuthorizationManager allRolesAuthorizationManager;
 
-    /** Register authorization interceptor for @RequirePermission annotation. */
+    // Permission-based authorization
     @Bean
     public Advisor requirePermissionAuthorizationAdvisor() {
         AspectJExpressionPointcut pointcut = createPointcutForAnnotation(RequirePermission.class);
-
         AuthorizationManagerBeforeMethodInterceptor interceptor =
                 new AuthorizationManagerBeforeMethodInterceptor(
                         pointcut, permissionAuthorizationManager);
-
         return new DefaultPointcutAdvisor(pointcut, interceptor);
     }
 
-    /** Register authorization interceptor for @RequireAnyPermission annotation. */
     @Bean
     public Advisor requireAnyPermissionAuthorizationAdvisor() {
         AspectJExpressionPointcut pointcut =
                 createPointcutForAnnotation(RequireAnyPermission.class);
-
         AuthorizationManagerBeforeMethodInterceptor interceptor =
                 new AuthorizationManagerBeforeMethodInterceptor(
                         pointcut, anyPermissionAuthorizationManager);
-
         return new DefaultPointcutAdvisor(pointcut, interceptor);
     }
 
-    /**
-     * Create a pointcut that matches methods or classes annotated with the given annotation.
-     *
-     * @param annotationClass the annotation class to match
-     * @return configured AspectJ pointcut
-     */
+    // Role-based authorization
+    @Bean
+    public Advisor requireRoleAuthorizationAdvisor() {
+        AspectJExpressionPointcut pointcut = createPointcutForAnnotation(RequireRole.class);
+        AuthorizationManagerBeforeMethodInterceptor interceptor =
+                new AuthorizationManagerBeforeMethodInterceptor(pointcut, roleAuthorizationManager);
+        return new DefaultPointcutAdvisor(pointcut, interceptor);
+    }
+
+    @Bean
+    public Advisor requireAnyRoleAuthorizationAdvisor() {
+        AspectJExpressionPointcut pointcut = createPointcutForAnnotation(RequireAnyRole.class);
+        AuthorizationManagerBeforeMethodInterceptor interceptor =
+                new AuthorizationManagerBeforeMethodInterceptor(
+                        pointcut, anyRoleAuthorizationManager);
+        return new DefaultPointcutAdvisor(pointcut, interceptor);
+    }
+
+    @Bean
+    public Advisor requireAllRolesAuthorizationAdvisor() {
+        AspectJExpressionPointcut pointcut = createPointcutForAnnotation(RequireAllRoles.class);
+        AuthorizationManagerBeforeMethodInterceptor interceptor =
+                new AuthorizationManagerBeforeMethodInterceptor(
+                        pointcut, allRolesAuthorizationManager);
+        return new DefaultPointcutAdvisor(pointcut, interceptor);
+    }
+
     private AspectJExpressionPointcut createPointcutForAnnotation(
             Class<? extends Annotation> annotationClass) {
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();

@@ -1,4 +1,4 @@
-package com.vertyll.freshly.permission;
+package com.vertyll.freshly.common.enums;
 
 import lombok.Getter;
 

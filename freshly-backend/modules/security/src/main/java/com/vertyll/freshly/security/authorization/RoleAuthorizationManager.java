@@ -13,16 +13,14 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.vertyll.freshly.common.annotation.RequirePermission;
-import com.vertyll.freshly.common.enums.Permission;
-import com.vertyll.freshly.permission.application.PermissionService;
+import com.vertyll.freshly.common.annotation.RequireRole;
+import com.vertyll.freshly.common.enums.UserRoleEnum;
 
+/** Authorization manager for @RequireRole annotation. */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PermissionAuthorizationManager implements AuthorizationManager<MethodInvocation> {
-
-    private final PermissionService permissionService;
+public class RoleAuthorizationManager implements AuthorizationManager<MethodInvocation> {
 
     @Override
     public AuthorizationResult authorize(
@@ -30,34 +28,36 @@ public class PermissionAuthorizationManager implements AuthorizationManager<Meth
         Method method = methodInvocation.getMethod();
 
         // Check method-level annotation first
-        RequirePermission methodAnnotation = method.getAnnotation(RequirePermission.class);
+        RequireRole methodAnnotation = method.getAnnotation(RequireRole.class);
         if (methodAnnotation != null) {
-            Permission permission = methodAnnotation.value(); // Bezpośrednio enum!
-            boolean granted = permissionService.hasPermission(authentication.get(), permission);
-            log.debug(
-                    "Permission check for method {}: {} = {}",
-                    method.getName(),
-                    permission,
-                    granted);
+            UserRoleEnum role = methodAnnotation.value();
+            boolean granted = hasRole(authentication.get(), role);
+            log.debug("Role check for method {}: {} = {}", method.getName(), role, granted);
             return new AuthorizationDecision(granted);
         }
 
         // Check class-level annotation
-        RequirePermission classAnnotation =
-                method.getDeclaringClass().getAnnotation(RequirePermission.class);
+        RequireRole classAnnotation = method.getDeclaringClass().getAnnotation(RequireRole.class);
         if (classAnnotation != null) {
-            Permission permission = classAnnotation.value();
-            boolean granted = permissionService.hasPermission(authentication.get(), permission);
+            UserRoleEnum role = classAnnotation.value();
+            boolean granted = hasRole(authentication.get(), role);
             log.debug(
-                    "Permission check for class {}: {} = {}",
+                    "Role check for class {}: {} = {}",
                     method.getDeclaringClass().getSimpleName(),
-                    permission,
+                    role,
                     granted);
             return new AuthorizationDecision(granted);
         }
 
         // No annotation found - deny by default
-        log.warn("No @RequirePermission annotation found on {} - denying access", method.getName());
+        log.warn("No @RequireRole annotation found on {} - denying access", method.getName());
         return new AuthorizationDecision(false);
+    }
+
+    private boolean hasRole(Authentication authentication, UserRoleEnum role) {
+        return authentication != null
+                && authentication.getAuthorities().stream()
+                        .anyMatch(
+                                authority -> role.getAuthority().equals(authority.getAuthority()));
     }
 }

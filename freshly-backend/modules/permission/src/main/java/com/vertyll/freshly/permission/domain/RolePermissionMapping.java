@@ -7,8 +7,8 @@ import org.jspecify.annotations.Nullable;
 
 import lombok.Getter;
 
+import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
-import com.vertyll.freshly.permission.Permission;
 
 /** Domain entity representing the mapping between Keycloak roles and system permissions. */
 @Getter

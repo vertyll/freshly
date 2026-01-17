@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.vertyll.freshly.permission.Permission;
+import com.vertyll.freshly.common.enums.Permission;
 
 /**
  * Service responsible for checking user permissions based on their Keycloak roles. Delegates

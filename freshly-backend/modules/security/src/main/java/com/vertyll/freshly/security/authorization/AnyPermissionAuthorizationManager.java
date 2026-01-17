@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.vertyll.freshly.permission.Permission;
+import com.vertyll.freshly.common.annotation.RequireAnyPermission;
+import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.permission.application.PermissionService;
-import com.vertyll.freshly.security.annotation.RequireAnyPermission;
 
 @Slf4j
 @Component

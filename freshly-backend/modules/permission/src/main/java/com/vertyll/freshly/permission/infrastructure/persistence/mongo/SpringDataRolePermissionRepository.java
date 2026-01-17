@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
-import com.vertyll.freshly.permission.Permission;
 
 public interface SpringDataRolePermissionRepository
         extends MongoRepository<RolePermissionMappingDocument, UUID> {

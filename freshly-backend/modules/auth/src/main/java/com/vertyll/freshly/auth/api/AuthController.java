@@ -15,8 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.vertyll.freshly.auth.api.dto.*;
 import com.vertyll.freshly.auth.application.AuthService;
+import com.vertyll.freshly.common.annotation.RefreshTokenCookie;
 import com.vertyll.freshly.common.response.ApiResponse;
-import com.vertyll.freshly.security.annotation.RefreshTokenCookie;
 import com.vertyll.freshly.security.config.CookieProperties;
 import com.vertyll.freshly.security.config.JwtProperties;
 

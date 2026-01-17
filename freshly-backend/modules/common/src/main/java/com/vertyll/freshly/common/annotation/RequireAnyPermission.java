@@ -1,11 +1,11 @@
-package com.vertyll.freshly.security.annotation;
+package com.vertyll.freshly.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.vertyll.freshly.permission.Permission;
+import com.vertyll.freshly.common.enums.Permission;
 
 /**
  * Annotation to secure endpoints requiring ANY of the specified permissions.

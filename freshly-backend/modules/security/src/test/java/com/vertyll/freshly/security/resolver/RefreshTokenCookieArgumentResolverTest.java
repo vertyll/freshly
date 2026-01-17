@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;
 
-import com.vertyll.freshly.security.annotation.RefreshTokenCookie;
+import com.vertyll.freshly.common.annotation.RefreshTokenCookie;
 import com.vertyll.freshly.security.config.JwtProperties;
 
 import jakarta.servlet.http.Cookie;

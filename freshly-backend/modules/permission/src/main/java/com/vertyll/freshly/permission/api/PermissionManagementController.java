@@ -7,15 +7,15 @@ import java.util.UUID;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.vertyll.freshly.common.annotation.RequireRole;
+import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.common.response.ApiResponse;
-import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.permission.api.dto.CreatePermissionMappingDto;
 import com.vertyll.freshly.permission.api.dto.PermissionMappingResponseDto;
 import com.vertyll.freshly.permission.application.PermissionManagementService;
@@ -26,7 +26,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/admin/permissions")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
+@RequireRole(UserRoleEnum.ADMIN)
 public class PermissionManagementController {
 
     private final PermissionManagementService permissionManagementService;
