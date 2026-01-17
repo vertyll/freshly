@@ -17,7 +17,6 @@ import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.permission.application.PermissionService;
 import com.vertyll.freshly.security.annotation.RequirePermission;
 
-/** Authorization manager for @RequirePermission annotation. */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -33,8 +32,7 @@ public class PermissionAuthorizationManager implements AuthorizationManager<Meth
         // Check method-level annotation first
         RequirePermission methodAnnotation = method.getAnnotation(RequirePermission.class);
         if (methodAnnotation != null) {
-            String permissionValue = methodAnnotation.value();
-            Permission permission = Permission.fromValue(permissionValue);
+            Permission permission = methodAnnotation.value(); // Bezpośrednio enum!
             boolean granted = permissionService.hasPermission(authentication.get(), permission);
             log.debug(
                     "Permission check for method {}: {} = {}",
@@ -48,13 +46,12 @@ public class PermissionAuthorizationManager implements AuthorizationManager<Meth
         RequirePermission classAnnotation =
                 method.getDeclaringClass().getAnnotation(RequirePermission.class);
         if (classAnnotation != null) {
-            String permissionValue = classAnnotation.value();
-            Permission permission = Permission.fromValue(permissionValue);
+            Permission permission = classAnnotation.value();
             boolean granted = permissionService.hasPermission(authentication.get(), permission);
             log.debug(
                     "Permission check for class {}: {} = {}",
                     method.getDeclaringClass().getSimpleName(),
-                    permissionValue,
+                    permission,
                     granted);
             return new AuthorizationDecision(granted);
         }

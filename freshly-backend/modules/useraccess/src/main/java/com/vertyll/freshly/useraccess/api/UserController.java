@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.vertyll.freshly.common.response.ApiResponse;
+import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.security.annotation.RequirePermission;
 import com.vertyll.freshly.useraccess.api.dto.CreateUserRequestDto;
 import com.vertyll.freshly.useraccess.api.dto.UpdateUserRolesRequestDto;
@@ -41,7 +42,7 @@ public class UserController {
     private final MessageSource messageSource;
 
     @PostMapping
-    @RequirePermission("users:create")
+    @RequirePermission(Permission.USERS_CREATE)
     public ResponseEntity<ApiResponse<UserResponseDto>> createUser(
             @Valid @RequestBody CreateUserRequestDto request) {
 
@@ -59,7 +60,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    @RequirePermission("users:read")
+    @RequirePermission(Permission.USERS_READ)
     public ResponseEntity<ApiResponse<UserResponseDto>> getUserById(@PathVariable UUID userId) {
         log.info("Fetching user: {}", userId);
 
@@ -70,7 +71,7 @@ public class UserController {
     }
 
     @GetMapping
-    @RequirePermission("users:read")
+    @RequirePermission(Permission.USERS_READ)
     public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUsers() {
         log.info("Fetching all users");
 
@@ -84,7 +85,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/activate")
-    @RequirePermission("users:activate")
+    @RequirePermission(Permission.USERS_ACTIVATE)
     public ResponseEntity<ApiResponse<Void>> activateUser(@PathVariable UUID userId) {
         log.info("Activating user: {}", userId);
 
@@ -95,7 +96,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/deactivate")
-    @RequirePermission("users:deactivate")
+    @RequirePermission(Permission.USERS_DEACTIVATE)
     public ResponseEntity<ApiResponse<Void>> deactivateUser(
             @PathVariable UUID userId, @AuthenticationPrincipal Jwt jwt) {
 
@@ -109,7 +110,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/roles")
-    @RequirePermission("users:manage-roles")
+    @RequirePermission(Permission.USERS_MANAGE_ROLES)
     public ResponseEntity<ApiResponse<Void>> updateUserRoles(
             @PathVariable UUID userId, @Valid @RequestBody UpdateUserRolesRequestDto request) {
 
