@@ -39,9 +39,9 @@ public class PermissionManagementService {
         if (repository.existsByKeycloakRoleAndPermission(role, permission)) {
             throw new IllegalArgumentException(
                     "Mapping already exists for role '"
-                            + request.keycloakRole()
+                            + role.name()
                             + "' and permission '"
-                            + request.permission()
+                            + permission.getValue()
                             + "'");
         }
 
@@ -49,10 +49,7 @@ public class PermissionManagementService {
 
         RolePermissionMapping saved = repository.save(mapping);
 
-        log.info(
-                "Created permission mapping: {} -> {}",
-                request.keycloakRole(),
-                request.permission());
+        log.info("Created permission mapping: {} -> {}", role.name(), permission.getValue());
 
         return toDto(saved);
     }
