@@ -27,13 +27,17 @@ class SmtpEmailSender implements EmailSender {
     private final TemplateEngine templateEngine;
     private final MailProperties mailProperties;
 
+    private static final String UTF_8_ENCODING = "UTF-8";
+
+    private static final String EMAIL_SEND_FAILURE = "Failed to send email";
+
     @Override
     public void send(EmailNotification notification) {
         try {
             String htmlContent = renderTemplate(notification);
 
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, UTF_8_ENCODING);
 
             helper.setFrom(mailProperties.from());
             helper.setTo(notification.getRecipient().value());
@@ -49,7 +53,7 @@ class SmtpEmailSender implements EmailSender {
 
         } catch (MessagingException e) {
             log.error("Failed to send email: {}", e.getMessage());
-            throw new EmailSendingException("Failed to send email", e);
+            throw new EmailSendingException(EMAIL_SEND_FAILURE, e);
         }
     }
 

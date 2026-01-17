@@ -19,6 +19,14 @@ import com.vertyll.freshly.airquality.domain.*;
 @Slf4j
 public class AirQualityService {
 
+    private static final int MIN_DAYS = 1;
+    private static final int MAX_DAYS = 90;
+    private static final int MIN_RADIUS_KM = 1;
+    private static final int MAX_RADIUS_KM = 100;
+    private static final int MIN_RANKING_LIMIT = 5;
+    private static final int MAX_RANKING_LIMIT = 50;
+    private static final int EARTH_RADIUS_KM = 6371;
+
     private final AirQualityProvider airQualityProvider;
     private final AirQualityHistoryRepository historyRepository;
 
@@ -49,7 +57,7 @@ public class AirQualityService {
      * @param daysBack Number of days to look back (default 7, max 90)
      */
     public List<AirQualityMeasurement> getHistoricalMeasurements(int stationId, int daysBack) {
-        int days = Math.clamp(daysBack, 1, 90); // Clamp between 1-90
+        int days = Math.clamp(daysBack, MIN_DAYS, MAX_DAYS);
         LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC).minusDays(days);
         LocalDateTime to = LocalDateTime.now(ZoneOffset.UTC);
         return historyRepository.findByStationIdAndDateRange(stationId, from, to);
@@ -71,7 +79,7 @@ public class AirQualityService {
      */
     public List<StationDistance> findNearestStations(
             double latitude, double longitude, double radiusKm) {
-        double radius = Math.clamp(radiusKm, 1, 100); // Clamp between 1-100
+        double radius = Math.clamp(radiusKm, MIN_RADIUS_KM, MAX_RADIUS_KM);
 
         List<Station> allStations = airQualityProvider.findAllStations();
         List<StationDistance> stationsWithDistance = new ArrayList<>();
@@ -99,7 +107,7 @@ public class AirQualityService {
 
     /** Calculate statistics for a station within time range */
     public Optional<AirQualityStatistics> getStatistics(int stationId, int daysBack) {
-        int days = Math.clamp(daysBack, 1, 90);
+        int days = Math.clamp(daysBack, MIN_DAYS, MAX_DAYS);
         LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC).minusDays(days);
         LocalDateTime to = LocalDateTime.now(ZoneOffset.UTC);
 
@@ -113,8 +121,8 @@ public class AirQualityService {
      * @param limit Max number of stations to return (default 10, max 50)
      */
     public List<StationRanking> getRanking(int daysBack, int limit) {
-        int days = Math.clamp(daysBack, 1, 90);
-        int maxResults = Math.clamp(limit, 5, 50);
+        int days = Math.clamp(daysBack, MIN_DAYS, MAX_DAYS);
+        int maxResults = Math.clamp(limit, MIN_RANKING_LIMIT, MAX_RANKING_LIMIT);
 
         LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC).minusDays(days);
         LocalDateTime to = LocalDateTime.now(ZoneOffset.UTC);
@@ -124,8 +132,6 @@ public class AirQualityService {
 
     /** Haversine formula to calculate distance between two coordinates */
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-        final int earthRadiusKm = 6371;
-
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
 
@@ -138,6 +144,6 @@ public class AirQualityService {
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-        return earthRadiusKm * c;
+        return EARTH_RADIUS_KM * c;
     }
 }

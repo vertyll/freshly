@@ -18,9 +18,9 @@ import com.vertyll.freshly.auth.domain.VerificationTokenService;
 import com.vertyll.freshly.auth.domain.event.UserRegisteredEvent;
 import com.vertyll.freshly.auth.keycloak.KeycloakAdminClient;
 import com.vertyll.freshly.auth.keycloak.KeycloakTokenClient;
+import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.notification.application.NotificationService;
 import com.vertyll.freshly.useraccess.application.UserAccessService;
-import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
 
 @Slf4j
 @Service
@@ -37,6 +37,11 @@ public class AuthService {
     @Value("${application.frontend.url}")
     @SuppressWarnings("NullAway.Init")
     private String frontendUrl;
+
+    private static final String USERNAME = "user";
+    private static final String VERIFY_EMAIL_PATH = "/verify-email";
+    private static final String TOKEN_QUERY_PARAM = "?token=%s";
+    private static final String VERIFY_EMAIL_URL_TEMPLATE = VERIFY_EMAIL_PATH + TOKEN_QUERY_PARAM;
 
     @Transactional
     @SuppressWarnings("PMD.AvoidCatchingGenericException") // Catch-all before compensation rollback
@@ -61,7 +66,8 @@ public class AuthService {
             String verificationToken =
                     verificationTokenService.generateEmailVerificationToken(
                             keycloakUserId, request.email());
-            String verificationLink = frontendUrl + "/verify-email?token=" + verificationToken;
+            String verificationLink =
+                    frontendUrl + String.format(VERIFY_EMAIL_URL_TEMPLATE, verificationToken);
 
             notificationService.sendEmailVerification(
                     request.email(), request.username(), verificationLink);
@@ -169,9 +175,12 @@ public class AuthService {
 
         String verificationToken =
                 verificationTokenService.generateEmailVerificationToken(userId, request.newEmail());
-        String verificationLink = frontendUrl + "/verify-email?token=" + verificationToken;
+        String verificationLink =
+                frontendUrl
+                        + VERIFY_EMAIL_PATH
+                        + String.format(TOKEN_QUERY_PARAM, verificationToken);
 
-        notificationService.sendEmailVerification(request.newEmail(), "User", verificationLink);
+        notificationService.sendEmailVerification(request.newEmail(), USERNAME, verificationLink);
 
         log.info("Email change initiated for user: {}", userId);
     }

@@ -18,6 +18,10 @@ public class NotificationService {
 
     private final EmailSender emailSender;
 
+    private static final String USERNAME_KEY = "username";
+    private static final String VERIFICATION_LINK_KEY = "verificationLink";
+    private static final String RESET_LINK_KEY = "resetLink";
+
     public void sendEmail(SendEmailCommand command) {
         log.info(
                 "Sending email to: {} using template: {}",
@@ -47,8 +51,8 @@ public class NotificationService {
                         email,
                         com.vertyll.freshly.notification.domain.EmailTemplate.EMAIL_VERIFICATION,
                         java.util.Map.of(
-                                "username", username,
-                                "verificationLink", verificationLink)));
+                                USERNAME_KEY, username,
+                                VERIFICATION_LINK_KEY, verificationLink)));
     }
 
     public void sendWelcomeEmail(String email, String username) {
@@ -56,7 +60,7 @@ public class NotificationService {
                 new SendEmailCommand(
                         email,
                         com.vertyll.freshly.notification.domain.EmailTemplate.USER_REGISTERED,
-                        java.util.Map.of("username", username)));
+                        java.util.Map.of(USERNAME_KEY, username)));
     }
 
     public void sendPasswordResetEmail(String email, String username, String resetLink) {
@@ -65,7 +69,7 @@ public class NotificationService {
                         email,
                         com.vertyll.freshly.notification.domain.EmailTemplate.PASSWORD_RESET,
                         java.util.Map.of(
-                                "username", username,
-                                "resetLink", resetLink)));
+                                USERNAME_KEY, username,
+                                RESET_LINK_KEY, resetLink)));
     }
 }

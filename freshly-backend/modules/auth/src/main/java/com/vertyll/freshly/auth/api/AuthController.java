@@ -29,6 +29,24 @@ import jakarta.validation.Valid;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private static final String REFRESH_TOKEN_NOT_FOUND = "Refresh token not found in cookies";
+    private static final String EMPTY_COOKIE_VALUE = "";
+    private static final String SET_COOKIE_HEADER = "Set-Cookie";
+
+    private static final String AUTH_REGISTERED_MSG_KEY = "success.auth.registered";
+    private static final String AUTH_EMAIL_VERIFIED_MSG_KEY = "success.auth.emailVerified";
+    private static final String AUTH_LOGIN_SUCCESSFUL_MSG_KEY = "success.auth.loginSuccessful";
+    private static final String AUTH_TOKEN_REFRESHED_MSG_KEY = "success.auth.tokenRefreshed";
+    private static final String AUTH_LOGOUT_SUCCESSFUL_MSG_KEY = "success.auth.logoutSuccessful";
+    private static final String AUTH_RESET_EMAIL_SENT_MSG_KEY = "success.auth.resetEmailSent";
+    private static final String AUTH_PASSWORD_RESET_MSG_KEY = "success.auth.passwordReset";
+    private static final String AUTH_PASSWORD_CHANGED_MSG_KEY = "success.auth.passwordChanged";
+    private static final String AUTH_EMAIL_CHANGE_INITIATED_MSG_KEY =
+            "success.auth.emailChangeInitiated";
+
+    private static final long COOKIE_MAX_AGE_ZERO = 0L;
+    private static final long MILLISECONDS_TO_SECONDS_DIVISOR = 1000L;
+
     private final AuthService authService;
     private final CookieProperties cookieProperties;
     private final JwtProperties jwtProperties;
@@ -45,7 +63,7 @@ public class AuthController {
         AuthResponseDto response = new AuthResponseDto(userId);
 
         return ApiResponse.buildResponse(
-                response, "success.auth.registered", messageSource, HttpStatus.CREATED);
+                response, AUTH_REGISTERED_MSG_KEY, messageSource, HttpStatus.CREATED);
     }
 
     @GetMapping("/verify-email")
@@ -55,7 +73,7 @@ public class AuthController {
         authService.verifyEmail(token);
 
         return ApiResponse.buildResponse(
-                null, "success.auth.emailVerified", messageSource, HttpStatus.OK);
+                null, AUTH_EMAIL_VERIFIED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PostMapping("/login")
@@ -72,7 +90,7 @@ public class AuthController {
                         tokens.accessToken(), tokens.expiresIn(), tokens.tokenType());
 
         return ApiResponse.buildResponse(
-                accessTokenResponse, "success.auth.loginSuccessful", messageSource, HttpStatus.OK);
+                accessTokenResponse, AUTH_LOGIN_SUCCESSFUL_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PostMapping("/refresh")
@@ -81,7 +99,7 @@ public class AuthController {
         log.info("Refreshing access token");
 
         if (refreshToken == null || refreshToken.isBlank()) {
-            throw new IllegalArgumentException("Refresh token not found in cookies");
+            throw new IllegalArgumentException(REFRESH_TOKEN_NOT_FOUND);
         }
 
         TokenResponseDto tokens = authService.refreshToken(refreshToken);
@@ -93,7 +111,7 @@ public class AuthController {
                         tokens.accessToken(), tokens.expiresIn(), tokens.tokenType());
 
         return ApiResponse.buildResponse(
-                accessTokenResponse, "success.auth.tokenRefreshed", messageSource, HttpStatus.OK);
+                accessTokenResponse, AUTH_TOKEN_REFRESHED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PostMapping("/logout")
@@ -108,7 +126,7 @@ public class AuthController {
         clearRefreshTokenCookie(response);
 
         return ApiResponse.buildResponse(
-                null, "success.auth.logoutSuccessful", messageSource, HttpStatus.OK);
+                null, AUTH_LOGOUT_SUCCESSFUL_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PostMapping("/forgot-password")
@@ -119,7 +137,7 @@ public class AuthController {
         authService.initiatePasswordReset(request);
 
         return ApiResponse.buildResponse(
-                null, "success.auth.resetEmailSent", messageSource, HttpStatus.OK);
+                null, AUTH_RESET_EMAIL_SENT_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PostMapping("/reset-password")
@@ -130,7 +148,7 @@ public class AuthController {
         authService.resetPassword(request);
 
         return ApiResponse.buildResponse(
-                null, "success.auth.passwordReset", messageSource, HttpStatus.OK);
+                null, AUTH_PASSWORD_RESET_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PutMapping("/change-password")
@@ -144,7 +162,7 @@ public class AuthController {
         authService.changePassword(userId, request);
 
         return ApiResponse.buildResponse(
-                null, "success.auth.passwordChanged", messageSource, HttpStatus.OK);
+                null, AUTH_PASSWORD_CHANGED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PutMapping("/change-email")
@@ -157,7 +175,7 @@ public class AuthController {
         authService.changeEmail(userId, request);
 
         return ApiResponse.buildResponse(
-                null, "success.auth.emailChangeInitiated", messageSource, HttpStatus.OK);
+                null, AUTH_EMAIL_CHANGE_INITIATED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
@@ -166,26 +184,28 @@ public class AuthController {
                         .httpOnly(cookieProperties.httpOnly())
                         .secure(cookieProperties.secure())
                         .path(cookieProperties.path())
-                        .maxAge(jwtProperties.refreshToken().expiration() / 1000)
+                        .maxAge(
+                                jwtProperties.refreshToken().expiration()
+                                        / MILLISECONDS_TO_SECONDS_DIVISOR)
                         .sameSite(cookieProperties.sameSite())
                         .build();
 
-        response.addHeader("Set-Cookie", cookie.toString());
+        response.addHeader(SET_COOKIE_HEADER, cookie.toString());
 
         log.debug("Refresh token cookie set");
     }
 
     private void clearRefreshTokenCookie(HttpServletResponse response) {
         ResponseCookie cookie =
-                ResponseCookie.from(jwtProperties.refreshToken().cookieName(), "")
+                ResponseCookie.from(jwtProperties.refreshToken().cookieName(), EMPTY_COOKIE_VALUE)
                         .httpOnly(cookieProperties.httpOnly())
                         .secure(cookieProperties.secure())
                         .path(cookieProperties.path())
-                        .maxAge(0)
+                        .maxAge(COOKIE_MAX_AGE_ZERO)
                         .sameSite(cookieProperties.sameSite())
                         .build();
 
-        response.addHeader("Set-Cookie", cookie.toString());
+        response.addHeader(SET_COOKIE_HEADER, cookie.toString());
 
         log.debug("Refresh token cookie cleared");
     }

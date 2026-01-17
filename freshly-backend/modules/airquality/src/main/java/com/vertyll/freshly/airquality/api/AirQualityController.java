@@ -26,6 +26,27 @@ import com.vertyll.freshly.common.response.ApiResponse;
 @RequiredArgsConstructor
 public class AirQualityController {
 
+    private static final String SUCCESS_STATIONS_FETCHED_MSG_KEY =
+            "success.airquality.stationsFetched";
+    private static final String SUCCESS_INDEX_FETCHED_MSG_KEY = "success.airquality.indexFetched";
+    private static final String SUCCESS_MEASUREMENTS_FETCHED_MSG_KEY =
+            "success.airquality.measurementsFetched";
+    private static final String SUCCESS_LATEST_FETCHED_MSG_KEY = "success.airquality.latestFetched";
+    private static final String SUCCESS_HISTORY_FETCHED_MSG_KEY =
+            "success.airquality.historyFetched";
+    private static final String SUCCESS_SYNC_TRIGGERED_MSG_KEY = "success.airquality.syncTriggered";
+    private static final String SUCCESS_NEAREST_FETCHED_MSG_KEY =
+            "success.airquality.nearestFetched";
+    private static final String SUCCESS_STATISTICS_FETCHED_MSG_KEY =
+            "success.airquality.statisticsFetched";
+    private static final String SUCCESS_RANKING_FETCHED_MSG_KEY =
+            "success.airquality.rankingFetched";
+
+    private static final String SYNC_TRIGGERED = "Synchronization triggered";
+    private static final String DEFAULT_DAYS = "7";
+    private static final String DEFAULT_RADIUS = "10";
+    private static final String DEFAULT_LIMIT = "10";
+
     private final AirQualityService airQualityService;
     private final AirQualitySyncService syncService;
     private final AirQualityDtoMapper dtoMapper;
@@ -37,7 +58,7 @@ public class AirQualityController {
         List<Station> stations = airQualityService.getAllStations();
         List<StationResponseDto> response = dtoMapper.toStationResponseList(stations);
         return ApiResponse.buildResponse(
-                response, "success.airquality.stationsFetched", messageSource, HttpStatus.OK);
+                response, SUCCESS_STATIONS_FETCHED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     /** Get current air quality index (live from GIOŚ API) */
@@ -52,7 +73,7 @@ public class AirQualityController {
                                     dtoMapper.toAirQualityIndexResponse(index);
                             return ApiResponse.buildResponse(
                                     response,
-                                    "success.airquality.indexFetched",
+                                    SUCCESS_INDEX_FETCHED_MSG_KEY,
                                     messageSource,
                                     HttpStatus.OK);
                         })
@@ -68,7 +89,7 @@ public class AirQualityController {
         List<SensorMeasurementResponseDto> response =
                 dtoMapper.toSensorMeasurementResponseList(measurements);
         return ApiResponse.buildResponse(
-                response, "success.airquality.measurementsFetched", messageSource, HttpStatus.OK);
+                response, SUCCESS_MEASUREMENTS_FETCHED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     /**
@@ -86,7 +107,7 @@ public class AirQualityController {
                                     dtoMapper.toAirQualityMeasurementResponse(measurement);
                             return ApiResponse.buildResponse(
                                     response,
-                                    "success.airquality.latestFetched",
+                                    SUCCESS_LATEST_FETCHED_MSG_KEY,
                                     messageSource,
                                     HttpStatus.OK);
                         })
@@ -101,13 +122,13 @@ public class AirQualityController {
      */
     @GetMapping("/stations/{stationId}/history")
     public ResponseEntity<ApiResponse<List<AirQualityMeasurementResponseDto>>> getHistory(
-            @PathVariable int stationId, @RequestParam(defaultValue = "7") int days) {
+            @PathVariable int stationId, @RequestParam(defaultValue = DEFAULT_DAYS) int days) {
         List<AirQualityMeasurement> history =
                 airQualityService.getHistoricalMeasurements(stationId, days);
         List<AirQualityMeasurementResponseDto> response =
                 dtoMapper.toAirQualityMeasurementResponseList(history);
         return ApiResponse.buildResponse(
-                response, "success.airquality.historyFetched", messageSource, HttpStatus.OK);
+                response, SUCCESS_HISTORY_FETCHED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     /**
@@ -118,10 +139,7 @@ public class AirQualityController {
     public ResponseEntity<ApiResponse<String>> triggerSync() {
         syncService.triggerManualSync();
         return ApiResponse.buildResponse(
-                "Synchronization triggered",
-                "success.airquality.syncTriggered",
-                messageSource,
-                HttpStatus.ACCEPTED);
+                SYNC_TRIGGERED, SUCCESS_SYNC_TRIGGERED_MSG_KEY, messageSource, HttpStatus.ACCEPTED);
     }
 
     /**
@@ -135,13 +153,13 @@ public class AirQualityController {
     public ResponseEntity<ApiResponse<List<StationDistanceResponseDto>>> getNearestStations(
             @RequestParam double latitude,
             @RequestParam double longitude,
-            @RequestParam(defaultValue = "10") double radius) {
+            @RequestParam(defaultValue = DEFAULT_RADIUS) double radius) {
         List<StationDistance> stationsWithDistance =
                 airQualityService.findNearestStations(latitude, longitude, radius);
         List<StationDistanceResponseDto> response =
                 dtoMapper.toStationDistanceResponseList(stationsWithDistance);
         return ApiResponse.buildResponse(
-                response, "success.airquality.nearestFetched", messageSource, HttpStatus.OK);
+                response, SUCCESS_NEAREST_FETCHED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     /**
@@ -152,7 +170,7 @@ public class AirQualityController {
      */
     @GetMapping("/stations/{stationId}/statistics")
     public ResponseEntity<ApiResponse<AirQualityStatisticsResponseDto>> getStatistics(
-            @PathVariable int stationId, @RequestParam(defaultValue = "7") int days) {
+            @PathVariable int stationId, @RequestParam(defaultValue = DEFAULT_DAYS) int days) {
         return airQualityService
                 .getStatistics(stationId, days)
                 .map(
@@ -161,7 +179,7 @@ public class AirQualityController {
                                     dtoMapper.toStatisticsResponse(stats);
                             return ApiResponse.buildResponse(
                                     response,
-                                    "success.airquality.statisticsFetched",
+                                    SUCCESS_STATISTICS_FETCHED_MSG_KEY,
                                     messageSource,
                                     HttpStatus.OK);
                         })
@@ -176,11 +194,11 @@ public class AirQualityController {
      */
     @GetMapping("/stations/ranking")
     public ResponseEntity<ApiResponse<List<StationRankingResponseDto>>> getRanking(
-            @RequestParam(defaultValue = "7") int days,
-            @RequestParam(defaultValue = "10") int limit) {
+            @RequestParam(defaultValue = DEFAULT_DAYS) int days,
+            @RequestParam(defaultValue = DEFAULT_LIMIT) int limit) {
         List<StationRanking> rankings = airQualityService.getRanking(days, limit);
         List<StationRankingResponseDto> response = dtoMapper.toRankingResponseList(rankings);
         return ApiResponse.buildResponse(
-                response, "success.airquality.rankingFetched", messageSource, HttpStatus.OK);
+                response, SUCCESS_RANKING_FETCHED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 }

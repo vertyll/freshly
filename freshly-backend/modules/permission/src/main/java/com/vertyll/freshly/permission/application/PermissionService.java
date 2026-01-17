@@ -21,25 +21,27 @@ public class PermissionService {
 
     private final UserPermissionCache permissionCache;
 
+    private static final String AUTH_NULL_OR_NOT_AUTHENTICATED =
+            "Authentication is null or not authenticated";
+
     /**
      * Check if the authenticated user has a specific permission.
      *
      * @param authentication Spring Security authentication object
-     * @param permissionValue Permission string value (e.g., "users:create")
+     * @param permission Permission enum value
      * @return true if user has the permission
      */
-    public boolean hasPermission(Authentication authentication, String permissionValue) {
+    public boolean hasPermission(Authentication authentication, Permission permission) {
         if (authentication == null || !authentication.isAuthenticated()) {
-            log.debug("Authentication is null or not authenticated");
+            log.debug(AUTH_NULL_OR_NOT_AUTHENTICATED);
             return false;
         }
 
         Set<Permission> userPermissions = permissionCache.getUserPermissions(authentication);
 
-        boolean hasPermission =
-                userPermissions.stream().anyMatch(p -> p.getValue().equals(permissionValue));
+        boolean hasPermission = userPermissions.contains(permission);
 
-        log.debug("Permission check for '{}': {}", permissionValue, hasPermission);
+        log.debug("Permission check for '{}': {}", permission.getValue(), hasPermission);
         return hasPermission;
     }
 
@@ -58,14 +60,14 @@ public class PermissionService {
      * Check if user has any of the specified permissions.
      *
      * @param authentication Spring Security authentication object
-     * @param permissionValues Variable number of permission values to check
+     * @param permissions Variable number of permission enums to check
      * @return true if user has at least one of the specified permissions
      */
-    public boolean hasAnyPermission(Authentication authentication, String... permissionValues) {
+    public boolean hasAnyPermission(Authentication authentication, Permission... permissions) {
         Set<Permission> userPermissions = permissionCache.getUserPermissions(authentication);
 
-        for (String permissionValue : permissionValues) {
-            if (userPermissions.stream().anyMatch(p -> p.getValue().equals(permissionValue))) {
+        for (Permission permission : permissions) {
+            if (userPermissions.contains(permission)) {
                 return true;
             }
         }

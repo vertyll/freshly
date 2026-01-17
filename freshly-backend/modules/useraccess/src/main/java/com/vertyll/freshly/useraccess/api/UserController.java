@@ -29,6 +29,12 @@ import jakarta.validation.Valid;
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
+    private static final String USER_CREATED_MSG_KEY = "success.user.created";
+    private static final String USER_FETCHED_MSG_KEY = "success.user.fetched";
+    private static final String USER_LIST_FETCHED_MSG_KEY = "success.user.listFetched";
+    private static final String USER_ACTIVATED_MSG_KEY = "success.user.activated";
+    private static final String USER_DEACTIVATED_MSG_KEY = "success.user.deactivated";
+    private static final String USER_ROLES_UPDATED_MSG_KEY = "success.user.rolesUpdated";
 
     private final UserAccessService userAccessService;
     private final UserDtoMapper userDtoMapper;
@@ -47,7 +53,7 @@ public class UserController {
 
         return ApiResponse.buildResponse(
                 userDtoMapper.toResponse(user),
-                "success.user.created",
+                USER_CREATED_MSG_KEY,
                 messageSource,
                 HttpStatus.CREATED);
     }
@@ -60,10 +66,7 @@ public class UserController {
         SystemUser user = userAccessService.getUserById(userId);
 
         return ApiResponse.buildResponse(
-                userDtoMapper.toResponse(user),
-                "success.user.fetched",
-                messageSource,
-                HttpStatus.OK);
+                userDtoMapper.toResponse(user), USER_FETCHED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @GetMapping
@@ -75,7 +78,7 @@ public class UserController {
 
         return ApiResponse.buildResponse(
                 userDtoMapper.toResponseList(users),
-                "success.user.listFetched",
+                USER_LIST_FETCHED_MSG_KEY,
                 messageSource,
                 HttpStatus.OK);
     }
@@ -88,7 +91,7 @@ public class UserController {
         userAccessService.activateUser(userId);
 
         return ApiResponse.buildResponse(
-                null, "success.user.activated", messageSource, HttpStatus.OK);
+                null, USER_ACTIVATED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PatchMapping("/{userId}/deactivate")
@@ -102,7 +105,7 @@ public class UserController {
         userAccessService.deactivateUser(userId, loggedInUserId);
 
         return ApiResponse.buildResponse(
-                null, "success.user.deactivated", messageSource, HttpStatus.OK);
+                null, USER_DEACTIVATED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PutMapping("/{userId}/roles")
@@ -115,6 +118,6 @@ public class UserController {
         userAccessService.replaceUserRoles(userId, request.roles());
 
         return ApiResponse.buildResponse(
-                null, "success.user.rolesUpdated", messageSource, HttpStatus.OK);
+                null, USER_ROLES_UPDATED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 }

@@ -9,11 +9,14 @@ class RolePermissionMappingMapper {
 
     public RolePermissionMappingDocument toDocument(RolePermissionMapping mapping) {
         return new RolePermissionMappingDocument(
-                mapping.getId(), mapping.getKeycloakRole(), mapping.getPermission());
+                mapping.getId(), mapping.getKeycloakRole(), mapping.getPermission(), null);
     }
 
     public RolePermissionMapping toDomain(RolePermissionMappingDocument document) {
         return RolePermissionMapping.reconstitute(
-                document.getId(), document.getKeycloakRole(), document.getPermission());
+                document.getId(),
+                document.getKeycloakRole(),
+                document.getPermission(),
+                document.getVersion());
     }
 }

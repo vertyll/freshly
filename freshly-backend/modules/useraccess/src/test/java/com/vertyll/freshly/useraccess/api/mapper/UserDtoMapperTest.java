@@ -11,12 +11,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
+import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.useraccess.api.dto.UserResponseDto;
 import com.vertyll.freshly.useraccess.domain.SystemUser;
-import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
 
 class UserDtoMapperTest {
-
     private UserDtoMapper mapper;
 
     @BeforeEach
@@ -37,7 +36,7 @@ class UserDtoMapperTest {
         // Then
         assertThat(result.id()).isEqualTo(userId);
         assertThat(result.isActive()).isTrue();
-        assertThat(result.roles()).containsExactly("USER");
+        assertThat(result.roles()).containsExactly(UserRoleEnum.USER);
     }
 
     @Test
@@ -66,7 +65,7 @@ class UserDtoMapperTest {
         UserResponseDto result = mapper.toResponse(user);
 
         // Then
-        assertThat(result.roles()).containsExactlyInAnyOrder("USER", "ADMIN");
+        assertThat(result.roles()).containsExactlyInAnyOrder(UserRoleEnum.USER, UserRoleEnum.ADMIN);
     }
 
     @Test
@@ -80,7 +79,7 @@ class UserDtoMapperTest {
         UserResponseDto result = mapper.toResponse(user);
 
         // Then
-        assertThat(result.roles()).containsExactly("ADMIN");
+        assertThat(result.roles()).containsExactly(UserRoleEnum.ADMIN);
     }
 
     @Test
@@ -100,10 +99,10 @@ class UserDtoMapperTest {
         assertThat(result).hasSize(2);
         assertThat(result.getFirst().id()).isEqualTo(userId1);
         assertThat(result.get(0).isActive()).isTrue();
-        assertThat(result.get(0).roles()).containsExactly("USER");
+        assertThat(result.get(0).roles()).containsExactly(UserRoleEnum.USER);
         assertThat(result.get(1).id()).isEqualTo(userId2);
         assertThat(result.get(1).isActive()).isFalse();
-        assertThat(result.get(1).roles()).containsExactly("ADMIN");
+        assertThat(result.get(1).roles()).containsExactly(UserRoleEnum.ADMIN);
     }
 
     @Test
@@ -177,11 +176,12 @@ class UserDtoMapperTest {
         // Then
         assertThat(result).hasSize(3);
         assertThat(result.get(0).isActive()).isTrue();
-        assertThat(result.get(0).roles()).containsExactly("USER");
+        assertThat(result.get(0).roles()).containsExactly(UserRoleEnum.USER);
         assertThat(result.get(1).isActive()).isFalse();
-        assertThat(result.get(1).roles()).containsExactly("ADMIN");
+        assertThat(result.get(1).roles()).containsExactly(UserRoleEnum.ADMIN);
         assertThat(result.get(2).isActive()).isTrue();
-        assertThat(result.get(2).roles()).containsExactlyInAnyOrder("USER", "ADMIN");
+        assertThat(result.get(2).roles())
+                .containsExactlyInAnyOrder(UserRoleEnum.USER, UserRoleEnum.ADMIN);
     }
 
     @Test
@@ -197,6 +197,6 @@ class UserDtoMapperTest {
         // Then
         assertThat(result.id()).isEqualTo(userId);
         assertThat(result.isActive()).isFalse();
-        assertThat(result.roles()).containsExactly("ADMIN");
+        assertThat(result.roles()).containsExactly(UserRoleEnum.ADMIN);
     }
 }

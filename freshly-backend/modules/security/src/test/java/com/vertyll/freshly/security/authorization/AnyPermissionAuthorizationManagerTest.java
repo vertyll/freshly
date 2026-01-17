@@ -17,11 +17,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.core.Authentication;
 
+import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.permission.application.PermissionService;
 import com.vertyll.freshly.security.annotation.RequireAnyPermission;
 
 @ExtendWith(MockitoExtension.class)
 class AnyPermissionAuthorizationManagerTest {
+    private static final String METHOD_WITHOUT_ANNOTATION = "methodWithoutAnnotation";
+    private static final String METHOD_WITH_DIFFERENT_PERMISSIONS =
+            "methodWithDifferentPermissions";
+    private static final String METHOD_WITH_MULTIPLE_PERMISSIONS = "methodWithMultiplePermissions";
+    private static final String METHOD_WITH_SINGLE_PERMISSION = "methodWithSinglePermission";
 
     @Mock
     @SuppressWarnings("NullAway.Init")
@@ -48,9 +54,11 @@ class AnyPermissionAuthorizationManagerTest {
     void shouldGrantAccessWhenUserHasAnyOfRequiredPermissionsOnMethod()
             throws NoSuchMethodException {
         // Given
-        Method method = SecurityMockTarget.class.getMethod("methodWithMultiplePermissions");
+        Method method = SecurityMockTarget.class.getMethod(METHOD_WITH_MULTIPLE_PERMISSIONS);
         when(methodInvocation.getMethod()).thenReturn(method);
-        String[] permissions = {"READ_DATA", "WRITE_DATA", "DELETE_DATA"};
+        Permission[] permissions = {
+            Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE
+        };
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(true);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -71,7 +79,9 @@ class AnyPermissionAuthorizationManagerTest {
         // Given
         Method method = SecurityMockTarget.class.getMethod("methodWithMultiplePermissions");
         when(methodInvocation.getMethod()).thenReturn(method);
-        String[] permissions = {"READ_DATA", "WRITE_DATA", "DELETE_DATA"};
+        Permission[] permissions = {
+            Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE
+        };
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(false);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -90,9 +100,9 @@ class AnyPermissionAuthorizationManagerTest {
     void shouldCheckClassLevelAnnotationWhenMethodAnnotationIsAbsent()
             throws NoSuchMethodException {
         // Given
-        Method method = ClassWithAnyPermission.class.getMethod("methodWithoutAnnotation");
+        Method method = ClassWithAnyPermission.class.getMethod(METHOD_WITHOUT_ANNOTATION);
         when(methodInvocation.getMethod()).thenReturn(method);
-        String[] permissions = {"ADMIN", "MODERATOR"};
+        Permission[] permissions = {Permission.USERS_READ, Permission.USERS_CREATE};
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(true);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -111,9 +121,9 @@ class AnyPermissionAuthorizationManagerTest {
     void shouldPrioritizeMethodLevelAnnotationOverClassLevelAnnotation()
             throws NoSuchMethodException {
         // Given
-        Method method = ClassWithAnyPermission.class.getMethod("methodWithDifferentPermissions");
+        Method method = ClassWithAnyPermission.class.getMethod(METHOD_WITH_DIFFERENT_PERMISSIONS);
         when(methodInvocation.getMethod()).thenReturn(method);
-        String[] methodPermissions = {"USER", "GUEST"};
+        Permission[] methodPermissions = {Permission.REPORTS_READ, Permission.REPORTS_GENERATE};
         when(permissionService.hasAnyPermission(authentication, methodPermissions))
                 .thenReturn(true);
 
@@ -126,14 +136,15 @@ class AnyPermissionAuthorizationManagerTest {
         assertThat(result).isNotNull();
         assertThat(result.isGranted()).isTrue();
         verify(permissionService).hasAnyPermission(authentication, methodPermissions);
-        verify(permissionService, never()).hasAnyPermission(authentication, "ADMIN", "MODERATOR");
+        verify(permissionService, never())
+                .hasAnyPermission(authentication, Permission.USERS_READ, Permission.USERS_CREATE);
     }
 
     @Test
     @DisplayName("Should deny access when no annotation is found")
     void shouldDenyAccessWhenNoAnnotationIsFound() throws NoSuchMethodException {
         // Given
-        Method method = SecurityMockTarget.class.getMethod("methodWithoutAnnotation");
+        Method method = SecurityMockTarget.class.getMethod(METHOD_WITHOUT_ANNOTATION);
         when(methodInvocation.getMethod()).thenReturn(method);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -144,16 +155,16 @@ class AnyPermissionAuthorizationManagerTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.isGranted()).isFalse();
-        verify(permissionService, never()).hasAnyPermission(any(), any(String[].class));
+        verify(permissionService, never()).hasAnyPermission(any(), any(Permission[].class));
     }
 
     @Test
     @DisplayName("Should handle single permission in annotation")
     void shouldHandleSinglePermissionInAnnotation() throws NoSuchMethodException {
         // Given
-        Method method = SecurityMockTarget.class.getMethod("methodWithSinglePermission");
+        Method method = SecurityMockTarget.class.getMethod(METHOD_WITH_SINGLE_PERMISSION);
         when(methodInvocation.getMethod()).thenReturn(method);
-        String[] permissions = {"SINGLE_PERMISSION"};
+        Permission[] permissions = {Permission.USERS_UPDATE};
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(true);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -172,9 +183,11 @@ class AnyPermissionAuthorizationManagerTest {
     @SuppressWarnings("NullAway")
     void shouldHandleNullAuthenticationGracefully() throws NoSuchMethodException {
         // Given
-        Method method = SecurityMockTarget.class.getMethod("methodWithMultiplePermissions");
+        Method method = SecurityMockTarget.class.getMethod(METHOD_WITH_MULTIPLE_PERMISSIONS);
         when(methodInvocation.getMethod()).thenReturn(method);
-        String[] permissions = {"READ_DATA", "WRITE_DATA", "DELETE_DATA"};
+        Permission[] permissions = {
+            Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE
+        };
         when(permissionService.hasAnyPermission(null, permissions)).thenReturn(false);
 
         Supplier<Authentication> authSupplier = () -> null;
@@ -190,28 +203,32 @@ class AnyPermissionAuthorizationManagerTest {
 
     // Test classes
     public static class SecurityMockTarget {
-        @RequireAnyPermission({"READ_DATA", "WRITE_DATA", "DELETE_DATA"})
+        @RequireAnyPermission({"users:read", "users:create", "users:delete"})
         public void methodWithMultiplePermissions() {
             // Empty method used only for testing authorization annotations
         }
 
-        @RequireAnyPermission("SINGLE_PERMISSION")
+        @RequireAnyPermission("users:update")
+        @SuppressWarnings("unused")
         public void methodWithSinglePermission() {
             // Empty method used only for testing authorization annotations
         }
 
+        @SuppressWarnings("unused")
         public void methodWithoutAnnotation() {
             // Empty method used only for testing authorization behavior when annotation is absent
         }
     }
 
-    @RequireAnyPermission({"ADMIN", "MODERATOR"})
+    @RequireAnyPermission({"users:read", "users:create"})
     public static class ClassWithAnyPermission {
+        @SuppressWarnings("unused")
         public void methodWithoutAnnotation() {
             // Empty method used only for testing class-level authorization annotations
         }
 
-        @RequireAnyPermission({"USER", "GUEST"})
+        @RequireAnyPermission({"reports:read", "reports:generate"})
+        @SuppressWarnings("unused")
         public void methodWithDifferentPermissions() {
             // Empty method used only for testing method-level vs class-level annotation priority
         }

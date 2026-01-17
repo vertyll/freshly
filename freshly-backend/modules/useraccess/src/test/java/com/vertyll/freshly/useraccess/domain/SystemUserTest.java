@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import com.vertyll.freshly.useraccess.domain.exception.*;
 
 class SystemUserTest {
+    private static final String KEYCLOAK_USER_ID_CANNOT_BE_NULL = "Keycloak user ID cannot be null";
+    private static final String ROLES_CANNOT_BE_NULL = "Roles cannot be null";
 
     @Test
     @DisplayName("Should create user with valid data")
@@ -18,7 +20,8 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         boolean isActive = true;
-        Set<UserRoleEnum> roles = Set.of(UserRoleEnum.USER);
+        Set<com.vertyll.freshly.common.enums.UserRoleEnum> roles =
+                Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER);
 
         // When
         SystemUser user = new SystemUser(keycloakUserId, isActive, roles);
@@ -26,7 +29,8 @@ class SystemUserTest {
         // Then
         assertThat(user.getKeycloakUserId()).isEqualTo(keycloakUserId);
         assertThat(user.isActive()).isTrue();
-        assertThat(user.getRoles()).containsExactly(UserRoleEnum.USER);
+        assertThat(user.getRoles())
+                .containsExactly(com.vertyll.freshly.common.enums.UserRoleEnum.USER);
     }
 
     @Test
@@ -34,14 +38,19 @@ class SystemUserTest {
     void shouldCreateUserWithMultipleRoles() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        Set<UserRoleEnum> roles = Set.of(UserRoleEnum.USER, UserRoleEnum.ADMIN);
+        Set<com.vertyll.freshly.common.enums.UserRoleEnum> roles =
+                Set.of(
+                        com.vertyll.freshly.common.enums.UserRoleEnum.USER,
+                        com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
 
         // When
         SystemUser user = new SystemUser(keycloakUserId, true, roles);
 
         // Then
         assertThat(user.getRoles())
-                .containsExactlyInAnyOrder(UserRoleEnum.USER, UserRoleEnum.ADMIN);
+                .containsExactlyInAnyOrder(
+                        com.vertyll.freshly.common.enums.UserRoleEnum.USER,
+                        com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
     }
 
     @Test
@@ -49,12 +58,13 @@ class SystemUserTest {
     @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenKeycloakUserIdIsNull() {
         // Given
-        Set<UserRoleEnum> roles = Set.of(UserRoleEnum.USER);
+        Set<com.vertyll.freshly.common.enums.UserRoleEnum> roles =
+                Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER);
 
         // When & Then
         assertThatThrownBy(() -> new SystemUser(null, true, roles))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("Keycloak user ID cannot be null");
+                .hasMessageContaining(KEYCLOAK_USER_ID_CANNOT_BE_NULL);
     }
 
     @Test
@@ -67,7 +77,7 @@ class SystemUserTest {
         // When & Then
         assertThatThrownBy(() -> new SystemUser(keycloakUserId, true, null))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("Roles cannot be null");
+                .hasMessageContaining(ROLES_CANNOT_BE_NULL);
     }
 
     @Test
@@ -75,7 +85,7 @@ class SystemUserTest {
     void shouldThrowExceptionWhenRolesAreEmpty() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        Set<UserRoleEnum> emptyRoles = Set.of();
+        Set<com.vertyll.freshly.common.enums.UserRoleEnum> emptyRoles = Set.of();
 
         // When & Then
         assertThatThrownBy(() -> new SystemUser(keycloakUserId, true, emptyRoles))
@@ -88,7 +98,8 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         boolean isActive = false;
-        Set<UserRoleEnum> roles = Set.of(UserRoleEnum.ADMIN);
+        Set<com.vertyll.freshly.common.enums.UserRoleEnum> roles =
+                Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
 
         // When
         SystemUser user = SystemUser.reconstitute(keycloakUserId, isActive, roles, 1L);
@@ -96,7 +107,8 @@ class SystemUserTest {
         // Then
         assertThat(user.getKeycloakUserId()).isEqualTo(keycloakUserId);
         assertThat(user.isActive()).isFalse();
-        assertThat(user.getRoles()).containsExactly(UserRoleEnum.ADMIN);
+        assertThat(user.getRoles())
+                .containsExactly(com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
     }
 
     @Test
@@ -104,7 +116,8 @@ class SystemUserTest {
     void shouldActivateInactiveUser() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        Set<UserRoleEnum> roles = Set.of(UserRoleEnum.USER);
+        Set<com.vertyll.freshly.common.enums.UserRoleEnum> roles =
+                Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER);
         SystemUser user = new SystemUser(keycloakUserId, false, roles);
 
         // When
@@ -119,7 +132,11 @@ class SystemUserTest {
     void shouldThrowExceptionWhenActivatingAlreadyActiveUser() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user =
+                new SystemUser(
+                        keycloakUserId,
+                        true,
+                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
 
         // When & Then
         assertThatThrownBy(user::activate)
@@ -133,7 +150,11 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         UUID loggedInUserId = UUID.randomUUID();
-        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user =
+                new SystemUser(
+                        keycloakUserId,
+                        true,
+                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
 
         // When
         user.deactivate(loggedInUserId);
@@ -148,7 +169,11 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         UUID loggedInUserId = UUID.randomUUID();
-        SystemUser user = new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER));
+        SystemUser user =
+                new SystemUser(
+                        keycloakUserId,
+                        false,
+                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
 
         // When & Then
         assertThatThrownBy(() -> user.deactivate(loggedInUserId))
@@ -161,7 +186,9 @@ class SystemUserTest {
     void shouldThrowExceptionWhenUserTriesToDeactivateThemselves() {
         // Given
         UUID userId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user =
+                new SystemUser(
+                        userId, true, Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
 
         // When & Then
         assertThatThrownBy(() -> user.deactivate(userId))
@@ -174,7 +201,11 @@ class SystemUserTest {
     void shouldDeactivateSelf() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user =
+                new SystemUser(
+                        keycloakUserId,
+                        true,
+                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
 
         // When
         user.deactivateSelf();
@@ -188,7 +219,11 @@ class SystemUserTest {
     void shouldThrowExceptionWhenDeactivatingSelfWhileAlreadyInactive() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user = new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER));
+        SystemUser user =
+                new SystemUser(
+                        keycloakUserId,
+                        false,
+                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
 
         // When & Then
         assertThatThrownBy(user::deactivateSelf).isInstanceOf(UserAlreadyInactiveException.class);
@@ -199,14 +234,20 @@ class SystemUserTest {
     void shouldReplaceUserRoles() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
-        Set<UserRoleEnum> newRoles = Set.of(UserRoleEnum.ADMIN);
+        SystemUser user =
+                new SystemUser(
+                        keycloakUserId,
+                        true,
+                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
+        Set<com.vertyll.freshly.common.enums.UserRoleEnum> newRoles =
+                Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
 
         // When
         user.replaceRoles(newRoles);
 
         // Then
-        assertThat(user.getRoles()).containsExactly(UserRoleEnum.ADMIN);
+        assertThat(user.getRoles())
+                .containsExactly(com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
     }
 
     @Test
@@ -214,15 +255,24 @@ class SystemUserTest {
     void shouldReplaceSingleRoleWithMultipleRoles() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
-        Set<UserRoleEnum> newRoles = Set.of(UserRoleEnum.USER, UserRoleEnum.ADMIN);
+        SystemUser user =
+                new SystemUser(
+                        keycloakUserId,
+                        true,
+                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
+        Set<com.vertyll.freshly.common.enums.UserRoleEnum> newRoles =
+                Set.of(
+                        com.vertyll.freshly.common.enums.UserRoleEnum.USER,
+                        com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
 
         // When
         user.replaceRoles(newRoles);
 
         // Then
         assertThat(user.getRoles())
-                .containsExactlyInAnyOrder(UserRoleEnum.USER, UserRoleEnum.ADMIN);
+                .containsExactlyInAnyOrder(
+                        com.vertyll.freshly.common.enums.UserRoleEnum.USER,
+                        com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
     }
 
     @Test
@@ -231,12 +281,16 @@ class SystemUserTest {
     void shouldThrowExceptionWhenReplacingRolesWithNull() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user =
+                new SystemUser(
+                        keycloakUserId,
+                        true,
+                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
 
         // When & Then
         assertThatThrownBy(() -> user.replaceRoles(null))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("Roles cannot be null");
+                .hasMessageContaining(ROLES_CANNOT_BE_NULL);
     }
 
     @Test
@@ -244,8 +298,12 @@ class SystemUserTest {
     void shouldThrowExceptionWhenReplacingRolesWithEmptySet() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
-        Set<UserRoleEnum> emptyRoles = Set.of();
+        SystemUser user =
+                new SystemUser(
+                        keycloakUserId,
+                        true,
+                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
+        Set<com.vertyll.freshly.common.enums.UserRoleEnum> emptyRoles = Set.of();
 
         // When & Then
         assertThatThrownBy(() -> user.replaceRoles(emptyRoles))
@@ -258,7 +316,8 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         boolean isActive = false;
-        Set<UserRoleEnum> roles = Set.of(UserRoleEnum.USER);
+        Set<com.vertyll.freshly.common.enums.UserRoleEnum> roles =
+                Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER);
 
         // When
         SystemUser user = new SystemUser(keycloakUserId, isActive, roles);

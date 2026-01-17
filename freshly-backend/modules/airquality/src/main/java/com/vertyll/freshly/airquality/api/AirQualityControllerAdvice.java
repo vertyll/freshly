@@ -17,9 +17,17 @@ import com.vertyll.freshly.airquality.domain.exception.StationNotFoundException;
 @RestControllerAdvice(assignableTypes = AirQualityController.class)
 public class AirQualityControllerAdvice {
 
-    private final MessageSource messageSource;
-
     private static final Logger LOGGER = LogManager.getLogger(AirQualityControllerAdvice.class);
+
+    private static final String ERROR_STATION_NOT_FOUND_MSG_KEY =
+            "error.airquality.stationNotFound";
+    private static final String ERROR_DATA_NOT_FOUND_MSG_KEY = "error.airquality.dataNotFound";
+    private static final String ERROR_INVALID_DATE_RANGE_MSG_KEY =
+            "error.airquality.invalidDateRange";
+    private static final String ERROR_GIOS_API_UNAVAILABLE_MSG_KEY =
+            "error.airquality.giosApiUnavailable";
+
+    private final MessageSource messageSource;
 
     public AirQualityControllerAdvice(MessageSource messageSource) {
         this.messageSource = messageSource;
@@ -30,7 +38,7 @@ public class AirQualityControllerAdvice {
         LOGGER.warn("Station not found: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.airquality.stationNotFound", null, LocaleContextHolder.getLocale());
+                        ERROR_STATION_NOT_FOUND_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, message);
     }
 
@@ -39,7 +47,7 @@ public class AirQualityControllerAdvice {
         LOGGER.warn("Air quality data not found: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.airquality.dataNotFound", null, LocaleContextHolder.getLocale());
+                        ERROR_DATA_NOT_FOUND_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, message);
     }
 
@@ -48,7 +56,7 @@ public class AirQualityControllerAdvice {
         LOGGER.warn("Invalid date range: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.airquality.invalidDateRange", null, LocaleContextHolder.getLocale());
+                        ERROR_INVALID_DATE_RANGE_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
 
@@ -57,9 +65,7 @@ public class AirQualityControllerAdvice {
         LOGGER.error("GIOS API error: {}", ex.getMessage(), ex);
         String message =
                 messageSource.getMessage(
-                        "error.airquality.giosApiUnavailable",
-                        null,
-                        LocaleContextHolder.getLocale());
+                        ERROR_GIOS_API_UNAVAILABLE_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, message);
     }
 }

@@ -35,6 +35,91 @@ import com.vertyll.freshly.common.exception.GlobalExceptionHandler;
 @ExtendWith(MockitoExtension.class)
 class AirQualityControllerTest {
 
+    private static final String ENDPOINT_STATIONS = "/air-quality/stations";
+    private static final String ENDPOINT_STATION_INDEX = "/air-quality/stations/{stationId}/index";
+    private static final String ENDPOINT_STATION_SENSORS =
+            "/air-quality/stations/{stationId}/sensors";
+    private static final String ENDPOINT_STATION_LATEST =
+            "/air-quality/stations/{stationId}/latest";
+    private static final String ENDPOINT_STATION_HISTORY =
+            "/air-quality/stations/{stationId}/history";
+    private static final String ENDPOINT_SYNC_TRIGGER = "/air-quality/sync/trigger";
+    private static final String ENDPOINT_STATIONS_NEAREST = "/air-quality/stations/nearest";
+    private static final String ENDPOINT_STATION_STATISTICS =
+            "/air-quality/stations/{stationId}/statistics";
+    private static final String ENDPOINT_STATIONS_RANKING = "/air-quality/stations/ranking";
+
+    private static final String PARAM_DAYS = "days";
+    private static final String PARAM_LATITUDE = "latitude";
+    private static final String PARAM_LONGITUDE = "longitude";
+    private static final String PARAM_RADIUS = "radius";
+    private static final String PARAM_LIMIT = "limit";
+
+    private static final String JSON_PATH_DATA = "$.data";
+    private static final String JSON_PATH_DATA_0_ID = "$.data[0].id";
+    private static final String JSON_PATH_DATA_0_NAME = "$.data[0].name";
+    private static final String JSON_PATH_DATA_1_ID = "$.data[1].id";
+    private static final String JSON_PATH_DATA_STATION_ID = "$.data.stationId";
+    private static final String JSON_PATH_DATA_OVERALL_INDEX = "$.data.overallIndex";
+    private static final String JSON_PATH_DATA_0_PARAM_CODE = "$.data[0].paramCode";
+    private static final String JSON_PATH_DATA_PM10_VALUE = "$.data.pm10Value";
+    private static final String JSON_PATH_DATA_0_DISTANCE = "$.data[0].distanceInKm";
+    private static final String JSON_PATH_DATA_PM10_AVERAGE = "$.data.pm10.average";
+    private static final String JSON_PATH_DATA_0_STATION_ID = "$.data[0].station.id";
+
+    private static final String STATION_1_NAME = "Station 1";
+    private static final String STATION_2_NAME = "Station 2";
+    private static final String CITY_WARSAW = "Warsaw";
+    private static final String CITY_KRAKOW = "Krakow";
+    private static final String STREET_1 = "Street 1";
+    private static final String STREET_2 = "Street 2";
+    private static final String QUALITY_GOOD_PL = "Dobry";
+    private static final String QUALITY_MODERATE_PL = "Umiarkowany";
+    private static final String QUALITY_GOOD_EN = "GOOD";
+    private static final String PARAM_PM10 = "PM10";
+    private static final String PARAM_PM10_NAME = "Pył zawieszony PM10";
+    private static final String SYNC_TRIGGERED_MESSAGE = "Synchronization triggered";
+    private static final String MESSAGE_SUCCESS = "Success";
+    private static final String MEASUREMENT_ID = "id-123";
+
+    private static final int STATION_ID_123 = 123;
+    private static final int STATION_ID_124 = 124;
+    private static final int STATION_ID_999 = 999;
+    private static final int SENSOR_ID_1 = 1;
+    private static final int DEFAULT_DAYS = 7;
+    private static final int CUSTOM_DAYS_30 = 30;
+    private static final int DEFAULT_RADIUS = 10;
+    private static final int CUSTOM_RADIUS_50 = 50;
+    private static final int DEFAULT_LIMIT = 10;
+    private static final int CUSTOM_LIMIT_20 = 20;
+    private static final int MEASUREMENT_COUNT_100 = 100;
+    private static final int RANK_1 = 1;
+    private static final int MEASUREMENT_COUNT_90 = 90;
+
+    private static final double LAT_WARSAW = 52.2297;
+    private static final double LON_WARSAW = 21.0122;
+    private static final double LAT_KRAKOW = 50.0647;
+    private static final double LON_KRAKOW = 19.9450;
+    private static final double PM10_VALUE_25_5 = 25.5;
+    private static final double PM10_VALUE_30_2 = 30.2;
+    private static final double DISTANCE_5_5_KM = 5.5;
+    private static final double PM10_MIN_10_0 = 10.0;
+    private static final double PM10_MAX_50_0 = 50.0;
+    private static final double PM25_AVG_15_2 = 15.2;
+    private static final double PM25_MIN_5_0 = 5.0;
+    private static final double PM25_MAX_30_0 = 30.0;
+    private static final double SO2_AVG_8_5 = 8.5;
+    private static final double NO2_AVG_12_3 = 12.3;
+    private static final double CO_AVG_0_5 = 0.5;
+    private static final double O3_AVG_45_2 = 45.2;
+
+    private static final int QUALITY_VERY_GOOD_20 = 20;
+    private static final int QUALITY_GOOD_30 = 30;
+    private static final int QUALITY_MODERATE_25 = 25;
+    private static final int QUALITY_SUFFICIENT_15 = 15;
+    private static final int QUALITY_BAD_8 = 8;
+    private static final int QUALITY_VERY_BAD_2 = 2;
+
     private MockMvc mockMvc;
 
     @Mock
@@ -58,7 +143,7 @@ class AirQualityControllerTest {
     @BeforeEach
     @SuppressWarnings("NullAway.Init")
     void setUp() {
-        when(messageSource.getMessage(anyString(), any(), any())).thenReturn("Success");
+        when(messageSource.getMessage(anyString(), any(), any())).thenReturn(MESSAGE_SUCCESS);
 
         mockMvc =
                 MockMvcBuilders.standaloneSetup(airQualityController)
@@ -77,30 +162,52 @@ class AirQualityControllerTest {
         void shouldGetAllStationsSuccessfully() throws Exception {
             // Given
             Station station1 =
-                    new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
+                    new Station(
+                            STATION_ID_123,
+                            STATION_1_NAME,
+                            CITY_WARSAW,
+                            STREET_1,
+                            LAT_WARSAW,
+                            LON_WARSAW);
             Station station2 =
-                    new Station(124, "Station 2", "Krakow", "Street 2", 50.0647, 19.9450);
+                    new Station(
+                            STATION_ID_124,
+                            STATION_2_NAME,
+                            CITY_KRAKOW,
+                            STREET_2,
+                            LAT_KRAKOW,
+                            LON_KRAKOW);
             List<Station> stations = List.of(station1, station2);
 
             StationResponseDto dto1 =
                     new StationResponseDto(
-                            123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
+                            STATION_ID_123,
+                            STATION_1_NAME,
+                            CITY_WARSAW,
+                            STREET_1,
+                            LAT_WARSAW,
+                            LON_WARSAW);
             StationResponseDto dto2 =
                     new StationResponseDto(
-                            124, "Station 2", "Krakow", "Street 2", 50.0647, 19.9450);
+                            STATION_ID_124,
+                            STATION_2_NAME,
+                            CITY_KRAKOW,
+                            STREET_2,
+                            LAT_KRAKOW,
+                            LON_KRAKOW);
             List<StationResponseDto> responseDtos = List.of(dto1, dto2);
 
             when(airQualityService.getAllStations()).thenReturn(stations);
             when(dtoMapper.toStationResponseList(stations)).thenReturn(responseDtos);
 
             // When & Then
-            mockMvc.perform(get("/air-quality/stations").contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATIONS).contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data", hasSize(2)))
-                    .andExpect(jsonPath("$.data[0].id").value(123))
-                    .andExpect(jsonPath("$.data[0].name").value("Station 1"))
-                    .andExpect(jsonPath("$.data[1].id").value(124));
+                    .andExpect(jsonPath(JSON_PATH_DATA, hasSize(2)))
+                    .andExpect(jsonPath(JSON_PATH_DATA_0_ID).value(STATION_ID_123))
+                    .andExpect(jsonPath(JSON_PATH_DATA_0_NAME).value(STATION_1_NAME))
+                    .andExpect(jsonPath(JSON_PATH_DATA_1_ID).value(STATION_ID_124));
 
             verify(airQualityService).getAllStations();
             verify(dtoMapper).toStationResponseList(stations);
@@ -115,10 +222,10 @@ class AirQualityControllerTest {
                     .thenReturn(Collections.emptyList());
 
             // When & Then
-            mockMvc.perform(get("/air-quality/stations").contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATIONS).contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data", hasSize(0)));
+                    .andExpect(jsonPath(JSON_PATH_DATA, hasSize(0)));
 
             verify(airQualityService).getAllStations();
         }
@@ -132,37 +239,37 @@ class AirQualityControllerTest {
         @DisplayName("Should get air quality index successfully")
         void shouldGetAirQualityIndexSuccessfully() throws Exception {
             // Given
-            int stationId = 123;
             AirQualityIndex index =
                     new AirQualityIndex(
-                            stationId,
+                            STATION_ID_123,
                             LocalDateTime.now(ZoneOffset.UTC),
-                            "Dobry",
-                            "Dobry",
-                            "Umiarkowany",
-                            "Dobry");
+                            QUALITY_GOOD_PL,
+                            QUALITY_GOOD_PL,
+                            QUALITY_MODERATE_PL,
+                            QUALITY_GOOD_PL);
             AirQualityIndexResponseDto responseDto =
                     new AirQualityIndexResponseDto(
-                            stationId,
+                            STATION_ID_123,
                             LocalDateTime.now(ZoneOffset.UTC),
-                            "Dobry",
-                            "Dobry",
-                            "Umiarkowany",
-                            "Dobry");
+                            QUALITY_GOOD_PL,
+                            QUALITY_GOOD_PL,
+                            QUALITY_MODERATE_PL,
+                            QUALITY_GOOD_PL);
 
-            when(airQualityService.getIndexForStation(stationId)).thenReturn(Optional.of(index));
+            when(airQualityService.getIndexForStation(STATION_ID_123))
+                    .thenReturn(Optional.of(index));
             when(dtoMapper.toAirQualityIndexResponse(index)).thenReturn(responseDto);
 
             // When & Then
             mockMvc.perform(
-                            get("/air-quality/stations/{stationId}/index", stationId)
+                            get(ENDPOINT_STATION_INDEX, STATION_ID_123)
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.stationId").value(stationId))
-                    .andExpect(jsonPath("$.data.overallIndex").value("Dobry"));
+                    .andExpect(jsonPath(JSON_PATH_DATA_STATION_ID).value(STATION_ID_123))
+                    .andExpect(jsonPath(JSON_PATH_DATA_OVERALL_INDEX).value(QUALITY_GOOD_PL));
 
-            verify(airQualityService).getIndexForStation(stationId);
+            verify(airQualityService).getIndexForStation(STATION_ID_123);
             verify(dtoMapper).toAirQualityIndexResponse(index);
         }
 
@@ -170,17 +277,16 @@ class AirQualityControllerTest {
         @DisplayName("Should throw exception when index not found")
         void shouldThrowExceptionWhenIndexNotFound() throws Exception {
             // Given
-            int stationId = 999;
-            when(airQualityService.getIndexForStation(stationId)).thenReturn(Optional.empty());
+            when(airQualityService.getIndexForStation(STATION_ID_999)).thenReturn(Optional.empty());
 
             // When & Then
             mockMvc.perform(
-                            get("/air-quality/stations/{stationId}/index", stationId)
+                            get(ENDPOINT_STATION_INDEX, STATION_ID_999)
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isNotFound());
 
-            verify(airQualityService).getIndexForStation(stationId);
+            verify(airQualityService).getIndexForStation(STATION_ID_999);
             verify(dtoMapper, never()).toAirQualityIndexResponse(any());
         }
     }
@@ -193,34 +299,36 @@ class AirQualityControllerTest {
         @DisplayName("Should get sensor measurements successfully")
         void shouldGetSensorMeasurementsSuccessfully() throws Exception {
             // Given
-            int stationId = 123;
             SensorMeasurement.Reading reading1 =
-                    new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
+                    new SensorMeasurement.Reading(
+                            LocalDateTime.now(ZoneOffset.UTC), PM10_VALUE_25_5);
             SensorMeasurement.Reading reading2 =
                     new SensorMeasurement.Reading(
-                            LocalDateTime.now(ZoneOffset.UTC).minusHours(1), 30.2);
+                            LocalDateTime.now(ZoneOffset.UTC).minusHours(1), PM10_VALUE_30_2);
             SensorMeasurement measurement =
                     new SensorMeasurement(
-                            1, "PM10", "Pył zawieszony PM10", List.of(reading1, reading2));
+                            SENSOR_ID_1, PARAM_PM10, PARAM_PM10_NAME, List.of(reading1, reading2));
             List<SensorMeasurement> measurements = List.of(measurement);
 
             SensorMeasurementResponseDto responseDto =
-                    new SensorMeasurementResponseDto(1, "PM10", "Pył zawieszony PM10", List.of());
+                    new SensorMeasurementResponseDto(
+                            SENSOR_ID_1, PARAM_PM10, PARAM_PM10_NAME, List.of());
             List<SensorMeasurementResponseDto> responseDtos = List.of(responseDto);
 
-            when(airQualityService.getMeasurementsForStation(stationId)).thenReturn(measurements);
+            when(airQualityService.getMeasurementsForStation(STATION_ID_123))
+                    .thenReturn(measurements);
             when(dtoMapper.toSensorMeasurementResponseList(measurements)).thenReturn(responseDtos);
 
             // When & Then
             mockMvc.perform(
-                            get("/air-quality/stations/{stationId}/sensors", stationId)
+                            get(ENDPOINT_STATION_SENSORS, STATION_ID_123)
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data", hasSize(1)))
-                    .andExpect(jsonPath("$.data[0].paramCode").value("PM10"));
+                    .andExpect(jsonPath(JSON_PATH_DATA, hasSize(1)))
+                    .andExpect(jsonPath(JSON_PATH_DATA_0_PARAM_CODE).value(PARAM_PM10));
 
-            verify(airQualityService).getMeasurementsForStation(stationId);
+            verify(airQualityService).getMeasurementsForStation(STATION_ID_123);
             verify(dtoMapper).toSensorMeasurementResponseList(measurements);
         }
 
@@ -228,21 +336,20 @@ class AirQualityControllerTest {
         @DisplayName("Should return empty list when no measurements")
         void shouldReturnEmptyListWhenNoMeasurements() throws Exception {
             // Given
-            int stationId = 123;
-            when(airQualityService.getMeasurementsForStation(stationId))
+            when(airQualityService.getMeasurementsForStation(STATION_ID_123))
                     .thenReturn(Collections.emptyList());
             when(dtoMapper.toSensorMeasurementResponseList(Collections.emptyList()))
                     .thenReturn(Collections.emptyList());
 
             // When & Then
             mockMvc.perform(
-                            get("/air-quality/stations/{stationId}/sensors", stationId)
+                            get(ENDPOINT_STATION_SENSORS, STATION_ID_123)
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data", hasSize(0)));
+                    .andExpect(jsonPath(JSON_PATH_DATA, hasSize(0)));
 
-            verify(airQualityService).getMeasurementsForStation(stationId);
+            verify(airQualityService).getMeasurementsForStation(STATION_ID_123);
         }
     }
 
@@ -254,25 +361,24 @@ class AirQualityControllerTest {
         @DisplayName("Should get latest measurement successfully")
         void shouldGetLatestMeasurementSuccessfully() throws Exception {
             // Given
-            int stationId = 123;
             AirQualityMeasurement measurement = new AirQualityMeasurement();
-            measurement.setStationId(stationId);
-            measurement.setStationName("Station 1");
+            measurement.setStationId(STATION_ID_123);
+            measurement.setStationName(STATION_1_NAME);
             measurement.setOverallIndexLevel(AirQualityLevel.GOOD);
-            measurement.setPm10Value(25.5);
+            measurement.setPm10Value(PM10_VALUE_25_5);
 
             AirQualityMeasurementResponseDto responseDto =
                     new AirQualityMeasurementResponseDto(
-                            "id-123",
-                            stationId,
-                            "Station 1",
+                            MEASUREMENT_ID,
+                            STATION_ID_123,
+                            STATION_1_NAME,
                             LocalDateTime.now(ZoneOffset.UTC),
-                            "GOOD",
+                            QUALITY_GOOD_EN,
                             null,
                             null,
                             null,
                             null,
-                            25.5,
+                            PM10_VALUE_25_5,
                             null,
                             null,
                             null,
@@ -280,20 +386,20 @@ class AirQualityControllerTest {
                             null,
                             LocalDateTime.now(ZoneOffset.UTC));
 
-            when(airQualityService.getLatestMeasurement(stationId))
+            when(airQualityService.getLatestMeasurement(STATION_ID_123))
                     .thenReturn(Optional.of(measurement));
             when(dtoMapper.toAirQualityMeasurementResponse(measurement)).thenReturn(responseDto);
 
             // When & Then
             mockMvc.perform(
-                            get("/air-quality/stations/{stationId}/latest", stationId)
+                            get(ENDPOINT_STATION_LATEST, STATION_ID_123)
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.stationId").value(stationId))
-                    .andExpect(jsonPath("$.data.pm10Value").value(25.5));
+                    .andExpect(jsonPath(JSON_PATH_DATA_STATION_ID).value(STATION_ID_123))
+                    .andExpect(jsonPath(JSON_PATH_DATA_PM10_VALUE).value(PM10_VALUE_25_5));
 
-            verify(airQualityService).getLatestMeasurement(stationId);
+            verify(airQualityService).getLatestMeasurement(STATION_ID_123);
             verify(dtoMapper).toAirQualityMeasurementResponse(measurement);
         }
 
@@ -301,17 +407,17 @@ class AirQualityControllerTest {
         @DisplayName("Should throw exception when latest measurement not found")
         void shouldThrowExceptionWhenLatestMeasurementNotFound() throws Exception {
             // Given
-            int stationId = 999;
-            when(airQualityService.getLatestMeasurement(stationId)).thenReturn(Optional.empty());
+            when(airQualityService.getLatestMeasurement(STATION_ID_999))
+                    .thenReturn(Optional.empty());
 
             // When & Then
             mockMvc.perform(
-                            get("/air-quality/stations/{stationId}/latest", stationId)
+                            get(ENDPOINT_STATION_LATEST, STATION_ID_999)
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isNotFound());
 
-            verify(airQualityService).getLatestMeasurement(stationId);
+            verify(airQualityService).getLatestMeasurement(STATION_ID_999);
             verify(dtoMapper, never()).toAirQualityMeasurementResponse(any());
         }
     }
@@ -324,21 +430,20 @@ class AirQualityControllerTest {
         @DisplayName("Should get historical measurements successfully with default days")
         void shouldGetHistoricalMeasurementsWithDefaultDays() throws Exception {
             // Given
-            int stationId = 123;
             List<AirQualityMeasurement> measurements = List.of(new AirQualityMeasurement());
             List<AirQualityMeasurementResponseDto> responseDtos =
                     List.of(
                             new AirQualityMeasurementResponseDto(
-                                    "id-123",
-                                    stationId,
-                                    "Station 1",
+                                    MEASUREMENT_ID,
+                                    STATION_ID_123,
+                                    STATION_1_NAME,
                                     LocalDateTime.now(ZoneOffset.UTC),
-                                    "GOOD",
+                                    QUALITY_GOOD_EN,
                                     null,
                                     null,
                                     null,
                                     null,
-                                    25.5,
+                                    PM10_VALUE_25_5,
                                     null,
                                     null,
                                     null,
@@ -346,42 +451,40 @@ class AirQualityControllerTest {
                                     null,
                                     LocalDateTime.now(ZoneOffset.UTC)));
 
-            when(airQualityService.getHistoricalMeasurements(stationId, 7))
+            when(airQualityService.getHistoricalMeasurements(STATION_ID_123, DEFAULT_DAYS))
                     .thenReturn(measurements);
             when(dtoMapper.toAirQualityMeasurementResponseList(measurements))
                     .thenReturn(responseDtos);
 
             // When & Then
             mockMvc.perform(
-                            get("/air-quality/stations/{stationId}/history", stationId)
+                            get(ENDPOINT_STATION_HISTORY, STATION_ID_123)
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data", hasSize(1)));
+                    .andExpect(jsonPath(JSON_PATH_DATA, hasSize(1)));
 
-            verify(airQualityService).getHistoricalMeasurements(stationId, 7);
+            verify(airQualityService).getHistoricalMeasurements(STATION_ID_123, DEFAULT_DAYS);
         }
 
         @Test
         @DisplayName("Should get historical measurements with custom days parameter")
         void shouldGetHistoricalMeasurementsWithCustomDays() throws Exception {
             // Given
-            int stationId = 123;
-            int days = 30;
             List<AirQualityMeasurement> measurements = List.of(new AirQualityMeasurement());
             List<AirQualityMeasurementResponseDto> responseDtos =
                     List.of(
                             new AirQualityMeasurementResponseDto(
-                                    "id-123",
-                                    stationId,
-                                    "Station 1",
+                                    MEASUREMENT_ID,
+                                    STATION_ID_123,
+                                    STATION_1_NAME,
                                     LocalDateTime.now(ZoneOffset.UTC),
-                                    "GOOD",
+                                    QUALITY_GOOD_EN,
                                     null,
                                     null,
                                     null,
                                     null,
-                                    25.5,
+                                    PM10_VALUE_25_5,
                                     null,
                                     null,
                                     null,
@@ -389,21 +492,21 @@ class AirQualityControllerTest {
                                     null,
                                     LocalDateTime.now(ZoneOffset.UTC)));
 
-            when(airQualityService.getHistoricalMeasurements(stationId, days))
+            when(airQualityService.getHistoricalMeasurements(STATION_ID_123, CUSTOM_DAYS_30))
                     .thenReturn(measurements);
             when(dtoMapper.toAirQualityMeasurementResponseList(measurements))
                     .thenReturn(responseDtos);
 
             // When & Then
             mockMvc.perform(
-                            get("/air-quality/stations/{stationId}/history", stationId)
-                                    .param("days", String.valueOf(days))
+                            get(ENDPOINT_STATION_HISTORY, STATION_ID_123)
+                                    .param(PARAM_DAYS, String.valueOf(CUSTOM_DAYS_30))
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data", hasSize(1)));
+                    .andExpect(jsonPath(JSON_PATH_DATA, hasSize(1)));
 
-            verify(airQualityService).getHistoricalMeasurements(stationId, days);
+            verify(airQualityService).getHistoricalMeasurements(STATION_ID_123, CUSTOM_DAYS_30);
         }
     }
 
@@ -418,12 +521,10 @@ class AirQualityControllerTest {
             doNothing().when(syncService).triggerManualSync();
 
             // When & Then
-            mockMvc.perform(
-                            post("/air-quality/sync/trigger")
-                                    .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(post(ENDPOINT_SYNC_TRIGGER).contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isAccepted())
-                    .andExpect(jsonPath("$.data").value("Synchronization triggered"));
+                    .andExpect(jsonPath(JSON_PATH_DATA).value(SYNC_TRIGGERED_MESSAGE));
 
             verify(syncService).triggerManualSync();
         }
@@ -437,64 +538,71 @@ class AirQualityControllerTest {
         @DisplayName("Should get nearest stations with default radius")
         void shouldGetNearestStationsWithDefaultRadius() throws Exception {
             // Given
-            double latitude = 52.2297;
-            double longitude = 21.0122;
-            Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
-            StationDistance stationDistance = new StationDistance(station, 5.5);
+            Station station =
+                    new Station(
+                            STATION_ID_123,
+                            STATION_1_NAME,
+                            CITY_WARSAW,
+                            STREET_1,
+                            LAT_WARSAW,
+                            LON_WARSAW);
+            StationDistance stationDistance = new StationDistance(station, DISTANCE_5_5_KM);
             List<StationDistance> stationsWithDistance = List.of(stationDistance);
 
             StationDistanceResponseDto responseDto =
                     new StationDistanceResponseDto(
                             new StationResponseDto(
-                                    123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122),
-                            5.5);
+                                    STATION_ID_123,
+                                    STATION_1_NAME,
+                                    CITY_WARSAW,
+                                    STREET_1,
+                                    LAT_WARSAW,
+                                    LON_WARSAW),
+                            DISTANCE_5_5_KM);
             List<StationDistanceResponseDto> responseDtos = List.of(responseDto);
 
-            when(airQualityService.findNearestStations(latitude, longitude, 10))
+            when(airQualityService.findNearestStations(LAT_WARSAW, LON_WARSAW, DEFAULT_RADIUS))
                     .thenReturn(stationsWithDistance);
             when(dtoMapper.toStationDistanceResponseList(stationsWithDistance))
                     .thenReturn(responseDtos);
 
             // When & Then
             mockMvc.perform(
-                            get("/air-quality/stations/nearest")
-                                    .param("latitude", String.valueOf(latitude))
-                                    .param("longitude", String.valueOf(longitude))
+                            get(ENDPOINT_STATIONS_NEAREST)
+                                    .param(PARAM_LATITUDE, String.valueOf(LAT_WARSAW))
+                                    .param(PARAM_LONGITUDE, String.valueOf(LON_WARSAW))
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data", hasSize(1)))
-                    .andExpect(jsonPath("$.data[0].distanceInKm").value(5.5));
+                    .andExpect(jsonPath(JSON_PATH_DATA, hasSize(1)))
+                    .andExpect(jsonPath(JSON_PATH_DATA_0_DISTANCE).value(DISTANCE_5_5_KM));
 
-            verify(airQualityService).findNearestStations(latitude, longitude, 10);
+            verify(airQualityService).findNearestStations(LAT_WARSAW, LON_WARSAW, DEFAULT_RADIUS);
         }
 
         @Test
         @DisplayName("Should get nearest stations with custom radius")
         void shouldGetNearestStationsWithCustomRadius() throws Exception {
             // Given
-            double latitude = 52.2297;
-            double longitude = 21.0122;
-            double radius = 50;
             List<StationDistance> stationsWithDistance = List.of();
 
-            when(airQualityService.findNearestStations(latitude, longitude, radius))
+            when(airQualityService.findNearestStations(LAT_WARSAW, LON_WARSAW, CUSTOM_RADIUS_50))
                     .thenReturn(stationsWithDistance);
             when(dtoMapper.toStationDistanceResponseList(stationsWithDistance))
                     .thenReturn(List.of());
 
             // When & Then
             mockMvc.perform(
-                            get("/air-quality/stations/nearest")
-                                    .param("latitude", String.valueOf(latitude))
-                                    .param("longitude", String.valueOf(longitude))
-                                    .param("radius", String.valueOf(radius))
+                            get(ENDPOINT_STATIONS_NEAREST)
+                                    .param(PARAM_LATITUDE, String.valueOf(LAT_WARSAW))
+                                    .param(PARAM_LONGITUDE, String.valueOf(LON_WARSAW))
+                                    .param(PARAM_RADIUS, String.valueOf(CUSTOM_RADIUS_50))
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data", hasSize(0)));
+                    .andExpect(jsonPath(JSON_PATH_DATA, hasSize(0)));
 
-            verify(airQualityService).findNearestStations(latitude, longitude, radius);
+            verify(airQualityService).findNearestStations(LAT_WARSAW, LON_WARSAW, CUSTOM_RADIUS_50);
         }
     }
 
@@ -506,75 +614,82 @@ class AirQualityControllerTest {
         @DisplayName("Should get statistics successfully")
         void shouldGetStatisticsSuccessfully() throws Exception {
             // Given
-            int stationId = 123;
             AirQualityStatistics statistics =
                     new AirQualityStatistics(
-                            stationId,
-                            "Station 1",
-                            LocalDateTime.now(ZoneOffset.UTC).minusDays(7),
+                            STATION_ID_123,
+                            STATION_1_NAME,
+                            LocalDateTime.now(ZoneOffset.UTC).minusDays(DEFAULT_DAYS),
                             LocalDateTime.now(ZoneOffset.UTC),
-                            100,
-                            25.5,
-                            10.0,
-                            50.0,
-                            15.2,
-                            5.0,
-                            30.0,
-                            8.5,
-                            12.3,
-                            0.5,
-                            45.2,
-                            20,
-                            30,
-                            25,
-                            15,
-                            8,
-                            2);
+                            MEASUREMENT_COUNT_100,
+                            PM10_VALUE_25_5,
+                            PM10_MIN_10_0,
+                            PM10_MAX_50_0,
+                            PM25_AVG_15_2,
+                            PM25_MIN_5_0,
+                            PM25_MAX_30_0,
+                            SO2_AVG_8_5,
+                            NO2_AVG_12_3,
+                            CO_AVG_0_5,
+                            O3_AVG_45_2,
+                            QUALITY_VERY_GOOD_20,
+                            QUALITY_GOOD_30,
+                            QUALITY_MODERATE_25,
+                            QUALITY_SUFFICIENT_15,
+                            QUALITY_BAD_8,
+                            QUALITY_VERY_BAD_2);
             AirQualityStatisticsResponseDto responseDto =
                     new AirQualityStatisticsResponseDto(
-                            stationId,
-                            "Station 1",
-                            LocalDateTime.now(ZoneOffset.UTC).minusDays(7),
+                            STATION_ID_123,
+                            STATION_1_NAME,
+                            LocalDateTime.now(ZoneOffset.UTC).minusDays(DEFAULT_DAYS),
                             LocalDateTime.now(ZoneOffset.UTC),
-                            100,
-                            new AirQualityStatisticsResponseDto.Pm10Statistics(25.5, 10.0, 50.0),
-                            new AirQualityStatisticsResponseDto.Pm25Statistics(15.2, 5.0, 30.0),
+                            MEASUREMENT_COUNT_100,
+                            new AirQualityStatisticsResponseDto.Pm10Statistics(
+                                    PM10_VALUE_25_5, PM10_MIN_10_0, PM10_MAX_50_0),
+                            new AirQualityStatisticsResponseDto.Pm25Statistics(
+                                    PM25_AVG_15_2, PM25_MIN_5_0, PM25_MAX_30_0),
                             new AirQualityStatisticsResponseDto.OtherPollutants(
-                                    8.5, 12.3, 0.5, 45.2),
+                                    SO2_AVG_8_5, NO2_AVG_12_3, CO_AVG_0_5, O3_AVG_45_2),
                             new AirQualityStatisticsResponseDto.QualityDistribution(
-                                    20, 30, 25, 15, 8, 2),
-                            "GOOD");
+                                    QUALITY_VERY_GOOD_20,
+                                    QUALITY_GOOD_30,
+                                    QUALITY_MODERATE_25,
+                                    QUALITY_SUFFICIENT_15,
+                                    QUALITY_BAD_8,
+                                    QUALITY_VERY_BAD_2),
+                            QUALITY_GOOD_EN);
 
-            when(airQualityService.getStatistics(stationId, 7)).thenReturn(Optional.of(statistics));
+            when(airQualityService.getStatistics(STATION_ID_123, DEFAULT_DAYS))
+                    .thenReturn(Optional.of(statistics));
             when(dtoMapper.toStatisticsResponse(statistics)).thenReturn(responseDto);
 
             // When & Then
             mockMvc.perform(
-                            get("/air-quality/stations/{stationId}/statistics", stationId)
+                            get(ENDPOINT_STATION_STATISTICS, STATION_ID_123)
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.stationId").value(stationId))
-                    .andExpect(jsonPath("$.data.pm10.average").value(25.5));
+                    .andExpect(jsonPath(JSON_PATH_DATA_STATION_ID).value(STATION_ID_123))
+                    .andExpect(jsonPath(JSON_PATH_DATA_PM10_AVERAGE).value(PM10_VALUE_25_5));
 
-            verify(airQualityService).getStatistics(stationId, 7);
+            verify(airQualityService).getStatistics(STATION_ID_123, DEFAULT_DAYS);
         }
 
         @Test
         @DisplayName("Should throw exception when statistics not found")
         void shouldThrowExceptionWhenStatisticsNotFound() throws Exception {
             // Given
-            int stationId = 999;
-            when(airQualityService.getStatistics(stationId, 7)).thenReturn(Optional.empty());
+            when(airQualityService.getStatistics(STATION_ID_999, DEFAULT_DAYS))
+                    .thenReturn(Optional.empty());
 
             // When & Then
             mockMvc.perform(
-                            get("/air-quality/stations/{stationId}/statistics", stationId)
+                            get(ENDPOINT_STATION_STATISTICS, STATION_ID_999)
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isNotFound());
 
-            verify(airQualityService).getStatistics(stationId, 7);
+            verify(airQualityService).getStatistics(STATION_ID_999, DEFAULT_DAYS);
         }
     }
 
@@ -586,53 +701,73 @@ class AirQualityControllerTest {
         @DisplayName("Should get ranking with default parameters")
         void shouldGetRankingWithDefaultParameters() throws Exception {
             // Given
-            Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
-            StationRanking ranking = new StationRanking(1, station, 25.5, AirQualityLevel.GOOD, 90);
+            Station station =
+                    new Station(
+                            STATION_ID_123,
+                            STATION_1_NAME,
+                            CITY_WARSAW,
+                            STREET_1,
+                            LAT_WARSAW,
+                            LON_WARSAW);
+            StationRanking ranking =
+                    new StationRanking(
+                            RANK_1,
+                            station,
+                            PM10_VALUE_25_5,
+                            AirQualityLevel.GOOD,
+                            MEASUREMENT_COUNT_90);
             List<StationRanking> rankings = List.of(ranking);
             StationResponseDto stationDto =
                     new StationResponseDto(
-                            123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
+                            STATION_ID_123,
+                            STATION_1_NAME,
+                            CITY_WARSAW,
+                            STREET_1,
+                            LAT_WARSAW,
+                            LON_WARSAW);
             StationRankingResponseDto responseDto =
-                    new StationRankingResponseDto(1, stationDto, 25.5, "GOOD", 90);
+                    new StationRankingResponseDto(
+                            RANK_1,
+                            stationDto,
+                            PM10_VALUE_25_5,
+                            QUALITY_GOOD_EN,
+                            MEASUREMENT_COUNT_90);
             List<StationRankingResponseDto> responseDtos = List.of(responseDto);
 
-            when(airQualityService.getRanking(7, 10)).thenReturn(rankings);
+            when(airQualityService.getRanking(DEFAULT_DAYS, DEFAULT_LIMIT)).thenReturn(rankings);
             when(dtoMapper.toRankingResponseList(rankings)).thenReturn(responseDtos);
 
             // When & Then
-            mockMvc.perform(
-                            get("/air-quality/stations/ranking")
-                                    .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATIONS_RANKING).contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data", hasSize(1)))
-                    .andExpect(jsonPath("$.data[0].station.id").value(123));
+                    .andExpect(jsonPath(JSON_PATH_DATA, hasSize(1)))
+                    .andExpect(jsonPath(JSON_PATH_DATA_0_STATION_ID).value(STATION_ID_123));
 
-            verify(airQualityService).getRanking(7, 10);
+            verify(airQualityService).getRanking(DEFAULT_DAYS, DEFAULT_LIMIT);
         }
 
         @Test
         @DisplayName("Should get ranking with custom parameters")
         void shouldGetRankingWithCustomParameters() throws Exception {
             // Given
-            int days = 30;
-            int limit = 20;
             List<StationRanking> rankings = List.of();
 
-            when(airQualityService.getRanking(days, limit)).thenReturn(rankings);
+            when(airQualityService.getRanking(CUSTOM_DAYS_30, CUSTOM_LIMIT_20))
+                    .thenReturn(rankings);
             when(dtoMapper.toRankingResponseList(rankings)).thenReturn(List.of());
 
             // When & Then
             mockMvc.perform(
-                            get("/air-quality/stations/ranking")
-                                    .param("days", String.valueOf(days))
-                                    .param("limit", String.valueOf(limit))
+                            get(ENDPOINT_STATIONS_RANKING)
+                                    .param(PARAM_DAYS, String.valueOf(CUSTOM_DAYS_30))
+                                    .param(PARAM_LIMIT, String.valueOf(CUSTOM_LIMIT_20))
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data", hasSize(0)));
+                    .andExpect(jsonPath(JSON_PATH_DATA, hasSize(0)));
 
-            verify(airQualityService).getRanking(days, limit);
+            verify(airQualityService).getRanking(CUSTOM_DAYS_30, CUSTOM_LIMIT_20);
         }
     }
 }

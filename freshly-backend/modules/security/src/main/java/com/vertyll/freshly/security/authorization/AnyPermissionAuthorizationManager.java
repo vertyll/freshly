@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.permission.application.PermissionService;
 import com.vertyll.freshly.security.annotation.RequireAnyPermission;
 
@@ -33,12 +34,16 @@ public class AnyPermissionAuthorizationManager implements AuthorizationManager<M
         // Check method-level annotation first
         RequireAnyPermission methodAnnotation = method.getAnnotation(RequireAnyPermission.class);
         if (methodAnnotation != null) {
-            String[] permissions = methodAnnotation.value();
+            String[] permissionValues = methodAnnotation.value();
+            Permission[] permissions =
+                    Arrays.stream(permissionValues)
+                            .map(Permission::fromValue)
+                            .toArray(Permission[]::new);
             boolean granted = permissionService.hasAnyPermission(authentication.get(), permissions);
             log.debug(
                     "Any permission check for method {}: {} = {}",
                     method.getName(),
-                    Arrays.toString(permissions),
+                    Arrays.toString(permissionValues),
                     granted);
             return new AuthorizationDecision(granted);
         }
@@ -47,12 +52,16 @@ public class AnyPermissionAuthorizationManager implements AuthorizationManager<M
         RequireAnyPermission classAnnotation =
                 method.getDeclaringClass().getAnnotation(RequireAnyPermission.class);
         if (classAnnotation != null) {
-            String[] permissions = classAnnotation.value();
+            String[] permissionValues = classAnnotation.value();
+            Permission[] permissions =
+                    Arrays.stream(permissionValues)
+                            .map(Permission::fromValue)
+                            .toArray(Permission[]::new);
             boolean granted = permissionService.hasAnyPermission(authentication.get(), permissions);
             log.debug(
                     "Any permission check for class {}: {} = {}",
                     method.getDeclaringClass().getSimpleName(),
-                    Arrays.toString(permissions),
+                    Arrays.toString(permissionValues),
                     granted);
             return new AuthorizationDecision(granted);
         }

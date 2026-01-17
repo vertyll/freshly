@@ -20,6 +20,11 @@ class AuthControllerAdvice {
     private final MessageSource messageSource;
     private static final Logger LOGGER = LogManager.getLogger(AuthControllerAdvice.class);
 
+    private static final String AUTH_USERNAME_EXISTS_MSG_KEY = "error.auth.usernameExists";
+    private static final String AUTH_EMAIL_EXISTS_MSG_KEY = "error.auth.emailExists";
+    private static final String AUTH_INVALID_TOKEN_MSG_KEY = "error.auth.invalidToken";
+    private static final String AUTH_INVALID_PASSWORD_MSG_KEY = "error.auth.invalidPassword";
+
     public AuthControllerAdvice(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
@@ -29,7 +34,7 @@ class AuthControllerAdvice {
         LOGGER.warn("Username conflict: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.auth.usernameExists", null, LocaleContextHolder.getLocale());
+                        AUTH_USERNAME_EXISTS_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
     }
 
@@ -38,7 +43,7 @@ class AuthControllerAdvice {
         LOGGER.warn("Email conflict: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.auth.emailExists", null, LocaleContextHolder.getLocale());
+                        AUTH_EMAIL_EXISTS_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
     }
 
@@ -47,7 +52,7 @@ class AuthControllerAdvice {
         LOGGER.warn("Invalid verification token: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.auth.invalidToken", null, LocaleContextHolder.getLocale());
+                        AUTH_INVALID_TOKEN_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
 
@@ -56,7 +61,7 @@ class AuthControllerAdvice {
         LOGGER.warn("Invalid password: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.auth.invalidPassword", null, LocaleContextHolder.getLocale());
+                        AUTH_INVALID_PASSWORD_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, message);
     }
 }

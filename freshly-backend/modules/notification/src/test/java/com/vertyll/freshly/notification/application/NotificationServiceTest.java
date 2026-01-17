@@ -24,6 +24,22 @@ import com.vertyll.freshly.notification.domain.exception.EmailSendingException;
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
 
+    private static final String TEST_EMAIL = "test@example.com";
+    private static final String USER_EMAIL = "user@example.com";
+    private static final String USERNAME_KEY = "username";
+    private static final String USERNAME_VALUE_JOHN = "John";
+    private static final String USERNAME_VALUE_JOHN_DOE = "John Doe";
+    private static final String VERIFICATION_LINK_KEY = "verificationLink";
+    private static final String VERIFICATION_LINK_VALUE = "https://example.com/verify/token123";
+    private static final String RESET_LINK_KEY = "resetLink";
+    private static final String RESET_LINK_VALUE = "https://example.com/reset/token456";
+
+    private static final String SMTP_ERROR_MESSAGE = "SMTP error";
+    private static final String CONNECTION_TIMEOUT_MESSAGE = "Connection timeout";
+
+    private static final int EXPECTED_VARIABLE_SIZE_ONE = 1;
+    private static final int EXPECTED_SENDER_INVOCATIONS = 1;
+
     @Mock
     @SuppressWarnings("NullAway.Init")
     private EmailSender emailSender;
@@ -44,11 +60,14 @@ class NotificationServiceTest {
     @DisplayName("Should send email successfully")
     void shouldSendEmailSuccessfully() {
         // Given
-        String recipientEmail = "test@example.com";
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
         Map<String, Object> variables =
-                Map.of("username", "John", "verificationLink", "https://example.com");
-        SendEmailCommand command = new SendEmailCommand(recipientEmail, template, variables);
+                Map.of(
+                        USERNAME_KEY,
+                        USERNAME_VALUE_JOHN,
+                        VERIFICATION_LINK_KEY,
+                        VERIFICATION_LINK_VALUE);
+        SendEmailCommand command = new SendEmailCommand(TEST_EMAIL, template, variables);
 
         doNothing().when(emailSender).send(any(EmailNotification.class));
 
@@ -59,7 +78,7 @@ class NotificationServiceTest {
         verify(emailSender).send(notificationCaptor.capture());
         EmailNotification sentNotification = notificationCaptor.getValue();
 
-        assertThat(sentNotification.getRecipient().value()).isEqualTo(recipientEmail);
+        assertThat(sentNotification.getRecipient().value()).isEqualTo(TEST_EMAIL);
         assertThat(sentNotification.getTemplate()).isEqualTo(template);
         assertThat(sentNotification.getTemplateVariables()).isEqualTo(variables);
         assertThat(sentNotification.getStatus()).isEqualTo(EmailNotification.EmailStatus.SENT);
@@ -69,92 +88,86 @@ class NotificationServiceTest {
     @DisplayName("Should throw exception when email sending fails")
     void shouldThrowExceptionWhenEmailSendingFails() {
         // Given
-        String recipientEmail = "test@example.com";
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
-        Map<String, Object> variables = Map.of("username", "John");
-        SendEmailCommand command = new SendEmailCommand(recipientEmail, template, variables);
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN);
+        SendEmailCommand command = new SendEmailCommand(TEST_EMAIL, template, variables);
 
-        EmailSendingException exception = new EmailSendingException("SMTP error");
+        EmailSendingException exception = new EmailSendingException(SMTP_ERROR_MESSAGE);
         doThrow(exception).when(emailSender).send(any(EmailNotification.class));
 
         // When & Then
         assertThatThrownBy(() -> notificationService.sendEmail(command))
                 .isInstanceOf(EmailSendingException.class)
-                .hasMessageContaining("SMTP error");
+                .hasMessageContaining(SMTP_ERROR_MESSAGE);
 
         verify(emailSender).send(notificationCaptor.capture());
         EmailNotification failedNotification = notificationCaptor.getValue();
         assertThat(failedNotification.getStatus()).isEqualTo(EmailNotification.EmailStatus.FAILED);
-        assertThat(failedNotification.getErrorMessage()).isEqualTo("SMTP error");
+        assertThat(failedNotification.getErrorMessage()).isEqualTo(SMTP_ERROR_MESSAGE);
     }
 
     @Test
     @DisplayName("Should send email verification successfully")
     void shouldSendEmailVerificationSuccessfully() {
         // Given
-        String email = "user@example.com";
-        String username = "John Doe";
-        String verificationLink = "https://example.com/verify/token123";
-
         doNothing().when(emailSender).send(any(EmailNotification.class));
 
         // When
-        notificationService.sendEmailVerification(email, username, verificationLink);
+        notificationService.sendEmailVerification(
+                USER_EMAIL, USERNAME_VALUE_JOHN_DOE, VERIFICATION_LINK_VALUE);
 
         // Then
         verify(emailSender).send(notificationCaptor.capture());
         EmailNotification sentNotification = notificationCaptor.getValue();
 
-        assertThat(sentNotification.getRecipient().value()).isEqualTo(email);
+        assertThat(sentNotification.getRecipient().value()).isEqualTo(USER_EMAIL);
         assertThat(sentNotification.getTemplate()).isEqualTo(EmailTemplate.EMAIL_VERIFICATION);
-        assertThat(sentNotification.getTemplateVariables()).containsEntry("username", username);
         assertThat(sentNotification.getTemplateVariables())
-                .containsEntry("verificationLink", verificationLink);
+                .containsEntry(USERNAME_KEY, USERNAME_VALUE_JOHN_DOE);
+        assertThat(sentNotification.getTemplateVariables())
+                .containsEntry(VERIFICATION_LINK_KEY, VERIFICATION_LINK_VALUE);
     }
 
     @Test
     @DisplayName("Should send welcome email successfully")
     void shouldSendWelcomeEmailSuccessfully() {
         // Given
-        String email = "user@example.com";
-        String username = "John Doe";
-
         doNothing().when(emailSender).send(any(EmailNotification.class));
 
         // When
-        notificationService.sendWelcomeEmail(email, username);
+        notificationService.sendWelcomeEmail(USER_EMAIL, USERNAME_VALUE_JOHN_DOE);
 
         // Then
         verify(emailSender).send(notificationCaptor.capture());
         EmailNotification sentNotification = notificationCaptor.getValue();
 
-        assertThat(sentNotification.getRecipient().value()).isEqualTo(email);
+        assertThat(sentNotification.getRecipient().value()).isEqualTo(USER_EMAIL);
         assertThat(sentNotification.getTemplate()).isEqualTo(EmailTemplate.USER_REGISTERED);
-        assertThat(sentNotification.getTemplateVariables()).containsEntry("username", username);
-        assertThat(sentNotification.getTemplateVariables()).hasSize(1);
+        assertThat(sentNotification.getTemplateVariables())
+                .containsEntry(USERNAME_KEY, USERNAME_VALUE_JOHN_DOE);
+        assertThat(sentNotification.getTemplateVariables()).hasSize(EXPECTED_VARIABLE_SIZE_ONE);
     }
 
     @Test
     @DisplayName("Should send password reset email successfully")
     void shouldSendPasswordResetEmailSuccessfully() {
         // Given
-        String email = "user@example.com";
-        String username = "John Doe";
-        String resetLink = "https://example.com/reset/token456";
-
         doNothing().when(emailSender).send(any(EmailNotification.class));
 
         // When
-        notificationService.sendPasswordResetEmail(email, username, resetLink);
+        notificationService.sendPasswordResetEmail(
+                USER_EMAIL, USERNAME_VALUE_JOHN_DOE, RESET_LINK_VALUE);
 
         // Then
         verify(emailSender).send(notificationCaptor.capture());
         EmailNotification sentNotification = notificationCaptor.getValue();
 
-        assertThat(sentNotification.getRecipient().value()).isEqualTo(email);
+        assertThat(sentNotification.getRecipient().value()).isEqualTo(USER_EMAIL);
         assertThat(sentNotification.getTemplate()).isEqualTo(EmailTemplate.PASSWORD_RESET);
-        assertThat(sentNotification.getTemplateVariables()).containsEntry("username", username);
-        assertThat(sentNotification.getTemplateVariables()).containsEntry("resetLink", resetLink);
+        assertThat(sentNotification.getTemplateVariables())
+                .containsEntry(USERNAME_KEY, USERNAME_VALUE_JOHN_DOE);
+        assertThat(sentNotification.getTemplateVariables())
+                .containsEntry(RESET_LINK_KEY, RESET_LINK_VALUE);
     }
 
     @Test
@@ -163,9 +176,9 @@ class NotificationServiceTest {
         // Given
         SendEmailCommand command =
                 new SendEmailCommand(
-                        "test@example.com",
+                        TEST_EMAIL,
                         EmailTemplate.USER_REGISTERED,
-                        Map.of("username", "John"));
+                        Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN));
 
         doNothing().when(emailSender).send(any(EmailNotification.class));
 
@@ -186,12 +199,11 @@ class NotificationServiceTest {
         // Given
         SendEmailCommand command =
                 new SendEmailCommand(
-                        "test@example.com",
+                        TEST_EMAIL,
                         EmailTemplate.EMAIL_VERIFICATION,
-                        Map.of("username", "John"));
+                        Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN));
 
-        String errorMessage = "Connection timeout";
-        doThrow(new EmailSendingException(errorMessage))
+        doThrow(new EmailSendingException(CONNECTION_TIMEOUT_MESSAGE))
                 .when(emailSender)
                 .send(any(EmailNotification.class));
 
@@ -203,7 +215,7 @@ class NotificationServiceTest {
         EmailNotification notification = notificationCaptor.getValue();
 
         assertThat(notification.getStatus()).isEqualTo(EmailNotification.EmailStatus.FAILED);
-        assertThat(notification.getErrorMessage()).isEqualTo(errorMessage);
+        assertThat(notification.getErrorMessage()).isEqualTo(CONNECTION_TIMEOUT_MESSAGE);
     }
 
     @Test
@@ -212,9 +224,9 @@ class NotificationServiceTest {
         // Given
         SendEmailCommand command =
                 new SendEmailCommand(
-                        "test@example.com",
+                        TEST_EMAIL,
                         EmailTemplate.USER_REGISTERED,
-                        Map.of("username", "John"));
+                        Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN));
 
         doNothing().when(emailSender).send(any(EmailNotification.class));
 
@@ -222,6 +234,6 @@ class NotificationServiceTest {
         notificationService.sendEmail(command);
 
         // Then
-        verify(emailSender, times(1)).send(any(EmailNotification.class));
+        verify(emailSender, times(EXPECTED_SENDER_INVOCATIONS)).send(any(EmailNotification.class));
     }
 }

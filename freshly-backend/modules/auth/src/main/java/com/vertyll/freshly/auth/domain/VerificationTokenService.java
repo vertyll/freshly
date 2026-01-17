@@ -29,6 +29,16 @@ public class VerificationTokenService {
     private static final String EMAIL_VERIFICATION_TYPE = "email_verification";
     private static final String PASSWORD_RESET_TYPE = "password_reset";
 
+    private static final String ERROR_TOKEN_INVALID_MSG_KEY = "error.auth.tokenInvalid";
+    private static final String ERROR_TOKEN_EXPIRED_MSG_KEY = "error.auth.tokenExpired";
+    private static final String ERROR_TOKEN_TYPE_INVALID_MSG_KEY = "error.auth.tokenTypeInvalid";
+    private static final String ERROR_TOKEN_FORMAT_INVALID_MSG_KEY =
+            "error.auth.tokenFormatInvalid";
+    private static final String ERROR_PASSWORD_RESET_TOKEN_EXPIRED_MSG_KEY =
+            "error.auth.passwordResetTokenExpired";
+    private static final String ERROR_PASSWORD_RESET_TOKEN_INVALID_MSG_KEY =
+            "error.auth.passwordResetTokenInvalid";
+
     private final JwtProperties jwtProperties;
 
     private SecretKey getSigningKey() {
@@ -74,22 +84,19 @@ public class VerificationTokenService {
 
             String type = claims.get(TYPE_CLAIM, String.class);
             if (!EMAIL_VERIFICATION_TYPE.equals(type)) {
-                throw new InvalidVerificationTokenException("Invalid token type");
+                throw new InvalidVerificationTokenException(ERROR_TOKEN_TYPE_INVALID_MSG_KEY);
             }
 
             String userId = claims.getSubject();
             return UUID.fromString(userId);
 
-        } catch (ExpiredJwtException e) {
-            log.warn("Email verification token expired: {}", e.getMessage());
-            throw new InvalidVerificationTokenException(
-                    "Verification token has expired. Please request a new one.");
-        } catch (JwtException e) {
-            log.warn("Invalid email verification token: {}", e.getMessage());
-            throw new InvalidVerificationTokenException("Invalid verification token");
+        } catch (ExpiredJwtException _) {
+            throw new InvalidVerificationTokenException(ERROR_TOKEN_EXPIRED_MSG_KEY);
+        } catch (JwtException _) {
+            throw new InvalidVerificationTokenException(ERROR_TOKEN_INVALID_MSG_KEY);
         } catch (IllegalArgumentException e) {
             log.warn("Invalid user ID in token: {}", e.getMessage());
-            throw new InvalidVerificationTokenException("Invalid token format");
+            throw new InvalidVerificationTokenException(ERROR_TOKEN_FORMAT_INVALID_MSG_KEY);
         }
     }
 
@@ -104,7 +111,7 @@ public class VerificationTokenService {
 
             String type = claims.get(TYPE_CLAIM, String.class);
             if (!PASSWORD_RESET_TYPE.equals(type)) {
-                throw new InvalidVerificationTokenException("Invalid token type");
+                throw new InvalidVerificationTokenException(ERROR_TOKEN_TYPE_INVALID_MSG_KEY);
             }
 
             String userId = claims.getSubject();
@@ -112,14 +119,13 @@ public class VerificationTokenService {
 
         } catch (ExpiredJwtException e) {
             log.warn("Password reset token expired: {}", e.getMessage());
-            throw new InvalidVerificationTokenException(
-                    "Password reset token has expired. Please request a new one.");
+            throw new InvalidVerificationTokenException(ERROR_PASSWORD_RESET_TOKEN_EXPIRED_MSG_KEY);
         } catch (JwtException e) {
             log.warn("Invalid password reset token: {}", e.getMessage());
-            throw new InvalidVerificationTokenException("Invalid password reset token");
+            throw new InvalidVerificationTokenException(ERROR_PASSWORD_RESET_TOKEN_INVALID_MSG_KEY);
         } catch (IllegalArgumentException e) {
             log.warn("Invalid user ID in token: {}", e.getMessage());
-            throw new InvalidVerificationTokenException("Invalid token format");
+            throw new InvalidVerificationTokenException(ERROR_TOKEN_FORMAT_INVALID_MSG_KEY);
         }
     }
 

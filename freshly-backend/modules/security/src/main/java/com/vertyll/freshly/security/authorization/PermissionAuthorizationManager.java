@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.permission.application.PermissionService;
 import com.vertyll.freshly.security.annotation.RequirePermission;
 
@@ -32,7 +33,8 @@ public class PermissionAuthorizationManager implements AuthorizationManager<Meth
         // Check method-level annotation first
         RequirePermission methodAnnotation = method.getAnnotation(RequirePermission.class);
         if (methodAnnotation != null) {
-            String permission = methodAnnotation.value();
+            String permissionValue = methodAnnotation.value();
+            Permission permission = Permission.fromValue(permissionValue);
             boolean granted = permissionService.hasPermission(authentication.get(), permission);
             log.debug(
                     "Permission check for method {}: {} = {}",
@@ -46,12 +48,13 @@ public class PermissionAuthorizationManager implements AuthorizationManager<Meth
         RequirePermission classAnnotation =
                 method.getDeclaringClass().getAnnotation(RequirePermission.class);
         if (classAnnotation != null) {
-            String permission = classAnnotation.value();
+            String permissionValue = classAnnotation.value();
+            Permission permission = Permission.fromValue(permissionValue);
             boolean granted = permissionService.hasPermission(authentication.get(), permission);
             log.debug(
                     "Permission check for class {}: {} = {}",
                     method.getDeclaringClass().getSimpleName(),
-                    permission,
+                    permissionValue,
                     granted);
             return new AuthorizationDecision(granted);
         }

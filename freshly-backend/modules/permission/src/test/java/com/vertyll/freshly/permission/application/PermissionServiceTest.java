@@ -17,7 +17,6 @@ import com.vertyll.freshly.permission.Permission;
 
 @ExtendWith(MockitoExtension.class)
 class PermissionServiceTest {
-
     @Mock
     @SuppressWarnings("NullAway.Init")
     private UserPermissionCache permissionCache;
@@ -43,7 +42,8 @@ class PermissionServiceTest {
         when(permissionCache.getUserPermissions(authentication)).thenReturn(userPermissions);
 
         // When
-        boolean hasPermission = permissionService.hasPermission(authentication, "users:read");
+        boolean hasPermission =
+                permissionService.hasPermission(authentication, Permission.USERS_READ);
 
         // Then
         assertThat(hasPermission).isTrue();
@@ -59,7 +59,8 @@ class PermissionServiceTest {
         when(permissionCache.getUserPermissions(authentication)).thenReturn(userPermissions);
 
         // When
-        boolean hasPermission = permissionService.hasPermission(authentication, "users:delete");
+        boolean hasPermission =
+                permissionService.hasPermission(authentication, Permission.USERS_DELETE);
 
         // Then
         assertThat(hasPermission).isFalse();
@@ -71,7 +72,7 @@ class PermissionServiceTest {
     @SuppressWarnings("NullAway")
     void shouldReturnFalseWhenAuthenticationIsNull() {
         // When
-        boolean hasPermission = permissionService.hasPermission(null, "users:read");
+        boolean hasPermission = permissionService.hasPermission(null, Permission.USERS_READ);
 
         // Then
         assertThat(hasPermission).isFalse();
@@ -85,7 +86,8 @@ class PermissionServiceTest {
         when(authentication.isAuthenticated()).thenReturn(false);
 
         // When
-        boolean hasPermission = permissionService.hasPermission(authentication, "users:read");
+        boolean hasPermission =
+                permissionService.hasPermission(authentication, Permission.USERS_READ);
 
         // Then
         assertThat(hasPermission).isFalse();
@@ -118,7 +120,10 @@ class PermissionServiceTest {
         // When
         boolean hasAnyPermission =
                 permissionService.hasAnyPermission(
-                        authentication, "users:create", "users:read", "users:delete");
+                        authentication,
+                        Permission.USERS_CREATE,
+                        Permission.USERS_READ,
+                        Permission.USERS_DELETE);
 
         // Then
         assertThat(hasAnyPermission).isTrue();
@@ -135,7 +140,10 @@ class PermissionServiceTest {
         // When
         boolean hasAnyPermission =
                 permissionService.hasAnyPermission(
-                        authentication, "users:create", "users:read", "users:delete");
+                        authentication,
+                        Permission.USERS_CREATE,
+                        Permission.USERS_READ,
+                        Permission.USERS_DELETE);
 
         // Then
         assertThat(hasAnyPermission).isFalse();
@@ -150,7 +158,8 @@ class PermissionServiceTest {
         when(permissionCache.getUserPermissions(authentication)).thenReturn(Set.of());
 
         // When
-        boolean hasPermission = permissionService.hasPermission(authentication, "users:read");
+        boolean hasPermission =
+                permissionService.hasPermission(authentication, Permission.USERS_READ);
 
         // Then
         assertThat(hasPermission).isFalse();
@@ -179,7 +188,8 @@ class PermissionServiceTest {
         when(permissionCache.getUserPermissions(authentication)).thenReturn(userPermissions);
 
         // When
-        boolean hasPermission = permissionService.hasPermission(authentication, "users:READ");
+        boolean hasPermission =
+                permissionService.hasPermission(authentication, Permission.USERS_CREATE);
 
         // Then
         assertThat(hasPermission).isFalse();
@@ -195,9 +205,11 @@ class PermissionServiceTest {
         when(permissionCache.getUserPermissions(authentication)).thenReturn(userPermissions);
 
         // When
-        boolean hasRead = permissionService.hasPermission(authentication, "users:read");
-        boolean hasCreate = permissionService.hasPermission(authentication, "users:create");
-        boolean hasUpdate = permissionService.hasPermission(authentication, "users:update");
+        boolean hasRead = permissionService.hasPermission(authentication, Permission.USERS_READ);
+        boolean hasCreate =
+                permissionService.hasPermission(authentication, Permission.USERS_CREATE);
+        boolean hasUpdate =
+                permissionService.hasPermission(authentication, Permission.USERS_UPDATE);
 
         // Then
         assertThat(hasRead).isTrue();
@@ -211,7 +223,7 @@ class PermissionServiceTest {
     void shouldReturnFalseForHasAnyPermissionWhenAuthenticationIsNull() {
         // When
         when(permissionCache.getUserPermissions(null)).thenReturn(Set.of());
-        boolean hasAnyPermission = permissionService.hasAnyPermission(null, "users:read");
+        boolean hasAnyPermission = permissionService.hasAnyPermission(null, Permission.USERS_READ);
 
         // Then
         assertThat(hasAnyPermission).isFalse();

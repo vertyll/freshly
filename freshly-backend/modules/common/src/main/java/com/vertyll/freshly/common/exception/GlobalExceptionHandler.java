@@ -19,6 +19,15 @@ public class GlobalExceptionHandler {
 
     private static final Logger LOGGER = LogManager.getLogger(GlobalExceptionHandler.class);
 
+    private static final String VALIDATION_FAILED = "Validation failed for one or more fields";
+    private static final String INVALID_VALUE = "Invalid value";
+    private static final String RESOURCE_NOT_FOUND = "The requested resource was not found";
+    private static final String UNEXPECTED_ERROR =
+            "An unexpected error occurred. Please contact support.";
+    private static final String UNKNOWN_TYPE = "unknown";
+
+    private static final String ERRORS_PROPERTY = "errors";
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleValidationExceptions(MethodArgumentNotValidException ex) {
         LOGGER.warn("Validation error: {}", ex.getMessage());
@@ -32,13 +41,12 @@ public class GlobalExceptionHandler {
                                                 error ->
                                                         error.getDefaultMessage() != null
                                                                 ? error.getDefaultMessage()
-                                                                : "Invalid value",
+                                                                : INVALID_VALUE,
                                                 Collectors.toList())));
 
         ProblemDetail problemDetail =
-                ProblemDetail.forStatusAndDetail(
-                        HttpStatus.BAD_REQUEST, "Validation failed for one or more fields");
-        problemDetail.setProperty("errors", errors);
+                ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, VALIDATION_FAILED);
+        problemDetail.setProperty(ERRORS_PROPERTY, errors);
 
         return problemDetail;
     }
@@ -52,7 +60,7 @@ public class GlobalExceptionHandler {
                 String.format(
                         "Parameter '%s' should be of type %s",
                         ex.getName(),
-                        requiredType != null ? requiredType.getSimpleName() : "unknown");
+                        requiredType != null ? requiredType.getSimpleName() : UNKNOWN_TYPE);
 
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
@@ -60,15 +68,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public ProblemDetail handleNoResourceFound(NoResourceFoundException ex) {
         LOGGER.warn("Resource not found: {}", ex.getMessage());
-        return ProblemDetail.forStatusAndDetail(
-                HttpStatus.NOT_FOUND, "The requested resource was not found");
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, RESOURCE_NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGenericException(Exception ex) {
         LOGGER.error("Unhandled exception", ex);
-        return ProblemDetail.forStatusAndDetail(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred. Please contact support.");
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, UNEXPECTED_ERROR);
     }
 }

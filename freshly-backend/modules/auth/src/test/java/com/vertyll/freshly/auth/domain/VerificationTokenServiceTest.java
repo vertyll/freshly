@@ -11,6 +11,7 @@ import java.util.UUID;
 import javax.crypto.SecretKey;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,16 +28,25 @@ import io.jsonwebtoken.security.Keys;
 @ExtendWith(MockitoExtension.class)
 class VerificationTokenServiceTest {
 
-    @Mock private JwtProperties jwtProperties;
+    private static final long EMAIL_VERIFICATION_EXPIRATION = 3600000L;
+    private static final long PASSWORD_RESET_EXPIRATION = 1800000L;
 
+    private static final String SECRET = "testSecretKeyForJwtTokensMinimum256BitsRequiredForHS256";
+
+    private static final String ERROR_TOKEN_EXPIRED_MSG_KEY = "error.auth.tokenExpired";
+    private static final String ERROR_TOKEN_INVALID_MSG_KEY = "error.auth.tokenTypeInvalid";
+
+    private static final String EMAIL_CLAIM_KEY = "email";
+    private static final String TYPE_CLAIM_KEY = "type";
+    private static final String TYPE_EMAIL_VERIFICATION = "email_verification";
+    private static final String TYPE_PASSWORD_RESET = "password_reset";
+
+    private static final String TEST_EMAIL = "test@example.com";
+
+    @Mock private JwtProperties jwtProperties;
     @Mock private JwtProperties.Expiration expiration;
 
     @InjectMocks private VerificationTokenService verificationTokenService;
-
-    private static final String SECRET =
-            "testSecretKeyForJwtTokensMinimum256BitsRequiredForHS256AlgorithmInTest==";
-    private static final long EMAIL_VERIFICATION_EXPIRATION = 3600000L;
-    private static final long PASSWORD_RESET_EXPIRATION = 1800000L;
 
     @BeforeEach
     @SuppressWarnings("NullAway.Init")
@@ -48,34 +58,33 @@ class VerificationTokenServiceTest {
     }
 
     @Test
+    @DisplayName("Should generate valid email verification token")
     void shouldGenerateEmailVerificationToken() {
         // Given
         UUID userId = UUID.randomUUID();
-        String email = "test@example.com";
 
         // When
-        String token = verificationTokenService.generateEmailVerificationToken(userId, email);
+        String token = verificationTokenService.generateEmailVerificationToken(userId, TEST_EMAIL);
 
         // Then
         assertThat(token).isNotNull().isNotEmpty();
 
-        // Verify token structure
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
         Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
 
         assertThat(claims.getSubject()).isEqualTo(userId.toString());
-        assertThat(claims.get("email", String.class)).isEqualTo(email);
-        assertThat(claims.get("type", String.class)).isEqualTo("email_verification");
+        assertThat(claims.get(EMAIL_CLAIM_KEY, String.class)).isEqualTo(TEST_EMAIL);
+        assertThat(claims.get(TYPE_CLAIM_KEY, String.class)).isEqualTo(TYPE_EMAIL_VERIFICATION);
     }
 
     @Test
+    @DisplayName("Should generate valid password reset token")
     void shouldGeneratePasswordResetToken() {
         // Given
         UUID userId = UUID.randomUUID();
-        String email = "test@example.com";
 
         // When
-        String token = verificationTokenService.generatePasswordResetToken(userId, email);
+        String token = verificationTokenService.generatePasswordResetToken(userId, TEST_EMAIL);
 
         // Then
         assertThat(token).isNotNull().isNotEmpty();
@@ -84,16 +93,16 @@ class VerificationTokenServiceTest {
         Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
 
         assertThat(claims.getSubject()).isEqualTo(userId.toString());
-        assertThat(claims.get("email", String.class)).isEqualTo(email);
-        assertThat(claims.get("type", String.class)).isEqualTo("password_reset");
+        assertThat(claims.get(EMAIL_CLAIM_KEY, String.class)).isEqualTo(TEST_EMAIL);
+        assertThat(claims.get(TYPE_CLAIM_KEY, String.class)).isEqualTo(TYPE_PASSWORD_RESET);
     }
 
     @Test
+    @DisplayName("Should validate correct email verification token")
     void shouldValidateEmailVerificationToken() {
         // Given
         UUID userId = UUID.randomUUID();
-        String email = "test@example.com";
-        String token = verificationTokenService.generateEmailVerificationToken(userId, email);
+        String token = verificationTokenService.generateEmailVerificationToken(userId, TEST_EMAIL);
 
         // When
         UUID validatedUserId = verificationTokenService.validateEmailVerificationToken(token);
@@ -103,11 +112,11 @@ class VerificationTokenServiceTest {
     }
 
     @Test
+    @DisplayName("Should validate correct password reset token")
     void shouldValidatePasswordResetToken() {
         // Given
         UUID userId = UUID.randomUUID();
-        String email = "test@example.com";
-        String token = verificationTokenService.generatePasswordResetToken(userId, email);
+        String token = verificationTokenService.generatePasswordResetToken(userId, TEST_EMAIL);
 
         // When
         UUID validatedUserId = verificationTokenService.validatePasswordResetToken(token);
@@ -117,26 +126,27 @@ class VerificationTokenServiceTest {
     }
 
     @Test
-    void shouldThrowException_whenTokenIsInvalid() {
-        // Given
-        String invalidToken = "invalid.token.here";
-
-        // When & Then
+    @DisplayName("Should throw exception when token is malformed")
+    void shouldThrowExceptionWhenTokenIsInvalid() {
+        // Given & When & Then
         assertThatThrownBy(
-                        () -> verificationTokenService.validateEmailVerificationToken(invalidToken))
+                        () ->
+                                verificationTokenService.validateEmailVerificationToken(
+                                        ERROR_TOKEN_INVALID_MSG_KEY))
                 .isInstanceOf(InvalidVerificationTokenException.class);
     }
 
     @Test
-    void shouldThrowException_whenTokenIsExpired() {
-        // Given - Manual JWT with expired date (past)
+    @DisplayName("Should throw exception and specific message key when token is expired")
+    void shouldThrowExceptionWhenTokenIsExpired() {
+        // Given
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
         Instant now = Instant.now();
         String expiredToken =
                 Jwts.builder()
                         .subject(UUID.randomUUID().toString())
-                        .claim("email", "test@example.com")
-                        .claim("type", "email_verification")
+                        .claim(EMAIL_CLAIM_KEY, TEST_EMAIL)
+                        .claim(TYPE_CLAIM_KEY, TYPE_EMAIL_VERIFICATION)
                         .issuedAt(Date.from(now.minusSeconds(10)))
                         .expiration(Date.from(now.minusSeconds(5)))
                         .signWith(key)
@@ -146,6 +156,20 @@ class VerificationTokenServiceTest {
         assertThatThrownBy(
                         () -> verificationTokenService.validateEmailVerificationToken(expiredToken))
                 .isInstanceOf(InvalidVerificationTokenException.class)
-                .hasMessageContaining("expired");
+                .hasMessageContaining(ERROR_TOKEN_EXPIRED_MSG_KEY);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when token type is incorrect")
+    void shouldThrowExceptionWhenTokenTypeIsMismatch() {
+        // Given
+        UUID userId = UUID.randomUUID();
+        String resetToken = verificationTokenService.generatePasswordResetToken(userId, TEST_EMAIL);
+
+        // When & Then
+        assertThatThrownBy(
+                        () -> verificationTokenService.validateEmailVerificationToken(resetToken))
+                .isInstanceOf(InvalidVerificationTokenException.class)
+                .hasMessageContaining(ERROR_TOKEN_INVALID_MSG_KEY);
     }
 }

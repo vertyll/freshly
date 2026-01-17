@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,12 +17,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.permission.domain.RolePermissionMapping;
 import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
 
 @ExtendWith(MockitoExtension.class)
 class UserPermissionCacheTest {
+    private static final String TEST_USER = "testuser";
 
     @Mock
     @SuppressWarnings("NullAway.Init")
@@ -45,21 +46,22 @@ class UserPermissionCacheTest {
     @DisplayName("Should get user permissions from repository")
     void shouldGetUserPermissionsFromRepository() {
         // Given
-        when(authentication.getName()).thenReturn("testuser");
+        when(authentication.getName()).thenReturn(TEST_USER);
         Collection<GrantedAuthority> authorities =
                 List.of(
-                        new SimpleGrantedAuthority("ROLE_admin"),
-                        new SimpleGrantedAuthority("ROLE_user"));
+                        new SimpleGrantedAuthority(UserRoleEnum.ADMIN.getRoleWithPrefix()),
+                        new SimpleGrantedAuthority(UserRoleEnum.USER.getRoleWithPrefix()));
         when(authentication.getAuthorities()).thenAnswer(_ -> authorities);
 
         RolePermissionMapping mapping1 =
-                new RolePermissionMapping(UUID.randomUUID(), "admin", Permission.USERS_READ);
+                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_READ);
         RolePermissionMapping mapping2 =
-                new RolePermissionMapping(UUID.randomUUID(), "admin", Permission.USERS_CREATE);
+                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_CREATE);
         RolePermissionMapping mapping3 =
-                new RolePermissionMapping(UUID.randomUUID(), "user", Permission.REPORTS_READ);
+                new RolePermissionMapping(UserRoleEnum.USER, Permission.REPORTS_READ);
 
-        when(rolePermissionRepository.findByKeycloakRoleIn(Set.of("admin", "user")))
+        when(rolePermissionRepository.findByKeycloakRoleIn(
+                        Set.of(UserRoleEnum.ADMIN, UserRoleEnum.USER)))
                 .thenReturn(List.of(mapping1, mapping2, mapping3));
 
         // When
@@ -69,56 +71,59 @@ class UserPermissionCacheTest {
         assertThat(permissions)
                 .hasSize(3)
                 .contains(Permission.USERS_READ, Permission.USERS_CREATE, Permission.REPORTS_READ);
-        verify(rolePermissionRepository).findByKeycloakRoleIn(Set.of("admin", "user"));
+        verify(rolePermissionRepository)
+                .findByKeycloakRoleIn(Set.of(UserRoleEnum.ADMIN, UserRoleEnum.USER));
     }
 
     @Test
     @DisplayName("Should strip ROLE_ prefix from authorities")
     void shouldStripRolePrefixFromAuthorities() {
         // Given
-        when(authentication.getName()).thenReturn("testuser");
+        when(authentication.getName()).thenReturn(TEST_USER);
         Collection<GrantedAuthority> authorities =
                 List.of(
-                        new SimpleGrantedAuthority("ROLE_admin"),
-                        new SimpleGrantedAuthority("ROLE_moderator"));
+                        new SimpleGrantedAuthority(UserRoleEnum.ADMIN.getRoleWithPrefix()),
+                        new SimpleGrantedAuthority(UserRoleEnum.MODERATOR.getRoleWithPrefix()));
         when(authentication.getAuthorities()).thenAnswer(_ -> authorities);
 
         RolePermissionMapping mapping =
-                new RolePermissionMapping(UUID.randomUUID(), "admin", Permission.USERS_READ);
+                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_READ);
         when(rolePermissionRepository.findByKeycloakRoleIn(any())).thenReturn(List.of(mapping));
 
         // When
         userPermissionCache.getUserPermissions(authentication);
 
         // Then
-        verify(rolePermissionRepository).findByKeycloakRoleIn(Set.of("admin", "moderator"));
+        verify(rolePermissionRepository)
+                .findByKeycloakRoleIn(Set.of(UserRoleEnum.ADMIN, UserRoleEnum.MODERATOR));
     }
 
     @Test
     @DisplayName("Should handle authorities without ROLE_ prefix")
     void shouldHandleAuthoritiesWithoutRolePrefix() {
         // Given
-        when(authentication.getName()).thenReturn("testuser");
+        when(authentication.getName()).thenReturn(TEST_USER);
         Collection<GrantedAuthority> authorities =
                 List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("user"));
         when(authentication.getAuthorities()).thenAnswer(_ -> authorities);
 
         RolePermissionMapping mapping =
-                new RolePermissionMapping(UUID.randomUUID(), "admin", Permission.USERS_READ);
+                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_READ);
         when(rolePermissionRepository.findByKeycloakRoleIn(any())).thenReturn(List.of(mapping));
 
         // When
         userPermissionCache.getUserPermissions(authentication);
 
         // Then
-        verify(rolePermissionRepository).findByKeycloakRoleIn(Set.of("admin", "user"));
+        verify(rolePermissionRepository)
+                .findByKeycloakRoleIn(Set.of(UserRoleEnum.ADMIN, UserRoleEnum.USER));
     }
 
     @Test
     @DisplayName("Should return empty set when user has no roles")
     void shouldReturnEmptySetWhenUserHasNoRoles() {
         // Given
-        when(authentication.getName()).thenReturn("testuser");
+        when(authentication.getName()).thenReturn(TEST_USER);
         when(authentication.getAuthorities()).thenReturn(List.of());
         when(rolePermissionRepository.findByKeycloakRoleIn(Set.of())).thenReturn(List.of());
 
@@ -133,11 +138,12 @@ class UserPermissionCacheTest {
     @DisplayName("Should return empty set when roles have no mapped permissions")
     void shouldReturnEmptySetWhenRolesHaveNoMappedPermissions() {
         // Given
-        when(authentication.getName()).thenReturn("testuser");
+        when(authentication.getName()).thenReturn(TEST_USER);
         Collection<GrantedAuthority> authorities =
-                List.of(new SimpleGrantedAuthority("ROLE_norole"));
+                List.of(new SimpleGrantedAuthority(UserRoleEnum.USER.getRoleWithPrefix()));
         when(authentication.getAuthorities()).thenAnswer(_ -> authorities);
-        when(rolePermissionRepository.findByKeycloakRoleIn(Set.of("norole"))).thenReturn(List.of());
+        when(rolePermissionRepository.findByKeycloakRoleIn(Set.of(UserRoleEnum.USER)))
+                .thenReturn(List.of());
 
         // When
         Set<Permission> permissions = userPermissionCache.getUserPermissions(authentication);
@@ -150,21 +156,22 @@ class UserPermissionCacheTest {
     @DisplayName("Should deduplicate permissions from multiple roles")
     void shouldDeduplicatePermissionsFromMultipleRoles() {
         // Given
-        when(authentication.getName()).thenReturn("testuser");
+        when(authentication.getName()).thenReturn(TEST_USER);
         Collection<GrantedAuthority> authorities =
                 List.of(
-                        new SimpleGrantedAuthority("ROLE_admin"),
-                        new SimpleGrantedAuthority("ROLE_superadmin"));
+                        new SimpleGrantedAuthority(UserRoleEnum.ADMIN.getRoleWithPrefix()),
+                        new SimpleGrantedAuthority(UserRoleEnum.SUPERADMIN.getRoleWithPrefix()));
         when(authentication.getAuthorities()).thenAnswer(_ -> authorities);
 
         RolePermissionMapping mapping1 =
-                new RolePermissionMapping(UUID.randomUUID(), "admin", Permission.USERS_READ);
+                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_READ);
         RolePermissionMapping mapping2 =
-                new RolePermissionMapping(UUID.randomUUID(), "superadmin", Permission.USERS_READ);
+                new RolePermissionMapping(UserRoleEnum.SUPERADMIN, Permission.USERS_READ);
         RolePermissionMapping mapping3 =
-                new RolePermissionMapping(UUID.randomUUID(), "superadmin", Permission.USERS_DELETE);
+                new RolePermissionMapping(UserRoleEnum.SUPERADMIN, Permission.USERS_DELETE);
 
-        when(rolePermissionRepository.findByKeycloakRoleIn(Set.of("admin", "superadmin")))
+        when(rolePermissionRepository.findByKeycloakRoleIn(
+                        Set.of(UserRoleEnum.ADMIN, UserRoleEnum.SUPERADMIN)))
                 .thenReturn(List.of(mapping1, mapping2, mapping3));
 
         // When
@@ -178,39 +185,42 @@ class UserPermissionCacheTest {
     @DisplayName("Should filter out null authorities")
     void shouldFilterOutNullAuthorities() {
         // Given
-        when(authentication.getName()).thenReturn("testuser");
+        when(authentication.getName()).thenReturn(TEST_USER);
         GrantedAuthority nullAuthority = () -> null;
         Collection<GrantedAuthority> authorities =
-                List.of(new SimpleGrantedAuthority("ROLE_admin"), nullAuthority);
+                List.of(
+                        new SimpleGrantedAuthority(UserRoleEnum.ADMIN.getRoleWithPrefix()),
+                        nullAuthority);
         when(authentication.getAuthorities()).thenAnswer(_ -> authorities);
 
         RolePermissionMapping mapping =
-                new RolePermissionMapping(UUID.randomUUID(), "admin", Permission.USERS_READ);
+                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_READ);
         when(rolePermissionRepository.findByKeycloakRoleIn(any())).thenReturn(List.of(mapping));
 
         // When
         userPermissionCache.getUserPermissions(authentication);
 
         // Then
-        verify(rolePermissionRepository).findByKeycloakRoleIn(Set.of("admin"));
+        verify(rolePermissionRepository).findByKeycloakRoleIn(Set.of(UserRoleEnum.ADMIN));
     }
 
     @Test
     @DisplayName("Should handle mixed ROLE_ prefix authorities")
     void shouldHandleMixedRolePrefixAuthorities() {
         // Given
-        when(authentication.getName()).thenReturn("testuser");
+        when(authentication.getName()).thenReturn(TEST_USER);
         Collection<GrantedAuthority> authorities =
                 List.of(
-                        new SimpleGrantedAuthority("ROLE_admin"),
+                        new SimpleGrantedAuthority(UserRoleEnum.ADMIN.getRoleWithPrefix()),
                         new SimpleGrantedAuthority("user"));
         when(authentication.getAuthorities()).thenAnswer(_ -> authorities);
 
         RolePermissionMapping mapping1 =
-                new RolePermissionMapping(UUID.randomUUID(), "admin", Permission.USERS_READ);
+                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_READ);
         RolePermissionMapping mapping2 =
-                new RolePermissionMapping(UUID.randomUUID(), "user", Permission.REPORTS_READ);
-        when(rolePermissionRepository.findByKeycloakRoleIn(Set.of("admin", "user")))
+                new RolePermissionMapping(UserRoleEnum.USER, Permission.REPORTS_READ);
+        when(rolePermissionRepository.findByKeycloakRoleIn(
+                        Set.of(UserRoleEnum.ADMIN, UserRoleEnum.USER)))
                 .thenReturn(List.of(mapping1, mapping2));
 
         // When
@@ -218,21 +228,22 @@ class UserPermissionCacheTest {
 
         // Then
         assertThat(permissions).hasSize(2).contains(Permission.USERS_READ, Permission.REPORTS_READ);
-        verify(rolePermissionRepository).findByKeycloakRoleIn(Set.of("admin", "user"));
+        verify(rolePermissionRepository)
+                .findByKeycloakRoleIn(Set.of(UserRoleEnum.ADMIN, UserRoleEnum.USER));
     }
 
     @Test
     @DisplayName("Should cache results per username")
     void shouldCacheResultsPerUsername() {
         // Given
-        when(authentication.getName()).thenReturn("testuser");
+        when(authentication.getName()).thenReturn(TEST_USER);
         Collection<GrantedAuthority> authorities =
-                List.of(new SimpleGrantedAuthority("ROLE_admin"));
+                List.of(new SimpleGrantedAuthority(UserRoleEnum.ADMIN.getRoleWithPrefix()));
         when(authentication.getAuthorities()).thenAnswer(_ -> authorities);
 
         RolePermissionMapping mapping =
-                new RolePermissionMapping(UUID.randomUUID(), "admin", Permission.USERS_READ);
-        when(rolePermissionRepository.findByKeycloakRoleIn(Set.of("admin")))
+                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_READ);
+        when(rolePermissionRepository.findByKeycloakRoleIn(Set.of(UserRoleEnum.ADMIN)))
                 .thenReturn(List.of(mapping));
 
         Set<Permission> permissions1 = userPermissionCache.getUserPermissions(authentication);

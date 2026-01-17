@@ -6,14 +6,15 @@ import java.util.UUID;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.permission.Permission;
 
 public interface SpringDataRolePermissionRepository
         extends MongoRepository<RolePermissionMappingDocument, UUID> {
 
-    List<RolePermissionMappingDocument> findByKeycloakRoleIn(Set<String> roles);
+    List<RolePermissionMappingDocument> findByKeycloakRoleIn(Set<UserRoleEnum> roles);
 
-    List<RolePermissionMappingDocument> findByKeycloakRole(String role);
+    List<RolePermissionMappingDocument> findByKeycloakRole(UserRoleEnum role);
 
-    boolean existsByKeycloakRoleAndPermission(String keycloakRole, Permission permission);
+    boolean existsByKeycloakRoleAndPermission(UserRoleEnum keycloakRole, Permission permission);
 }

@@ -24,9 +24,26 @@ import com.vertyll.freshly.airquality.domain.*;
 @RequiredArgsConstructor
 class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
 
+    private static final String FIELD_STATION_ID = "stationId";
     private static final String FIELD_STATION_NAME = "stationName";
+    private static final String FIELD_MEASUREMENT_DATE = "measurementDate";
+    private static final String FIELD_PM10_VALUE = "pm10Value";
+    private static final String FIELD_PM25_VALUE = "pm25Value";
     private static final String FIELD_PM10_AVG = "pm10Avg";
     private static final String FIELD_PM25_AVG = "pm25Avg";
+    private static final String FIELD_OVERALL_INDEX_LEVEL = "overallIndexLevel";
+    private static final String FIELD_DOMINANT_QUALITY = "dominantQuality";
+    private static final String FIELD_MEASUREMENT_COUNT = "measurementCount";
+    private static final String FIELD_ID = "_id";
+
+    private static final String COLLECTION_AIR_QUALITY_MEASUREMENTS = "air_quality_measurements";
+
+    private static final int INITIAL_RANK = 1;
+    private static final int DEFAULT_MEASUREMENT_COUNT = 0;
+
+    private static final double DEFAULT_AVG_VALUE = 0.0;
+    private static final double AVG_SCORE_DIVISOR = 2.0;
+    private static final double DEFAULT_STATION_COORDINATE = 0.0;
 
     private final SpringDataAirQualityMeasurementRepository springDataRepository;
     private final AirQualityMeasurementMapper mapper;
@@ -126,7 +143,7 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
                         .filter(Objects::nonNull)
                         .mapToDouble(Double::doubleValue)
                         .average()
-                        .orElse(0.0);
+                        .orElse(DEFAULT_AVG_VALUE);
 
         double no2Avg =
                 measurements.stream()
@@ -134,7 +151,7 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
                         .filter(Objects::nonNull)
                         .mapToDouble(Double::doubleValue)
                         .average()
-                        .orElse(0.0);
+                        .orElse(DEFAULT_AVG_VALUE);
 
         double coAvg =
                 measurements.stream()
@@ -142,7 +159,7 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
                         .filter(Objects::nonNull)
                         .mapToDouble(Double::doubleValue)
                         .average()
-                        .orElse(0.0);
+                        .orElse(DEFAULT_AVG_VALUE);
 
         double o3Avg =
                 measurements.stream()
@@ -150,7 +167,7 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
                         .filter(Objects::nonNull)
                         .mapToDouble(Double::doubleValue)
                         .average()
-                        .orElse(0.0);
+                        .orElse(DEFAULT_AVG_VALUE);
 
         // Count quality levels (stored as enum in MongoDB)
         Map<AirQualityLevel, Long> qualityCounts =
@@ -189,18 +206,18 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
         // MongoDB aggregation to calculate average scores per station
         Aggregation aggregation =
                 Aggregation.newAggregation(
-                        Aggregation.match(Criteria.where("measurementDate").gte(from).lte(to)),
-                        Aggregation.group("stationId")
+                        Aggregation.match(Criteria.where(FIELD_MEASUREMENT_DATE).gte(from).lte(to)),
+                        Aggregation.group(FIELD_STATION_ID)
                                 .first(FIELD_STATION_NAME)
                                 .as(FIELD_STATION_NAME)
-                                .avg("pm10Value")
+                                .avg(FIELD_PM10_VALUE)
                                 .as(FIELD_PM10_AVG)
-                                .avg("pm25Value")
+                                .avg(FIELD_PM25_VALUE)
                                 .as(FIELD_PM25_AVG)
-                                .first("overallIndexLevel")
-                                .as("dominantQuality")
+                                .first(FIELD_OVERALL_INDEX_LEVEL)
+                                .as(FIELD_DOMINANT_QUALITY)
                                 .count()
-                                .as("measurementCount"),
+                                .as(FIELD_MEASUREMENT_COUNT),
                         Aggregation.sort(
                                 org.springframework.data.domain.Sort.by(
                                         org.springframework.data.domain.Sort.Order.asc(
@@ -210,31 +227,32 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
                         Aggregation.limit(limit));
 
         AggregationResults<?> rawResults =
-                mongoTemplate.aggregate(aggregation, "air_quality_measurements", Map.class);
+                mongoTemplate.aggregate(
+                        aggregation, COLLECTION_AIR_QUALITY_MEASUREMENTS, Map.class);
 
         return getStationRankings(rawResults);
     }
 
     @SuppressWarnings(
             "PMD.AvoidInstantiatingObjectsInLoops") // Domain objects must be created per iteration
-    private static List<StationRanking> getStationRankings(AggregationResults<?> rawResults) {
+    private List<StationRanking> getStationRankings(AggregationResults<?> rawResults) {
         List<StationRanking> rankings = new ArrayList<>();
-        int rank = 1;
+        int rank = INITIAL_RANK;
 
         for (Object resultObj : rawResults.getMappedResults()) {
             @SuppressWarnings("unchecked")
             Map<String, Object> result = (Map<String, Object>) resultObj;
-            Integer stationId = (Integer) result.get("_id");
+            Integer stationId = (Integer) result.get(FIELD_ID);
             String stationName = (String) result.get(FIELD_STATION_NAME);
             Double pm10Avg = (Double) result.get(FIELD_PM10_AVG);
             Double pm25Avg = (Double) result.get(FIELD_PM25_AVG);
-            String dominantQuality = (String) result.get("dominantQuality");
-            Integer measurementCount = (Integer) result.get("measurementCount");
+            String dominantQuality = (String) result.get(FIELD_DOMINANT_QUALITY);
+            Integer measurementCount = (Integer) result.get(FIELD_MEASUREMENT_COUNT);
 
             // Calculate average score (lower is better)
             Double avgScore = null;
             if (pm10Avg != null && pm25Avg != null) {
-                avgScore = (pm10Avg + pm25Avg) / 2.0;
+                avgScore = (pm10Avg + pm25Avg) / AVG_SCORE_DIVISOR;
             } else if (pm10Avg != null) {
                 avgScore = pm10Avg;
             } else if (pm25Avg != null) {
@@ -242,7 +260,14 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
             }
 
             // Create Station object (simplified - in real scenario you'd fetch full station data)
-            Station station = new Station(stationId, stationName, "", "", 0.0, 0.0);
+            Station station =
+                    new Station(
+                            stationId,
+                            stationName,
+                            "",
+                            "",
+                            DEFAULT_STATION_COORDINATE,
+                            DEFAULT_STATION_COORDINATE);
 
             // Convert dominant quality String to enum (MongoDB returns enum name as String)
             AirQualityLevel dominantLevel = null;
@@ -260,7 +285,9 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
                             station,
                             avgScore,
                             dominantLevel,
-                            measurementCount != null ? measurementCount : 0));
+                            measurementCount != null
+                                    ? measurementCount
+                                    : DEFAULT_MEASUREMENT_COUNT));
             rank++;
         }
         return rankings;

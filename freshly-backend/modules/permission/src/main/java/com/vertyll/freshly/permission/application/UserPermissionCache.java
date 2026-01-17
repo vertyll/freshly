@@ -1,5 +1,6 @@
 package com.vertyll.freshly.permission.application;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.permission.domain.RolePermissionMapping;
 import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
@@ -24,6 +26,7 @@ import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
 @Component
 @RequiredArgsConstructor
 class UserPermissionCache {
+    private static final String USER_PERMISSIONS_CACHE = "user-permissions";
 
     private final RolePermissionMappingRepository rolePermissionRepository;
 
@@ -34,9 +37,9 @@ class UserPermissionCache {
      * @param authentication Spring Security authentication object
      * @return Set of permissions
      */
-    @Cacheable(value = "user-permissions", key = "#authentication.name")
+    @Cacheable(value = USER_PERMISSIONS_CACHE, key = "#authentication.name")
     public Set<Permission> getUserPermissions(Authentication authentication) {
-        Set<String> roles = extractRoles(authentication);
+        Set<UserRoleEnum> roles = extractRoles(authentication);
 
         log.debug(
                 "Fetching permissions for user '{}' with roles: {}",
@@ -54,15 +57,19 @@ class UserPermissionCache {
 
     /**
      * Extract Keycloak roles from Spring Security authentication. Removes "ROLE_" prefix that
-     * Spring adds.
+     * Spring adds and normalizes to uppercase using Locale.ROOT for security.
      */
-    private Set<String> extractRoles(Authentication authentication) {
+    private Set<UserRoleEnum> extractRoles(Authentication authentication) {
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(Objects::nonNull)
                 .map(
                         authority ->
-                                authority.startsWith("ROLE_") ? authority.substring(5) : authority)
+                                authority.startsWith(UserRoleEnum.ROLE_PREFIX)
+                                        ? authority.substring(UserRoleEnum.ROLE_PREFIX.length())
+                                        : authority)
+                .map(role -> role.toUpperCase(Locale.ROOT))
+                .map(UserRoleEnum::fromValue)
                 .collect(Collectors.toSet());
     }
 }

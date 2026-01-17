@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.vertyll.freshly.useraccess.domain.UserRoleEnum;
+import com.vertyll.freshly.common.enums.UserRoleEnum;
 
 @Document(collection = "system_user")
 @Data

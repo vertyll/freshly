@@ -26,6 +26,10 @@ import com.vertyll.freshly.airquality.domain.*;
 @RequiredArgsConstructor
 public class AirQualitySyncService {
 
+    private static final String SYNC_CRON = "0 5 * * * *";
+    private static final int RECENT_MEASUREMENT_THRESHOLD_MINUTES = 50;
+    private static final int OLD_DATA_THRESHOLD_DAYS = 90;
+
     private final AirQualityProvider airQualityProvider;
     private final AirQualityHistoryRepository historyRepository;
     private final ObjectProvider<AirQualitySyncService> selfProvider;
@@ -34,7 +38,7 @@ public class AirQualitySyncService {
      * Synchronize data every hour (5 minutes after the hour to allow GIOŚ to update) Cron: 0 5 * *
      * * * = at 5 minutes past every hour
      */
-    @Scheduled(cron = "0 5 * * * *")
+    @Scheduled(cron = SYNC_CRON)
     @Transactional
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public void syncAirQualityData() {
@@ -78,7 +82,9 @@ public class AirQualitySyncService {
 
     private void syncStationData(Station station) {
         // Check if we already have recent data (within last 50 minutes)
-        LocalDateTime threshold = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(50);
+        LocalDateTime threshold =
+                LocalDateTime.now(ZoneOffset.UTC)
+                        .minusMinutes(RECENT_MEASUREMENT_THRESHOLD_MINUTES);
         if (historyRepository.hasRecentMeasurement(station.id(), threshold)) {
             log.debug("Skipping station {} - has recent measurement", station.id());
             return;
@@ -127,7 +133,8 @@ public class AirQualitySyncService {
     /** Remove measurements older than 90 days to prevent database bloat */
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private void cleanupOldData() {
-        LocalDateTime threshold = LocalDateTime.now(ZoneOffset.UTC).minusDays(90);
+        LocalDateTime threshold =
+                LocalDateTime.now(ZoneOffset.UTC).minusDays(OLD_DATA_THRESHOLD_DAYS);
         try {
             historyRepository.deleteOlderThan(threshold);
             log.info("Cleaned up measurements older than {}", threshold);

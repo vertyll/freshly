@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.common.response.ApiResponse;
 import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.permission.api.dto.CreatePermissionMappingDto;
@@ -31,6 +32,17 @@ public class PermissionManagementController {
     private final PermissionManagementService permissionManagementService;
     private final MessageSource messageSource;
 
+    private static final String FETCHING_AVAILABLE_PERMISSIONS_MSG_KEY =
+            "success.permission.availableFetched";
+    private static final String FETCHING_ROLE_PERMISSION_MAPPINGS_MSG_KEY =
+            "success.permission.mappingsFetched";
+    private static final String FETCHING_PERMISSIONS_FOR_ROLE_MSG_KEY =
+            "success.permission.mappingsByRoleFetched";
+    private static final String CREATING_PERMISSION_MAPPING_MSG_KEY =
+            "success.permission.mappingCreated";
+    private static final String DELETING_PERMISSION_MAPPING_MSG_KEY =
+            "success.permission.mappingDeleted";
+
     @GetMapping("/available")
     public ResponseEntity<ApiResponse<List<String>>> getAvailablePermissions() {
         log.info("Fetching all available permissions");
@@ -39,7 +51,7 @@ public class PermissionManagementController {
                 Arrays.stream(Permission.values()).map(Permission::getValue).toList();
 
         return ApiResponse.buildResponse(
-                permissions, "success.permission.availableFetched", messageSource, HttpStatus.OK);
+                permissions, FETCHING_AVAILABLE_PERMISSIONS_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @GetMapping("/mappings")
@@ -49,12 +61,12 @@ public class PermissionManagementController {
         List<PermissionMappingResponseDto> mappings = permissionManagementService.getAllMappings();
 
         return ApiResponse.buildResponse(
-                mappings, "success.permission.mappingsFetched", messageSource, HttpStatus.OK);
+                mappings, FETCHING_ROLE_PERMISSION_MAPPINGS_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @GetMapping("/mappings/role/{role}")
     public ResponseEntity<ApiResponse<List<PermissionMappingResponseDto>>> getMappingsByRole(
-            @PathVariable String role) {
+            @PathVariable UserRoleEnum role) {
 
         log.info("Fetching permissions for role: {}", role);
 
@@ -62,7 +74,7 @@ public class PermissionManagementController {
                 permissionManagementService.getMappingsByRole(role);
 
         return ApiResponse.buildResponse(
-                mappings, "success.permission.mappingsByRoleFetched", messageSource, HttpStatus.OK);
+                mappings, FETCHING_PERMISSIONS_FOR_ROLE_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PostMapping("/mappings")
@@ -77,7 +89,7 @@ public class PermissionManagementController {
         PermissionMappingResponseDto mapping = permissionManagementService.createMapping(request);
 
         return ApiResponse.buildResponse(
-                mapping, "success.permission.mappingCreated", messageSource, HttpStatus.CREATED);
+                mapping, CREATING_PERMISSION_MAPPING_MSG_KEY, messageSource, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/mappings/{mappingId}")
@@ -87,6 +99,6 @@ public class PermissionManagementController {
         permissionManagementService.deleteMapping(mappingId);
 
         return ApiResponse.buildResponse(
-                null, "success.permission.mappingDeleted", messageSource, HttpStatus.OK);
+                null, DELETING_PERMISSION_MAPPING_MSG_KEY, messageSource, HttpStatus.OK);
     }
 }

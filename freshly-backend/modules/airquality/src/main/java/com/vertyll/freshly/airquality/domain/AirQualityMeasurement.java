@@ -18,6 +18,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AirQualityMeasurement {
 
+    private static final String PARAM_PM10 = "PM10";
+    private static final String PARAM_PM25 = "PM2.5";
+    private static final String PARAM_SO2 = "SO2";
+    private static final String PARAM_NO2 = "NO2";
+    private static final String PARAM_CO = "CO";
+    private static final String PARAM_O3 = "O3";
+
     @Nullable private String id; // MongoDB ID
     private int stationId;
     @Nullable private String stationName;
@@ -56,12 +63,12 @@ public class AirQualityMeasurement {
         measurement.no2IndexLevel = AirQualityLevel.fromPolishName(index.no2IndexLevel());
         measurement.pm10IndexLevel = AirQualityLevel.fromPolishName(index.pm10IndexLevel());
 
-        measurement.pm10Value = sensorValues.get("PM10");
-        measurement.pm25Value = sensorValues.get("PM2.5");
-        measurement.so2Value = sensorValues.get("SO2");
-        measurement.no2Value = sensorValues.get("NO2");
-        measurement.coValue = sensorValues.get("CO");
-        measurement.o3Value = sensorValues.get("O3");
+        measurement.pm10Value = sensorValues.get(PARAM_PM10);
+        measurement.pm25Value = sensorValues.get(PARAM_PM25);
+        measurement.so2Value = sensorValues.get(PARAM_SO2);
+        measurement.no2Value = sensorValues.get(PARAM_NO2);
+        measurement.coValue = sensorValues.get(PARAM_CO);
+        measurement.o3Value = sensorValues.get(PARAM_O3);
 
         measurement.createdAt = LocalDateTime.now(ZoneOffset.UTC);
         return measurement;

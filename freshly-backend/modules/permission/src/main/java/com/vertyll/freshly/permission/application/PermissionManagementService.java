@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.permission.api.dto.CreatePermissionMappingDto;
 import com.vertyll.freshly.permission.api.dto.PermissionMappingResponseDto;
@@ -26,15 +27,16 @@ public class PermissionManagementService {
         return repository.findAll().stream().map(this::toDto).toList();
     }
 
-    public List<PermissionMappingResponseDto> getMappingsByRole(String role) {
+    public List<PermissionMappingResponseDto> getMappingsByRole(UserRoleEnum role) {
         return repository.findByKeycloakRole(role).stream().map(this::toDto).toList();
     }
 
     @CacheEvict(value = "user-permissions", allEntries = true)
     public PermissionMappingResponseDto createMapping(CreatePermissionMappingDto request) {
         Permission permission = Permission.fromValue(request.permission());
+        UserRoleEnum role = UserRoleEnum.fromValue(request.keycloakRole());
 
-        if (repository.existsByKeycloakRoleAndPermission(request.keycloakRole(), permission)) {
+        if (repository.existsByKeycloakRoleAndPermission(role, permission)) {
             throw new IllegalArgumentException(
                     "Mapping already exists for role '"
                             + request.keycloakRole()
@@ -43,8 +45,7 @@ public class PermissionManagementService {
                             + "'");
         }
 
-        RolePermissionMapping mapping =
-                new RolePermissionMapping(request.keycloakRole(), permission);
+        RolePermissionMapping mapping = new RolePermissionMapping(role, permission);
 
         RolePermissionMapping saved = repository.save(mapping);
 
@@ -64,6 +65,6 @@ public class PermissionManagementService {
 
     private PermissionMappingResponseDto toDto(RolePermissionMapping mapping) {
         return new PermissionMappingResponseDto(
-                mapping.getId(), mapping.getKeycloakRole(), mapping.getPermission().getValue());
+                mapping.getId(), mapping.getKeycloakRole(), mapping.getPermission());
     }
 }

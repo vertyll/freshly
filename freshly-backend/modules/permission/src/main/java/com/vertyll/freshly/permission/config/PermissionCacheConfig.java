@@ -12,11 +12,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableCaching
 class PermissionCacheConfig {
+    private static final String USER_PERMISSIONS_CACHE = "user-permissions";
 
     @Bean
     public CacheManager cacheManager() {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
-        cacheManager.setCaches(List.of(new ConcurrentMapCache("user-permissions")));
+        cacheManager.setCaches(List.of(new ConcurrentMapCache(USER_PERMISSIONS_CACHE)));
         return cacheManager;
     }
 }

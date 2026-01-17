@@ -23,6 +23,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import lombok.extern.slf4j.Slf4j;
 
+import com.vertyll.freshly.common.enums.UserRoleEnum;
+
 @Slf4j
 @Configuration
 @Profile("dev")
@@ -106,7 +108,7 @@ public class DevSecurityConfig {
             }
 
             return roles.stream()
-                    .map(roleName -> "ROLE_" + roleName)
+                    .map(roleName -> UserRoleEnum.ROLE_PREFIX + roleName)
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
         }

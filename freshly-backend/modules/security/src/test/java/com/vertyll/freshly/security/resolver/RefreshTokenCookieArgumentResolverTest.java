@@ -20,6 +20,12 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @ExtendWith(MockitoExtension.class)
 class RefreshTokenCookieArgumentResolverTest {
+    private static final String REFRESH_TOKEN = "refresh_token";
+    private static final String SESSION_ID = "session_id";
+    private static final String SESSION_123 = "session123";
+    private static final String TOKEN_123 = "token123";
+    private static final String OTHER = "other";
+    private static final String VALUE = "value";
 
     @Mock
     @SuppressWarnings("NullAway.Init")
@@ -47,7 +53,7 @@ class RefreshTokenCookieArgumentResolverTest {
     @SuppressWarnings("NullAway.Init")
     void setUp() {
         lenient().when(jwtProperties.refreshToken()).thenReturn(refreshToken);
-        lenient().when(refreshToken.cookieName()).thenReturn("refresh_token");
+        lenient().when(refreshToken.cookieName()).thenReturn(REFRESH_TOKEN);
         resolver = new RefreshTokenCookieArgumentResolver(jwtProperties);
     }
 
@@ -82,9 +88,9 @@ class RefreshTokenCookieArgumentResolverTest {
     void shouldResolveRefreshTokenFromCookie() {
         // Given
         Cookie[] cookies = {
-            new Cookie("session_id", "session123"),
-            new Cookie("refresh_token", "token123"),
-            new Cookie("other", "value")
+            new Cookie(SESSION_ID, SESSION_123),
+            new Cookie(REFRESH_TOKEN, TOKEN_123),
+            new Cookie(OTHER, VALUE)
         };
 
         when(webRequest.getNativeRequest(HttpServletRequest.class)).thenReturn(httpServletRequest);
@@ -94,14 +100,14 @@ class RefreshTokenCookieArgumentResolverTest {
         Object result = resolver.resolveArgument(methodParameter, null, webRequest, null);
 
         // Then
-        assertThat(result).isEqualTo("token123");
+        assertThat(result).isEqualTo(TOKEN_123);
     }
 
     @Test
     @DisplayName("Should return null when refresh token cookie not found")
     void shouldReturnNullWhenRefreshTokenCookieNotFound() {
         // Given
-        Cookie[] cookies = {new Cookie("session_id", "session123"), new Cookie("other", "value")};
+        Cookie[] cookies = {new Cookie(SESSION_ID, SESSION_123), new Cookie(OTHER, VALUE)};
 
         when(webRequest.getNativeRequest(HttpServletRequest.class)).thenReturn(httpServletRequest);
         when(httpServletRequest.getCookies()).thenReturn(cookies);
@@ -160,12 +166,13 @@ class RefreshTokenCookieArgumentResolverTest {
     @DisplayName("Should use correct cookie name from properties")
     void shouldUseCorrectCookieNameFromProperties() {
         // Given
-        when(refreshToken.cookieName()).thenReturn("custom_refresh_token");
+        String customCookieName = "custom_refresh_token";
+        String correctToken = "correct_token";
+        when(refreshToken.cookieName()).thenReturn(customCookieName);
         resolver = new RefreshTokenCookieArgumentResolver(jwtProperties);
 
         Cookie[] cookies = {
-            new Cookie("refresh_token", "wrong_token"),
-            new Cookie("custom_refresh_token", "correct_token")
+            new Cookie(REFRESH_TOKEN, "wrong_token"), new Cookie(customCookieName, correctToken)
         };
 
         when(webRequest.getNativeRequest(HttpServletRequest.class)).thenReturn(httpServletRequest);
@@ -175,15 +182,16 @@ class RefreshTokenCookieArgumentResolverTest {
         Object result = resolver.resolveArgument(methodParameter, null, webRequest, null);
 
         // Then
-        assertThat(result).isEqualTo("correct_token");
+        assertThat(result).isEqualTo(correctToken);
     }
 
     @Test
     @DisplayName("Should return first matching cookie when multiple cookies with same name exist")
     void shouldReturnFirstMatchingCookieWhenMultipleCookiesWithSameNameExist() {
         // Given
+        String firstToken = "first_token";
         Cookie[] cookies = {
-            new Cookie("refresh_token", "first_token"), new Cookie("refresh_token", "second_token")
+            new Cookie(REFRESH_TOKEN, firstToken), new Cookie(REFRESH_TOKEN, "second_token")
         };
 
         when(webRequest.getNativeRequest(HttpServletRequest.class)).thenReturn(httpServletRequest);
@@ -193,6 +201,6 @@ class RefreshTokenCookieArgumentResolverTest {
         Object result = resolver.resolveArgument(methodParameter, null, webRequest, null);
 
         // Then
-        assertThat(result).isEqualTo("first_token");
+        assertThat(result).isEqualTo(firstToken);
     }
 }

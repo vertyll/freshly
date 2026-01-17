@@ -10,10 +10,13 @@ public record Email(String value) {
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
+    private static final String EMAIL_NULL = "Email cannot be null";
+    private static final String INVALID_EMAIL_FORMAT = "Invalid email format: ";
+
     public Email {
-        Objects.requireNonNull(value, "Email cannot be null");
+        Objects.requireNonNull(value, EMAIL_NULL);
         if (!EMAIL_PATTERN.matcher(value).matches()) {
-            throw new IllegalArgumentException("Invalid email format: " + value);
+            throw new IllegalArgumentException(INVALID_EMAIL_FORMAT + value);
         }
     }
 

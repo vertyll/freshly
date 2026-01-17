@@ -26,6 +26,21 @@ public class KeycloakTokenClient {
     private static final String GRANT_TYPE = "grant_type";
     private static final String CLIENT_ID = "client_id";
     private static final String REFRESH_TOKEN = "refresh_token";
+    private static final String TOKEN_TYPE_KEY = "token_type";
+    private static final String BEARER = "Bearer";
+
+    private static final String ACCESS_TOKEN_KEY = "access_token";
+    private static final String EXPIRES_IN_KEY = "expires_in";
+    private static final String REFRESH_EXPIRES_IN_KEY = "refresh_expires_in";
+    private static final String USERNAME_KEY = "username";
+    private static final String PASSWORD_KEY = "password";
+
+    private static final String EMPTY_RESPONSE = "Empty response from Keycloak";
+    private static final String REFRESH_TOKEN_INVALID = "Refresh token invalid or expired";
+    private static final String INVALID_USERNAME_PASSWORD = "Invalid username or password";
+
+    private static final String TOKEN_REFRESH_FAILED = "Token refresh failed";
+    private static final String LOGIN_FAILED = "Login failed";
 
     private final RestClient restClient;
     private final KeycloakProperties properties;
@@ -42,39 +57,6 @@ public class KeycloakTokenClient {
                 + "/realms/"
                 + properties.realm()
                 + "/protocol/openid-connect/logout";
-    }
-
-    /** Get tokens using username/password (Resource Owner Password Credentials Grant) */
-    public TokenResponseDto getToken(String username, String password) {
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add(GRANT_TYPE, "password");
-        formData.add(CLIENT_ID, properties.userClientId());
-        formData.add("username", username);
-        formData.add("password", password);
-
-        try {
-            Map<String, Object> response =
-                    restClient
-                            .post()
-                            .uri(getTokenUrl())
-                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                            .body(formData)
-                            .retrieve()
-                            .body(new ParameterizedTypeReference<>() {});
-
-            if (response == null) {
-                throw new KeycloakClientException("Empty response from Keycloak");
-            }
-
-            return mapToTokenResponse(response);
-
-        } catch (HttpClientErrorException.Unauthorized _) {
-            log.warn("Login failed for user: {}", username);
-            throw new InvalidPasswordException("Invalid username or password");
-        } catch (RestClientException e) {
-            log.error("Error during login for user: {}", username, e);
-            throw new KeycloakClientException("Login failed", e);
-        }
     }
 
     /** Refresh access token using refresh token */
@@ -95,17 +77,46 @@ public class KeycloakTokenClient {
                             .body(new ParameterizedTypeReference<>() {});
 
             if (response == null) {
-                throw new KeycloakClientException("Empty response from Keycloak");
+                throw new KeycloakClientException(EMPTY_RESPONSE);
             }
 
             return mapToTokenResponse(response);
 
         } catch (HttpClientErrorException.Unauthorized _) {
-            log.warn("Refresh token invalid or expired");
-            throw new InvalidPasswordException("Refresh token invalid or expired");
+            throw new InvalidPasswordException(REFRESH_TOKEN_INVALID);
         } catch (RestClientException e) {
-            log.error("Error during token refresh", e);
-            throw new KeycloakClientException("Token refresh failed", e);
+            throw new KeycloakClientException(TOKEN_REFRESH_FAILED, e);
+        }
+    }
+
+    /** Get tokens using username/password (Resource Owner Password Credentials Grant) */
+    public TokenResponseDto getToken(String username, String password) {
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add(GRANT_TYPE, PASSWORD_KEY);
+        formData.add(CLIENT_ID, properties.userClientId());
+        formData.add(USERNAME_KEY, username);
+        formData.add(PASSWORD_KEY, password);
+
+        try {
+            Map<String, Object> response =
+                    restClient
+                            .post()
+                            .uri(getTokenUrl())
+                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                            .body(formData)
+                            .retrieve()
+                            .body(new ParameterizedTypeReference<>() {});
+
+            if (response == null) {
+                throw new KeycloakClientException(EMPTY_RESPONSE);
+            }
+
+            return mapToTokenResponse(response);
+
+        } catch (HttpClientErrorException.Unauthorized _) {
+            throw new InvalidPasswordException(INVALID_USERNAME_PASSWORD);
+        } catch (RestClientException e) {
+            throw new KeycloakClientException(LOGIN_FAILED, e);
         }
     }
 
@@ -135,11 +146,11 @@ public class KeycloakTokenClient {
 
     private TokenResponseDto mapToTokenResponse(Map<String, Object> response) {
         return new TokenResponseDto(
-                (String) response.get("access_token"),
+                (String) response.get(ACCESS_TOKEN_KEY),
                 (String) response.get(REFRESH_TOKEN),
-                getNumber(response, "expires_in"),
-                getNumber(response, "refresh_expires_in"),
-                (String) response.getOrDefault("token_type", "Bearer"));
+                getNumber(response, EXPIRES_IN_KEY),
+                getNumber(response, REFRESH_EXPIRES_IN_KEY),
+                (String) response.getOrDefault(TOKEN_TYPE_KEY, BEARER));
     }
 
     private Integer getNumber(Map<String, Object> response, String key) {

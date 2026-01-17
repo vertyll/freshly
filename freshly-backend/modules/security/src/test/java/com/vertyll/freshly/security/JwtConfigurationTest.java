@@ -24,6 +24,12 @@ import io.jsonwebtoken.security.Keys;
 
 @ExtendWith(MockitoExtension.class)
 class JwtConfigurationTest {
+    private static final long EXPIRATION_EMAIL_VERIFICATION = 3600000L;
+    private static final long EXPIRATION_PASSWORD_RESET = 1800000L;
+    private static final long REFRESH_TOKEN_EXPIRATION = 86400000L;
+
+    private static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
+    private static final String SECRET = "testSecretKeyForJwtTokensMinimum256BitsRequiredForHS256";
 
     private final JwtProperties jwtProperties = Mockito.mock(JwtProperties.class);
     private final JwtProperties.RefreshToken refreshToken =
@@ -31,18 +37,15 @@ class JwtConfigurationTest {
     private final JwtProperties.Expiration expiration =
             Mockito.mock(JwtProperties.Expiration.class);
 
-    private static final String SECRET =
-            "testSecretKeyForJwtTokensMinimum256BitsRequiredForHS256AlgorithmInTest==";
-
     @BeforeEach
     void setUp() {
         lenient().when(jwtProperties.secret()).thenReturn(SECRET);
         lenient().when(jwtProperties.refreshToken()).thenReturn(refreshToken);
         lenient().when(jwtProperties.expiration()).thenReturn(expiration);
-        lenient().when(expiration.emailVerification()).thenReturn(3600000L);
-        lenient().when(expiration.passwordReset()).thenReturn(1800000L);
-        lenient().when(refreshToken.expiration()).thenReturn(86400000L);
-        lenient().when(refreshToken.cookieName()).thenReturn("refresh_token");
+        lenient().when(expiration.emailVerification()).thenReturn(EXPIRATION_EMAIL_VERIFICATION);
+        lenient().when(expiration.passwordReset()).thenReturn(EXPIRATION_PASSWORD_RESET);
+        lenient().when(refreshToken.expiration()).thenReturn(REFRESH_TOKEN_EXPIRATION);
+        lenient().when(refreshToken.cookieName()).thenReturn(REFRESH_TOKEN_COOKIE_NAME);
     }
 
     @Test
@@ -61,7 +64,7 @@ class JwtConfigurationTest {
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
         Instant now = Instant.now();
-        Instant expiry = now.plusMillis(3600000L);
+        Instant expiry = now.plusMillis(EXPIRATION_EMAIL_VERIFICATION);
 
         // When - Generate token
         String token =
@@ -89,15 +92,10 @@ class JwtConfigurationTest {
 
     @Test
     void shouldHaveReasonableTokenExpiration() {
-        // Given
-        long emailVerificationMs = 3600000L;
-        long passwordResetMs = 1800000L;
-        long refreshTokenMs = 86400000L;
-
-        // Then
-        long emailVerificationMinutes = emailVerificationMs / (1000 * 60);
-        long passwordResetMinutes = passwordResetMs / (1000 * 60);
-        long refreshTokenMinutes = refreshTokenMs / (1000 * 60);
+        // Given & Then
+        long emailVerificationMinutes = EXPIRATION_EMAIL_VERIFICATION / (1000 * 60);
+        long passwordResetMinutes = EXPIRATION_PASSWORD_RESET / (1000 * 60);
+        long refreshTokenMinutes = REFRESH_TOKEN_EXPIRATION / (1000 * 60);
 
         assertThat(emailVerificationMinutes).isBetween(1L, 2880L); // Between 1 minute and 48 hours
         assertThat(passwordResetMinutes).isBetween(1L, 2880L);
@@ -106,10 +104,7 @@ class JwtConfigurationTest {
 
     @Test
     void shouldHaveRefreshTokenCookieName() {
-        // Given
-        String cookieName = "refresh_token";
-
-        // Then
-        assertThat(cookieName).isNotNull().isNotEmpty();
+        // Given & Then
+        assertThat(REFRESH_TOKEN_COOKIE_NAME).isNotNull().isNotEmpty();
     }
 }

@@ -9,15 +9,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.permission.Permission;
 
 class RolePermissionMappingTest {
+    private static final String ID_CANNOT_BE_NULL = "ID cannot be null";
+    private static final String KEYCLOAK_ROLE_CANNOT_BE_NULL = "Keycloak role cannot be null";
+    private static final String PERMISSION_CANNOT_BE_NULL = "Permission cannot be null";
 
     @Test
     @DisplayName("Should create mapping with generated UUID")
     void shouldCreateMappingWithGeneratedUuid() {
         // Given
-        String role = "admin";
+        UserRoleEnum role = UserRoleEnum.ADMIN;
         Permission permission = Permission.USERS_READ;
 
         // When
@@ -34,11 +38,12 @@ class RolePermissionMappingTest {
     void shouldCreateMappingWithSpecificUuid() {
         // Given
         UUID id = UUID.randomUUID();
-        String role = "admin";
+        UserRoleEnum role = UserRoleEnum.ADMIN;
         Permission permission = Permission.USERS_CREATE;
 
         // When
-        RolePermissionMapping mapping = new RolePermissionMapping(id, role, permission);
+        RolePermissionMapping mapping =
+                RolePermissionMapping.reconstitute(id, role, permission, null);
 
         // Then
         assertThat(mapping.getId()).isEqualTo(id);
@@ -51,11 +56,12 @@ class RolePermissionMappingTest {
     void shouldReconstituteMappingFromRepository() {
         // Given
         UUID id = UUID.randomUUID();
-        String role = "moderator";
+        UserRoleEnum role = UserRoleEnum.MODERATOR;
         Permission permission = Permission.REPORTS_READ;
 
         // When
-        RolePermissionMapping mapping = RolePermissionMapping.reconstitute(id, role, permission);
+        RolePermissionMapping mapping =
+                RolePermissionMapping.reconstitute(id, role, permission, 1L);
 
         // Then
         assertThat(mapping.getId()).isEqualTo(id);
@@ -68,13 +74,13 @@ class RolePermissionMappingTest {
     @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenReconstitutingWithNullId() {
         // Given
-        String role = "admin";
+        UserRoleEnum role = UserRoleEnum.ADMIN;
         Permission permission = Permission.USERS_READ;
 
         // When & Then
-        assertThatThrownBy(() -> RolePermissionMapping.reconstitute(null, role, permission))
+        assertThatThrownBy(() -> RolePermissionMapping.reconstitute(null, role, permission, 1L))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("ID cannot be null");
+                .hasMessageContaining(ID_CANNOT_BE_NULL);
     }
 
     @Test
@@ -86,9 +92,9 @@ class RolePermissionMappingTest {
         Permission permission = Permission.USERS_READ;
 
         // When & Then
-        assertThatThrownBy(() -> RolePermissionMapping.reconstitute(id, null, permission))
+        assertThatThrownBy(() -> RolePermissionMapping.reconstitute(id, null, permission, 1L))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("Keycloak role cannot be null");
+                .hasMessageContaining(KEYCLOAK_ROLE_CANNOT_BE_NULL);
     }
 
     @Test
@@ -97,19 +103,19 @@ class RolePermissionMappingTest {
     void shouldThrowExceptionWhenReconstitutingWithNullPermission() {
         // Given
         UUID id = UUID.randomUUID();
-        String role = "admin";
+        UserRoleEnum role = UserRoleEnum.ADMIN;
 
         // When & Then
-        assertThatThrownBy(() -> RolePermissionMapping.reconstitute(id, role, null))
+        assertThatThrownBy(() -> RolePermissionMapping.reconstitute(id, role, null, 1L))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("Permission cannot be null");
+                .hasMessageContaining(PERMISSION_CANNOT_BE_NULL);
     }
 
     @Test
     @DisplayName("Should create mappings with different UUIDs")
     void shouldCreateMappingsWithDifferentUuids() {
         // Given
-        String role = "admin";
+        UserRoleEnum role = UserRoleEnum.ADMIN;
         Permission permission = Permission.USERS_READ;
 
         // When
@@ -125,11 +131,12 @@ class RolePermissionMappingTest {
     void shouldBeImmutable() {
         // Given
         UUID id = UUID.randomUUID();
-        String role = "admin";
+        UserRoleEnum role = UserRoleEnum.ADMIN;
         Permission permission = Permission.USERS_READ;
 
         // When
-        RolePermissionMapping mapping = new RolePermissionMapping(id, role, permission);
+        RolePermissionMapping mapping =
+                RolePermissionMapping.reconstitute(id, role, permission, null);
 
         // Then
         assertThat(mapping.getId()).isEqualTo(id);
@@ -143,7 +150,7 @@ class RolePermissionMappingTest {
     @DisplayName("Should handle all permission types")
     void shouldHandleAllPermissionTypes(Permission permission) {
         // Given
-        String role = "admin";
+        UserRoleEnum role = UserRoleEnum.ADMIN;
 
         // When
         RolePermissionMapping mapping = new RolePermissionMapping(role, permission);
@@ -156,7 +163,7 @@ class RolePermissionMappingTest {
     @DisplayName("Should preserve role and permission values")
     void shouldPreserveRoleAndPermissionValues() {
         // Given
-        String role = "custom_role";
+        UserRoleEnum role = UserRoleEnum.MODERATOR;
         Permission permission = Permission.SETTINGS_MANAGE;
 
         // When
@@ -172,30 +179,16 @@ class RolePermissionMappingTest {
     void shouldReconstituteMappingWithAllValidData() {
         // Given
         UUID id = UUID.randomUUID();
-        String role = "test_role";
+        UserRoleEnum role = UserRoleEnum.USER;
         Permission permission = Permission.AUTH_CHANGE_PASSWORD;
 
         // When
-        RolePermissionMapping mapping = RolePermissionMapping.reconstitute(id, role, permission);
+        RolePermissionMapping mapping =
+                RolePermissionMapping.reconstitute(id, role, permission, 1L);
 
         // Then
         assertThat(mapping.getId()).isEqualTo(id);
         assertThat(mapping.getKeycloakRole()).isEqualTo(role);
-        assertThat(mapping.getPermission()).isEqualTo(permission);
-    }
-
-    @Test
-    @DisplayName("Should create mapping with empty role name")
-    void shouldCreateMappingWithEmptyRoleName() {
-        // Given
-        String emptyRole = "";
-        Permission permission = Permission.USERS_READ;
-
-        // When
-        RolePermissionMapping mapping = new RolePermissionMapping(emptyRole, permission);
-
-        // Then
-        assertThat(mapping.getKeycloakRole()).isEmpty();
         assertThat(mapping.getPermission()).isEqualTo(permission);
     }
 }

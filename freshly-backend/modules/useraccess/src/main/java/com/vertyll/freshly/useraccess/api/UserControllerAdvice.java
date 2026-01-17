@@ -14,6 +14,14 @@ import com.vertyll.freshly.useraccess.domain.exception.*;
 
 @RestControllerAdvice(assignableTypes = UserController.class)
 class UserControllerAdvice {
+    private static final String USER_NOT_FOUND_MSG_KEY = "error.user.notFound";
+    private static final String USER_ALREADY_EXISTS_MSG_KEY = "error.user.alreadyExists";
+    private static final String USER_ALREADY_ACTIVE_MSG_KEY = "error.user.alreadyActive";
+    private static final String USER_ALREADY_INACTIVE_MSG_KEY = "error.user.alreadyInactive";
+    private static final String SELF_DEACTIVATION_MSG_KEY = "error.user.selfDeactivation";
+    private static final String USER_ROLES_EMPTY_MSG_KEY = "error.user.rolesEmpty";
+    private static final String OPTIMISTIC_LOCKING_FAILURE_MSG_KEY =
+            "error.common.optimisticLockingFailure";
 
     private final MessageSource messageSource;
 
@@ -28,7 +36,7 @@ class UserControllerAdvice {
         LOGGER.warn("User not found: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.user.notFound", null, LocaleContextHolder.getLocale());
+                        USER_NOT_FOUND_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, message);
     }
 
@@ -37,7 +45,7 @@ class UserControllerAdvice {
         LOGGER.warn("User already exists: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.user.alreadyExists", null, LocaleContextHolder.getLocale());
+                        USER_ALREADY_EXISTS_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
     }
 
@@ -46,7 +54,7 @@ class UserControllerAdvice {
         LOGGER.warn("User already active: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.user.alreadyActive", null, LocaleContextHolder.getLocale());
+                        USER_ALREADY_ACTIVE_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
 
@@ -55,7 +63,7 @@ class UserControllerAdvice {
         LOGGER.warn("User already inactive: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.user.alreadyInactive", null, LocaleContextHolder.getLocale());
+                        USER_ALREADY_INACTIVE_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
 
@@ -64,7 +72,7 @@ class UserControllerAdvice {
         LOGGER.warn("Self deactivation attempt: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.user.selfDeactivation", null, LocaleContextHolder.getLocale());
+                        SELF_DEACTIVATION_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, message);
     }
 
@@ -73,7 +81,7 @@ class UserControllerAdvice {
         LOGGER.warn("User roles empty: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.user.rolesEmpty", null, LocaleContextHolder.getLocale());
+                        USER_ROLES_EMPTY_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
 
@@ -82,9 +90,7 @@ class UserControllerAdvice {
         LOGGER.warn("Optimistic locking failure: {}", ex.getMessage());
         String message =
                 messageSource.getMessage(
-                        "error.common.optimisticLockingFailure",
-                        null,
-                        LocaleContextHolder.getLocale());
+                        OPTIMISTIC_LOCKING_FAILURE_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
     }
 }

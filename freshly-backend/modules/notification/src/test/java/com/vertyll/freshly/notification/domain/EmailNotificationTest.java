@@ -12,13 +12,34 @@ import org.junit.jupiter.api.Test;
 
 class EmailNotificationTest {
 
+    private static final String TEST_EMAIL = "test@example.com";
+    private static final String USERNAME_KEY = "username";
+    private static final String USERNAME_VALUE = "John";
+    private static final String LINK_KEY = "link";
+    private static final String LINK_VALUE = "https://example.com";
+    private static final String RESET_LINK_KEY = "resetLink";
+    private static final String RESET_LINK_VALUE = "https://example.com/reset";
+    private static final String NEW_KEY = "newKey";
+    private static final String NEW_VALUE = "newValue";
+    private static final String FAIL_KEY = "fail";
+    private static final String FAIL_VALUE = "fail";
+
+    private static final String SMTP_CONNECTION_FAILED = "SMTP connection failed";
+    private static final String CONNECTION_TIMEOUT = "Connection timeout";
+
+    private static final String RECIPIENT_CANNOT_BE_NULL = "Recipient cannot be null";
+    private static final String TEMPLATE_CANNOT_BE_NULL = "Template cannot be null";
+    private static final String TEMPLATE_VARIABLES_CANNOT_BE_NULL =
+            "Template variables cannot be null";
+    private static final String EMAIL_ALREADY_SENT = "Email already sent";
+
     @Test
     @DisplayName("Should create email notification with pending status")
     void shouldCreateEmailNotificationWithPendingStatus() {
         // Given
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
-        Map<String, Object> variables = Map.of("username", "John", "link", "https://example.com");
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE, LINK_KEY, LINK_VALUE);
 
         // When
         EmailNotification notification = new EmailNotification(recipient, template, variables);
@@ -40,12 +61,12 @@ class EmailNotificationTest {
     void shouldThrowExceptionWhenRecipientIsNull() {
         // Given
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
-        Map<String, Object> variables = Map.of("username", "John");
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE);
 
         // When & Then
         assertThatThrownBy(() -> new EmailNotification(null, template, variables))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("Recipient cannot be null");
+                .hasMessageContaining(RECIPIENT_CANNOT_BE_NULL);
     }
 
     @Test
@@ -53,13 +74,13 @@ class EmailNotificationTest {
     @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenTemplateIsNull() {
         // Given
-        Email recipient = new Email("test@example.com");
-        Map<String, Object> variables = Map.of("username", "John");
+        Email recipient = new Email(TEST_EMAIL);
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE);
 
         // When & Then
         assertThatThrownBy(() -> new EmailNotification(recipient, null, variables))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("Template cannot be null");
+                .hasMessageContaining(TEMPLATE_CANNOT_BE_NULL);
     }
 
     @Test
@@ -67,22 +88,22 @@ class EmailNotificationTest {
     @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenTemplateVariablesAreNull() {
         // Given
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
 
         // When & Then
         assertThatThrownBy(() -> new EmailNotification(recipient, template, null))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("Template variables cannot be null");
+                .hasMessageContaining(TEMPLATE_VARIABLES_CANNOT_BE_NULL);
     }
 
     @Test
     @DisplayName("Should mark notification as sent")
     void shouldMarkNotificationAsSent() {
         // Given
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
-        Map<String, Object> variables = Map.of("username", "John");
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE);
         EmailNotification notification = new EmailNotification(recipient, template, variables);
 
         // When
@@ -98,60 +119,58 @@ class EmailNotificationTest {
     @DisplayName("Should throw exception when marking already sent notification as sent")
     void shouldThrowExceptionWhenMarkingAlreadySentNotificationAsSent() {
         // Given
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
-        Map<String, Object> variables = Map.of("username", "John");
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE);
         EmailNotification notification = new EmailNotification(recipient, template, variables);
         notification.markAsSent();
 
         // When & Then
         assertThatThrownBy(notification::markAsSent)
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Email already sent");
+                .hasMessageContaining(EMAIL_ALREADY_SENT);
     }
 
     @Test
     @DisplayName("Should mark notification as failed with error message")
     void shouldMarkNotificationAsFailedWithErrorMessage() {
         // Given
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
-        Map<String, Object> variables = Map.of("username", "John");
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE);
         EmailNotification notification = new EmailNotification(recipient, template, variables);
-        String errorMessage = "SMTP connection failed";
 
         // When
-        notification.markAsFailed(errorMessage);
+        notification.markAsFailed(SMTP_CONNECTION_FAILED);
 
         // Then
         assertThat(notification.getStatus()).isEqualTo(EmailNotification.EmailStatus.FAILED);
-        assertThat(notification.getErrorMessage()).isEqualTo(errorMessage);
+        assertThat(notification.getErrorMessage()).isEqualTo(SMTP_CONNECTION_FAILED);
     }
 
     @Test
-    @SuppressWarnings(
-            "PMD.UseConcurrentHashMap") // HashMap is safe here (no concurrent access in test)
+    @SuppressWarnings("PMD.UseConcurrentHashMap")
     @DisplayName("Should create immutable copy of template variables")
     void shouldCreateImmutableCopyOfTemplateVariables() {
         // Given
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
 
         Map<String, Object> variables = new java.util.HashMap<>();
-        variables.put("username", "John");
+        variables.put(USERNAME_KEY, USERNAME_VALUE);
 
         // When
         EmailNotification notification = new EmailNotification(recipient, template, variables);
 
-        variables.put("newKey", "newValue");
+        variables.put(NEW_KEY, NEW_VALUE);
 
         Map<String, Object> notificationVariables = notification.getTemplateVariables();
 
         // Then
-        assertThat(notification.getTemplateVariables()).doesNotContainKey("newKey");
+        assertThat(notification.getTemplateVariables()).doesNotContainKey(NEW_KEY);
         assertThat(notification.getTemplateVariables()).hasSize(1);
 
-        assertThatThrownBy(() -> notificationVariables.put("fail", "fail"))
+        assertThatThrownBy(() -> notificationVariables.put(FAIL_KEY, FAIL_VALUE))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
@@ -161,10 +180,10 @@ class EmailNotificationTest {
     void shouldReconstituteNotificationFromDatabase() {
         // Given
         UUID id = UUID.randomUUID();
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.PASSWORD_RESET;
         Map<String, Object> variables =
-                Map.of("username", "John", "resetLink", "https://example.com/reset");
+                Map.of(USERNAME_KEY, USERNAME_VALUE, RESET_LINK_KEY, RESET_LINK_VALUE);
         LocalDateTime createdAt = LocalDateTime.now(ZoneOffset.UTC).minusHours(1);
         EmailNotification.EmailStatus status = EmailNotification.EmailStatus.SENT;
         LocalDateTime sentAt = LocalDateTime.now(ZoneOffset.UTC);
@@ -191,21 +210,27 @@ class EmailNotificationTest {
     void shouldReconstituteFailedNotificationFromDatabase() {
         // Given
         UUID id = UUID.randomUUID();
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.USER_REGISTERED;
-        Map<String, Object> variables = Map.of("username", "John");
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE);
         LocalDateTime createdAt = LocalDateTime.now(ZoneOffset.UTC).minusHours(1);
         EmailNotification.EmailStatus status = EmailNotification.EmailStatus.FAILED;
-        String errorMessage = "Connection timeout";
 
         // When
         EmailNotification notification =
                 EmailNotification.reconstitute(
-                        id, recipient, template, variables, createdAt, status, null, errorMessage);
+                        id,
+                        recipient,
+                        template,
+                        variables,
+                        createdAt,
+                        status,
+                        null,
+                        CONNECTION_TIMEOUT);
 
         // Then
         assertThat(notification.getStatus()).isEqualTo(EmailNotification.EmailStatus.FAILED);
-        assertThat(notification.getErrorMessage()).isEqualTo(errorMessage);
+        assertThat(notification.getErrorMessage()).isEqualTo(CONNECTION_TIMEOUT);
         assertThat(notification.getSentAt()).isNull();
     }
 
@@ -213,7 +238,7 @@ class EmailNotificationTest {
     @DisplayName("Should handle empty template variables")
     void shouldHandleEmptyTemplateVariables() {
         // Given
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.USER_REGISTERED;
         Map<String, Object> variables = Map.of();
 

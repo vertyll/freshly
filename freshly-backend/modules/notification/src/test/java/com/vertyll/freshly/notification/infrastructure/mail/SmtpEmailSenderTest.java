@@ -2,6 +2,7 @@ package com.vertyll.freshly.notification.infrastructure.mail;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -29,6 +30,39 @@ import jakarta.mail.internet.MimeMessage;
 
 @ExtendWith(MockitoExtension.class)
 class SmtpEmailSenderTest {
+
+    private static final String USERNAME_KEY = "username";
+    private static final String VERIFICATION_LINK_KEY = "verificationLink";
+    private static final String RESET_LINK_KEY = "resetLink";
+
+    private static final String TEST_EMAIL = "test@example.com";
+    private static final String USER_EMAIL = "user@example.com";
+    private static final String RECIPIENT_EMAIL = "recipient@example.com";
+    private static final String NOREPLY_EMAIL = "noreply@example.com";
+
+    private static final String USERNAME_JOHN = "John";
+    private static final String USERNAME_JANE_DOE = "Jane Doe";
+
+    private static final String VERIFICATION_LINK = "https://example.com";
+    private static final String RESET_LINK = "https://example.com/reset/token123";
+
+    private static final String HTML_VERIFICATION_EMAIL =
+            "<html><body>Verification email</body></html>";
+    private static final String HTML_WELCOME = "<html><body>Welcome</body></html>";
+    private static final String HTML_PASSWORD_RESET =
+            "<html><body>Reset your password</body></html>";
+    private static final String HTML_VERIFY_EMAIL = "<html><body>Verify your email</body></html>";
+    private static final String HTML_EMAIL = "<html><body>Email</body></html>";
+
+    private static final String TEMPLATE_NOT_FOUND = "Template not found";
+    private static final String SMTP_SERVER_NOT_RESPONDING = "SMTP server not responding";
+    private static final String FAILED_TO_SEND_EMAIL = "Failed to send email";
+
+    private static final String TEMPLATE_EMAIL_VERIFICATION = "email/email-verification";
+    private static final String TEMPLATE_USER_REGISTERED = "email/user-registered";
+    private static final String TEMPLATE_PASSWORD_RESET = "email/password-reset";
+
+    private static final int EXPECTED_SEND_CALLS = 2;
 
     @Mock
     @SuppressWarnings("NullAway.Init")
@@ -62,17 +96,16 @@ class SmtpEmailSenderTest {
     @DisplayName("Should send email successfully")
     void shouldSendEmailSuccessfully() {
         // Given
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
         Map<String, Object> variables =
-                Map.of("username", "John", "verificationLink", "https://example.com");
+                Map.of(USERNAME_KEY, USERNAME_JOHN, VERIFICATION_LINK_KEY, VERIFICATION_LINK);
         EmailNotification notification = new EmailNotification(recipient, template, variables);
 
-        String htmlContent = "<html><body>Verification email</body></html>";
         when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenReturn(htmlContent);
+                .thenReturn(HTML_VERIFICATION_EMAIL);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
-        when(mailProperties.from()).thenReturn("noreply@example.com");
+        when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
         doNothing().when(mailSender).send(mimeMessage);
 
         // When
@@ -84,29 +117,27 @@ class SmtpEmailSenderTest {
         verify(mailSender).send(mimeMessage);
 
         Context capturedContext = contextCaptor.getValue();
-        assertThat(capturedContext.getVariable("username")).isEqualTo("John");
-        assertThat(capturedContext.getVariable("verificationLink"))
-                .isEqualTo("https://example.com");
+        assertThat(capturedContext.getVariable(USERNAME_KEY)).isEqualTo(USERNAME_JOHN);
+        assertThat(capturedContext.getVariable(VERIFICATION_LINK_KEY)).isEqualTo(VERIFICATION_LINK);
     }
 
     @Test
     @DisplayName("Should throw EmailSendingException when MessagingException occurs")
     void shouldThrowEmailSendingExceptionWhenMessagingExceptionOccurs() {
         // Given
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.USER_REGISTERED;
-        Map<String, Object> variables = Map.of("username", "John");
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_JOHN);
         EmailNotification notification = new EmailNotification(recipient, template, variables);
 
-        String htmlContent = "<html><body>Welcome</body></html>";
         when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenReturn(htmlContent);
+                .thenReturn(HTML_WELCOME);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
-        when(mailProperties.from()).thenReturn("noreply@example.com");
+        when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
 
         doAnswer(
                         _ -> {
-                            throw new MessagingException("SMTP server not responding");
+                            throw new MessagingException(SMTP_SERVER_NOT_RESPONDING);
                         })
                 .when(mailSender)
                 .send(any(MimeMessage.class));
@@ -114,7 +145,7 @@ class SmtpEmailSenderTest {
         // When & Then
         assertThatThrownBy(() -> smtpEmailSender.send(notification))
                 .isInstanceOf(EmailSendingException.class)
-                .hasMessageContaining("Failed to send email")
+                .hasMessageContaining(FAILED_TO_SEND_EMAIL)
                 .hasCauseInstanceOf(MessagingException.class);
 
         verify(mailSender).send(any(MimeMessage.class));
@@ -124,46 +155,43 @@ class SmtpEmailSenderTest {
     @DisplayName("Should process template with correct variables")
     void shouldProcessTemplateWithCorrectVariables() {
         // Given
-        Email recipient = new Email("user@example.com");
+        Email recipient = new Email(USER_EMAIL);
         EmailTemplate template = EmailTemplate.PASSWORD_RESET;
         Map<String, Object> variables =
                 Map.of(
-                        "username", "Jane Doe",
-                        "resetLink", "https://example.com/reset/token123");
+                        USERNAME_KEY, USERNAME_JANE_DOE,
+                        RESET_LINK_KEY, RESET_LINK);
         EmailNotification notification = new EmailNotification(recipient, template, variables);
 
-        String htmlContent = "<html><body>Reset your password</body></html>";
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
-        when(mailProperties.from()).thenReturn("noreply@example.com");
+        when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
         when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenReturn(htmlContent);
+                .thenReturn(HTML_PASSWORD_RESET);
         doNothing().when(mailSender).send(mimeMessage);
 
         // When
         smtpEmailSender.send(notification);
 
         // Then
-        verify(templateEngine).process(eq("email/password-reset"), contextCaptor.capture());
+        verify(templateEngine).process(eq(TEMPLATE_PASSWORD_RESET), contextCaptor.capture());
         Context capturedContext = contextCaptor.getValue();
-        assertThat(capturedContext.getVariable("username")).isEqualTo("Jane Doe");
-        assertThat(capturedContext.getVariable("resetLink"))
-                .isEqualTo("https://example.com/reset/token123");
+        assertThat(capturedContext.getVariable(USERNAME_KEY)).isEqualTo(USERNAME_JANE_DOE);
+        assertThat(capturedContext.getVariable(RESET_LINK_KEY)).isEqualTo(RESET_LINK);
     }
 
     @Test
     @DisplayName("Should send email with correct recipient and subject")
     void shouldSendEmailWithCorrectRecipientAndSubject() {
         // Given
-        Email recipient = new Email("recipient@example.com");
+        Email recipient = new Email(RECIPIENT_EMAIL);
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
-        Map<String, Object> variables = Map.of("username", "John");
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_JOHN);
         EmailNotification notification = new EmailNotification(recipient, template, variables);
 
-        String htmlContent = "<html><body>Verify your email</body></html>";
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
-        when(mailProperties.from()).thenReturn("noreply@example.com");
+        when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
         when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenReturn(htmlContent);
+                .thenReturn(HTML_VERIFY_EMAIL);
         doNothing().when(mailSender).send(mimeMessage);
 
         // When
@@ -171,24 +199,21 @@ class SmtpEmailSenderTest {
 
         // Then
         verify(mailSender).send(mimeMessage);
-        // We can't verify MimeMessage content directly without mocking MimeMessageHelper,
-        // but we verify that the send method was called
     }
 
     @Test
     @DisplayName("Should handle empty template variables")
     void shouldHandleEmptyTemplateVariables() {
         // Given
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.USER_REGISTERED;
         Map<String, Object> variables = Map.of();
         EmailNotification notification = new EmailNotification(recipient, template, variables);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
-        when(mailProperties.from()).thenReturn("noreply@example.com");
+        when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
 
-        String htmlContent = "<html><body>Welcome</body></html>";
         when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenReturn(htmlContent);
+                .thenReturn(HTML_WELCOME);
         doNothing().when(mailSender).send(mimeMessage);
 
         // When
@@ -205,18 +230,18 @@ class SmtpEmailSenderTest {
     @DisplayName("Should throw exception when template processing fails")
     void shouldThrowExceptionWhenTemplateProcessingFails() {
         // Given
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
-        Map<String, Object> variables = Map.of("username", "John");
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_JOHN);
         EmailNotification notification = new EmailNotification(recipient, template, variables);
 
         when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenThrow(new RuntimeException("Template not found"));
+                .thenThrow(new RuntimeException(TEMPLATE_NOT_FOUND));
 
         // When & Then
         assertThatThrownBy(() -> smtpEmailSender.send(notification))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Template not found");
+                .hasMessageContaining(TEMPLATE_NOT_FOUND);
 
         verify(mailSender, never()).send(any(MimeMessage.class));
     }
@@ -225,49 +250,47 @@ class SmtpEmailSenderTest {
     @DisplayName("Should use correct template name for each email type")
     void shouldUseCorrectTemplateNameForEachEmailType() {
         // Given
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
-        when(mailProperties.from()).thenReturn("noreply@example.com");
-        Map<String, Object> variables = Map.of("username", "John");
+        when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_JOHN);
 
-        String htmlContent = "<html><body>Email</body></html>";
-        when(templateEngine.process(anyString(), any(Context.class))).thenReturn(htmlContent);
+        when(templateEngine.process(anyString(), any(Context.class))).thenReturn(HTML_EMAIL);
         doNothing().when(mailSender).send(mimeMessage);
 
         // When & Then - Email Verification
         EmailNotification verificationNotification =
                 new EmailNotification(recipient, EmailTemplate.EMAIL_VERIFICATION, variables);
         smtpEmailSender.send(verificationNotification);
-        verify(templateEngine).process(eq("email/email-verification"), any(Context.class));
+        verify(templateEngine).process(eq(TEMPLATE_EMAIL_VERIFICATION), any(Context.class));
 
         // When & Then - User Registered
         EmailNotification registeredNotification =
                 new EmailNotification(recipient, EmailTemplate.USER_REGISTERED, variables);
         smtpEmailSender.send(registeredNotification);
-        verify(templateEngine).process(eq("email/user-registered"), any(Context.class));
+        verify(templateEngine).process(eq(TEMPLATE_USER_REGISTERED), any(Context.class));
 
         // When & Then - Password Reset
         EmailNotification resetNotification =
                 new EmailNotification(recipient, EmailTemplate.PASSWORD_RESET, variables);
         smtpEmailSender.send(resetNotification);
-        verify(templateEngine).process(eq("email/password-reset"), any(Context.class));
+        verify(templateEngine).process(eq(TEMPLATE_PASSWORD_RESET), any(Context.class));
     }
 
     @Test
     @DisplayName("Should create new MimeMessage for each send")
     void shouldCreateNewMimeMessageForEachSend() {
         // Given
-        Email recipient = new Email("test@example.com");
+        Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.USER_REGISTERED;
-        Map<String, Object> variables = Map.of("username", "John");
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_JOHN);
         EmailNotification notification1 = new EmailNotification(recipient, template, variables);
         EmailNotification notification2 = new EmailNotification(recipient, template, variables);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
-        when(mailProperties.from()).thenReturn("noreply@example.com");
+        when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
 
-        String htmlContent = "<html><body>Welcome</body></html>";
         when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenReturn(htmlContent);
+                .thenReturn(HTML_WELCOME);
         doNothing().when(mailSender).send(mimeMessage);
 
         // When
@@ -275,7 +298,7 @@ class SmtpEmailSenderTest {
         smtpEmailSender.send(notification2);
 
         // Then
-        verify(mailSender, times(2)).createMimeMessage();
-        verify(mailSender, times(2)).send(mimeMessage);
+        verify(mailSender, times(EXPECTED_SEND_CALLS)).createMimeMessage();
+        verify(mailSender, times(EXPECTED_SEND_CALLS)).send(mimeMessage);
     }
 }

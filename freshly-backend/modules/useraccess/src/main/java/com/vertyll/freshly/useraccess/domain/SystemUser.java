@@ -6,10 +6,13 @@ import org.jspecify.annotations.Nullable;
 
 import lombok.Getter;
 
+import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.useraccess.domain.exception.*;
 
 @Getter
 public final class SystemUser {
+    private static final String KEYCLOAK_USER_ID_CANNOT_BE_NULL = "Keycloak user ID cannot be null";
+    private static final String ROLES_CANNOT_BE_NULL = "Roles cannot be null";
 
     private final UUID keycloakUserId;
     private boolean isActive;
@@ -26,8 +29,8 @@ public final class SystemUser {
             Set<UserRoleEnum> roles,
             @Nullable Long version) {
         this.keycloakUserId =
-                Objects.requireNonNull(keycloakUserId, "Keycloak user ID cannot be null");
-        this.roles = Set.copyOf(Objects.requireNonNull(roles, "Roles cannot be null"));
+                Objects.requireNonNull(keycloakUserId, KEYCLOAK_USER_ID_CANNOT_BE_NULL);
+        this.roles = Set.copyOf(Objects.requireNonNull(roles, ROLES_CANNOT_BE_NULL));
         if (this.roles.isEmpty()) {
             throw new UserRolesEmptyException();
         }
@@ -66,7 +69,7 @@ public final class SystemUser {
 
     public void replaceRoles(Set<UserRoleEnum> newRoles) {
         Set<UserRoleEnum> copiedRoles =
-                Set.copyOf(Objects.requireNonNull(newRoles, "Roles cannot be null"));
+                Set.copyOf(Objects.requireNonNull(newRoles, ROLES_CANNOT_BE_NULL));
         if (copiedRoles.isEmpty()) {
             throw new UserRolesEmptyException();
         }

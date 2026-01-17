@@ -32,6 +32,38 @@ import tools.jackson.databind.ObjectMapper;
 })
 class GiosAirQualityAdapter implements AirQualityProvider {
 
+    private static final String USER_AGENT_HEADER = "User-Agent";
+    private static final String USER_AGENT_VALUE = "Freshly-App/1.0";
+
+    private static final String URI_STATION_FIND_ALL = "/station/findAll";
+    private static final String URI_AQ_INDEX = "/aqindex/getIndex/{stationId}";
+    private static final String URI_STATION_SENSORS = "/station/sensors/{stationId}";
+    private static final String URI_SENSOR_DATA = "/data/getData/{sensorId}";
+
+    private static final String JSON_PATH_STATIONS_LIST = "Lista stacji pomiarowych";
+    private static final String JSON_PATH_LIST_LOWERCASE = "lista";
+    private static final String JSON_PATH_LIST = "list";
+    private static final String JSON_PATH_DATA = "data";
+    private static final String JSON_PATH_AQ_INDEX = "AqIndex";
+    private static final String JSON_PATH_AQ_INDEX_PL = "Indeks jakości powietrza";
+    private static final String JSON_PATH_SENSORS_LIST_FULL =
+            "Lista stanowisk pomiarowych dla podanej stacji";
+    private static final String JSON_PATH_SENSORS_LIST = "Lista stanowisk pomiarowych";
+    private static final String JSON_PATH_SENSORS_LIST_SHORT = "Lista stanowisk";
+    private static final String JSON_PATH_MEASUREMENT_DATA = "Lista danych pomiarowych";
+    private static final String JSON_PATH_VALUES = "values";
+    private static final String JSON_PATH_MEASUREMENT_DATA_SHORT = "Dane pomiarowe";
+
+    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final String COMMA = ",";
+    private static final String DOT = ".";
+    private static final String UNKNOWN_PARAMETER = "Nieznany parametr";
+    private static final String NO_DATA = "Brak danych";
+    private static final String PARAM_NA = "N/A";
+
+    private static final double DEFAULT_COORDINATE = 0.0;
+    private static final int DEFAULT_STATION_ID = 0;
+
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
@@ -39,7 +71,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
         this.restClient =
                 RestClient.builder()
                         .baseUrl(externalServiceProperties.gios().apiUrl())
-                        .defaultHeader("User-Agent", "Freshly-App/1.0")
+                        .defaultHeader(USER_AGENT_HEADER, USER_AGENT_VALUE)
                         .build();
 
         this.objectMapper = new ObjectMapper();
@@ -47,7 +79,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
 
     @Override
     public List<Station> findAllStations() {
-        String response = restClient.get().uri("/station/findAll").retrieve().body(String.class);
+        String response = restClient.get().uri(URI_STATION_FIND_ALL).retrieve().body(String.class);
 
         if (response == null) {
             return List.of();
@@ -64,10 +96,10 @@ class GiosAirQualityAdapter implements AirQualityProvider {
         log.debug("GIOŚ stations response: {}", root);
 
         // Próba znalezienia listy pod popularnymi kluczami w API GIOŚ
-        JsonNode listNode = root.findPath("Lista stacji pomiarowych");
-        if (listNode.isMissingNode()) listNode = root.findPath("lista");
-        if (listNode.isMissingNode()) listNode = root.findPath("list");
-        if (listNode.isMissingNode()) listNode = root.findPath("data");
+        JsonNode listNode = root.findPath(JSON_PATH_STATIONS_LIST);
+        if (listNode.isMissingNode()) listNode = root.findPath(JSON_PATH_LIST_LOWERCASE);
+        if (listNode.isMissingNode()) listNode = root.findPath(JSON_PATH_LIST);
+        if (listNode.isMissingNode()) listNode = root.findPath(JSON_PATH_DATA);
 
         // Jeśli root sam jest tablicą, użyj go bezpośrednio
         if (listNode.isMissingNode() && root.isArray()) {
@@ -92,11 +124,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
     @Override
     public Optional<AirQualityIndex> findIndexByStationId(int stationId) {
         String response =
-                restClient
-                        .get()
-                        .uri("/aqindex/getIndex/{stationId}", stationId)
-                        .retrieve()
-                        .body(String.class);
+                restClient.get().uri(URI_AQ_INDEX, stationId).retrieve().body(String.class);
 
         if (response == null) return Optional.empty();
 
@@ -104,8 +132,8 @@ class GiosAirQualityAdapter implements AirQualityProvider {
             JsonNode root = objectMapper.readTree(response);
             log.debug("GIOŚ index response for station {}: {}", stationId, root);
 
-            JsonNode indexNode = root.findPath("AqIndex");
-            if (indexNode.isMissingNode()) indexNode = root.findPath("Indeks jakości powietrza");
+            JsonNode indexNode = root.findPath(JSON_PATH_AQ_INDEX);
+            if (indexNode.isMissingNode()) indexNode = root.findPath(JSON_PATH_AQ_INDEX_PL);
             if (indexNode.isMissingNode()) indexNode = root;
 
             // Zabezpieczenie: jeśli węzeł jest tablicą (czasami API tak zwraca), bierzemy pierwszy
@@ -143,8 +171,8 @@ class GiosAirQualityAdapter implements AirQualityProvider {
             measurements.add(
                     new SensorMeasurement(
                             sensor.id(),
-                            sensor.paramCode() != null ? sensor.paramCode() : "N/A",
-                            sensor.paramName() != null ? sensor.paramName() : "Nieznany parametr",
+                            sensor.paramCode() != null ? sensor.paramCode() : PARAM_NA,
+                            sensor.paramName() != null ? sensor.paramName() : UNKNOWN_PARAMETER,
                             readings));
         }
 
@@ -156,7 +184,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
             String response =
                     restClient
                             .get()
-                            .uri("/station/sensors/{stationId}", stationId)
+                            .uri(URI_STATION_SENSORS, stationId)
                             .retrieve()
                             .body(String.class);
 
@@ -165,9 +193,9 @@ class GiosAirQualityAdapter implements AirQualityProvider {
             JsonNode root = objectMapper.readTree(response);
             log.debug("GIOŚ sensors response for station {}: {}", stationId, root);
 
-            JsonNode listNode = root.findPath("Lista stanowisk pomiarowych dla podanej stacji");
-            if (listNode.isMissingNode()) listNode = root.findPath("Lista stanowisk pomiarowych");
-            if (listNode.isMissingNode()) listNode = root.findPath("Lista stanowisk");
+            JsonNode listNode = root.findPath(JSON_PATH_SENSORS_LIST_FULL);
+            if (listNode.isMissingNode()) listNode = root.findPath(JSON_PATH_SENSORS_LIST);
+            if (listNode.isMissingNode()) listNode = root.findPath(JSON_PATH_SENSORS_LIST_SHORT);
             if (listNode.isMissingNode()) listNode = root;
 
             if (listNode.isArray()) {
@@ -182,27 +210,24 @@ class GiosAirQualityAdapter implements AirQualityProvider {
     private List<SensorMeasurement.Reading> fetchDataForSensor(int sensorId) {
         try {
             String response =
-                    restClient
-                            .get()
-                            .uri("/data/getData/{sensorId}", sensorId)
-                            .retrieve()
-                            .body(String.class);
+                    restClient.get().uri(URI_SENSOR_DATA, sensorId).retrieve().body(String.class);
 
             if (response == null) return List.of();
 
             JsonNode root = objectMapper.readTree(response);
             log.debug("GIOŚ data response for sensor {}: {}", sensorId, root);
 
-            JsonNode valuesNode = root.findPath("Lista danych pomiarowych"); // Klucz w nowym API
-            if (valuesNode.isMissingNode()) valuesNode = root.findPath("values");
-            if (valuesNode.isMissingNode()) valuesNode = root.findPath("Dane pomiarowe");
-            if (valuesNode.isMissingNode()) valuesNode = root.findPath("lista");
-            if (valuesNode.isMissingNode()) valuesNode = root.findPath("data");
+            JsonNode valuesNode = root.findPath(JSON_PATH_MEASUREMENT_DATA);
+            if (valuesNode.isMissingNode()) valuesNode = root.findPath(JSON_PATH_VALUES);
+            if (valuesNode.isMissingNode())
+                valuesNode = root.findPath(JSON_PATH_MEASUREMENT_DATA_SHORT);
+            if (valuesNode.isMissingNode()) valuesNode = root.findPath(JSON_PATH_LIST_LOWERCASE);
+            if (valuesNode.isMissingNode()) valuesNode = root.findPath(JSON_PATH_DATA);
 
             if (valuesNode.isArray()) {
                 List<GiosDataValueDto> values =
                         objectMapper.readerForListOf(GiosDataValueDto.class).readValue(valuesNode);
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
 
                 return values.stream()
                         .filter(v -> v.value() != null) // Filtrujemy nulle (częste w GIOŚ)
@@ -227,7 +252,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
 
     private Station mapToStation(GiosStationDto dto) {
         return new Station(
-                dto.id() != null ? dto.id() : 0,
+                dto.id() != null ? dto.id() : DEFAULT_STATION_ID,
                 dto.stationName(),
                 dto.cityName() != null ? dto.cityName() : "",
                 dto.addressStreet(),
@@ -236,7 +261,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
     }
 
     private AirQualityIndex mapToDomain(GiosAQIndexDto dto, int stationId) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
         LocalDateTime date =
                 dto.stCalcDate() != null
                         ? LocalDateTime.parse(dto.stCalcDate(), formatter)
@@ -252,17 +277,17 @@ class GiosAirQualityAdapter implements AirQualityProvider {
     }
 
     private String getLevelName(String levelName) {
-        return levelName != null ? levelName : "Brak danych";
+        return levelName != null ? levelName : NO_DATA;
     }
 
     private double parseCoordinate(String value) {
         try {
-            if (value == null) return 0.0;
+            if (value == null) return DEFAULT_COORDINATE;
             // GIOŚ API może zwracać współrzędne z przecinkiem jako separatorem dziesiętnym
-            String normalized = value.replace(',', '.');
+            String normalized = value.replace(COMMA.charAt(0), DOT.charAt(0));
             return Double.parseDouble(normalized);
         } catch (NumberFormatException _) {
-            return 0.0;
+            return DEFAULT_COORDINATE;
         }
     }
 }

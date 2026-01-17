@@ -14,6 +14,8 @@ import com.vertyll.freshly.useraccess.domain.SystemUserRepository;
 @Repository("systemUserRepository")
 @RequiredArgsConstructor
 class MongoSystemUserRepository implements SystemUserRepository {
+    private static final String CANNOT_UPDATE_NON_EXISTENT_USER =
+            "Cannot update non-existent user: ";
 
     private final SpringDataSystemUserRepository springDataRepository;
     private final SystemUserMapper mapper;
@@ -31,7 +33,7 @@ class MongoSystemUserRepository implements SystemUserRepository {
                             .orElseThrow(
                                     () ->
                                             new IllegalStateException(
-                                                    "Cannot update non-existent user: "
+                                                    CANNOT_UPDATE_NON_EXISTENT_USER
                                                             + user.getKeycloakUserId()));
 
             document.setActive(user.isActive());

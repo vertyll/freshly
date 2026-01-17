@@ -14,6 +14,10 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 
 @ExtendWith(MockitoExtension.class)
 class SecurityExceptionHandlerTest {
+    private static final String ACCESS_DENIED = "Access denied";
+    private static final String INSUFFICIENT_PRIVILEGES = "Insufficient privileges";
+    private static final String PERMISSION_DENIED_DETAIL =
+            "You do not have permission to access this resource";
 
     private SecurityExceptionHandler exceptionHandler;
 
@@ -27,15 +31,14 @@ class SecurityExceptionHandlerTest {
     void shouldHandleAuthorizationDeniedException() {
         // Given
         AuthorizationDeniedException exception =
-                new AuthorizationDeniedException("Access denied", new AuthorizationDecision(false));
+                new AuthorizationDeniedException(ACCESS_DENIED, new AuthorizationDecision(false));
 
         // When
         ProblemDetail problemDetail = exceptionHandler.handleAuthorizationDenied(exception);
 
         // Then
         assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
-        assertThat(problemDetail.getDetail())
-                .isEqualTo("You do not have permission to access this resource");
+        assertThat(problemDetail.getDetail()).isEqualTo(PERMISSION_DENIED_DETAIL);
     }
 
     @Test
@@ -44,14 +47,13 @@ class SecurityExceptionHandlerTest {
         // Given
         AuthorizationDeniedException exception =
                 new AuthorizationDeniedException(
-                        "Insufficient privileges", new AuthorizationDecision(false));
+                        INSUFFICIENT_PRIVILEGES, new AuthorizationDecision(false));
 
         // When
         ProblemDetail problemDetail = exceptionHandler.handleAuthorizationDenied(exception);
 
         // Then
         assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
-        assertThat(problemDetail.getDetail())
-                .isEqualTo("You do not have permission to access this resource");
+        assertThat(problemDetail.getDetail()).isEqualTo(PERMISSION_DENIED_DETAIL);
     }
 }

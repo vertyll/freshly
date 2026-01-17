@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Profile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.permission.Permission;
 import com.vertyll.freshly.permission.domain.RolePermissionMapping;
 import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
@@ -26,20 +27,20 @@ class PermissionInitializer {
             log.info("Initializing default role-permission mappings...");
 
             // USER role permissions
-            createMappingIfNotExists("USER", Permission.AUTH_CHANGE_PASSWORD);
-            createMappingIfNotExists("USER", Permission.AUTH_CHANGE_EMAIL);
-            createMappingIfNotExists("USER", Permission.USERS_READ);
+            createMappingIfNotExists(UserRoleEnum.USER, Permission.AUTH_CHANGE_PASSWORD);
+            createMappingIfNotExists(UserRoleEnum.USER, Permission.AUTH_CHANGE_EMAIL);
+            createMappingIfNotExists(UserRoleEnum.USER, Permission.USERS_READ);
 
             // ADMIN role permissions (all permissions)
             for (Permission permission : Permission.values()) {
-                createMappingIfNotExists("ADMIN", permission);
+                createMappingIfNotExists(UserRoleEnum.ADMIN, permission);
             }
 
             log.info("Role-permission mappings initialized successfully");
         };
     }
 
-    private void createMappingIfNotExists(String role, Permission permission) {
+    private void createMappingIfNotExists(UserRoleEnum role, Permission permission) {
         if (!repository.existsByKeycloakRoleAndPermission(role, permission)) {
             RolePermissionMapping mapping = new RolePermissionMapping(role, permission);
             repository.save(mapping);

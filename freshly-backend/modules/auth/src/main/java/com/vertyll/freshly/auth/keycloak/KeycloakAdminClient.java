@@ -36,6 +36,20 @@ import jakarta.ws.rs.core.Response;
 @RequiredArgsConstructor
 public class KeycloakAdminClient {
 
+    private static final String GRANT_TYPE_KEY = "grant_type";
+    private static final String GRANT_TYPE_PASSWORD_KEY = "password";
+    private static final String CLIENT_ID_KEY = "client_id";
+    private static final String USERNAME_KEY = "username";
+    private static final String PASSWORD_KEY = "password";
+    private static final String ACCESS_TOKEN_KEY = "access_token";
+    private static final String LOCATION_HEADER_KEY = "Location";
+
+    private static final String KEYCLOAK_CREATE_FAIL = "Failed to create user in Keycloak: ";
+    private static final String LOCATION_MISSING = "Location header missing from Keycloak response";
+    private static final String INVALID_UUID = "Invalid user ID format from Keycloak";
+    private static final String INVALID_PASSWORD = "Current password is incorrect";
+    private static final String VERIFY_FAIL = "Failed to verify password";
+
     private final Keycloak keycloak;
     private final KeycloakProperties properties;
     private final RestClient restClient;
@@ -61,7 +75,7 @@ public class KeycloakAdminClient {
         user.setEmail(email);
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        user.setEnabled(false); // Disabled until email verified
+        user.setEnabled(false);
         user.setEmailVerified(false);
 
         CredentialRepresentation credential = new CredentialRepresentation();
@@ -76,13 +90,12 @@ public class KeycloakAdminClient {
                         "Failed to create user in Keycloak: status={}, info={}",
                         response.getStatus(),
                         response.getStatusInfo());
-                throw new KeycloakClientException(
-                        "Failed to create user in Keycloak: " + response.getStatusInfo());
+                throw new KeycloakClientException(KEYCLOAK_CREATE_FAIL + response.getStatusInfo());
             }
 
-            String locationHeader = response.getHeaderString("Location");
+            String locationHeader = response.getHeaderString(LOCATION_HEADER_KEY);
             if (locationHeader == null) {
-                throw new KeycloakClientException("Location header missing from Keycloak response");
+                throw new KeycloakClientException(LOCATION_MISSING);
             }
 
             String userId = locationHeader.substring(locationHeader.lastIndexOf('/') + 1);
@@ -90,7 +103,7 @@ public class KeycloakAdminClient {
             return UUID.fromString(userId);
         } catch (IllegalArgumentException e) {
             log.error("Invalid UUID format in Keycloak response", e);
-            throw new KeycloakClientException("Invalid user ID format from Keycloak", e);
+            throw new KeycloakClientException(INVALID_UUID, e);
         }
     }
 
@@ -117,7 +130,7 @@ public class KeycloakAdminClient {
         }
 
         user.setEmail(newEmail);
-        user.setEmailVerified(false); // Require re-verification
+        user.setEmailVerified(false);
         userResource.update(user);
 
         log.info("Email changed for user: {} to: {}", userId, newEmail);
@@ -158,10 +171,10 @@ public class KeycloakAdminClient {
 
     public void verifyPassword(String username, String password) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("grant_type", "password");
-        formData.add("client_id", properties.userClientId());
-        formData.add("username", username);
-        formData.add("password", password);
+        formData.add(GRANT_TYPE_KEY, GRANT_TYPE_PASSWORD_KEY);
+        formData.add(CLIENT_ID_KEY, properties.userClientId());
+        formData.add(USERNAME_KEY, username);
+        formData.add(PASSWORD_KEY, password);
 
         String tokenUrl =
                 properties.serverUrl()
@@ -179,22 +192,22 @@ public class KeycloakAdminClient {
                             .retrieve()
                             .body(new ParameterizedTypeReference<>() {});
 
-            if (response == null || !response.containsKey("access_token")) {
+            if (response == null || !response.containsKey(ACCESS_TOKEN_KEY)) {
                 log.warn("Password verification failed for user: {} - invalid response", username);
-                throw new InvalidPasswordException("Current password is incorrect");
+                throw new InvalidPasswordException(INVALID_PASSWORD);
             }
 
             log.debug("Password verification successful for user: {}", username);
 
         } catch (HttpClientErrorException.Unauthorized _) {
             log.warn("Password verification failed for user: {}", username);
-            throw new InvalidPasswordException("Current password is incorrect");
+            throw new InvalidPasswordException(INVALID_PASSWORD);
         } catch (HttpClientErrorException e) {
             log.error("HTTP error verifying password for user: {}", username, e);
-            throw new KeycloakClientException("Failed to verify password", e);
+            throw new KeycloakClientException(VERIFY_FAIL, e);
         } catch (RestClientException e) {
             log.error("Client error verifying password for user: {}", username, e);
-            throw new KeycloakClientException("Failed to verify password", e);
+            throw new KeycloakClientException(VERIFY_FAIL, e);
         }
     }
 

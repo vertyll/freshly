@@ -15,6 +15,11 @@ import lombok.Getter;
 @Getter
 public class EmailNotification {
 
+    private static final String RECIPIENT_NULL = "Recipient cannot be null";
+    private static final String TEMPLATE_NULL = "Template cannot be null";
+    private static final String TEMPLATE_VARIABLES_NULL = "Template variables cannot be null";
+    private static final String EMAIL_ALREADY_SENT = "Email already sent";
+
     private final UUID id;
     private final Email recipient;
     private final EmailTemplate template;
@@ -27,12 +32,10 @@ public class EmailNotification {
     public EmailNotification(
             Email recipient, EmailTemplate template, Map<String, Object> templateVariables) {
         this.id = UUID.randomUUID();
-        this.recipient = Objects.requireNonNull(recipient, "Recipient cannot be null");
-        this.template = Objects.requireNonNull(template, "Template cannot be null");
+        this.recipient = Objects.requireNonNull(recipient, RECIPIENT_NULL);
+        this.template = Objects.requireNonNull(template, TEMPLATE_NULL);
         this.templateVariables =
-                Map.copyOf(
-                        Objects.requireNonNull(
-                                templateVariables, "Template variables cannot be null"));
+                Map.copyOf(Objects.requireNonNull(templateVariables, TEMPLATE_VARIABLES_NULL));
         this.createdAt = LocalDateTime.now(ZoneOffset.UTC);
         this.status = EmailStatus.PENDING;
     }
@@ -68,8 +71,8 @@ public class EmailNotification {
             Map<String, Object> templateVariables,
             LocalDateTime createdAt,
             EmailStatus status,
-            LocalDateTime sentAt,
-            String errorMessage) {
+            @Nullable LocalDateTime sentAt,
+            @Nullable String errorMessage) {
         this.id = id;
         this.recipient = recipient;
         this.template = template;
@@ -82,7 +85,7 @@ public class EmailNotification {
 
     public void markAsSent() {
         if (this.status == EmailStatus.SENT) {
-            throw new IllegalStateException("Email already sent");
+            throw new IllegalStateException(EMAIL_ALREADY_SENT);
         }
         this.status = EmailStatus.SENT;
         this.sentAt = LocalDateTime.now(ZoneOffset.UTC);
