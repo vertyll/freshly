@@ -79,7 +79,8 @@ class AuthServiceTest {
 
             // Then
             assertThat(result).isEqualTo(keycloakUserId);
-            verify(userAccessService).createUser(keycloakUserId, false, Set.of(UserRoleEnum.USER));
+            verify(userAccessService)
+                    .createUser(keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
             verify(notificationService)
                     .sendEmailVerification(eq(request.email()), any(), anyString());
 

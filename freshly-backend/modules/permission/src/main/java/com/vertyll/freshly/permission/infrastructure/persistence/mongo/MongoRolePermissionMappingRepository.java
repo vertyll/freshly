@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import lombok.RequiredArgsConstructor;
 
 import com.vertyll.freshly.common.enums.Permission;
-import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.permission.domain.RolePermissionMapping;
 import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
 
@@ -28,14 +27,14 @@ class MongoRolePermissionMappingRepository implements RolePermissionMappingRepos
     }
 
     @Override
-    public List<RolePermissionMapping> findByKeycloakRoleIn(Set<UserRoleEnum> roles) {
+    public List<RolePermissionMapping> findByKeycloakRoleIn(Set<String> roles) {
         return springDataRepository.findByKeycloakRoleIn(roles).stream()
                 .map(mapper::toDomain)
                 .toList();
     }
 
     @Override
-    public List<RolePermissionMapping> findByKeycloakRole(UserRoleEnum role) {
+    public List<RolePermissionMapping> findByKeycloakRole(String role) {
         return springDataRepository.findByKeycloakRole(role).stream()
                 .map(mapper::toDomain)
                 .toList();
@@ -52,8 +51,7 @@ class MongoRolePermissionMappingRepository implements RolePermissionMappingRepos
     }
 
     @Override
-    public boolean existsByKeycloakRoleAndPermission(
-            UserRoleEnum keycloakRole, Permission permission) {
+    public boolean existsByKeycloakRoleAndPermission(String keycloakRole, Permission permission) {
         return springDataRepository.existsByKeycloakRoleAndPermission(keycloakRole, permission);
     }
 }

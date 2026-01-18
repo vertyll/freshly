@@ -61,7 +61,7 @@ public class AuthService {
             userAccessService.createUser(
                     keycloakUserId,
                     false, // Inactive until email verified
-                    Set.of(UserRoleEnum.USER));
+                    Set.of(UserRoleEnum.USER.getValue()));
 
             String verificationToken =
                     verificationTokenService.generateEmailVerificationToken(

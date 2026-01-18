@@ -67,13 +67,16 @@ class UserControllerTest {
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
         UUID keycloakUserId = UUID.randomUUID();
         CreateUserRequestDto request =
-                new CreateUserRequestDto(keycloakUserId, true, Set.of(UserRoleEnum.USER));
+                new CreateUserRequestDto(
+                        keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
-        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user =
+                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
         UserResponseDto responseDto =
-                new UserResponseDto(keycloakUserId, true, Set.of(UserRoleEnum.USER));
+                new UserResponseDto(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
-        when(userAccessService.createUser(keycloakUserId, true, Set.of(UserRoleEnum.USER)))
+        when(userAccessService.createUser(
+                        keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue())))
                 .thenReturn(user);
         when(userDtoMapper.toResponse(user)).thenReturn(responseDto);
 
@@ -82,7 +85,8 @@ class UserControllerTest {
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        verify(userAccessService).createUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
+        verify(userAccessService)
+                .createUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
         verify(userDtoMapper).toResponse(user);
     }
 
@@ -93,13 +97,16 @@ class UserControllerTest {
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
         UUID keycloakUserId = UUID.randomUUID();
         CreateUserRequestDto request =
-                new CreateUserRequestDto(keycloakUserId, false, Set.of(UserRoleEnum.USER));
+                new CreateUserRequestDto(
+                        keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
 
-        SystemUser user = new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER));
+        SystemUser user =
+                new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
         UserResponseDto responseDto =
-                new UserResponseDto(keycloakUserId, false, Set.of(UserRoleEnum.USER));
+                new UserResponseDto(keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
 
-        when(userAccessService.createUser(keycloakUserId, false, Set.of(UserRoleEnum.USER)))
+        when(userAccessService.createUser(
+                        keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue())))
                 .thenReturn(user);
         when(userDtoMapper.toResponse(user)).thenReturn(responseDto);
 
@@ -108,7 +115,8 @@ class UserControllerTest {
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        verify(userAccessService).createUser(keycloakUserId, false, Set.of(UserRoleEnum.USER));
+        verify(userAccessService)
+                .createUser(keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
     }
 
     @Test
@@ -117,13 +125,15 @@ class UserControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
         UUID keycloakUserId = UUID.randomUUID();
-        Set<UserRoleEnum> roles = Set.of(UserRoleEnum.USER, UserRoleEnum.ADMIN);
+        Set<String> roles = Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
         CreateUserRequestDto request = new CreateUserRequestDto(keycloakUserId, true, roles);
 
         SystemUser user = new SystemUser(keycloakUserId, true, roles);
         UserResponseDto responseDto =
                 new UserResponseDto(
-                        keycloakUserId, true, Set.of(UserRoleEnum.USER, UserRoleEnum.ADMIN));
+                        keycloakUserId,
+                        true,
+                        Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue()));
 
         when(userAccessService.createUser(keycloakUserId, true, roles)).thenReturn(user);
         when(userDtoMapper.toResponse(user)).thenReturn(responseDto);
@@ -141,9 +151,11 @@ class UserControllerTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         CreateUserRequestDto request =
-                new CreateUserRequestDto(keycloakUserId, true, Set.of(UserRoleEnum.USER));
+                new CreateUserRequestDto(
+                        keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
-        when(userAccessService.createUser(keycloakUserId, true, Set.of(UserRoleEnum.USER)))
+        when(userAccessService.createUser(
+                        keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue())))
                 .thenThrow(new UserAlreadyExistsException(keycloakUserId));
 
         // When & Then
@@ -157,8 +169,9 @@ class UserControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
         UUID userId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER));
-        UserResponseDto responseDto = new UserResponseDto(userId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER.getValue()));
+        UserResponseDto responseDto =
+                new UserResponseDto(userId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         when(userAccessService.getUserById(userId)).thenReturn(user);
         when(userDtoMapper.toResponse(user)).thenReturn(responseDto);
@@ -190,14 +203,18 @@ class UserControllerTest {
     void shouldGetAllUsers() {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
-        SystemUser user1 = new SystemUser(UUID.randomUUID(), true, Set.of(UserRoleEnum.USER));
-        SystemUser user2 = new SystemUser(UUID.randomUUID(), false, Set.of(UserRoleEnum.ADMIN));
+        SystemUser user1 =
+                new SystemUser(UUID.randomUUID(), true, Set.of(UserRoleEnum.USER.getValue()));
+        SystemUser user2 =
+                new SystemUser(UUID.randomUUID(), false, Set.of(UserRoleEnum.ADMIN.getValue()));
         List<SystemUser> users = List.of(user1, user2);
 
         UserResponseDto dto1 =
-                new UserResponseDto(user1.getKeycloakUserId(), true, Set.of(UserRoleEnum.USER));
+                new UserResponseDto(
+                        user1.getKeycloakUserId(), true, Set.of(UserRoleEnum.USER.getValue()));
         UserResponseDto dto2 =
-                new UserResponseDto(user2.getKeycloakUserId(), false, Set.of(UserRoleEnum.ADMIN));
+                new UserResponseDto(
+                        user2.getKeycloakUserId(), false, Set.of(UserRoleEnum.ADMIN.getValue()));
         List<UserResponseDto> responseDtos = List.of(dto1, dto2);
 
         when(userAccessService.getAllUsers()).thenReturn(users);
@@ -298,7 +315,7 @@ class UserControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
         UUID userId = UUID.randomUUID();
-        Set<UserRoleEnum> newRoles = Set.of(UserRoleEnum.ADMIN);
+        Set<String> newRoles = Set.of(UserRoleEnum.ADMIN.getValue());
         UpdateUserRolesRequestDto request = new UpdateUserRolesRequestDto(newRoles);
 
         doNothing().when(userAccessService).replaceUserRoles(userId, newRoles);
@@ -317,7 +334,7 @@ class UserControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
         UUID userId = UUID.randomUUID();
-        Set<UserRoleEnum> newRoles = Set.of(UserRoleEnum.USER, UserRoleEnum.ADMIN);
+        Set<String> newRoles = Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
         UpdateUserRolesRequestDto request = new UpdateUserRolesRequestDto(newRoles);
 
         doNothing().when(userAccessService).replaceUserRoles(userId, newRoles);
@@ -335,7 +352,7 @@ class UserControllerTest {
     void shouldThrowExceptionWhenUpdatingRolesForNonExistentUser() {
         // Given
         UUID userId = UUID.randomUUID();
-        Set<UserRoleEnum> newRoles = Set.of(UserRoleEnum.ADMIN);
+        Set<String> newRoles = Set.of(UserRoleEnum.ADMIN.getValue());
         UpdateUserRolesRequestDto request = new UpdateUserRolesRequestDto(newRoles);
 
         doThrow(new UserNotFoundException(userId))
@@ -372,13 +389,16 @@ class UserControllerTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         CreateUserRequestDto request =
-                new CreateUserRequestDto(keycloakUserId, true, Set.of(UserRoleEnum.USER));
+                new CreateUserRequestDto(
+                        keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
-        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user =
+                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
         UserResponseDto responseDto =
-                new UserResponseDto(keycloakUserId, true, Set.of(UserRoleEnum.USER));
+                new UserResponseDto(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
-        when(userAccessService.createUser(keycloakUserId, true, Set.of(UserRoleEnum.USER)))
+        when(userAccessService.createUser(
+                        keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue())))
                 .thenReturn(user);
         when(userDtoMapper.toResponse(user)).thenReturn(responseDto);
 
@@ -396,13 +416,16 @@ class UserControllerTest {
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
         UUID keycloakUserId = UUID.randomUUID();
         CreateUserRequestDto request =
-                new CreateUserRequestDto(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN));
+                new CreateUserRequestDto(
+                        keycloakUserId, true, Set.of(UserRoleEnum.ADMIN.getValue()));
 
-        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN));
+        SystemUser user =
+                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN.getValue()));
         UserResponseDto responseDto =
-                new UserResponseDto(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN));
+                new UserResponseDto(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN.getValue()));
 
-        when(userAccessService.createUser(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN)))
+        when(userAccessService.createUser(
+                        keycloakUserId, true, Set.of(UserRoleEnum.ADMIN.getValue())))
                 .thenReturn(user);
         when(userDtoMapper.toResponse(user)).thenReturn(responseDto);
 
@@ -411,7 +434,8 @@ class UserControllerTest {
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        verify(userAccessService).createUser(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN));
+        verify(userAccessService)
+                .createUser(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN.getValue()));
         verify(messageSource).getMessage(eq(SUCCESS_USER_CREATED_MSG_KEY), any(), any());
     }
 }

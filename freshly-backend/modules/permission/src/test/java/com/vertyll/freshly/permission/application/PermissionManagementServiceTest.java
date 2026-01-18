@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -47,9 +48,9 @@ class PermissionManagementServiceTest {
     void shouldGetAllMappings() {
         // Given
         RolePermissionMapping mapping1 =
-                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_READ);
+                new RolePermissionMapping(UserRoleEnum.ADMIN.getValue(), Permission.USERS_READ);
         RolePermissionMapping mapping2 =
-                new RolePermissionMapping(UserRoleEnum.USER, Permission.REPORTS_READ);
+                new RolePermissionMapping(UserRoleEnum.USER.getValue(), Permission.REPORTS_READ);
         when(repository.findAll()).thenReturn(List.of(mapping1, mapping2));
 
         // When
@@ -57,9 +58,9 @@ class PermissionManagementServiceTest {
 
         // Then
         assertThat(result).hasSize(2);
-        assertThat(result.get(0).keycloakRole()).isEqualTo(UserRoleEnum.ADMIN);
+        assertThat(result.get(0).keycloakRole()).isEqualTo(UserRoleEnum.ADMIN.getValue());
         assertThat(result.get(0).permission()).isEqualTo(Permission.USERS_READ);
-        assertThat(result.get(1).keycloakRole()).isEqualTo(UserRoleEnum.USER);
+        assertThat(result.get(1).keycloakRole()).isEqualTo(UserRoleEnum.USER.getValue());
         assertThat(result.get(1).permission()).isEqualTo(Permission.REPORTS_READ);
         verify(repository).findAll();
     }
@@ -69,22 +70,23 @@ class PermissionManagementServiceTest {
     void shouldGetMappingsByRole() {
         // Given
         RolePermissionMapping mapping1 =
-                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_READ);
+                new RolePermissionMapping(UserRoleEnum.ADMIN.getValue(), Permission.USERS_READ);
         RolePermissionMapping mapping2 =
-                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_CREATE);
-        when(repository.findByKeycloakRole(UserRoleEnum.ADMIN))
+                new RolePermissionMapping(UserRoleEnum.ADMIN.getValue(), Permission.USERS_CREATE);
+        when(repository.findByKeycloakRole(UserRoleEnum.ADMIN.getValue()))
                 .thenReturn(List.of(mapping1, mapping2));
 
         // When
-        List<PermissionMappingResponseDto> result = service.getMappingsByRole(UserRoleEnum.ADMIN);
+        List<PermissionMappingResponseDto> result =
+                service.getMappingsByRole(UserRoleEnum.ADMIN.getValue());
 
         // Then
         assertThat(result).hasSize(2);
-        assertThat(result.get(0).keycloakRole()).isEqualTo(UserRoleEnum.ADMIN);
+        assertThat(result.get(0).keycloakRole()).isEqualTo(UserRoleEnum.ADMIN.getValue());
         assertThat(result.get(0).permission()).isEqualTo(Permission.USERS_READ);
-        assertThat(result.get(1).keycloakRole()).isEqualTo(UserRoleEnum.ADMIN);
+        assertThat(result.get(1).keycloakRole()).isEqualTo(UserRoleEnum.ADMIN.getValue());
         assertThat(result.get(1).permission()).isEqualTo(Permission.USERS_CREATE);
-        verify(repository).findByKeycloakRole(UserRoleEnum.ADMIN);
+        verify(repository).findByKeycloakRole(UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -92,21 +94,22 @@ class PermissionManagementServiceTest {
     void shouldCreateNewPermissionMapping() {
         // Given
         CreatePermissionMappingDto request =
-                new CreatePermissionMappingDto(UserRoleEnum.ADMIN, Permission.USERS_CREATE);
+                new CreatePermissionMappingDto(
+                        UserRoleEnum.ADMIN.getValue(), Permission.USERS_CREATE);
 
         when(repository.existsByKeycloakRoleAndPermission(
-                        UserRoleEnum.ADMIN, Permission.USERS_CREATE))
+                        UserRoleEnum.ADMIN.getValue(), Permission.USERS_CREATE))
                 .thenReturn(false);
 
         RolePermissionMapping savedMapping =
-                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_CREATE);
+                new RolePermissionMapping(UserRoleEnum.ADMIN.getValue(), Permission.USERS_CREATE);
         when(repository.save(any(RolePermissionMapping.class))).thenReturn(savedMapping);
 
         // When
         PermissionMappingResponseDto result = service.createMapping(request);
 
         // Then
-        assertThat(result.keycloakRole()).isEqualTo(UserRoleEnum.ADMIN);
+        assertThat(result.keycloakRole()).isEqualTo(UserRoleEnum.ADMIN.getValue());
         assertThat(result.permission()).isEqualTo(Permission.USERS_CREATE);
         assertThat(result.id()).isEqualTo(savedMapping.getId());
 
@@ -116,7 +119,7 @@ class PermissionManagementServiceTest {
         verify(repository).save(mappingCaptor.capture());
 
         RolePermissionMapping capturedMapping = mappingCaptor.getValue();
-        assertThat(capturedMapping.getKeycloakRole()).isEqualTo(UserRoleEnum.ADMIN);
+        assertThat(capturedMapping.getKeycloakRole()).isEqualTo(UserRoleEnum.ADMIN.getValue());
         assertThat(capturedMapping.getPermission()).isEqualTo(Permission.USERS_CREATE);
     }
 
@@ -125,7 +128,8 @@ class PermissionManagementServiceTest {
     void shouldThrowExceptionWhenMappingAlreadyExists() {
         // Given
         CreatePermissionMappingDto request =
-                new CreatePermissionMappingDto(UserRoleEnum.ADMIN, Permission.USERS_CREATE);
+                new CreatePermissionMappingDto(
+                        UserRoleEnum.ADMIN.getValue(), Permission.USERS_CREATE);
 
         when(repository.existsByKeycloakRoleAndPermission(
                         request.keycloakRole(), Permission.USERS_CREATE))
@@ -172,7 +176,7 @@ class PermissionManagementServiceTest {
     @DisplayName("Should return empty list when role has no mappings")
     void shouldReturnEmptyListWhenRoleHasNoMappings() {
         // Given
-        UserRoleEnum role = UserRoleEnum.USER;
+        String role = UserRoleEnum.USER.getValue();
         when(repository.findByKeycloakRole(role)).thenReturn(List.of());
 
         // When
@@ -187,21 +191,23 @@ class PermissionManagementServiceTest {
     void shouldCreateMultipleMappingsForTheSameRole() {
         // Given
         CreatePermissionMappingDto request1 =
-                new CreatePermissionMappingDto(UserRoleEnum.ADMIN, Permission.USERS_READ);
+                new CreatePermissionMappingDto(
+                        UserRoleEnum.ADMIN.getValue(), Permission.USERS_READ);
         CreatePermissionMappingDto request2 =
-                new CreatePermissionMappingDto(UserRoleEnum.ADMIN, Permission.USERS_CREATE);
+                new CreatePermissionMappingDto(
+                        UserRoleEnum.ADMIN.getValue(), Permission.USERS_CREATE);
 
         when(repository.existsByKeycloakRoleAndPermission(
-                        UserRoleEnum.ADMIN, Permission.USERS_READ))
+                        UserRoleEnum.ADMIN.getValue(), Permission.USERS_READ))
                 .thenReturn(false);
         when(repository.existsByKeycloakRoleAndPermission(
-                        UserRoleEnum.ADMIN, Permission.USERS_CREATE))
+                        UserRoleEnum.ADMIN.getValue(), Permission.USERS_CREATE))
                 .thenReturn(false);
 
         RolePermissionMapping savedMapping1 =
-                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_READ);
+                new RolePermissionMapping(UserRoleEnum.ADMIN.getValue(), Permission.USERS_READ);
         RolePermissionMapping savedMapping2 =
-                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_CREATE);
+                new RolePermissionMapping(UserRoleEnum.ADMIN.getValue(), Permission.USERS_CREATE);
 
         when(repository.save(any(RolePermissionMapping.class)))
                 .thenReturn(savedMapping1)
@@ -212,9 +218,9 @@ class PermissionManagementServiceTest {
         PermissionMappingResponseDto result2 = service.createMapping(request2);
 
         // Then
-        assertThat(result1.keycloakRole()).isEqualTo(UserRoleEnum.ADMIN);
+        assertThat(result1.keycloakRole()).isEqualTo(UserRoleEnum.ADMIN.getValue());
         assertThat(result1.permission()).isEqualTo(Permission.USERS_READ);
-        assertThat(result2.keycloakRole()).isEqualTo(UserRoleEnum.ADMIN);
+        assertThat(result2.keycloakRole()).isEqualTo(UserRoleEnum.ADMIN.getValue());
         assertThat(result2.permission()).isEqualTo(Permission.USERS_CREATE);
         verify(repository, times(2)).save(any(RolePermissionMapping.class));
     }
@@ -227,7 +233,8 @@ class PermissionManagementServiceTest {
         Permission permission = Permission.USERS_READ;
 
         RolePermissionMapping mapping =
-                RolePermissionMapping.reconstitute(id, UserRoleEnum.ADMIN, permission, null);
+                RolePermissionMapping.reconstitute(
+                        id, UserRoleEnum.ADMIN.getValue(), permission, null);
         when(repository.findAll()).thenReturn(List.of(mapping));
 
         // When
@@ -237,7 +244,7 @@ class PermissionManagementServiceTest {
         assertThat(result).hasSize(1);
         PermissionMappingResponseDto dto = result.stream().findFirst().orElseThrow();
         assertThat(dto.id()).isEqualTo(id);
-        assertThat(dto.keycloakRole()).isEqualTo(UserRoleEnum.ADMIN);
+        assertThat(dto.keycloakRole()).isEqualTo(UserRoleEnum.ADMIN.getValue());
         assertThat(dto.permission()).isEqualTo(permission);
     }
 
@@ -246,28 +253,29 @@ class PermissionManagementServiceTest {
     void shouldGetMappingsForMultipleRoles() {
         // Given
         RolePermissionMapping mapping1 =
-                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_READ);
+                new RolePermissionMapping(UserRoleEnum.ADMIN.getValue(), Permission.USERS_READ);
         RolePermissionMapping mapping2 =
-                new RolePermissionMapping(UserRoleEnum.ADMIN, Permission.USERS_CREATE);
+                new RolePermissionMapping(UserRoleEnum.ADMIN.getValue(), Permission.USERS_CREATE);
         RolePermissionMapping mapping3 =
-                new RolePermissionMapping(UserRoleEnum.USER, Permission.REPORTS_READ);
+                new RolePermissionMapping(UserRoleEnum.USER.getValue(), Permission.REPORTS_READ);
 
-        when(repository.findByKeycloakRole(UserRoleEnum.ADMIN))
+        when(repository.findByKeycloakRole(UserRoleEnum.ADMIN.getValue()))
                 .thenReturn(List.of(mapping1, mapping2));
-        when(repository.findByKeycloakRole(UserRoleEnum.USER)).thenReturn(List.of(mapping3));
+        when(repository.findByKeycloakRole(UserRoleEnum.USER.getValue()))
+                .thenReturn(List.of(mapping3));
 
         // When
         List<PermissionMappingResponseDto> adminMappings =
-                service.getMappingsByRole(UserRoleEnum.ADMIN);
+                service.getMappingsByRole(UserRoleEnum.ADMIN.getValue());
         List<PermissionMappingResponseDto> userMappings =
-                service.getMappingsByRole(UserRoleEnum.USER);
+                service.getMappingsByRole(UserRoleEnum.USER.getValue());
 
         // Then
         assertThat(adminMappings)
                 .hasSize(2)
-                .allMatch(dto -> dto.keycloakRole() == UserRoleEnum.ADMIN);
+                .allMatch(dto -> Objects.equals(dto.keycloakRole(), UserRoleEnum.ADMIN.getValue()));
         assertThat(userMappings)
                 .hasSize(1)
-                .allMatch(dto -> dto.keycloakRole() == UserRoleEnum.USER);
+                .allMatch(dto -> Objects.equals(dto.keycloakRole(), UserRoleEnum.USER.getValue()));
     }
 }

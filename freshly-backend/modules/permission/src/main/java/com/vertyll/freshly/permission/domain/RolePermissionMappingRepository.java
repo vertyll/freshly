@@ -5,19 +5,18 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.vertyll.freshly.common.enums.Permission;
-import com.vertyll.freshly.common.enums.UserRoleEnum;
 
 public interface RolePermissionMappingRepository {
 
     RolePermissionMapping save(RolePermissionMapping mapping);
 
-    List<RolePermissionMapping> findByKeycloakRoleIn(Set<UserRoleEnum> roles);
+    List<RolePermissionMapping> findByKeycloakRoleIn(Set<String> roles);
 
-    List<RolePermissionMapping> findByKeycloakRole(UserRoleEnum role);
+    List<RolePermissionMapping> findByKeycloakRole(String role);
 
     void deleteById(UUID id);
 
     List<RolePermissionMapping> findAll();
 
-    boolean existsByKeycloakRoleAndPermission(UserRoleEnum keycloakRole, Permission permission);
+    boolean existsByKeycloakRoleAndPermission(String keycloakRole, Permission permission);
 }

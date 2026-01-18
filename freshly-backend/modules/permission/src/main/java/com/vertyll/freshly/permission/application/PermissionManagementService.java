@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.vertyll.freshly.common.enums.Permission;
-import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.permission.api.dto.CreatePermissionMappingDto;
 import com.vertyll.freshly.permission.api.dto.PermissionMappingResponseDto;
 import com.vertyll.freshly.permission.domain.RolePermissionMapping;
@@ -27,19 +26,19 @@ public class PermissionManagementService {
         return repository.findAll().stream().map(this::toDto).toList();
     }
 
-    public List<PermissionMappingResponseDto> getMappingsByRole(UserRoleEnum role) {
+    public List<PermissionMappingResponseDto> getMappingsByRole(String role) {
         return repository.findByKeycloakRole(role).stream().map(this::toDto).toList();
     }
 
     @CacheEvict(value = "user-permissions", allEntries = true)
     public PermissionMappingResponseDto createMapping(CreatePermissionMappingDto request) {
         Permission permission = request.permission();
-        UserRoleEnum role = request.keycloakRole();
+        String role = request.keycloakRole();
 
         if (repository.existsByKeycloakRoleAndPermission(role, permission)) {
             throw new IllegalArgumentException(
                     "Mapping already exists for role '"
-                            + role.name()
+                            + role
                             + "' and permission '"
                             + permission.getValue()
                             + "'");
@@ -49,7 +48,7 @@ public class PermissionManagementService {
 
         RolePermissionMapping saved = repository.save(mapping);
 
-        log.info("Created permission mapping: {} -> {}", role.name(), permission.getValue());
+        log.info("Created permission mapping: {} -> {}", role, permission.getValue());
 
         return toDto(saved);
     }

@@ -6,7 +6,6 @@ import org.jspecify.annotations.Nullable;
 
 import lombok.Getter;
 
-import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.useraccess.domain.exception.*;
 
 @Getter
@@ -16,18 +15,15 @@ public final class SystemUser {
 
     private final UUID keycloakUserId;
     private boolean isActive;
-    private Set<UserRoleEnum> roles;
+    private Set<String> roles;
     @Nullable private final Long version;
 
-    public SystemUser(UUID keycloakUserId, boolean isActive, Set<UserRoleEnum> roles) {
+    public SystemUser(UUID keycloakUserId, boolean isActive, Set<String> roles) {
         this(keycloakUserId, isActive, roles, null);
     }
 
     private SystemUser(
-            UUID keycloakUserId,
-            boolean isActive,
-            Set<UserRoleEnum> roles,
-            @Nullable Long version) {
+            UUID keycloakUserId, boolean isActive, Set<String> roles, @Nullable Long version) {
         this.keycloakUserId =
                 Objects.requireNonNull(keycloakUserId, KEYCLOAK_USER_ID_CANNOT_BE_NULL);
         this.roles = Set.copyOf(Objects.requireNonNull(roles, ROLES_CANNOT_BE_NULL));
@@ -39,7 +35,7 @@ public final class SystemUser {
     }
 
     public static SystemUser reconstitute(
-            UUID keycloakUserId, boolean isActive, Set<UserRoleEnum> roles, Long version) {
+            UUID keycloakUserId, boolean isActive, Set<String> roles, Long version) {
         return new SystemUser(keycloakUserId, isActive, roles, version);
     }
 
@@ -67,8 +63,8 @@ public final class SystemUser {
         isActive = false;
     }
 
-    public void replaceRoles(Set<UserRoleEnum> newRoles) {
-        Set<UserRoleEnum> copiedRoles =
+    public void replaceRoles(Set<String> newRoles) {
+        Set<String> copiedRoles =
                 Set.copyOf(Objects.requireNonNull(newRoles, ROLES_CANNOT_BE_NULL));
         if (copiedRoles.isEmpty()) {
             throw new UserRolesEmptyException();
@@ -76,7 +72,7 @@ public final class SystemUser {
         this.roles = copiedRoles;
     }
 
-    public Set<UserRoleEnum> getRoles() {
+    public Set<String> getRoles() {
         return Set.copyOf(roles);
     }
 }

@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.useraccess.domain.exception.*;
 
 class SystemUserTest {
@@ -20,8 +21,7 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         boolean isActive = true;
-        Set<com.vertyll.freshly.common.enums.UserRoleEnum> roles =
-                Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER);
+        Set<String> roles = Set.of(UserRoleEnum.USER.getValue());
 
         // When
         SystemUser user = new SystemUser(keycloakUserId, isActive, roles);
@@ -29,8 +29,7 @@ class SystemUserTest {
         // Then
         assertThat(user.getKeycloakUserId()).isEqualTo(keycloakUserId);
         assertThat(user.isActive()).isTrue();
-        assertThat(user.getRoles())
-                .containsExactly(com.vertyll.freshly.common.enums.UserRoleEnum.USER);
+        assertThat(user.getRoles()).containsExactly(UserRoleEnum.USER.getValue());
     }
 
     @Test
@@ -38,10 +37,7 @@ class SystemUserTest {
     void shouldCreateUserWithMultipleRoles() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        Set<com.vertyll.freshly.common.enums.UserRoleEnum> roles =
-                Set.of(
-                        com.vertyll.freshly.common.enums.UserRoleEnum.USER,
-                        com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
+        Set<String> roles = Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
 
         // When
         SystemUser user = new SystemUser(keycloakUserId, true, roles);
@@ -49,8 +45,7 @@ class SystemUserTest {
         // Then
         assertThat(user.getRoles())
                 .containsExactlyInAnyOrder(
-                        com.vertyll.freshly.common.enums.UserRoleEnum.USER,
-                        com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
+                        UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -58,8 +53,7 @@ class SystemUserTest {
     @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenKeycloakUserIdIsNull() {
         // Given
-        Set<com.vertyll.freshly.common.enums.UserRoleEnum> roles =
-                Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER);
+        Set<String> roles = Set.of(UserRoleEnum.USER.getValue());
 
         // When & Then
         assertThatThrownBy(() -> new SystemUser(null, true, roles))
@@ -85,7 +79,7 @@ class SystemUserTest {
     void shouldThrowExceptionWhenRolesAreEmpty() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        Set<com.vertyll.freshly.common.enums.UserRoleEnum> emptyRoles = Set.of();
+        Set<String> emptyRoles = Set.of();
 
         // When & Then
         assertThatThrownBy(() -> new SystemUser(keycloakUserId, true, emptyRoles))
@@ -98,8 +92,7 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         boolean isActive = false;
-        Set<com.vertyll.freshly.common.enums.UserRoleEnum> roles =
-                Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
+        Set<String> roles = Set.of(UserRoleEnum.ADMIN.getValue());
 
         // When
         SystemUser user = SystemUser.reconstitute(keycloakUserId, isActive, roles, 1L);
@@ -107,8 +100,7 @@ class SystemUserTest {
         // Then
         assertThat(user.getKeycloakUserId()).isEqualTo(keycloakUserId);
         assertThat(user.isActive()).isFalse();
-        assertThat(user.getRoles())
-                .containsExactly(com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
+        assertThat(user.getRoles()).containsExactly(UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -116,8 +108,7 @@ class SystemUserTest {
     void shouldActivateInactiveUser() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        Set<com.vertyll.freshly.common.enums.UserRoleEnum> roles =
-                Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER);
+        Set<String> roles = Set.of(UserRoleEnum.USER.getValue());
         SystemUser user = new SystemUser(keycloakUserId, false, roles);
 
         // When
@@ -133,10 +124,7 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         SystemUser user =
-                new SystemUser(
-                        keycloakUserId,
-                        true,
-                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
+                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When & Then
         assertThatThrownBy(user::activate)
@@ -151,10 +139,7 @@ class SystemUserTest {
         UUID keycloakUserId = UUID.randomUUID();
         UUID loggedInUserId = UUID.randomUUID();
         SystemUser user =
-                new SystemUser(
-                        keycloakUserId,
-                        true,
-                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
+                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When
         user.deactivate(loggedInUserId);
@@ -170,10 +155,7 @@ class SystemUserTest {
         UUID keycloakUserId = UUID.randomUUID();
         UUID loggedInUserId = UUID.randomUUID();
         SystemUser user =
-                new SystemUser(
-                        keycloakUserId,
-                        false,
-                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
+                new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
 
         // When & Then
         assertThatThrownBy(() -> user.deactivate(loggedInUserId))
@@ -186,9 +168,7 @@ class SystemUserTest {
     void shouldThrowExceptionWhenUserTriesToDeactivateThemselves() {
         // Given
         UUID userId = UUID.randomUUID();
-        SystemUser user =
-                new SystemUser(
-                        userId, true, Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
+        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When & Then
         assertThatThrownBy(() -> user.deactivate(userId))
@@ -202,10 +182,7 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         SystemUser user =
-                new SystemUser(
-                        keycloakUserId,
-                        true,
-                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
+                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When
         user.deactivateSelf();
@@ -220,10 +197,7 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         SystemUser user =
-                new SystemUser(
-                        keycloakUserId,
-                        false,
-                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
+                new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
 
         // When & Then
         assertThatThrownBy(user::deactivateSelf).isInstanceOf(UserAlreadyInactiveException.class);
@@ -235,19 +209,14 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         SystemUser user =
-                new SystemUser(
-                        keycloakUserId,
-                        true,
-                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
-        Set<com.vertyll.freshly.common.enums.UserRoleEnum> newRoles =
-                Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
+                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
+        Set<String> newRoles = Set.of(UserRoleEnum.ADMIN.getValue());
 
         // When
         user.replaceRoles(newRoles);
 
         // Then
-        assertThat(user.getRoles())
-                .containsExactly(com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
+        assertThat(user.getRoles()).containsExactly(UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -256,14 +225,8 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         SystemUser user =
-                new SystemUser(
-                        keycloakUserId,
-                        true,
-                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
-        Set<com.vertyll.freshly.common.enums.UserRoleEnum> newRoles =
-                Set.of(
-                        com.vertyll.freshly.common.enums.UserRoleEnum.USER,
-                        com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
+                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
+        Set<String> newRoles = Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
 
         // When
         user.replaceRoles(newRoles);
@@ -271,8 +234,7 @@ class SystemUserTest {
         // Then
         assertThat(user.getRoles())
                 .containsExactlyInAnyOrder(
-                        com.vertyll.freshly.common.enums.UserRoleEnum.USER,
-                        com.vertyll.freshly.common.enums.UserRoleEnum.ADMIN);
+                        UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -282,10 +244,7 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         SystemUser user =
-                new SystemUser(
-                        keycloakUserId,
-                        true,
-                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
+                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When & Then
         assertThatThrownBy(() -> user.replaceRoles(null))
@@ -299,11 +258,8 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         SystemUser user =
-                new SystemUser(
-                        keycloakUserId,
-                        true,
-                        Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER));
-        Set<com.vertyll.freshly.common.enums.UserRoleEnum> emptyRoles = Set.of();
+                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
+        Set<String> emptyRoles = Set.of();
 
         // When & Then
         assertThatThrownBy(() -> user.replaceRoles(emptyRoles))
@@ -316,8 +272,7 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         boolean isActive = false;
-        Set<com.vertyll.freshly.common.enums.UserRoleEnum> roles =
-                Set.of(com.vertyll.freshly.common.enums.UserRoleEnum.USER);
+        Set<String> roles = Set.of(UserRoleEnum.USER.getValue());
 
         // When
         SystemUser user = new SystemUser(keycloakUserId, isActive, roles);

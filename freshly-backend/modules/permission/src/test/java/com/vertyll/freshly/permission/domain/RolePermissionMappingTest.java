@@ -21,7 +21,7 @@ class RolePermissionMappingTest {
     @DisplayName("Should create mapping with generated UUID")
     void shouldCreateMappingWithGeneratedUuid() {
         // Given
-        UserRoleEnum role = UserRoleEnum.ADMIN;
+        String role = UserRoleEnum.ADMIN.getValue();
         Permission permission = Permission.USERS_READ;
 
         // When
@@ -38,7 +38,7 @@ class RolePermissionMappingTest {
     void shouldCreateMappingWithSpecificUuid() {
         // Given
         UUID id = UUID.randomUUID();
-        UserRoleEnum role = UserRoleEnum.ADMIN;
+        String role = UserRoleEnum.ADMIN.getValue();
         Permission permission = Permission.USERS_CREATE;
 
         // When
@@ -56,7 +56,7 @@ class RolePermissionMappingTest {
     void shouldReconstituteMappingFromRepository() {
         // Given
         UUID id = UUID.randomUUID();
-        UserRoleEnum role = UserRoleEnum.MODERATOR;
+        String role = UserRoleEnum.MODERATOR.getValue();
         Permission permission = Permission.REPORTS_READ;
 
         // When
@@ -74,7 +74,7 @@ class RolePermissionMappingTest {
     @SuppressWarnings("NullAway")
     void shouldThrowExceptionWhenReconstitutingWithNullId() {
         // Given
-        UserRoleEnum role = UserRoleEnum.ADMIN;
+        String role = UserRoleEnum.ADMIN.getValue();
         Permission permission = Permission.USERS_READ;
 
         // When & Then
@@ -103,7 +103,7 @@ class RolePermissionMappingTest {
     void shouldThrowExceptionWhenReconstitutingWithNullPermission() {
         // Given
         UUID id = UUID.randomUUID();
-        UserRoleEnum role = UserRoleEnum.ADMIN;
+        String role = UserRoleEnum.ADMIN.getValue();
 
         // When & Then
         assertThatThrownBy(() -> RolePermissionMapping.reconstitute(id, role, null, 1L))
@@ -115,7 +115,7 @@ class RolePermissionMappingTest {
     @DisplayName("Should create mappings with different UUIDs")
     void shouldCreateMappingsWithDifferentUuids() {
         // Given
-        UserRoleEnum role = UserRoleEnum.ADMIN;
+        String role = UserRoleEnum.ADMIN.getValue();
         Permission permission = Permission.USERS_READ;
 
         // When
@@ -131,7 +131,7 @@ class RolePermissionMappingTest {
     void shouldBeImmutable() {
         // Given
         UUID id = UUID.randomUUID();
-        UserRoleEnum role = UserRoleEnum.ADMIN;
+        String role = UserRoleEnum.ADMIN.getValue();
         Permission permission = Permission.USERS_READ;
 
         // When
@@ -150,7 +150,7 @@ class RolePermissionMappingTest {
     @DisplayName("Should handle all permission types")
     void shouldHandleAllPermissionTypes(Permission permission) {
         // Given
-        UserRoleEnum role = UserRoleEnum.ADMIN;
+        String role = UserRoleEnum.ADMIN.getValue();
 
         // When
         RolePermissionMapping mapping = new RolePermissionMapping(role, permission);
@@ -163,7 +163,7 @@ class RolePermissionMappingTest {
     @DisplayName("Should preserve role and permission values")
     void shouldPreserveRoleAndPermissionValues() {
         // Given
-        UserRoleEnum role = UserRoleEnum.MODERATOR;
+        String role = UserRoleEnum.MODERATOR.getValue();
         Permission permission = Permission.SETTINGS_MANAGE;
 
         // When
@@ -179,7 +179,7 @@ class RolePermissionMappingTest {
     void shouldReconstituteMappingWithAllValidData() {
         // Given
         UUID id = UUID.randomUUID();
-        UserRoleEnum role = UserRoleEnum.USER;
+        String role = UserRoleEnum.USER.getValue();
         Permission permission = Permission.AUTH_CHANGE_PASSWORD;
 
         // When

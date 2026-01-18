@@ -13,7 +13,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import com.vertyll.freshly.common.enums.Permission;
-import com.vertyll.freshly.common.enums.UserRoleEnum;
 
 @Document(collection = "role_permission_mapping")
 @CompoundIndex(
@@ -27,7 +26,7 @@ public class RolePermissionMappingDocument {
 
     @Id private UUID id;
 
-    private UserRoleEnum keycloakRole;
+    private String keycloakRole;
 
     private Permission permission;
 

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.useraccess.domain.SystemUser;
 import com.vertyll.freshly.useraccess.domain.SystemUserRepository;
 import com.vertyll.freshly.useraccess.domain.exception.UserAlreadyExistsException;
@@ -21,7 +20,7 @@ import com.vertyll.freshly.useraccess.domain.exception.UserNotFoundException;
 public class UserAccessService {
     private final SystemUserRepository systemUserRepository;
 
-    public SystemUser createUser(UUID keycloakUserId, boolean isActive, Set<UserRoleEnum> roles) {
+    public SystemUser createUser(UUID keycloakUserId, boolean isActive, Set<String> roles) {
         if (systemUserRepository.findById(keycloakUserId).isPresent()) {
             throw new UserAlreadyExistsException(keycloakUserId);
         }
@@ -69,7 +68,7 @@ public class UserAccessService {
         log.info("User {} deactivated by {}", userId, loggedInUserId);
     }
 
-    public void replaceUserRoles(UUID userId, Set<UserRoleEnum> roles) {
+    public void replaceUserRoles(UUID userId, Set<String> roles) {
         SystemUser user =
                 systemUserRepository
                         .findById(userId)

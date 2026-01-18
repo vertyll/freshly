@@ -39,7 +39,7 @@ class UserPermissionCache {
      */
     @Cacheable(value = USER_PERMISSIONS_CACHE, key = "#authentication.name")
     public Set<Permission> getUserPermissions(Authentication authentication) {
-        Set<UserRoleEnum> roles = extractRoles(authentication);
+        Set<String> roles = extractRoles(authentication);
 
         log.debug(
                 "Fetching permissions for user '{}' with roles: {}",
@@ -59,7 +59,7 @@ class UserPermissionCache {
      * Extract Keycloak roles from Spring Security authentication. Removes "ROLE_" prefix that
      * Spring adds and normalizes to uppercase using Locale.ROOT for security.
      */
-    private Set<UserRoleEnum> extractRoles(Authentication authentication) {
+    private Set<String> extractRoles(Authentication authentication) {
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(Objects::nonNull)
@@ -69,7 +69,6 @@ class UserPermissionCache {
                                         ? authority.substring(UserRoleEnum.ROLE_PREFIX.length())
                                         : authority)
                 .map(role -> role.toUpperCase(Locale.ROOT))
-                .map(UserRoleEnum::fromValue)
                 .collect(Collectors.toSet());
     }
 }

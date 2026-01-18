@@ -28,7 +28,7 @@ class UserDtoMapperTest {
     void shouldMapSystemUserToUserResponseDto() {
         // Given
         UUID userId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When
         UserResponseDto result = mapper.toResponse(user);
@@ -36,7 +36,7 @@ class UserDtoMapperTest {
         // Then
         assertThat(result.id()).isEqualTo(userId);
         assertThat(result.isActive()).isTrue();
-        assertThat(result.roles()).containsExactly(UserRoleEnum.USER);
+        assertThat(result.roles()).containsExactly(UserRoleEnum.USER.getValue());
     }
 
     @Test
@@ -44,7 +44,7 @@ class UserDtoMapperTest {
     void shouldMapInactiveUserToUserResponseDto() {
         // Given
         UUID userId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, false, Set.of(UserRoleEnum.USER));
+        SystemUser user = new SystemUser(userId, false, Set.of(UserRoleEnum.USER.getValue()));
 
         // When
         UserResponseDto result = mapper.toResponse(user);
@@ -59,13 +59,18 @@ class UserDtoMapperTest {
         // Given
         UUID userId = UUID.randomUUID();
         SystemUser user =
-                new SystemUser(userId, true, Set.of(UserRoleEnum.USER, UserRoleEnum.ADMIN));
+                new SystemUser(
+                        userId,
+                        true,
+                        Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue()));
 
         // When
         UserResponseDto result = mapper.toResponse(user);
 
         // Then
-        assertThat(result.roles()).containsExactlyInAnyOrder(UserRoleEnum.USER, UserRoleEnum.ADMIN);
+        assertThat(result.roles())
+                .containsExactlyInAnyOrder(
+                        UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -73,13 +78,13 @@ class UserDtoMapperTest {
     void shouldMapAdminUserToUserResponseDto() {
         // Given
         UUID userId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.ADMIN));
+        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.ADMIN.getValue()));
 
         // When
         UserResponseDto result = mapper.toResponse(user);
 
         // Then
-        assertThat(result.roles()).containsExactly(UserRoleEnum.ADMIN);
+        assertThat(result.roles()).containsExactly(UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -88,8 +93,8 @@ class UserDtoMapperTest {
         // Given
         UUID userId1 = UUID.randomUUID();
         UUID userId2 = UUID.randomUUID();
-        SystemUser user1 = new SystemUser(userId1, true, Set.of(UserRoleEnum.USER));
-        SystemUser user2 = new SystemUser(userId2, false, Set.of(UserRoleEnum.ADMIN));
+        SystemUser user1 = new SystemUser(userId1, true, Set.of(UserRoleEnum.USER.getValue()));
+        SystemUser user2 = new SystemUser(userId2, false, Set.of(UserRoleEnum.ADMIN.getValue()));
         List<SystemUser> users = List.of(user1, user2);
 
         // When
@@ -99,10 +104,10 @@ class UserDtoMapperTest {
         assertThat(result).hasSize(2);
         assertThat(result.getFirst().id()).isEqualTo(userId1);
         assertThat(result.get(0).isActive()).isTrue();
-        assertThat(result.get(0).roles()).containsExactly(UserRoleEnum.USER);
+        assertThat(result.get(0).roles()).containsExactly(UserRoleEnum.USER.getValue());
         assertThat(result.get(1).id()).isEqualTo(userId2);
         assertThat(result.get(1).isActive()).isFalse();
-        assertThat(result.get(1).roles()).containsExactly(UserRoleEnum.ADMIN);
+        assertThat(result.get(1).roles()).containsExactly(UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -149,7 +154,8 @@ class UserDtoMapperTest {
     void shouldPreserveUserIdWhenMapping() {
         // Given
         UUID specificUserId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
-        SystemUser user = new SystemUser(specificUserId, true, Set.of(UserRoleEnum.USER));
+        SystemUser user =
+                new SystemUser(specificUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When
         UserResponseDto result = mapper.toResponse(user);
@@ -162,12 +168,15 @@ class UserDtoMapperTest {
     @DisplayName("Should map multiple users with different states")
     void shouldMapMultipleUsersWithDifferentStates() {
         // Given
-        SystemUser activeUser = new SystemUser(UUID.randomUUID(), true, Set.of(UserRoleEnum.USER));
+        SystemUser activeUser =
+                new SystemUser(UUID.randomUUID(), true, Set.of(UserRoleEnum.USER.getValue()));
         SystemUser inactiveAdmin =
-                new SystemUser(UUID.randomUUID(), false, Set.of(UserRoleEnum.ADMIN));
+                new SystemUser(UUID.randomUUID(), false, Set.of(UserRoleEnum.ADMIN.getValue()));
         SystemUser activeMultiRole =
                 new SystemUser(
-                        UUID.randomUUID(), true, Set.of(UserRoleEnum.USER, UserRoleEnum.ADMIN));
+                        UUID.randomUUID(),
+                        true,
+                        Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue()));
         List<SystemUser> users = List.of(activeUser, inactiveAdmin, activeMultiRole);
 
         // When
@@ -176,12 +185,13 @@ class UserDtoMapperTest {
         // Then
         assertThat(result).hasSize(3);
         assertThat(result.get(0).isActive()).isTrue();
-        assertThat(result.get(0).roles()).containsExactly(UserRoleEnum.USER);
+        assertThat(result.get(0).roles()).containsExactly(UserRoleEnum.USER.getValue());
         assertThat(result.get(1).isActive()).isFalse();
-        assertThat(result.get(1).roles()).containsExactly(UserRoleEnum.ADMIN);
+        assertThat(result.get(1).roles()).containsExactly(UserRoleEnum.ADMIN.getValue());
         assertThat(result.get(2).isActive()).isTrue();
         assertThat(result.get(2).roles())
-                .containsExactlyInAnyOrder(UserRoleEnum.USER, UserRoleEnum.ADMIN);
+                .containsExactlyInAnyOrder(
+                        UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -189,7 +199,8 @@ class UserDtoMapperTest {
     void shouldHandleReconstituedUser() {
         // Given
         UUID userId = UUID.randomUUID();
-        SystemUser user = SystemUser.reconstitute(userId, false, Set.of(UserRoleEnum.ADMIN), 1L);
+        SystemUser user =
+                SystemUser.reconstitute(userId, false, Set.of(UserRoleEnum.ADMIN.getValue()), 1L);
 
         // When
         UserResponseDto result = mapper.toResponse(user);
@@ -197,6 +208,6 @@ class UserDtoMapperTest {
         // Then
         assertThat(result.id()).isEqualTo(userId);
         assertThat(result.isActive()).isFalse();
-        assertThat(result.roles()).containsExactly(UserRoleEnum.ADMIN);
+        assertThat(result.roles()).containsExactly(UserRoleEnum.ADMIN.getValue());
     }
 }

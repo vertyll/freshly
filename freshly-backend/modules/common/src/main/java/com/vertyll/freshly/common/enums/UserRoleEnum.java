@@ -8,12 +8,6 @@ import lombok.Getter;
 
 @Getter
 public enum UserRoleEnum {
-    // Keycloak specific roles
-    OFFLINE_ACCESS("OFFLINE_ACCESS"),
-    FACTOR_BEARER("FACTOR_BEARER"),
-    UMA_AUTHORIZATION("UMA_AUTHORIZATION"),
-    DEFAULT_ROLES_FRESHLY_REALM("DEFAULT-ROLES-FRESHLY-REALM"),
-
     SUPERADMIN("SUPERADMIN"),
     ADMIN("ADMIN"),
     MODERATOR("MODERATOR"),

@@ -12,8 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.vertyll.freshly.common.enums.UserRoleEnum;
-
 @Document(collection = "system_user")
 @Data
 @NoArgsConstructor
@@ -23,7 +21,7 @@ public class SystemUserDocument {
     @Id private UUID keycloakUserId;
 
     private boolean isActive;
-    private Set<UserRoleEnum> roles;
+    private Set<String> roles;
 
     @Version @Nullable private Long version;
 }

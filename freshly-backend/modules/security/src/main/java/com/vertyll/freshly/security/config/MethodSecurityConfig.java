@@ -23,9 +23,6 @@ public class MethodSecurityConfig {
 
     private final PermissionAuthorizationManager permissionAuthorizationManager;
     private final AnyPermissionAuthorizationManager anyPermissionAuthorizationManager;
-    private final RoleAuthorizationManager roleAuthorizationManager;
-    private final AnyRoleAuthorizationManager anyRoleAuthorizationManager;
-    private final AllRolesAuthorizationManager allRolesAuthorizationManager;
 
     // Permission-based authorization
     @Bean
@@ -44,33 +41,6 @@ public class MethodSecurityConfig {
         AuthorizationManagerBeforeMethodInterceptor interceptor =
                 new AuthorizationManagerBeforeMethodInterceptor(
                         pointcut, anyPermissionAuthorizationManager);
-        return new DefaultPointcutAdvisor(pointcut, interceptor);
-    }
-
-    // Role-based authorization
-    @Bean
-    public Advisor requireRoleAuthorizationAdvisor() {
-        AspectJExpressionPointcut pointcut = createPointcutForAnnotation(RequireRole.class);
-        AuthorizationManagerBeforeMethodInterceptor interceptor =
-                new AuthorizationManagerBeforeMethodInterceptor(pointcut, roleAuthorizationManager);
-        return new DefaultPointcutAdvisor(pointcut, interceptor);
-    }
-
-    @Bean
-    public Advisor requireAnyRoleAuthorizationAdvisor() {
-        AspectJExpressionPointcut pointcut = createPointcutForAnnotation(RequireAnyRole.class);
-        AuthorizationManagerBeforeMethodInterceptor interceptor =
-                new AuthorizationManagerBeforeMethodInterceptor(
-                        pointcut, anyRoleAuthorizationManager);
-        return new DefaultPointcutAdvisor(pointcut, interceptor);
-    }
-
-    @Bean
-    public Advisor requireAllRolesAuthorizationAdvisor() {
-        AspectJExpressionPointcut pointcut = createPointcutForAnnotation(RequireAllRoles.class);
-        AuthorizationManagerBeforeMethodInterceptor interceptor =
-                new AuthorizationManagerBeforeMethodInterceptor(
-                        pointcut, allRolesAuthorizationManager);
         return new DefaultPointcutAdvisor(pointcut, interceptor);
     }
 
