@@ -1,6 +1,6 @@
 [versions]
 # Plugins
-spring-boot = "4.0.1"
+spring-boot = "4.0.2"
 spring-dependency-management = "1.1.7"
 spotless = "8.1.0"
 errorprone-plugin = "4.3.0"
