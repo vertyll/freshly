@@ -2,9 +2,9 @@
 # Plugins
 spring-boot = "4.0.2"
 spring-dependency-management = "1.1.7"
-spotless = "8.1.0"
+spotless = "8.2.1"
 errorprone-plugin = "5.0.0"
-nullaway-plugin = "2.4.0"
+nullaway-plugin = "3.0.0"
 pmd = "7.20.0"
 
 # Dependencies
