@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.vertyll.freshly.useraccess.domain.exception.*;
 
 @RestControllerAdvice(assignableTypes = UserController.class)
-class UserControllerAdvice {
+public class UserControllerAdvice {
     private static final String USER_NOT_FOUND_MSG_KEY = "error.user.notFound";
     private static final String USER_ALREADY_EXISTS_MSG_KEY = "error.user.alreadyExists";
     private static final String USER_ALREADY_ACTIVE_MSG_KEY = "error.user.alreadyActive";

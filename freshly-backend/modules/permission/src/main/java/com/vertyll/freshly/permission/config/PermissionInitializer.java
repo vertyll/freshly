@@ -17,7 +17,7 @@ import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
 @Configuration
 @Profile("dev")
 @RequiredArgsConstructor
-class PermissionInitializer {
+public class PermissionInitializer {
 
     private final RolePermissionMappingRepository repository;
 

@@ -25,7 +25,7 @@ import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-class UserPermissionCache {
+public class UserPermissionCache {
     private static final String USER_PERMISSIONS_CACHE = "user-permissions";
 
     private final RolePermissionMappingRepository rolePermissionRepository;

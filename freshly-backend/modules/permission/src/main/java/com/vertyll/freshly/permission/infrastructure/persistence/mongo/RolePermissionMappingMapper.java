@@ -7,12 +7,12 @@ import com.vertyll.freshly.permission.domain.RolePermissionMapping;
 @Component
 class RolePermissionMappingMapper {
 
-    public RolePermissionMappingDocument toDocument(RolePermissionMapping mapping) {
+    RolePermissionMappingDocument toDocument(RolePermissionMapping mapping) {
         return new RolePermissionMappingDocument(
                 mapping.getId(), mapping.getKeycloakRole(), mapping.getPermission(), null);
     }
 
-    public RolePermissionMapping toDomain(RolePermissionMappingDocument document) {
+    RolePermissionMapping toDomain(RolePermissionMappingDocument document) {
         return RolePermissionMapping.reconstitute(
                 document.getId(),
                 document.getKeycloakRole(),

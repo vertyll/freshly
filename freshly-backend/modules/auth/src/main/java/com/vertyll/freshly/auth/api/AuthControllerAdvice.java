@@ -15,7 +15,7 @@ import com.vertyll.freshly.auth.domain.exception.InvalidVerificationTokenExcepti
 import com.vertyll.freshly.auth.domain.exception.UsernameAlreadyExistsException;
 
 @RestControllerAdvice(assignableTypes = AuthController.class)
-class AuthControllerAdvice {
+public class AuthControllerAdvice {
 
     private final MessageSource messageSource;
     private static final Logger LOGGER = LogManager.getLogger(AuthControllerAdvice.class);

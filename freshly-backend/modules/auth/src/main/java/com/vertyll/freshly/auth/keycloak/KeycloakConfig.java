@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 @EnableConfigurationProperties(KeycloakProperties.class)
-class KeycloakConfig {
+public class KeycloakConfig {
 
     private static final String REALM_MASTER = "master";
 

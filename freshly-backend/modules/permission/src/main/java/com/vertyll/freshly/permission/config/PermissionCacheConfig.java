@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableCaching
-class PermissionCacheConfig {
+public class PermissionCacheConfig {
     private static final String USER_PERMISSIONS_CACHE = "user-permissions";
 
     @Bean

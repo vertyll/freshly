@@ -7,7 +7,7 @@ import com.vertyll.freshly.airquality.domain.AirQualityMeasurement;
 @Component
 class AirQualityMeasurementMapper {
 
-    public AirQualityMeasurementDocument toDocument(AirQualityMeasurement domain) {
+    AirQualityMeasurementDocument toDocument(AirQualityMeasurement domain) {
         return new AirQualityMeasurementDocument(
                 domain.getId(),
                 domain.getStationId(),
@@ -27,7 +27,7 @@ class AirQualityMeasurementMapper {
                 domain.getCreatedAt());
     }
 
-    public AirQualityMeasurement toDomain(AirQualityMeasurementDocument document) {
+    AirQualityMeasurement toDomain(AirQualityMeasurementDocument document) {
         return new AirQualityMeasurement(
                 document.getId(),
                 document.getStationId(),
