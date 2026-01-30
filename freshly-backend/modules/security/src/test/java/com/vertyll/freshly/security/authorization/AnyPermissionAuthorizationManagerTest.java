@@ -54,7 +54,8 @@ class AnyPermissionAuthorizationManagerTest {
     void shouldGrantAccessWhenUserHasAnyOfRequiredPermissionsOnMethod()
             throws NoSuchMethodException {
         // Given
-        Method method = SecurityMockTarget.class.getMethod(METHOD_WITH_MULTIPLE_PERMISSIONS);
+        Method method =
+                SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_MULTIPLE_PERMISSIONS);
         when(methodInvocation.getMethod()).thenReturn(method);
         Permission[] permissions = {
             Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE
@@ -77,7 +78,7 @@ class AnyPermissionAuthorizationManagerTest {
     void shouldDenyAccessWhenUserDoesNotHaveAnyOfRequiredPermissionsOnMethod()
             throws NoSuchMethodException {
         // Given
-        Method method = SecurityMockTarget.class.getMethod("methodWithMultiplePermissions");
+        Method method = SecurityMockTarget.class.getDeclaredMethod("methodWithMultiplePermissions");
         when(methodInvocation.getMethod()).thenReturn(method);
         Permission[] permissions = {
             Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE
@@ -100,7 +101,7 @@ class AnyPermissionAuthorizationManagerTest {
     void shouldCheckClassLevelAnnotationWhenMethodAnnotationIsAbsent()
             throws NoSuchMethodException {
         // Given
-        Method method = ClassWithAnyPermission.class.getMethod(METHOD_WITHOUT_ANNOTATION);
+        Method method = ClassWithAnyPermission.class.getDeclaredMethod(METHOD_WITHOUT_ANNOTATION);
         when(methodInvocation.getMethod()).thenReturn(method);
         Permission[] permissions = {Permission.USERS_READ, Permission.USERS_CREATE};
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(true);
@@ -121,7 +122,8 @@ class AnyPermissionAuthorizationManagerTest {
     void shouldPrioritizeMethodLevelAnnotationOverClassLevelAnnotation()
             throws NoSuchMethodException {
         // Given
-        Method method = ClassWithAnyPermission.class.getMethod(METHOD_WITH_DIFFERENT_PERMISSIONS);
+        Method method =
+                ClassWithAnyPermission.class.getDeclaredMethod(METHOD_WITH_DIFFERENT_PERMISSIONS);
         when(methodInvocation.getMethod()).thenReturn(method);
         Permission[] methodPermissions = {Permission.REPORTS_READ, Permission.REPORTS_GENERATE};
         when(permissionService.hasAnyPermission(authentication, methodPermissions))
@@ -144,7 +146,7 @@ class AnyPermissionAuthorizationManagerTest {
     @DisplayName("Should deny access when no annotation is found")
     void shouldDenyAccessWhenNoAnnotationIsFound() throws NoSuchMethodException {
         // Given
-        Method method = SecurityMockTarget.class.getMethod(METHOD_WITHOUT_ANNOTATION);
+        Method method = SecurityMockTarget.class.getDeclaredMethod(METHOD_WITHOUT_ANNOTATION);
         when(methodInvocation.getMethod()).thenReturn(method);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -162,7 +164,7 @@ class AnyPermissionAuthorizationManagerTest {
     @DisplayName("Should handle single permission in annotation")
     void shouldHandleSinglePermissionInAnnotation() throws NoSuchMethodException {
         // Given
-        Method method = SecurityMockTarget.class.getMethod(METHOD_WITH_SINGLE_PERMISSION);
+        Method method = SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_SINGLE_PERMISSION);
         when(methodInvocation.getMethod()).thenReturn(method);
         Permission[] permissions = {Permission.USERS_UPDATE};
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(true);
@@ -183,7 +185,8 @@ class AnyPermissionAuthorizationManagerTest {
     @SuppressWarnings("NullAway")
     void shouldHandleNullAuthenticationGracefully() throws NoSuchMethodException {
         // Given
-        Method method = SecurityMockTarget.class.getMethod(METHOD_WITH_MULTIPLE_PERMISSIONS);
+        Method method =
+                SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_MULTIPLE_PERMISSIONS);
         when(methodInvocation.getMethod()).thenReturn(method);
         Permission[] permissions = {
             Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE

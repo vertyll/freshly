@@ -51,7 +51,7 @@ class PermissionAuthorizationManagerTest {
     @DisplayName("Should grant access when user has required permission on method")
     void shouldGrantAccessWhenUserHasRequiredPermissionOnMethod() throws NoSuchMethodException {
         // Given
-        Method method = SecurityMockTarget.class.getMethod(METHOD_WITH_PERMISSION);
+        Method method = SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_PERMISSION);
         when(methodInvocation.getMethod()).thenReturn(method);
         when(permissionService.hasPermission(authentication, Permission.USERS_READ))
                 .thenReturn(true);
@@ -72,7 +72,7 @@ class PermissionAuthorizationManagerTest {
     void shouldDenyAccessWhenUserDoesNotHaveRequiredPermissionOnMethod()
             throws NoSuchMethodException {
         // Given
-        Method method = SecurityMockTarget.class.getMethod(METHOD_WITH_PERMISSION);
+        Method method = SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_PERMISSION);
         when(methodInvocation.getMethod()).thenReturn(method);
         when(permissionService.hasPermission(authentication, Permission.USERS_READ))
                 .thenReturn(false);
@@ -93,7 +93,7 @@ class PermissionAuthorizationManagerTest {
     void shouldCheckClassLevelAnnotationWhenMethodAnnotationIsAbsent()
             throws NoSuchMethodException {
         // Given
-        Method method = ClassWithPermission.class.getMethod(METHOD_WITHOUT_ANNOTATION);
+        Method method = ClassWithPermission.class.getDeclaredMethod(METHOD_WITHOUT_ANNOTATION);
         when(methodInvocation.getMethod()).thenReturn(method);
         when(permissionService.hasPermission(authentication, Permission.USERS_CREATE))
                 .thenReturn(true);
@@ -114,7 +114,8 @@ class PermissionAuthorizationManagerTest {
     void shouldPrioritizeMethodLevelAnnotationOverClassLevelAnnotation()
             throws NoSuchMethodException {
         // Given
-        Method method = ClassWithPermission.class.getMethod(METHOD_WITH_DIFFERENT_PERMISSION);
+        Method method =
+                ClassWithPermission.class.getDeclaredMethod(METHOD_WITH_DIFFERENT_PERMISSION);
         when(methodInvocation.getMethod()).thenReturn(method);
         when(permissionService.hasPermission(authentication, Permission.USERS_DELETE))
                 .thenReturn(true);
@@ -135,7 +136,7 @@ class PermissionAuthorizationManagerTest {
     @DisplayName("Should deny access when no annotation is found")
     void shouldDenyAccessWhenNoAnnotationIsFound() throws NoSuchMethodException {
         // Given
-        Method method = SecurityMockTarget.class.getMethod(METHOD_WITHOUT_ANNOTATION);
+        Method method = SecurityMockTarget.class.getDeclaredMethod(METHOD_WITHOUT_ANNOTATION);
         when(methodInvocation.getMethod()).thenReturn(method);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -154,7 +155,7 @@ class PermissionAuthorizationManagerTest {
     @SuppressWarnings("NullAway")
     void shouldHandleNullAuthenticationGracefully() throws NoSuchMethodException {
         // Given
-        Method method = SecurityMockTarget.class.getMethod(METHOD_WITH_PERMISSION);
+        Method method = SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_PERMISSION);
         when(methodInvocation.getMethod()).thenReturn(method);
         when(permissionService.hasPermission(null, Permission.USERS_READ)).thenReturn(false);
 
