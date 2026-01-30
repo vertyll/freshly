@@ -170,29 +170,29 @@ class PermissionAuthorizationManagerTest {
     }
 
     // Test classes
-    public static class SecurityMockTarget {
+    static class SecurityMockTarget {
         @RequirePermission(Permission.USERS_READ)
         @SuppressWarnings("unused")
-        public void methodWithPermission() {
+        void methodWithPermission() {
             // Empty method used only for testing authorization annotations
         }
 
         @SuppressWarnings("unused")
-        public void methodWithoutAnnotation() {
+        void methodWithoutAnnotation() {
             // Empty method used only for testing authorization behavior when annotation is absent
         }
     }
 
     @RequirePermission(Permission.USERS_CREATE)
-    public static class ClassWithPermission {
+    static class ClassWithPermission {
         @SuppressWarnings("unused")
-        public void methodWithoutAnnotation() {
+        void methodWithoutAnnotation() {
             // Empty method used only for testing class-level authorization annotations
         }
 
         @RequirePermission(Permission.USERS_DELETE)
         @SuppressWarnings("unused")
-        public void methodWithDifferentPermission() {
+        void methodWithDifferentPermission() {
             // Empty method used only for testing method-level vs class-level annotation priority
         }
     }
