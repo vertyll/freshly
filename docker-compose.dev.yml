@@ -13,7 +13,7 @@ services:
     networks:
       - freshly
     healthcheck:
-      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/admin -u ${MONGO_INITDB_ROOT_USERNAME:-root} -p ${MONGO_INITDB_ROOT_PASSWORD:-root} --quiet
       interval: 10s
       timeout: 5s
       retries: 5
@@ -30,7 +30,7 @@ services:
     networks:
       - freshly
     healthcheck:
-      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/admin -u test -p test --quiet
       interval: 10s
       timeout: 5s
       retries: 5
@@ -100,7 +100,7 @@ services:
     networks:
       - freshly
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_KC_USER:-keycloak_user}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_KC_USER:-keycloak_user} -d ${POSTGRES_KC_DB:-keycloak_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -115,46 +115,10 @@ services:
     networks:
       - freshly
 
-  backend:
-    build:
-      context: .
-      dockerfile: docker/backend.Dockerfile
-      target: ${DOCKER_ENV:-development}
-      args:
-        JAVA_VERSION: ${JAVA_VERSION:-25}
-        GRADLE_VERSION: ${GRADLE_VERSION:-9.2.1}
-        BACKEND_PORT: ${BACKEND_PORT:-8080}
-        BACKEND_DEBUG_PORT: ${BACKEND_DEBUG_PORT:-5005}
-    container_name: freshly-backend
-    volumes:
-      - ./freshly-backend:/app
-      - gradle-cache:/home/gradle/.gradle
-    ports:
-      - "${BACKEND_PORT:-8080}:8080"
-      - "${BACKEND_DEBUG_PORT:-5005}:5005"
-    environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
-      SPRING_DATA_MONGODB_HOST: mongodb
-      SPRING_DATA_MONGODB_DATABASE: ${MONGO_INITDB_DATABASE:-freshly_db}
-      SPRING_DATA_MONGODB_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
-      SPRING_DATA_MONGODB_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-root}
-      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
-      SPRING_MAIL_HOST: mail-dev
-      SPRING_MAIL_PORT: ${MAIL_SMTP_PORT:-1025}
-      SERVER_PORT: ${BACKEND_PORT:-8080}
-    networks:
-      - freshly
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      mail-dev:
-        condition: service_started
-
 volumes:
   mongodb-data:
   mongodb-test-data:
   postgres-data:
-  gradle-cache:
 
 networks:
   freshly:
