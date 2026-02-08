@@ -36,12 +36,13 @@ spring:
       mail:
         smtp:
           trust: "*"
-        auth: true
-        starttls:
-          enabled: true
-        connection-timeout: 5000
-        timeout: 3000
-        write-timeout: 5000
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
 
   security:
     oauth2:
