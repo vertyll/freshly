@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,13 +18,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.vertyll.freshly.auth.api.dto.*;
 import com.vertyll.freshly.auth.domain.VerificationTokenService;
 import com.vertyll.freshly.auth.domain.event.UserRegisteredEvent;
 import com.vertyll.freshly.auth.keycloak.KeycloakAdminClient;
 import com.vertyll.freshly.auth.keycloak.KeycloakTokenClient;
+import com.vertyll.freshly.common.config.ApplicationProperties;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.notification.application.NotificationService;
 import com.vertyll.freshly.useraccess.application.UserAccessService;
@@ -45,14 +44,10 @@ class AuthServiceTest {
     @Mock private NotificationService notificationService;
     @Mock private ApplicationEventPublisher eventPublisher;
     @Mock private VerificationTokenService verificationTokenService;
+    @Mock private ApplicationProperties applicationProperties;
+    @Mock private ApplicationProperties.Frontend frontendProperties;
 
     @InjectMocks private AuthService authService;
-
-    @BeforeEach
-    @SuppressWarnings("NullAway.Init")
-    void setUp() {
-        ReflectionTestUtils.setField(authService, "frontendUrl", FRONTEND_URL);
-    }
 
     @Nested
     @DisplayName("User Registration Tests")
@@ -68,6 +63,8 @@ class AuthServiceTest {
 
             UUID keycloakUserId = UUID.randomUUID();
 
+            when(applicationProperties.frontend()).thenReturn(frontendProperties);
+            when(frontendProperties.url()).thenReturn(FRONTEND_URL);
             when(keycloakAdminClient.createUser(any(), any(), any(), any(), any()))
                     .thenReturn(keycloakUserId);
 
@@ -98,6 +95,8 @@ class AuthServiceTest {
                     new RegisterUserRequestDto("user", "e@e.com", "p", "J", "D");
             UUID keycloakUserId = UUID.randomUUID();
 
+            lenient().when(applicationProperties.frontend()).thenReturn(frontendProperties);
+            lenient().when(frontendProperties.url()).thenReturn(FRONTEND_URL);
             when(keycloakAdminClient.createUser(any(), any(), any(), any(), any()))
                     .thenReturn(keycloakUserId);
             doThrow(new RuntimeException(DATABASE_ERROR))
@@ -184,6 +183,8 @@ class AuthServiceTest {
             user.setId(UUID.randomUUID().toString());
             user.setUsername("testuser");
 
+            when(applicationProperties.frontend()).thenReturn(frontendProperties);
+            when(frontendProperties.url()).thenReturn(FRONTEND_URL);
             when(keycloakAdminClient.findUsersByEmail(request.email())).thenReturn(List.of(user));
 
             // When
@@ -221,6 +222,9 @@ class AuthServiceTest {
             // Given
             UUID userId = UUID.randomUUID();
             ChangeEmailRequestDto request = new ChangeEmailRequestDto("new@e.com");
+
+            when(applicationProperties.frontend()).thenReturn(frontendProperties);
+            when(frontendProperties.url()).thenReturn(FRONTEND_URL);
 
             // When
             authService.changeEmail(userId, request);

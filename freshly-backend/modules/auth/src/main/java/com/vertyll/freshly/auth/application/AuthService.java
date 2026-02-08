@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +17,7 @@ import com.vertyll.freshly.auth.domain.VerificationTokenService;
 import com.vertyll.freshly.auth.domain.event.UserRegisteredEvent;
 import com.vertyll.freshly.auth.keycloak.KeycloakAdminClient;
 import com.vertyll.freshly.auth.keycloak.KeycloakTokenClient;
+import com.vertyll.freshly.common.config.ApplicationProperties;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.notification.application.NotificationService;
 import com.vertyll.freshly.useraccess.application.UserAccessService;
@@ -33,10 +33,7 @@ public class AuthService {
     private final NotificationService notificationService;
     private final ApplicationEventPublisher eventPublisher;
     private final VerificationTokenService verificationTokenService;
-
-    @Value("${application.frontend.url}")
-    @SuppressWarnings("NullAway.Init")
-    private String frontendUrl;
+    private final ApplicationProperties applicationProperties;
 
     private static final String USERNAME = "user";
     private static final String VERIFY_EMAIL_PATH = "/verify-email";
@@ -67,7 +64,8 @@ public class AuthService {
                     verificationTokenService.generateEmailVerificationToken(
                             keycloakUserId, request.email());
             String verificationLink =
-                    frontendUrl + String.format(VERIFY_EMAIL_URL_TEMPLATE, verificationToken);
+                    applicationProperties.frontend().url()
+                            + String.format(VERIFY_EMAIL_URL_TEMPLATE, verificationToken);
 
             notificationService.sendEmailVerification(
                     request.email(), request.username(), verificationLink);
@@ -139,7 +137,8 @@ public class AuthService {
 
         String resetToken =
                 verificationTokenService.generatePasswordResetToken(userId, request.email());
-        String resetLink = frontendUrl + "/reset-password?token=" + resetToken;
+        String resetLink =
+                applicationProperties.frontend().url() + "/reset-password?token=" + resetToken;
 
         notificationService.sendPasswordResetEmail(request.email(), username, resetLink);
 
@@ -176,7 +175,7 @@ public class AuthService {
         String verificationToken =
                 verificationTokenService.generateEmailVerificationToken(userId, request.newEmail());
         String verificationLink =
-                frontendUrl
+                applicationProperties.frontend().url()
                         + VERIFY_EMAIL_PATH
                         + String.format(TOKEN_QUERY_PARAM, verificationToken);
 

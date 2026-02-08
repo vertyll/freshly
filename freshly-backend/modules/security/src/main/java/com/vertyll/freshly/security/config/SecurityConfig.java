@@ -27,7 +27,7 @@ import com.vertyll.freshly.common.enums.UserRoleEnum;
 
 @Slf4j
 @Configuration
-@Profile("dev")
+@Profile({"dev", "prod"})
 @EnableMethodSecurity
 public class SecurityConfig {
 
