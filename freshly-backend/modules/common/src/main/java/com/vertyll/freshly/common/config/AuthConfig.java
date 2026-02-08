@@ -1,4 +1,4 @@
-package com.vertyll.freshly.security.config;
+package com.vertyll.freshly.common.config;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

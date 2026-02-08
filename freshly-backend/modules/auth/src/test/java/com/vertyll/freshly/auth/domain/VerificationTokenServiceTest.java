@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.vertyll.freshly.auth.domain.exception.InvalidVerificationTokenException;
-import com.vertyll.freshly.security.config.JwtProperties;
+import com.vertyll.freshly.common.config.JwtProperties;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

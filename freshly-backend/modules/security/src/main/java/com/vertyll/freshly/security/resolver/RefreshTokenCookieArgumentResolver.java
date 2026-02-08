@@ -14,7 +14,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import lombok.RequiredArgsConstructor;
 
 import com.vertyll.freshly.common.annotation.RefreshTokenCookie;
-import com.vertyll.freshly.security.config.JwtProperties;
+import com.vertyll.freshly.common.config.JwtProperties;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.Cookie;

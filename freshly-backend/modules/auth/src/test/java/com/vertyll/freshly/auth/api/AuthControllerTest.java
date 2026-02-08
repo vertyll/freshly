@@ -35,9 +35,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vertyll.freshly.auth.api.dto.*;
 import com.vertyll.freshly.auth.application.AuthService;
 import com.vertyll.freshly.auth.domain.exception.InvalidPasswordException;
+import com.vertyll.freshly.common.config.CookieProperties;
+import com.vertyll.freshly.common.config.JwtProperties;
 import com.vertyll.freshly.common.exception.GlobalExceptionHandler;
-import com.vertyll.freshly.security.config.CookieProperties;
-import com.vertyll.freshly.security.config.JwtProperties;
 import com.vertyll.freshly.security.resolver.RefreshTokenCookieArgumentResolver;
 
 import jakarta.servlet.http.Cookie;

@@ -1,4 +1,4 @@
-package com.vertyll.freshly.security.config;
+package com.vertyll.freshly.common.config;
 
 import java.util.List;
 

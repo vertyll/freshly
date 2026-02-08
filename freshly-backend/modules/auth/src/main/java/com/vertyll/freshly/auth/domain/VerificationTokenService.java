@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.vertyll.freshly.auth.domain.exception.InvalidVerificationTokenException;
-import com.vertyll.freshly.security.config.JwtProperties;
+import com.vertyll.freshly.common.config.JwtProperties;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

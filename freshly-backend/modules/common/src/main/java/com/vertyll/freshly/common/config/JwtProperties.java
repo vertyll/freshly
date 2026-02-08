@@ -1,4 +1,4 @@
-package com.vertyll.freshly.security.config;
+package com.vertyll.freshly.common.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;

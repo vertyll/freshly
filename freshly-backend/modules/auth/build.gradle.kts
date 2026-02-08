@@ -5,7 +5,6 @@ plugins {
 dependencies {
     // API - Internal Modules
     api(project(":modules:common"))
-    api(project(":modules:security"))
     api(project(":modules:notification"))
     api(project(":modules:useraccess"))
 
