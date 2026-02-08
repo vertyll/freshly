@@ -29,7 +29,7 @@ import com.vertyll.freshly.common.enums.UserRoleEnum;
 @Configuration
 @Profile("dev")
 @EnableMethodSecurity
-public class DevSecurityConfig {
+public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(

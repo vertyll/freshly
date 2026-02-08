@@ -49,6 +49,12 @@ spring:
         jwt:
           issuer-uri: http://localhost:8081/realms/freshly-realm
 
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
 security:
   jwt:
     secret: isN5Z1EinzeD2JyjXq6SZqoBd+QpOJMxZsBHwfhXHAA=
