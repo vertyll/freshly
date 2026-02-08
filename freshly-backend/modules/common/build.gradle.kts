@@ -18,6 +18,7 @@ sourceSets {
 dependencies {
     // API
     api(libs.bundles.spring.boot.starters.common)
+    api(libs.bundles.spring.boot.starters.mail)
     api(libs.mapstruct)
 
     // Compile Only
@@ -36,4 +37,5 @@ dependencies {
 
     // Test Implementation
     testImplementation(libs.bundles.spring.boot.test.common)
+    testImplementation(libs.bundles.spring.boot.test.mail)
 }

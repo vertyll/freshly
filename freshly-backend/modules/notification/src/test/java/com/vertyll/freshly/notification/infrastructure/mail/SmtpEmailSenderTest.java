@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.Map;
 
+import com.vertyll.freshly.common.config.MailProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
