@@ -1,13 +1,13 @@
 package com.vertyll.freshly.common.config;
 
+import java.util.Map;
+import java.util.Properties;
+
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-
-import java.util.Map;
-import java.util.Properties;
 
 @Configuration
 @EnableConfigurationProperties(MailProperties.class)

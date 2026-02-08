@@ -1,6 +1,5 @@
 package com.vertyll.freshly.notification.infrastructure.mail;
 
-import com.vertyll.freshly.common.config.MailProperties;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -10,6 +9,7 @@ import org.thymeleaf.context.Context;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.vertyll.freshly.common.config.MailProperties;
 import com.vertyll.freshly.notification.domain.EmailNotification;
 import com.vertyll.freshly.notification.domain.EmailSender;
 import com.vertyll.freshly.notification.domain.exception.EmailSendingException;

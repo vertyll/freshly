@@ -8,7 +8,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.Map;
 
-import com.vertyll.freshly.common.config.MailProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +20,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.vertyll.freshly.common.config.MailProperties;
 import com.vertyll.freshly.notification.domain.Email;
 import com.vertyll.freshly.notification.domain.EmailNotification;
 import com.vertyll.freshly.notification.domain.EmailTemplate;
