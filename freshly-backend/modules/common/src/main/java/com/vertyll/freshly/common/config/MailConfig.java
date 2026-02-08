@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import java.util.Map;
 import java.util.Properties;
 
 @Configuration
@@ -17,16 +18,18 @@ public class MailConfig {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
         mailSender.setHost(mailProperties.host());
-        if (mailProperties.port() != null) {
-            mailSender.setPort(mailProperties.port());
+        Integer port = mailProperties.port();
+        if (port != null) {
+            mailSender.setPort(port);
         }
         mailSender.setUsername(mailProperties.username());
         mailSender.setPassword(mailProperties.password());
         mailSender.setDefaultEncoding("UTF-8");
 
-        if (mailProperties.properties() != null && !mailProperties.properties().isEmpty()) {
+        Map<String, String> properties = mailProperties.properties();
+        if (properties != null && !properties.isEmpty()) {
             Properties props = mailSender.getJavaMailProperties();
-            props.putAll(mailProperties.properties());
+            props.putAll(properties);
         }
 
         return mailSender;
