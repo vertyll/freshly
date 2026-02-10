@@ -29,16 +29,16 @@ spring:
   mail:
     host: localhost
     port: 1025
-    username: vertyll
-    password: vertyll
-    from: no-reply@freshly.local
+    username: ""
+    password: ""
+    from: no-reply@projecta.local
     properties:
       mail:
         smtp:
           trust: "*"
-          auth: true
+          auth: false
           starttls:
-            enable: true
+            enable: false
           connectiontimeout: 5000
           timeout: 3000
           writetimeout: 5000
