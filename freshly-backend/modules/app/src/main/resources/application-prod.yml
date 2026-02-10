@@ -25,11 +25,12 @@ spring:
     properties:
       mail:
         smtp:
-          trust: "*"
           auth: true
           starttls:
             enable: true
             required: true
+          ssl:
+            trust: ${MAIL_SMTP_TRUST}
           connectiontimeout: 5000
           timeout: 3000
           writetimeout: 5000
