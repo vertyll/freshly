@@ -68,6 +68,14 @@ public class SecurityConfig {
                                                 "/swagger-ui.html")
                                         .permitAll()
 
+                                        // Actuator endpoints
+                                        .requestMatchers(
+                                                "/actuator/health",
+                                                "/actuator/health/**",
+                                                "/api/v1/actuator/health",
+                                                "/api/v1/actuator/health/**")
+                                        .permitAll()
+
                                         // All other endpoints require authentication
                                         .anyRequest()
                                         .authenticated())
