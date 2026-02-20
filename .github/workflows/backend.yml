@@ -80,13 +80,13 @@ jobs:
             cd ~/podman/compose
             
             echo "Logging into GitHub Container Registry..."
-            echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io -u ${{ github.actor }} --password-stdin
+            echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io -u ${{ github.actor }} --password-stdin > /dev/null 2>&1
             
             echo "Pulling latest backend image..."
-            podman pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            podman pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest > /dev/null 2>&1
             
             echo "Recreating backend container..."
-            podman-compose -f freshly.yml up -d --force-recreate --no-deps freshly-backend
+            podman-compose -f freshly.yml up -d --force-recreate --no-deps freshly-backend > /dev/null 2>&1
             
             echo "Waiting for container to start..."
             sleep 15
