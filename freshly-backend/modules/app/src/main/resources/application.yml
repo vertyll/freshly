@@ -14,12 +14,9 @@ management:
       exposure:
         include: health,metrics,info
   endpoint:
-    info:
-      access: READ_ONLY
     health:
-      access: READ_ONLY
-    metrics:
-      access: READ_ONLY
+      probes:
+        enabled: true
 
 springdoc:
   default-produces-media-type: application/json
