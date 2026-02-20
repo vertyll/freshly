@@ -55,9 +55,8 @@ services:
 
   keycloak:
     container_name: freshly-keycloak
-    build:
-      context: ./docker/keycloak
-      dockerfile: Dockerfile
+    image: quay.io/keycloak/keycloak:${KC_VERSION:-26.5.4}
+    command: start-dev --import-realm
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: keycloak-db
@@ -73,6 +72,8 @@ services:
       KC_HTTP_ENABLED: "true"
     ports:
       - "${KC_HTTP_PORT:-8081}:8080"
+    volumes:
+      - ./docker/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
     depends_on:
       keycloak-db:
         condition: service_healthy
