@@ -17,6 +17,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   test-mongodb:
     container_name: freshly-mongodb-test
@@ -34,6 +35,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   mongo-express:
     image: mongo-express:${MONGO_EXPRESS_VERSION:-latest}
@@ -105,6 +107,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   mail-dev:
     image: maildev/maildev:${MAILDEV_VERSION:-latest}
