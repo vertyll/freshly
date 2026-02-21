@@ -40,10 +40,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth ->
                                 auth
-                                        // Actuator
-                                        .requestMatchers("/actuator/health", "/actuator/info")
-                                        .permitAll()
-
                                         // Auth public endpoints
                                         .requestMatchers(
                                                 "/auth/register",
