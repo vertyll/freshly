@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Role;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.authorization.AuthorizationResult;
@@ -19,6 +21,7 @@ import com.vertyll.freshly.permission.application.PermissionService;
 
 @Slf4j
 @Component
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @RequiredArgsConstructor
 public class PermissionAuthorizationManager implements AuthorizationManager<MethodInvocation> {
 
