@@ -129,7 +129,7 @@ class AuthServiceTest {
 
             // Then
             verify(keycloakAdminClient).activateUser(userId);
-            verify(userAccessService).activateUser(userId);
+            verify(userAccessService).activateUser(userId, null);
         }
     }
 
@@ -231,7 +231,7 @@ class AuthServiceTest {
 
             // Then
             verify(keycloakAdminClient).changeEmail(userId, "new@e.com");
-            verify(userAccessService).deactivateUser(userId, userId);
+            verify(userAccessService).deactivateUser(userId, userId, null);
             verify(notificationService).sendEmailVerification(eq("new@e.com"), any(), anyString());
         }
     }

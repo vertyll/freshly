@@ -93,7 +93,7 @@ public class AuthService {
         UUID userId = verificationTokenService.validateEmailVerificationToken(token);
 
         keycloakAdminClient.activateUser(userId);
-        userAccessService.activateUser(userId);
+        userAccessService.activateUser(userId, null);
 
         log.info("Email verified for user: {}", userId);
     }
@@ -170,7 +170,7 @@ public class AuthService {
     @Transactional
     public void changeEmail(UUID userId, ChangeEmailRequestDto request) {
         keycloakAdminClient.changeEmail(userId, request.newEmail());
-        userAccessService.deactivateUser(userId, userId);
+        userAccessService.deactivateUser(userId, userId, null);
 
         String verificationToken =
                 verificationTokenService.generateEmailVerificationToken(userId, request.newEmail());

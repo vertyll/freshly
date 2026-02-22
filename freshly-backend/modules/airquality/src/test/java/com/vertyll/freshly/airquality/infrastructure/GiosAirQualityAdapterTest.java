@@ -37,6 +37,7 @@ class GiosAirQualityAdapterTest {
     void shouldFallbackToArchivalDataWhenGiosReturns400ForManualStation() {
         // Given
         int sensorId = 654;
+        @SuppressWarnings("rawtypes")
         RestClient.RequestHeadersUriSpec uriSpec = mock(RestClient.RequestHeadersUriSpec.class);
         RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
 
@@ -62,6 +63,6 @@ class GiosAirQualityAdapterTest {
 
         // Then
         assertThat(readings).hasSize(1);
-        assertThat(readings.get(0).value()).isEqualTo(25.5);
+        assertThat(readings.getFirst().value()).isEqualTo(25.5);
     }
 }

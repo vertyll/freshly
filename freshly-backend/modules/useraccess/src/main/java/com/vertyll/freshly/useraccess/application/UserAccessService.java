@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.vertyll.freshly.common.util.OptimisticLockingValidator;
 import com.vertyll.freshly.useraccess.domain.SystemUser;
 import com.vertyll.freshly.useraccess.domain.SystemUserRepository;
 import com.vertyll.freshly.useraccess.domain.exception.UserAlreadyExistsException;
@@ -44,36 +45,39 @@ public class UserAccessService {
         return systemUserRepository.findAll();
     }
 
-    public void activateUser(UUID userId) {
+    public void activateUser(UUID userId, Long expectedVersion) {
         SystemUser user =
                 systemUserRepository
                         .findById(userId)
                         .orElseThrow(() -> new UserNotFoundException(userId));
 
+        OptimisticLockingValidator.validate(user.getVersion(), expectedVersion);
         user.activate();
         systemUserRepository.save(user);
 
         log.info("User {} activated", userId);
     }
 
-    public void deactivateUser(UUID userId, UUID loggedInUserId) {
+    public void deactivateUser(UUID userId, UUID loggedInUserId, Long expectedVersion) {
         SystemUser user =
                 systemUserRepository
                         .findById(userId)
                         .orElseThrow(() -> new UserNotFoundException(userId));
 
+        OptimisticLockingValidator.validate(user.getVersion(), expectedVersion);
         user.deactivate(loggedInUserId);
         systemUserRepository.save(user);
 
         log.info("User {} deactivated by {}", userId, loggedInUserId);
     }
 
-    public void replaceUserRoles(UUID userId, Set<String> roles) {
+    public void replaceUserRoles(UUID userId, Set<String> roles, Long expectedVersion) {
         SystemUser user =
                 systemUserRepository
                         .findById(userId)
                         .orElseThrow(() -> new UserNotFoundException(userId));
 
+        OptimisticLockingValidator.validate(user.getVersion(), expectedVersion);
         user.replaceRoles(roles);
         systemUserRepository.save(user);
 

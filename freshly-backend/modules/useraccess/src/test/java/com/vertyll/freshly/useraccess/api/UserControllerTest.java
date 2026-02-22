@@ -73,7 +73,8 @@ class UserControllerTest {
         SystemUser user =
                 new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
         UserResponseDto responseDto =
-                new UserResponseDto(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
+                new UserResponseDto(
+                        keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()), null);
 
         when(userAccessService.createUser(
                         keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue())))
@@ -103,7 +104,8 @@ class UserControllerTest {
         SystemUser user =
                 new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
         UserResponseDto responseDto =
-                new UserResponseDto(keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
+                new UserResponseDto(
+                        keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()), null);
 
         when(userAccessService.createUser(
                         keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue())))
@@ -133,7 +135,8 @@ class UserControllerTest {
                 new UserResponseDto(
                         keycloakUserId,
                         true,
-                        Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue()));
+                        Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue()),
+                        null);
 
         when(userAccessService.createUser(keycloakUserId, true, roles)).thenReturn(user);
         when(userDtoMapper.toResponse(user)).thenReturn(responseDto);
@@ -171,7 +174,7 @@ class UserControllerTest {
         UUID userId = UUID.randomUUID();
         SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER.getValue()));
         UserResponseDto responseDto =
-                new UserResponseDto(userId, true, Set.of(UserRoleEnum.USER.getValue()));
+                new UserResponseDto(userId, true, Set.of(UserRoleEnum.USER.getValue()), null);
 
         when(userAccessService.getUserById(userId)).thenReturn(user);
         when(userDtoMapper.toResponse(user)).thenReturn(responseDto);
@@ -211,10 +214,16 @@ class UserControllerTest {
 
         UserResponseDto dto1 =
                 new UserResponseDto(
-                        user1.getKeycloakUserId(), true, Set.of(UserRoleEnum.USER.getValue()));
+                        user1.getKeycloakUserId(),
+                        true,
+                        Set.of(UserRoleEnum.USER.getValue()),
+                        null);
         UserResponseDto dto2 =
                 new UserResponseDto(
-                        user2.getKeycloakUserId(), false, Set.of(UserRoleEnum.ADMIN.getValue()));
+                        user2.getKeycloakUserId(),
+                        false,
+                        Set.of(UserRoleEnum.ADMIN.getValue()),
+                        null);
         List<UserResponseDto> responseDtos = List.of(dto1, dto2);
 
         when(userAccessService.getAllUsers()).thenReturn(users);
@@ -251,14 +260,14 @@ class UserControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
         UUID userId = UUID.randomUUID();
-        doNothing().when(userAccessService).activateUser(userId);
+        doNothing().when(userAccessService).activateUser(eq(userId), any());
 
         // When
-        ResponseEntity<?> response = userController.activateUser(userId);
+        ResponseEntity<?> response = userController.activateUser(userId, null);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        verify(userAccessService).activateUser(userId);
+        verify(userAccessService).activateUser(eq(userId), any());
     }
 
     @Test
@@ -266,10 +275,12 @@ class UserControllerTest {
     void shouldThrowExceptionWhenActivatingNonExistentUser() {
         // Given
         UUID userId = UUID.randomUUID();
-        doThrow(new UserNotFoundException(userId)).when(userAccessService).activateUser(userId);
+        doThrow(new UserNotFoundException(userId))
+                .when(userAccessService)
+                .activateUser(eq(userId), any());
 
         // When & Then
-        assertThatThrownBy(() -> userController.activateUser(userId))
+        assertThatThrownBy(() -> userController.activateUser(userId, null))
                 .isInstanceOf(UserNotFoundException.class);
     }
 
@@ -282,14 +293,14 @@ class UserControllerTest {
         UUID loggedInUserId = UUID.randomUUID();
 
         when(jwt.getSubject()).thenReturn(loggedInUserId.toString());
-        doNothing().when(userAccessService).deactivateUser(userId, loggedInUserId);
+        doNothing().when(userAccessService).deactivateUser(eq(userId), eq(loggedInUserId), any());
 
         // When
-        ResponseEntity<?> response = userController.deactivateUser(userId, jwt);
+        ResponseEntity<?> response = userController.deactivateUser(userId, jwt, null);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        verify(userAccessService).deactivateUser(userId, loggedInUserId);
+        verify(userAccessService).deactivateUser(eq(userId), eq(loggedInUserId), any());
     }
 
     @Test
@@ -302,10 +313,10 @@ class UserControllerTest {
         when(jwt.getSubject()).thenReturn(loggedInUserId.toString());
         doThrow(new UserNotFoundException(userId))
                 .when(userAccessService)
-                .deactivateUser(userId, loggedInUserId);
+                .deactivateUser(eq(userId), eq(loggedInUserId), any());
 
         // When & Then
-        assertThatThrownBy(() -> userController.deactivateUser(userId, jwt))
+        assertThatThrownBy(() -> userController.deactivateUser(userId, jwt, null))
                 .isInstanceOf(UserNotFoundException.class);
     }
 
@@ -318,14 +329,14 @@ class UserControllerTest {
         Set<String> newRoles = Set.of(UserRoleEnum.ADMIN.getValue());
         UpdateUserRolesRequestDto request = new UpdateUserRolesRequestDto(newRoles);
 
-        doNothing().when(userAccessService).replaceUserRoles(userId, newRoles);
+        doNothing().when(userAccessService).replaceUserRoles(eq(userId), eq(newRoles), any());
 
         // When
-        ResponseEntity<?> response = userController.updateUserRoles(userId, request);
+        ResponseEntity<?> response = userController.updateUserRoles(userId, request, null);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        verify(userAccessService).replaceUserRoles(userId, newRoles);
+        verify(userAccessService).replaceUserRoles(eq(userId), eq(newRoles), any());
     }
 
     @Test
@@ -337,14 +348,14 @@ class UserControllerTest {
         Set<String> newRoles = Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
         UpdateUserRolesRequestDto request = new UpdateUserRolesRequestDto(newRoles);
 
-        doNothing().when(userAccessService).replaceUserRoles(userId, newRoles);
+        doNothing().when(userAccessService).replaceUserRoles(eq(userId), eq(newRoles), any());
 
         // When
-        ResponseEntity<?> response = userController.updateUserRoles(userId, request);
+        ResponseEntity<?> response = userController.updateUserRoles(userId, request, null);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        verify(userAccessService).replaceUserRoles(userId, newRoles);
+        verify(userAccessService).replaceUserRoles(eq(userId), eq(newRoles), any());
     }
 
     @Test
@@ -357,10 +368,10 @@ class UserControllerTest {
 
         doThrow(new UserNotFoundException(userId))
                 .when(userAccessService)
-                .replaceUserRoles(userId, newRoles);
+                .replaceUserRoles(eq(userId), eq(newRoles), any());
 
         // When & Then
-        assertThatThrownBy(() -> userController.updateUserRoles(userId, request))
+        assertThatThrownBy(() -> userController.updateUserRoles(userId, request, null))
                 .isInstanceOf(UserNotFoundException.class);
     }
 
@@ -373,14 +384,14 @@ class UserControllerTest {
         UUID loggedInUserId = UUID.randomUUID();
 
         when(jwt.getSubject()).thenReturn(loggedInUserId.toString());
-        doNothing().when(userAccessService).deactivateUser(userId, loggedInUserId);
+        doNothing().when(userAccessService).deactivateUser(eq(userId), eq(loggedInUserId), any());
 
         // When
-        userController.deactivateUser(userId, jwt);
+        userController.deactivateUser(userId, jwt, null);
 
         // Then
         verify(jwt).getSubject();
-        verify(userAccessService).deactivateUser(userId, loggedInUserId);
+        verify(userAccessService).deactivateUser(eq(userId), eq(loggedInUserId), any());
     }
 
     @Test
@@ -395,7 +406,8 @@ class UserControllerTest {
         SystemUser user =
                 new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
         UserResponseDto responseDto =
-                new UserResponseDto(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
+                new UserResponseDto(
+                        keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()), null);
 
         when(userAccessService.createUser(
                         keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue())))
@@ -422,7 +434,8 @@ class UserControllerTest {
         SystemUser user =
                 new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN.getValue()));
         UserResponseDto responseDto =
-                new UserResponseDto(keycloakUserId, true, Set.of(UserRoleEnum.ADMIN.getValue()));
+                new UserResponseDto(
+                        keycloakUserId, true, Set.of(UserRoleEnum.ADMIN.getValue()), null);
 
         when(userAccessService.createUser(
                         keycloakUserId, true, Set.of(UserRoleEnum.ADMIN.getValue())))

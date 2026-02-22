@@ -1,6 +1,7 @@
 package com.vertyll.freshly.permission.domain;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -9,6 +10,8 @@ import com.vertyll.freshly.common.enums.Permission;
 public interface RolePermissionMappingRepository {
 
     RolePermissionMapping save(RolePermissionMapping mapping);
+
+    Optional<RolePermissionMapping> findById(UUID id);
 
     List<RolePermissionMapping> findByKeycloakRoleIn(Set<String> roles);
 

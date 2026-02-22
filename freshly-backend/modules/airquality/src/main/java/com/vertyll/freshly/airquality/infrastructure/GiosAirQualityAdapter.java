@@ -225,7 +225,9 @@ class GiosAirQualityAdapter implements AirQualityProvider {
         } catch (HttpClientErrorException.BadRequest e) {
             String body = e.getResponseBodyAsString();
             if (body.contains(ERROR_CODE_MANUAL_STATION)) {
-                log.info("Sensor {} is manual, attempting to fetch from archival data API", sensorId);
+                log.info(
+                        "Sensor {} is manual, attempting to fetch from archival data API",
+                        sensorId);
                 return fetchArchivalDataForSensor(sensorId);
             } else {
                 log.warn("Bad request fetching data for sensor {}: {}", sensorId, body);
@@ -257,7 +259,8 @@ class GiosAirQualityAdapter implements AirQualityProvider {
         try {
             JsonNode valuesNode = root.findPath(JSON_PATH_MEASUREMENT_DATA);
             if (valuesNode.isMissingNode()) valuesNode = root.findPath(JSON_PATH_VALUES);
-            if (valuesNode.isMissingNode()) valuesNode = root.findPath(JSON_PATH_MEASUREMENT_DATA_SHORT);
+            if (valuesNode.isMissingNode())
+                valuesNode = root.findPath(JSON_PATH_MEASUREMENT_DATA_SHORT);
             if (valuesNode.isMissingNode()) valuesNode = root.findPath(JSON_PATH_LIST_LOWERCASE);
             if (valuesNode.isMissingNode()) valuesNode = root.findPath(JSON_PATH_DATA);
 

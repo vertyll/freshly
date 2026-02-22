@@ -18,6 +18,7 @@ public interface UserDtoMapper {
     @Mapping(target = "id", source = "keycloakUserId")
     @Mapping(target = "isActive", source = "active")
     @Mapping(target = "roles", source = "roles")
+    @Mapping(target = "version", source = "version")
     UserResponseDto toResponse(SystemUser user);
 
     List<UserResponseDto> toResponseList(List<SystemUser> users);

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.vertyll.freshly.common.enums.Permission;
+import com.vertyll.freshly.common.util.OptimisticLockingValidator;
 import com.vertyll.freshly.permission.api.dto.CreatePermissionMappingDto;
 import com.vertyll.freshly.permission.api.dto.PermissionMappingResponseDto;
 import com.vertyll.freshly.permission.domain.RolePermissionMapping;
@@ -54,13 +55,26 @@ public class PermissionManagementService {
     }
 
     @CacheEvict(value = "user-permissions", allEntries = true)
-    public void deleteMapping(UUID mappingId) {
+    public void deleteMapping(UUID mappingId, Long expectedVersion) {
+        RolePermissionMapping mapping =
+                repository
+                        .findById(mappingId)
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "Mapping not found for id: " + mappingId));
+
+        OptimisticLockingValidator.validate(mapping.getVersion(), expectedVersion);
+
         repository.deleteById(mappingId);
         log.info("Deleted permission mapping: {}", mappingId);
     }
 
     private PermissionMappingResponseDto toDto(RolePermissionMapping mapping) {
         return new PermissionMappingResponseDto(
-                mapping.getId(), mapping.getKeycloakRole(), mapping.getPermission());
+                mapping.getId(),
+                mapping.getKeycloakRole(),
+                mapping.getPermission(),
+                mapping.getVersion());
     }
 }

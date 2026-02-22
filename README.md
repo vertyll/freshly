@@ -32,6 +32,7 @@ Application with air quality data from IoT sensors.
 - the application has Keycloak integration for authentication and authorization
 - the application has permission management based on keycloak roles
 - the application written in Domain-Driven Design (DDD) style
+- optimistic locking for concurrent updates with Etag and If-Match header
 - and many other features that can be found in the application code
 
 ### Core front-end:

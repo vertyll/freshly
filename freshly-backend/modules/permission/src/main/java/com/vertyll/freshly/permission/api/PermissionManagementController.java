@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.vertyll.freshly.common.enums.Permission;
+import com.vertyll.freshly.common.http.ETagUtil;
 import com.vertyll.freshly.common.response.ApiResponse;
 import com.vertyll.freshly.permission.api.dto.CreatePermissionMappingDto;
 import com.vertyll.freshly.permission.api.dto.PermissionMappingResponseDto;
@@ -87,15 +89,25 @@ public class PermissionManagementController {
 
         PermissionMappingResponseDto mapping = permissionManagementService.createMapping(request);
 
-        return ApiResponse.buildResponse(
-                mapping, CREATING_PERMISSION_MAPPING_MSG_KEY, messageSource, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .header(HttpHeaders.ETAG, ETagUtil.buildWeakETag(mapping.version()))
+                .body(
+                        ApiResponse.buildResponse(
+                                        mapping,
+                                        CREATING_PERMISSION_MAPPING_MSG_KEY,
+                                        messageSource,
+                                        HttpStatus.CREATED)
+                                .getBody());
     }
 
     @DeleteMapping("/mappings/{mappingId}")
-    public ResponseEntity<ApiResponse<Void>> deleteMapping(@PathVariable UUID mappingId) {
+    public ResponseEntity<ApiResponse<Void>> deleteMapping(
+            @PathVariable UUID mappingId,
+            @RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch) {
         log.info("Deleting permission mapping: {}", mappingId);
 
-        permissionManagementService.deleteMapping(mappingId);
+        permissionManagementService.deleteMapping(
+                mappingId, ETagUtil.parseIfMatchToVersion(ifMatch));
 
         return ApiResponse.buildResponse(
                 null, DELETING_PERMISSION_MAPPING_MSG_KEY, messageSource, HttpStatus.OK);

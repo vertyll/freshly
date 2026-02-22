@@ -9,7 +9,7 @@ class SystemUserMapper {
 
     SystemUserDocument toDocument(SystemUser user) {
         return new SystemUserDocument(
-                user.getKeycloakUserId(), user.isActive(), user.getRoles(), null);
+                user.getKeycloakUserId(), user.isActive(), user.getRoles(), user.getVersion());
     }
 
     SystemUser toDomain(SystemUserDocument document) {

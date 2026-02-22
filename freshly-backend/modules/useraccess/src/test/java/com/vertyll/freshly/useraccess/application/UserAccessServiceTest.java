@@ -17,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.useraccess.domain.SystemUser;
@@ -187,7 +188,7 @@ class UserAccessServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
-        userAccessService.activateUser(userId);
+        userAccessService.activateUser(userId, VERSION);
 
         // Then
         verify(systemUserRepository).findById(userId);
@@ -198,6 +199,26 @@ class UserAccessServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when activating user with version mismatch")
+    void shouldThrowExceptionWhenActivatingUserWithVersionMismatch() {
+        // Given
+        UUID userId = UUID.randomUUID();
+        SystemUser user =
+                SystemUser.reconstitute(
+                        userId, false, Set.of(UserRoleEnum.USER.getValue()), VERSION);
+
+        when(systemUserRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // When & Then
+        assertThatThrownBy(() -> userAccessService.activateUser(userId, VERSION + 1))
+                .isInstanceOf(OptimisticLockingFailureException.class)
+                .hasMessageContaining("Version mismatch");
+
+        verify(systemUserRepository).findById(userId);
+        verify(systemUserRepository, never()).save(any());
+    }
+
+    @Test
     @DisplayName("Should throw exception when activating non-existent user")
     void shouldThrowExceptionWhenActivatingNonExistentUser() {
         // Given
@@ -205,7 +226,7 @@ class UserAccessServiceTest {
         when(systemUserRepository.findById(userId)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(() -> userAccessService.activateUser(userId))
+        assertThatThrownBy(() -> userAccessService.activateUser(userId, VERSION))
                 .isInstanceOf(UserNotFoundException.class);
 
         verify(systemUserRepository).findById(userId);
@@ -227,7 +248,7 @@ class UserAccessServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
-        userAccessService.deactivateUser(userId, loggedInUserId);
+        userAccessService.deactivateUser(userId, loggedInUserId, VERSION);
 
         // Then
         verify(systemUserRepository).findById(userId);
@@ -246,7 +267,7 @@ class UserAccessServiceTest {
         when(systemUserRepository.findById(userId)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(() -> userAccessService.deactivateUser(userId, loggedInUserId))
+        assertThatThrownBy(() -> userAccessService.deactivateUser(userId, loggedInUserId, VERSION))
                 .isInstanceOf(UserNotFoundException.class);
 
         verify(systemUserRepository).findById(userId);
@@ -268,7 +289,7 @@ class UserAccessServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
-        userAccessService.replaceUserRoles(userId, newRoles);
+        userAccessService.replaceUserRoles(userId, newRoles, VERSION);
 
         // Then
         verify(systemUserRepository).findById(userId);
@@ -293,7 +314,7 @@ class UserAccessServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
-        userAccessService.replaceUserRoles(userId, newRoles);
+        userAccessService.replaceUserRoles(userId, newRoles, VERSION);
 
         // Then
         verify(systemUserRepository).save(userCaptor.capture());
@@ -312,7 +333,7 @@ class UserAccessServiceTest {
         Set<String> newRoles = Set.of(UserRoleEnum.ADMIN.getValue());
         when(systemUserRepository.findById(userId)).thenReturn(Optional.empty());
         // When & Then
-        assertThatThrownBy(() -> userAccessService.replaceUserRoles(userId, newRoles))
+        assertThatThrownBy(() -> userAccessService.replaceUserRoles(userId, newRoles, VERSION))
                 .isInstanceOf(UserNotFoundException.class);
 
         verify(systemUserRepository).findById(userId);
@@ -352,7 +373,7 @@ class UserAccessServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
-        userAccessService.activateUser(userId);
+        userAccessService.activateUser(userId, VERSION);
 
         // Then
         verify(systemUserRepository, times(1)).save(any(SystemUser.class));
@@ -373,7 +394,7 @@ class UserAccessServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
-        userAccessService.deactivateUser(userId, loggedInUserId);
+        userAccessService.deactivateUser(userId, loggedInUserId, VERSION);
 
         // Then
         verify(systemUserRepository, times(1)).save(any(SystemUser.class));
@@ -394,7 +415,7 @@ class UserAccessServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
-        userAccessService.replaceUserRoles(userId, newRoles);
+        userAccessService.replaceUserRoles(userId, newRoles, VERSION);
 
         // Then
         verify(systemUserRepository, times(1)).save(any(SystemUser.class));

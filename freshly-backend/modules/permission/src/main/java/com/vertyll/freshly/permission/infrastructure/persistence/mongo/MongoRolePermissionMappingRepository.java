@@ -1,6 +1,7 @@
 package com.vertyll.freshly.permission.infrastructure.persistence.mongo;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,6 +25,11 @@ class MongoRolePermissionMappingRepository implements RolePermissionMappingRepos
         RolePermissionMappingDocument document = mapper.toDocument(mapping);
         RolePermissionMappingDocument saved = springDataRepository.save(document);
         return mapper.toDomain(saved);
+    }
+
+    @Override
+    public Optional<RolePermissionMapping> findById(UUID id) {
+        return springDataRepository.findById(id).map(mapper::toDomain);
     }
 
     @Override

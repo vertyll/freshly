@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -28,6 +29,8 @@ public class GlobalExceptionHandler {
     private static final String RESOURCE_NOT_FOUND = "The requested resource was not found";
     private static final String UNEXPECTED_ERROR =
             "An unexpected error occurred. Please contact support.";
+    private static final String OPTIMISTIC_LOCKING_ERROR =
+            "The resource was updated by another user. Please refresh and try again.";
     private static final String UNKNOWN_TYPE = "unknown";
 
     private static final String ERRORS_PROPERTY = "errors";
@@ -93,6 +96,13 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleNoResourceFound(NoResourceFoundException ex) {
         LOGGER.warn("Resource not found: {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, RESOURCE_NOT_FOUND);
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ProblemDetail handleOptimisticLockingFailure(OptimisticLockingFailureException ex) {
+        LOGGER.warn("Optimistic locking failure: {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.PRECONDITION_FAILED, OPTIMISTIC_LOCKING_ERROR);
     }
 
     @ExceptionHandler(Exception.class)

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -150,10 +151,16 @@ class PermissionManagementServiceTest {
     void shouldDeleteMappingById() {
         // Given
         UUID mappingId = UUID.randomUUID();
+        Long version = 1L;
+        RolePermissionMapping mapping =
+                RolePermissionMapping.reconstitute(
+                        mappingId, UserRoleEnum.ADMIN.getValue(), Permission.USERS_READ, version);
+
+        when(repository.findById(mappingId)).thenReturn(Optional.of(mapping));
         doNothing().when(repository).deleteById(mappingId);
 
         // When
-        service.deleteMapping(mappingId);
+        service.deleteMapping(mappingId, version);
 
         // Then
         verify(repository).deleteById(mappingId);
