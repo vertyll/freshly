@@ -67,7 +67,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
     private static final double DEFAULT_COORDINATE = 0.0;
     private static final int DEFAULT_STATION_ID = 0;
 
-    private final RestClient restClient;
+    private RestClient restClient;
     private final ObjectMapper objectMapper;
 
     GiosAirQualityAdapter(ExternalServiceProperties externalServiceProperties) {
@@ -78,6 +78,10 @@ class GiosAirQualityAdapter implements AirQualityProvider {
                         .build();
 
         this.objectMapper = new ObjectMapper();
+    }
+
+    void setRestClient(RestClient restClient) {
+        this.restClient = restClient;
     }
 
     @Override
@@ -210,7 +214,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
         return List.of();
     }
 
-    private List<SensorMeasurement.Reading> fetchDataForSensor(int sensorId) {
+    List<SensorMeasurement.Reading> fetchDataForSensor(int sensorId) {
         try {
             String response =
                     restClient.get().uri(URI_SENSOR_DATA, sensorId).retrieve().body(String.class);

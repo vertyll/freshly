@@ -30,16 +30,7 @@ class GiosAirQualityAdapterTest {
                         new ExternalServiceProperties.Gios("http://api.gios.gov.pl/pjp-api/rest"));
         restClient = mock(RestClient.class);
         adapter = new GiosAirQualityAdapter(properties);
-
-        // Wstrzykujemy mocka restClient
-        try {
-            java.lang.reflect.Field field =
-                    GiosAirQualityAdapter.class.getDeclaredField("restClient");
-            field.setAccessible(true);
-            field.set(adapter, restClient);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        adapter.setRestClient(restClient);
     }
 
     @Test
@@ -67,26 +58,10 @@ class GiosAirQualityAdapterTest {
                 .thenReturn("{\"values\": [{\"date\": \"2026-02-22 07:00:00\", \"value\": 25.5}]}");
 
         // When
-        List<SensorMeasurement.Reading> readings = invokeFetchDataForSensor(sensorId);
+        List<SensorMeasurement.Reading> readings = adapter.fetchDataForSensor(sensorId);
 
         // Then
         assertThat(readings).hasSize(1);
         assertThat(readings.get(0).value()).isEqualTo(25.5);
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<SensorMeasurement.Reading> invokeFetchDataForSensor(int sensorId) {
-        try {
-            java.lang.reflect.Method method =
-                    GiosAirQualityAdapter.class.getDeclaredMethod("fetchDataForSensor", int.class);
-            method.setAccessible(true);
-            return (List<SensorMeasurement.Reading>) method.invoke(adapter, sensorId);
-        } catch (Exception e) {
-            // Unwrapping the actual exception thrown by the method
-            if (e instanceof java.lang.reflect.InvocationTargetException ite) {
-                if (ite.getCause() instanceof RuntimeException re) throw re;
-            }
-            throw new RuntimeException(e);
-        }
     }
 }
