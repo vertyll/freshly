@@ -38,10 +38,8 @@ class AirQualityMeasurementTest {
 
         // When
         AirQualityMeasurement measurement =
-                AirQualityMeasurement.create(stationId, stationName, index, sensorValues);
-
-        // Then
-        assertThat(measurement.getStationId()).isEqualTo(stationId);
+                AirQualityMeasurement.create(
+                        stationId, stationName, index, sensorValues, index.calculationDate());
         assertThat(measurement.getStationName()).isEqualTo(stationName);
         assertThat(measurement.getMeasurementDate()).isEqualTo(calculationDate);
         assertThat(measurement.getOverallIndexLevel()).isEqualTo(AirQualityLevel.GOOD);
@@ -77,7 +75,8 @@ class AirQualityMeasurementTest {
 
         // When
         AirQualityMeasurement measurement =
-                AirQualityMeasurement.create(stationId, stationName, index, sensorValues);
+                AirQualityMeasurement.create(
+                        stationId, stationName, index, sensorValues, index.calculationDate());
 
         // Then
         assertThat(measurement.getPm10Value()).isEqualTo(25.5);
@@ -208,7 +207,8 @@ class AirQualityMeasurementTest {
 
         // When
         AirQualityMeasurement measurement =
-                AirQualityMeasurement.create(stationId, stationName, index, emptySensorValues);
+                AirQualityMeasurement.create(
+                        stationId, stationName, index, emptySensorValues, index.calculationDate());
 
         // Then
         assertThat(measurement.getStationId()).isEqualTo(stationId);

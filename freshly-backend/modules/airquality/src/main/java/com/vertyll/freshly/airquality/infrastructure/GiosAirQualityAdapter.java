@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
     private static final String URI_AQ_INDEX = "/aqindex/getIndex/{stationId}";
     private static final String URI_STATION_SENSORS = "/station/sensors/{stationId}";
     private static final String URI_SENSOR_DATA = "/data/getData/{sensorId}";
+    private static final String URI_ARCHIVAL_DATA = "/archivalData/getDataBySensor/{sensorId}";
 
     private static final String JSON_PATH_STATIONS_LIST = "Lista stacji pomiarowych";
     private static final String JSON_PATH_LIST_LOWERCASE = "lista";
@@ -60,6 +62,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
     private static final String UNKNOWN_PARAMETER = "Nieznany parametr";
     private static final String NO_DATA = "Brak danych";
     private static final String PARAM_NA = "N/A";
+    private static final String ERROR_CODE_MANUAL_STATION = "API-ERR-100003";
 
     private static final double DEFAULT_COORDINATE = 0.0;
     private static final int DEFAULT_STATION_ID = 0;
@@ -217,6 +220,42 @@ class GiosAirQualityAdapter implements AirQualityProvider {
             JsonNode root = objectMapper.readTree(response);
             log.debug("GIOŚ data response for sensor {}: {}", sensorId, root);
 
+            return parseReadings(root);
+        } catch (HttpClientErrorException.BadRequest e) {
+            String body = e.getResponseBodyAsString();
+            if (body.contains(ERROR_CODE_MANUAL_STATION)) {
+                log.info(
+                        "Sensor {} is manual, attempting to fetch from archival data API",
+                        sensorId);
+                return fetchArchivalDataForSensor(sensorId);
+            } else {
+                log.warn("Bad request fetching data for sensor {}: {}", sensorId, body);
+            }
+        } catch (Exception e) {
+            log.error("Error fetching data for sensor {}", sensorId, e);
+        }
+        return List.of();
+    }
+
+    private List<SensorMeasurement.Reading> fetchArchivalDataForSensor(int sensorId) {
+        try {
+            String response =
+                    restClient.get().uri(URI_ARCHIVAL_DATA, sensorId).retrieve().body(String.class);
+
+            if (response == null) {
+                return List.of();
+            }
+
+            JsonNode root = objectMapper.readTree(response);
+            return parseReadings(root);
+        } catch (Exception e) {
+            log.error("Error fetching archival data for sensor {}", sensorId, e);
+            return List.of();
+        }
+    }
+
+    private List<SensorMeasurement.Reading> parseReadings(JsonNode root) {
+        try {
             JsonNode valuesNode = root.findPath(JSON_PATH_MEASUREMENT_DATA);
             if (valuesNode.isMissingNode()) valuesNode = root.findPath(JSON_PATH_VALUES);
             if (valuesNode.isMissingNode())
@@ -245,7 +284,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
                         .toList();
             }
         } catch (Exception e) {
-            log.error("Error fetching data for sensor {}", sensorId, e);
+            log.error("Error parsing readings", e);
         }
         return List.of();
     }

@@ -52,11 +52,12 @@ public class AirQualityMeasurement {
             int stationId,
             String stationName,
             AirQualityIndex index,
-            java.util.Map<String, Double> sensorValues) {
+            java.util.Map<String, Double> sensorValues,
+            LocalDateTime measurementDate) {
         AirQualityMeasurement measurement = new AirQualityMeasurement();
         measurement.stationId = stationId;
         measurement.stationName = stationName;
-        measurement.measurementDate = index.calculationDate();
+        measurement.measurementDate = measurementDate;
         // Convert Polish names from GIOS API to enum
         measurement.overallIndexLevel = AirQualityLevel.fromPolishName(index.stIndexLevel());
         measurement.so2IndexLevel = AirQualityLevel.fromPolishName(index.so2IndexLevel());

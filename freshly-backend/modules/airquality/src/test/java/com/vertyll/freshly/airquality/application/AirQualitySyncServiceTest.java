@@ -310,6 +310,49 @@ class AirQualitySyncServiceTest {
         AirQualityMeasurement savedMeasurement = measurementCaptor.getValue();
 
         assertThat(savedMeasurement.getPm10Value()).isEqualTo(25.5); // Should be the first reading
+        assertThat(savedMeasurement.getMeasurementDate()).isEqualTo(reading1.date());
+    }
+
+    @Test
+    @DisplayName("Should use archival date for manual station")
+    void shouldExpectArchivalDateForManualStation() {
+        // Given
+        Station station = new Station(123, "Manual Station", "City", "Street", 52.0, 21.0);
+        List<Station> stations = List.of(station);
+
+        LocalDateTime archivalDate = LocalDateTime.now(ZoneOffset.UTC).minusWeeks(6);
+        AirQualityIndex index =
+                new AirQualityIndex(
+                        123,
+                        LocalDateTime.now(ZoneOffset.UTC), // Index date is "now"
+                        "Brak danych",
+                        "Brak danych",
+                        "Brak danych",
+                        "Brak danych");
+
+        SensorMeasurement.Reading oldReading = new SensorMeasurement.Reading(archivalDate, 40.0);
+        SensorMeasurement measurement =
+                new SensorMeasurement(1, "PM10", "PM10", List.of(oldReading));
+
+        when(airQualityProvider.findAllStations()).thenReturn(stations);
+        when(historyRepository.hasRecentMeasurement(anyInt(), any(LocalDateTime.class)))
+                .thenReturn(false);
+        when(airQualityProvider.findIndexByStationId(123)).thenReturn(Optional.of(index));
+        when(airQualityProvider.findMeasurementsByStationId(123)).thenReturn(List.of(measurement));
+        when(historyRepository.save(any(AirQualityMeasurement.class)))
+                .thenReturn(new AirQualityMeasurement());
+        doNothing().when(historyRepository).deleteOlderThan(any(LocalDateTime.class));
+
+        // When
+        syncService.syncAirQualityData();
+
+        // Then
+        verify(historyRepository).save(measurementCaptor.capture());
+        AirQualityMeasurement savedMeasurement = measurementCaptor.getValue();
+
+        assertThat(savedMeasurement.getPm10Value()).isEqualTo(40.0);
+        assertThat(savedMeasurement.getMeasurementDate())
+                .isEqualTo(archivalDate); // Crucial: use sensor date, not index date
     }
 
     @Test

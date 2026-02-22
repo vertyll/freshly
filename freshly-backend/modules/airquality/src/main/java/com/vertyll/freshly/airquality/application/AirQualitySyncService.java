@@ -99,35 +99,54 @@ public class AirQualitySyncService {
 
         AirQualityIndex index = indexOpt.get();
 
-        // Fetch sensor measurements and extract latest values
+        // Fetch sensor measurements and extract latest values and their measurement dates
         List<SensorMeasurement> measurements =
                 airQualityProvider.findMeasurementsByStationId(station.id());
-        Map<String, Double> latestValues = extractLatestSensorValues(measurements);
+        SensorDataResult sensorData = extractLatestSensorValues(measurements);
+
+        // Use the latest sensor measurement date if available, otherwise fallback to index date
+        LocalDateTime measurementDate = sensorData.latestDate().orElse(index.calculationDate());
 
         // Create and save measurement
         AirQualityMeasurement measurement =
-                AirQualityMeasurement.create(station.id(), station.name(), index, latestValues);
+                AirQualityMeasurement.create(
+                        station.id(), station.name(), index, sensorData.values(), measurementDate);
 
         historyRepository.save(measurement);
-        log.debug("Saved measurement for station {}: {}", station.name(), index.stIndexLevel());
+        log.debug(
+                "Saved measurement for station {} at {}: {}",
+                station.name(),
+                measurementDate,
+                index.stIndexLevel());
     }
 
+    private record SensorDataResult(
+            Map<String, Double> values, Optional<LocalDateTime> latestDate) {}
+
     @SuppressWarnings("PMD.UseConcurrentHashMap") // Local variable, no concurrent access
-    private Map<String, Double> extractLatestSensorValues(List<SensorMeasurement> measurements) {
+    private SensorDataResult extractLatestSensorValues(List<SensorMeasurement> measurements) {
         Map<String, Double> values = new HashMap<>();
+        LocalDateTime latestDate = null;
 
         for (SensorMeasurement sensor : measurements) {
             if (sensor.readings().isEmpty()) continue;
 
             // Get the most recent reading (first in list after filtering nulls)
-            sensor.readings().stream()
-                    .filter(r -> r.value() != null)
-                    .findFirst()
-                    .map(SensorMeasurement.Reading::value)
-                    .ifPresent(latestValue -> values.put(sensor.paramCode(), latestValue));
+            Optional<SensorMeasurement.Reading> latestReading =
+                    sensor.readings().stream().filter(r -> r.value() != null).findFirst();
+
+            if (latestReading.isPresent()) {
+                SensorMeasurement.Reading reading = latestReading.get();
+                values.put(sensor.paramCode(), reading.value());
+
+                // Track the overall latest measurement date across all sensors
+                if (latestDate == null || reading.date().isAfter(latestDate)) {
+                    latestDate = reading.date();
+                }
+            }
         }
 
-        return values;
+        return new SensorDataResult(values, Optional.ofNullable(latestDate));
     }
 
     /** Remove measurements older than 90 days to prevent database bloat */
