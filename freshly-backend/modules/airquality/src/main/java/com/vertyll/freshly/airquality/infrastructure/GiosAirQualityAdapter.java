@@ -152,7 +152,6 @@ class GiosAirQualityAdapter implements AirQualityProvider {
 
             GiosAQIndexDto dto = objectMapper.treeToValue(indexNode, GiosAQIndexDto.class);
 
-            // Jeśli API zwróciło obiekt z samymi nullami (brak ID), traktujemy to jako brak danych
             if (dto == null || dto.id() == null) {
                 return Optional.empty();
             }
@@ -165,11 +164,9 @@ class GiosAirQualityAdapter implements AirQualityProvider {
 
     @Override
     public List<SensorMeasurement> findMeasurementsByStationId(int stationId) {
-        // 1. Pobierz listę sensorów dla stacji
         List<GiosSensorDto> sensors = fetchSensors(stationId);
         List<SensorMeasurement> measurements = new ArrayList<>();
 
-        // 2. Dla każdego sensora pobierz dane
         for (GiosSensorDto sensor : sensors) {
             if (sensor.id() == null) continue;
 
@@ -228,9 +225,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
         } catch (HttpClientErrorException.BadRequest e) {
             String body = e.getResponseBodyAsString();
             if (body.contains(ERROR_CODE_MANUAL_STATION)) {
-                log.info(
-                        "Sensor {} is manual, attempting to fetch from archival data API",
-                        sensorId);
+                log.info("Sensor {} is manual, attempting to fetch from archival data API", sensorId);
                 return fetchArchivalDataForSensor(sensorId);
             } else {
                 log.warn("Bad request fetching data for sensor {}: {}", sensorId, body);
@@ -262,8 +257,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
         try {
             JsonNode valuesNode = root.findPath(JSON_PATH_MEASUREMENT_DATA);
             if (valuesNode.isMissingNode()) valuesNode = root.findPath(JSON_PATH_VALUES);
-            if (valuesNode.isMissingNode())
-                valuesNode = root.findPath(JSON_PATH_MEASUREMENT_DATA_SHORT);
+            if (valuesNode.isMissingNode()) valuesNode = root.findPath(JSON_PATH_MEASUREMENT_DATA_SHORT);
             if (valuesNode.isMissingNode()) valuesNode = root.findPath(JSON_PATH_LIST_LOWERCASE);
             if (valuesNode.isMissingNode()) valuesNode = root.findPath(JSON_PATH_DATA);
 
@@ -273,7 +267,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
 
                 return values.stream()
-                        .filter(v -> v.value() != null) // Filtrujemy nulle (częste w GIOŚ)
+                        .filter(v -> v.value() != null)
                         .map(
                                 v -> {
                                     try {
@@ -281,7 +275,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
                                                 LocalDateTime.parse(v.date(), formatter),
                                                 v.value());
                                     } catch (Exception _) {
-                                        return null; // Ignorujemy błędne daty
+                                        return null;
                                     }
                                 })
                         .filter(Objects::nonNull)
@@ -326,7 +320,6 @@ class GiosAirQualityAdapter implements AirQualityProvider {
     private double parseCoordinate(String value) {
         try {
             if (value == null) return DEFAULT_COORDINATE;
-            // GIOŚ API może zwracać współrzędne z przecinkiem jako separatorem dziesiętnym
             String normalized = value.replace(COMMA.charAt(0), DOT.charAt(0));
             return Double.parseDouble(normalized);
         } catch (NumberFormatException _) {
