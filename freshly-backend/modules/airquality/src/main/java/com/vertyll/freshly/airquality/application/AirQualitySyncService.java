@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,10 @@ import com.vertyll.freshly.airquality.domain.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        name = "application.airquality.sync.enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 public class AirQualitySyncService {
 
     private static final String SYNC_CRON = "0 5 * * * *";

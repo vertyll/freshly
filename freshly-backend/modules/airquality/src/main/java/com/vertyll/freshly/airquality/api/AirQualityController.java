@@ -1,6 +1,7 @@
 package com.vertyll.freshly.airquality.api;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -48,7 +49,7 @@ public class AirQualityController {
     private static final String DEFAULT_LIMIT = "10";
 
     private final AirQualityService airQualityService;
-    private final AirQualitySyncService syncService;
+    private final Optional<AirQualitySyncService> syncService;
     private final AirQualityDtoMapper dtoMapper;
     private final MessageSource messageSource;
 
@@ -137,7 +138,7 @@ public class AirQualityController {
      */
     @PostMapping("/sync/trigger")
     public ResponseEntity<ApiResponse<String>> triggerSync() {
-        syncService.triggerManualSync();
+        syncService.ifPresent(AirQualitySyncService::triggerManualSync);
         return ApiResponse.buildResponse(
                 SYNC_TRIGGERED, SUCCESS_SYNC_TRIGGERED_MSG_KEY, messageSource, HttpStatus.ACCEPTED);
     }

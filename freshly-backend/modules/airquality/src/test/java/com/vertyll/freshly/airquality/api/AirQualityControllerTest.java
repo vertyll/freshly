@@ -17,7 +17,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
@@ -138,11 +137,13 @@ class AirQualityControllerTest {
     @SuppressWarnings("NullAway.Init")
     private MessageSource messageSource;
 
-    @InjectMocks private AirQualityController airQualityController;
-
     @BeforeEach
     @SuppressWarnings("NullAway.Init")
     void setUp() {
+        AirQualityController airQualityController =
+                new AirQualityController(
+                        airQualityService, Optional.of(syncService), dtoMapper, messageSource);
+
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(MESSAGE_SUCCESS);
 
         mockMvc =

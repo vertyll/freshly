@@ -1,3 +1,8 @@
+application:
+  airquality:
+    sync:
+      enabled: ${APP_AIRQUALITY_SYNC_ENABLED:true}
+
 spring:
   application:
     name: freshly-backend
