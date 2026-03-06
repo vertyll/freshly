@@ -34,7 +34,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8081/realms/freshly-realm-test
+          issuer-uri: http://localhost:8081/realms/freshly-test
 
 security:
   jwt:
@@ -65,7 +65,7 @@ application:
 
   keycloak:
     server-url: http://localhost:8081
-    realm: freshly-realm-test
+    realm: freshly-test
     admin-client-id: admin-cli-test
     admin-username: test-admin
     admin-password: test-admin
