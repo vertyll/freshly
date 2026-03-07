@@ -54,14 +54,6 @@ security:
     expiration:
       email-verification: ${JWT_EXPIRATION_EMAIL_VERIFICATION:86400000}
       password-reset: ${JWT_EXPIRATION_PASSWORD_RESET:3600000}
-    refresh-token:
-      expiration: ${JWT_REFRESH_EXPIRATION:1800000}
-      cookie-name: KEYCLOAK_REFRESH_TOKEN
-    cookie:
-      httpOnly: true
-      secure: true
-      sameSite: Strict
-      path: "/"
 
 external-service:
   gios:
@@ -83,6 +75,12 @@ application:
     user-client-id: ${KEYCLOAK_USER_CLIENT_ID}
     user-client-secret: ${KEYCLOAK_USER_CLIENT_SECRET}
     roles-claim-path: realm_access.roles
+    cookie:
+      refresh-token-cookie-name: KEYCLOAK_REFRESH_TOKEN
+      http-only: true
+      secure: true
+      same-site: Strict
+      path: "/"
 
 server:
   port: ${SERVER_PORT:8080}

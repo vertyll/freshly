@@ -43,14 +43,6 @@ security:
     expiration:
       email-verification: 3600000
       password-reset: 1800000
-    refresh-token:
-      expiration: 1800000
-      cookie-name: "refresh_token"
-    cookie:
-      httpOnly: true
-      secure: false
-      sameSite: Strict
-      path: "/"
 
 external-service:
   gios:
@@ -72,6 +64,12 @@ application:
     user-client-id: freshly-app-client-test
     user-client-secret: YTJcSSBrtEuC2VoNFlGbNVVMPtqokEC8
     roles-claim-path: realm_access.roles
+    cookie:
+      refresh-token-cookie-name: KEYCLOAK_REFRESH_TOKEN
+      http-only: true
+      secure: true
+      same-site: Strict
+      path: "/"
 
 server:
   port: 0

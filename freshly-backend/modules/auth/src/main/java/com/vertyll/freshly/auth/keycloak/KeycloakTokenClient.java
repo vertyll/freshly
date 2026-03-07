@@ -25,6 +25,7 @@ public class KeycloakTokenClient {
 
     private static final String GRANT_TYPE = "grant_type";
     private static final String CLIENT_ID = "client_id";
+    private static final String CLIENT_SECRET = "client_secret";
     private static final String REFRESH_TOKEN = "refresh_token";
     private static final String TOKEN_TYPE_KEY = "token_type";
     private static final String BEARER = "Bearer";
@@ -68,6 +69,7 @@ public class KeycloakTokenClient {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add(GRANT_TYPE, REFRESH_TOKEN);
         formData.add(CLIENT_ID, properties.userClientId());
+        formData.add(CLIENT_SECRET, properties.userClientSecret());
         formData.add(REFRESH_TOKEN, refreshToken);
 
         try {
@@ -98,6 +100,7 @@ public class KeycloakTokenClient {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add(GRANT_TYPE, PASSWORD_KEY);
         formData.add(CLIENT_ID, properties.userClientId());
+        formData.add(CLIENT_SECRET, properties.userClientSecret());
         formData.add(USERNAME_KEY, username);
         formData.add(PASSWORD_KEY, password);
 
@@ -134,6 +137,7 @@ public class KeycloakTokenClient {
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add(CLIENT_ID, properties.userClientId());
+        formData.add(CLIENT_SECRET, properties.userClientSecret());
         formData.add(REFRESH_TOKEN, refreshToken);
 
         try {

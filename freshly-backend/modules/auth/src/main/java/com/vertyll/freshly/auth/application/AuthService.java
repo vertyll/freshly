@@ -100,26 +100,20 @@ public class AuthService {
 
     public TokenResponseDto login(LoginRequestDto request) {
         log.info("Processing login for user: {}", request.username());
-
-        // Delegate to Keycloak token endpoint
         return keycloakTokenClient.getToken(request.username(), request.password());
     }
 
     public TokenResponseDto refreshToken(String refreshToken) {
         log.info("Refreshing access token");
-
-        // Delegate to Keycloak token endpoint
         return keycloakTokenClient.refreshToken(refreshToken);
     }
 
     public void logout(String refreshToken) {
         log.info("Processing logout");
-
         if (refreshToken == null || refreshToken.isBlank()) {
             log.info("No refresh token provided; skipping Keycloak revocation");
             return;
         }
-
         keycloakTokenClient.logout(refreshToken);
     }
 
