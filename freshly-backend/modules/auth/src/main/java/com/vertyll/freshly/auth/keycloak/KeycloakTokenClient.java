@@ -61,6 +61,10 @@ public class KeycloakTokenClient {
 
     /** Refresh access token using refresh token */
     public TokenResponseDto refreshToken(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new IllegalArgumentException("Refresh token must be provided");
+        }
+
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add(GRANT_TYPE, REFRESH_TOKEN);
         formData.add(CLIENT_ID, properties.userClientId());
@@ -123,6 +127,11 @@ public class KeycloakTokenClient {
     /** Logout (revoke refresh token) */
     @SuppressWarnings("PMD.AvoidCatchingGenericException") // Logout must always succeed
     public void logout(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            log.info("No refresh token provided to logout; skipping Keycloak revocation");
+            return;
+        }
+
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add(CLIENT_ID, properties.userClientId());
         formData.add(REFRESH_TOKEN, refreshToken);

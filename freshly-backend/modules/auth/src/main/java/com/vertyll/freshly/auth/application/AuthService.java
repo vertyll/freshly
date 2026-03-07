@@ -115,7 +115,11 @@ public class AuthService {
     public void logout(String refreshToken) {
         log.info("Processing logout");
 
-        // Revoke refresh token in Keycloak
+        if (refreshToken == null || refreshToken.isBlank()) {
+            log.info("No refresh token provided; skipping Keycloak revocation");
+            return;
+        }
+
         keycloakTokenClient.logout(refreshToken);
     }
 

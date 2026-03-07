@@ -12,5 +12,4 @@ public record KeycloakProperties(
         String adminClientSecret,
         String userClientId,
         String userClientSecret,
-        String rolesClaimPath
-) {}
+        String rolesClaimPath) {}
