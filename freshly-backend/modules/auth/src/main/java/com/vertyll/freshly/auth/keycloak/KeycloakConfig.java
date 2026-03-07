@@ -11,16 +11,14 @@ import org.springframework.web.client.RestClient;
 @EnableConfigurationProperties(KeycloakProperties.class)
 public class KeycloakConfig {
 
-    private static final String REALM_MASTER = "master";
-
     @Bean
     public Keycloak keycloak(KeycloakProperties properties) {
         return KeycloakBuilder.builder()
                 .serverUrl(properties.serverUrl())
-                .realm(REALM_MASTER)
+                .realm(properties.realm())
                 .clientId(properties.adminClientId())
-                .username(properties.adminUsername())
-                .password(properties.adminPassword())
+                .clientSecret(properties.adminClientSecret())
+                .grantType("client_credentials")
                 .build();
     }
 

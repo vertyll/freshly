@@ -40,6 +40,7 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URI}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI}
 
 springdoc:
   api-docs:
@@ -55,7 +56,7 @@ security:
       password-reset: ${JWT_EXPIRATION_PASSWORD_RESET:3600000}
     refresh-token:
       expiration: ${JWT_REFRESH_EXPIRATION:1800000}
-      cookie-name: "refresh_token"
+      cookie-name: KEYCLOAK_REFRESH_TOKEN
     cookie:
       httpOnly: true
       secure: true
@@ -78,9 +79,10 @@ application:
     server-url: ${KEYCLOAK_SERVER_URL}
     realm: ${KEYCLOAK_REALM}
     admin-client-id: ${KEYCLOAK_ADMIN_CLIENT_ID}
-    admin-username: ${KEYCLOAK_ADMIN_USERNAME}
-    admin-password: ${KEYCLOAK_ADMIN_PASSWORD}
+    admin-client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
     user-client-id: ${KEYCLOAK_USER_CLIENT_ID}
+    user-client-secret: ${KEYCLOAK_USER_CLIENT_SECRET}
+    roles-claim-path: roles
 
 server:
   port: ${SERVER_PORT:8080}

@@ -48,6 +48,7 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:9000/realms/freshly
+          jwk-set-uri: http://localhost:9000/realms/freshly/protocol/openid-connect/certs
 
 springdoc:
   api-docs:
@@ -63,7 +64,7 @@ security:
       password-reset: 3600000
     refresh-token:
       expiration: 1800000
-      cookie-name: "refresh_token"
+      cookie-name: KEYCLOAK_REFRESH_TOKEN
     cookie:
       httpOnly: true
       secure: false
@@ -85,10 +86,11 @@ application:
   keycloak:
     server-url: http://localhost:9000
     realm: freshly
-    admin-client-id: admin-cli
-    admin-username: admin
-    admin-password: admin
+    admin-client-id: freshly-service-account
+    admin-client-secret: x2Xw4liQTz3ncGwNtkg82IrgIUm6QPq1
     user-client-id: freshly-app-client
+    user-client-secret: hEOyM8Ckwom5LTdUUMaqwanVn1vltT0U
+    roles-claim-path: roles
 
 server:
   port: 8080

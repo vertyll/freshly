@@ -140,7 +140,7 @@ public class KeycloakTokenClient {
 
         } catch (Exception e) {
             log.error("Error during logout", e);
-            // Don't throw - logout should always succeed from user perspective
+            // Don't throw - logout should always succeed from the user perspective
         }
     }
 

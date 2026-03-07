@@ -9,6 +9,8 @@ public record KeycloakProperties(
         String serverUrl,
         String realm,
         String adminClientId,
-        String adminUsername,
-        String adminPassword,
-        String userClientId) {}
+        String adminClientSecret,
+        String userClientId,
+        String userClientSecret,
+        String rolesClaimPath
+) {}
