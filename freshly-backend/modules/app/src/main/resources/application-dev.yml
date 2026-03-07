@@ -87,9 +87,9 @@ application:
     server-url: http://localhost:9000
     realm: freshly
     admin-client-id: freshly-service-account
-    admin-client-secret: x2Xw4liQTz3ncGwNtkg82IrgIUm6QPq1
+    admin-client-secret: IEKlEpXPeu0Cd0SjUzEPImaIz8NDougC
     user-client-id: freshly-app-client
-    user-client-secret: hEOyM8Ckwom5LTdUUMaqwanVn1vltT0U
+    user-client-secret: YTJcSSBrtEuC2VoNFlGbNVVMPtqokEC8
     roles-claim-path: roles
 
 server:
