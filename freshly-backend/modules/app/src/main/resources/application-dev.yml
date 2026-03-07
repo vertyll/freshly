@@ -90,7 +90,7 @@ application:
     admin-client-secret: IEKlEpXPeu0Cd0SjUzEPImaIz8NDougC
     user-client-id: freshly-app-client
     user-client-secret: YTJcSSBrtEuC2VoNFlGbNVVMPtqokEC8
-    roles-claim-path: roles
+    roles-claim-path: realm_access.roles
 
 server:
   port: 8080

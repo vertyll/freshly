@@ -82,7 +82,7 @@ application:
     admin-client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
     user-client-id: ${KEYCLOAK_USER_CLIENT_ID}
     user-client-secret: ${KEYCLOAK_USER_CLIENT_SECRET}
-    roles-claim-path: roles
+    roles-claim-path: realm_access.roles
 
 server:
   port: ${SERVER_PORT:8080}
