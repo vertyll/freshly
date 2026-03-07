@@ -42,7 +42,7 @@ services:
     container_name: freshly-mongo-express
     restart: always
     ports:
-      - "${MONGO_EXPRESS_PORT:-8082}:8081"
+      - "${MONGO_EXPRESS_PORT:-8081}:8081"
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-root}
@@ -73,7 +73,7 @@ services:
       KC_HTTP_ENABLED: "true"
       KC_HEALTH_ENABLED: "true"
     ports:
-      - "${KC_HTTP_PORT:-8081}:8080"
+      - "${KC_HTTP_PORT:-9000}:8080"
     volumes:
       - ./docker/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
     depends_on:

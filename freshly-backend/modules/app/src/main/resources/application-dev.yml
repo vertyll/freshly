@@ -47,7 +47,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8081/realms/freshly
+          issuer-uri: http://localhost:9000/realms/freshly
 
 springdoc:
   api-docs:
@@ -83,7 +83,7 @@ application:
     url: http://localhost:4200
 
   keycloak:
-    server-url: http://localhost:8081
+    server-url: http://localhost:9000
     realm: freshly
     admin-client-id: admin-cli
     admin-username: admin
