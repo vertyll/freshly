@@ -44,7 +44,7 @@ public class KeycloakTokenClient {
     private static final String LOGIN_FAILED = "Login failed";
 
     private final RestClient restClient;
-    private final KeycloakProperties properties;
+    private final com.vertyll.freshly.common.config.KeycloakProperties properties;
 
     private String getTokenUrl() {
         return properties.serverUrl()

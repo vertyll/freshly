@@ -38,8 +38,8 @@ public class I18nConfig {
     }
 
     /**
-     * Configures LocaleResolver to determine user's locale from Accept-Language header. Falls back
-     * to en-US if header is missing or unsupported.
+     * Configures LocaleResolver to determine the user's locale from the Accept-Language header.
+     * Falls back to en-US if the header is missing or unsupported.
      */
     @Bean
     public LocaleResolver localeResolver() {

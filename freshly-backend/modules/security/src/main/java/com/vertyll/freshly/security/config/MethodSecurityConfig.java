@@ -13,8 +13,10 @@ import org.springframework.context.annotation.Role;
 import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
-import com.vertyll.freshly.common.annotation.*;
-import com.vertyll.freshly.security.authorization.*;
+import com.vertyll.freshly.common.annotation.RequireAnyPermission;
+import com.vertyll.freshly.common.annotation.RequirePermission;
+import com.vertyll.freshly.security.authorization.AnyPermissionAuthorizationManager;
+import com.vertyll.freshly.security.authorization.PermissionAuthorizationManager;
 
 /** Configuration for method-level security with custom permission and role annotations. */
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)

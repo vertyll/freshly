@@ -29,7 +29,7 @@ public class PermissionService {
      *
      * @param authentication Spring Security authentication object
      * @param permission Permission enum value
-     * @return true if user has the permission
+     * @return true if the user has the permission
      */
     public boolean hasPermission(Authentication authentication, Permission permission) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -57,11 +57,11 @@ public class PermissionService {
     }
 
     /**
-     * Check if user has any of the specified permissions.
+     * Check if the user has any of the specified permissions.
      *
      * @param authentication Spring Security authentication object
      * @param permissions Variable number of permission enums to check
-     * @return true if user has at least one of the specified permissions
+     * @return true if the user has at least one of the specified permissions
      */
     public boolean hasAnyPermission(Authentication authentication, Permission... permissions) {
         Set<Permission> userPermissions = permissionCache.getUserPermissions(authentication);

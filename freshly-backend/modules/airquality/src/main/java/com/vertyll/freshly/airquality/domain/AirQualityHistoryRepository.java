@@ -13,26 +13,26 @@ public interface AirQualityHistoryRepository {
     /** Save a measurement to the database */
     AirQualityMeasurement save(AirQualityMeasurement measurement);
 
-    /** Save multiple measurements in batch */
+    /** Save multiple measurements in a batch */
     List<AirQualityMeasurement> saveAll(List<AirQualityMeasurement> measurements);
 
-    /** Find latest measurement for a station */
+    /** Find the latest measurement for a station */
     Optional<AirQualityMeasurement> findLatestByStationId(int stationId);
 
     /** Find measurements for a station within time range (for charts) */
     List<AirQualityMeasurement> findByStationIdAndDateRange(
             int stationId, LocalDateTime from, LocalDateTime to);
 
-    /** Find all measurements within time range (for general statistics) */
+    /** Find all measurements within the time range (for general statistics) */
     List<AirQualityMeasurement> findByDateRange(LocalDateTime from, LocalDateTime to);
 
-    /** Check if we have recent data (within last hour) to avoid unnecessary API calls */
+    /** Check if we have recent data (within the last hour) to avoid unnecessary API calls */
     boolean hasRecentMeasurement(int stationId, LocalDateTime threshold);
 
     /** Delete old measurements (for data retention policy) */
     void deleteOlderThan(LocalDateTime threshold);
 
-    /** Calculate statistics for a station within time range */
+    /** Calculate statistics for a station within a time range */
     Optional<AirQualityStatistics> calculateStatistics(
             int stationId, LocalDateTime from, LocalDateTime to);
 

@@ -30,12 +30,12 @@ public class AirQualityService {
     private final AirQualityProvider airQualityProvider;
     private final AirQualityHistoryRepository historyRepository;
 
-    /** Get list of all air quality stations */
+    /** Get a list of all air quality stations */
     public List<Station> getAllStations() {
         return airQualityProvider.findAllStations();
     }
 
-    /** Get current air quality index from database (live data) */
+    /** Get the current air quality index from a database (live data) */
     public Optional<AirQualityIndex> getIndexForStation(int stationId) {
         return airQualityProvider.findIndexByStationId(stationId);
     }
@@ -70,7 +70,7 @@ public class AirQualityService {
     }
 
     /**
-     * Find nearest stations to given coordinates
+     * Find the nearest stations to given coordinates
      *
      * @param latitude Latitude
      * @param longitude Longitude
@@ -105,7 +105,7 @@ public class AirQualityService {
         return stationsWithDistance;
     }
 
-    /** Calculate statistics for a station within time range */
+    /** Calculate statistics for a station within a time range */
     public Optional<AirQualityStatistics> getStatistics(int stationId, int daysBack) {
         int days = Math.clamp(daysBack, MIN_DAYS, MAX_DAYS);
         LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC).minusDays(days);
@@ -115,7 +115,7 @@ public class AirQualityService {
     }
 
     /**
-     * Get ranking of stations (best to worst air quality)
+     * Get a ranking of stations (best to worst air quality)
      *
      * @param daysBack Number of days to analyze (default 7, max 90)
      * @param limit Max number of stations to return (default 10, max 50)

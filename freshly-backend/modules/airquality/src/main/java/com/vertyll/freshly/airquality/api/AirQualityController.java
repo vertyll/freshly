@@ -53,7 +53,7 @@ public class AirQualityController {
     private final AirQualityDtoMapper dtoMapper;
     private final MessageSource messageSource;
 
-    /** Get list of all air quality stations */
+    /** Get a list of all air quality stations */
     @GetMapping("/stations")
     public ResponseEntity<ApiResponse<List<StationResponseDto>>> getStations() {
         List<Station> stations = airQualityService.getAllStations();
@@ -62,7 +62,7 @@ public class AirQualityController {
                 response, SUCCESS_STATIONS_FETCHED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
-    /** Get current air quality index (live from GIOŚ API) */
+    /** Get the current air quality index (live from GIOŚ API) */
     @GetMapping("/stations/{stationId}/index")
     public ResponseEntity<ApiResponse<AirQualityIndexResponseDto>> getIndex(
             @PathVariable int stationId) {
@@ -94,8 +94,8 @@ public class AirQualityController {
     }
 
     /**
-     * Get latest cached measurement from database Use this for quick access without hitting GIOŚ
-     * API
+     * Get the latest cached measurement from the database Use this for quick access without hitting
+     * GIOŚ API
      */
     @GetMapping("/stations/{stationId}/latest")
     public ResponseEntity<ApiResponse<AirQualityMeasurementResponseDto>> getLatestMeasurement(
@@ -144,7 +144,7 @@ public class AirQualityController {
     }
 
     /**
-     * Find nearest stations to given coordinates
+     * Find the nearest stations to given coordinates
      *
      * @param latitude Latitude coordinate
      * @param longitude Longitude coordinate
@@ -188,7 +188,7 @@ public class AirQualityController {
     }
 
     /**
-     * Get ranking of stations (best to worst air quality)
+     * Get a ranking of stations (best to worst air quality)
      *
      * @param days Number of days to analyze (default 7, max 90)
      * @param limit Max number of stations to return (default 10, max 50)

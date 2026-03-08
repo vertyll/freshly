@@ -9,14 +9,29 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.vertyll.freshly.auth.api.dto.*;
+import com.vertyll.freshly.auth.api.dto.AccessTokenResponseDto;
+import com.vertyll.freshly.auth.api.dto.AuthResponseDto;
+import com.vertyll.freshly.auth.api.dto.ChangeEmailRequestDto;
+import com.vertyll.freshly.auth.api.dto.ChangePasswordRequestDto;
+import com.vertyll.freshly.auth.api.dto.ForgotPasswordRequestDto;
+import com.vertyll.freshly.auth.api.dto.LoginRequestDto;
+import com.vertyll.freshly.auth.api.dto.RegisterUserRequestDto;
+import com.vertyll.freshly.auth.api.dto.ResetPasswordRequestDto;
+import com.vertyll.freshly.auth.api.dto.TokenResponseDto;
 import com.vertyll.freshly.auth.application.AuthService;
-import com.vertyll.freshly.auth.keycloak.KeycloakProperties;
+import com.vertyll.freshly.common.annotation.RefreshTokenCookie;
+import com.vertyll.freshly.common.config.KeycloakProperties;
 import com.vertyll.freshly.common.response.ApiResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -84,11 +99,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<AccessTokenResponseDto>> refresh(
-            @CookieValue(
-                            name = "${application.keycloak.cookie.refresh-token-cookie-name}",
-                            required = false)
-                    String refreshToken,
-            HttpServletResponse response) {
+            @RefreshTokenCookie String refreshToken, HttpServletResponse response) {
         log.info("Refreshing access token");
 
         TokenResponseDto tokens = authService.refreshToken(refreshToken);
@@ -107,11 +118,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
-            @CookieValue(
-                            name = "${application.keycloak.cookie.refresh-token-cookie-name}",
-                            required = false)
-                    String refreshToken,
-            HttpServletResponse response) {
+            @RefreshTokenCookie String refreshToken, HttpServletResponse response) {
         log.info("User logout");
 
         authService.logout(refreshToken);

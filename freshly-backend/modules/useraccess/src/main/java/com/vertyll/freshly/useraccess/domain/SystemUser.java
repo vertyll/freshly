@@ -6,7 +6,10 @@ import org.jspecify.annotations.Nullable;
 
 import lombok.Getter;
 
-import com.vertyll.freshly.useraccess.domain.exception.*;
+import com.vertyll.freshly.useraccess.domain.exception.SelfDeactivationException;
+import com.vertyll.freshly.useraccess.domain.exception.UserAlreadyActiveException;
+import com.vertyll.freshly.useraccess.domain.exception.UserAlreadyInactiveException;
+import com.vertyll.freshly.useraccess.domain.exception.UserRolesEmptyException;
 
 @Getter
 public final class SystemUser {

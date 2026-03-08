@@ -40,8 +40,8 @@ public enum AirQualityLevel {
     }
 
     /**
-     * Returns the API value (enum name) to be sent to frontend. Frontend should use this value for
-     * translations.
+     * Returns the API value (enum name) to be sent to the frontend. Frontend should use this value
+     * for translations.
      */
     public String toApiValue() {
         return this.name();

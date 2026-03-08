@@ -5,7 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +33,7 @@ import org.springframework.web.client.RestClient;
 
 import com.vertyll.freshly.auth.domain.exception.EmailAlreadyExistsException;
 import com.vertyll.freshly.auth.domain.exception.UsernameAlreadyExistsException;
+import com.vertyll.freshly.common.config.KeycloakProperties;
 
 import jakarta.ws.rs.core.Response;
 

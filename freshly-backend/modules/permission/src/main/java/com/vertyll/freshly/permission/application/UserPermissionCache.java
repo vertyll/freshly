@@ -57,7 +57,7 @@ public class UserPermissionCache {
 
     /**
      * Extract Keycloak roles from Spring Security authentication. Removes "ROLE_" prefix that
-     * Spring adds and normalizes to uppercase using Locale.ROOT for security.
+     * Spring adds and normalizes to uppercase using Locale. ROOT for security.
      */
     private Set<String> extractRoles(Authentication authentication) {
         return authentication.getAuthorities().stream()

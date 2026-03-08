@@ -66,7 +66,7 @@ public class AirQualitySyncService {
 
             log.info("Sync completed: {} successful, {} failed", successCount, failedCount);
 
-            // Cleanup old data (older than 90 days)
+            // Clean up old data (older than 90 days)
             cleanupOldData();
 
         } catch (Exception e) {
@@ -86,7 +86,7 @@ public class AirQualitySyncService {
     }
 
     private void syncStationData(Station station) {
-        // Check if we already have recent data (within last 50 minutes)
+        // Check if we already have recent data (within the last 50 minutes)
         LocalDateTime threshold =
                 LocalDateTime.now(ZoneOffset.UTC)
                         .minusMinutes(RECENT_MEASUREMENT_THRESHOLD_MINUTES);
@@ -104,7 +104,7 @@ public class AirQualitySyncService {
 
         AirQualityIndex index = indexOpt.get();
 
-        // Fetch sensor measurements and extract latest values and their measurement dates
+        // Fetch sensor measurements and extract the latest values and their measurement dates
         List<SensorMeasurement> measurements =
                 airQualityProvider.findMeasurementsByStationId(station.id());
         SensorDataResult sensorData = extractLatestSensorValues(measurements);
@@ -136,7 +136,7 @@ public class AirQualitySyncService {
         for (SensorMeasurement sensor : measurements) {
             if (sensor.readings().isEmpty()) continue;
 
-            // Get the most recent reading (first in list after filtering nulls)
+            // Get the most recent reading (first in a list after filtering nulls)
             Optional<SensorMeasurement.Reading> latestReading =
                     sensor.readings().stream().filter(r -> r.value() != null).findFirst();
 

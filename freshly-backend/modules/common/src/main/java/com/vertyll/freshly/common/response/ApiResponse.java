@@ -17,8 +17,8 @@ import lombok.experimental.SuperBuilder;
 public class ApiResponse<T> extends BaseResponse<T> {
 
     /**
-     * Builds response with raw message (not localized). Use this for backward compatibility or when
-     * message doesn't need i18n.
+     * Builds response with a raw message (not localized). Use this for backward compatibility or
+     * when a message doesn't need i18n.
      *
      * @deprecated Use buildResponse(T, String, MessageSource, HttpStatus) for i18n support
      */
@@ -39,14 +39,14 @@ public class ApiResponse<T> extends BaseResponse<T> {
     }
 
     /**
-     * Builds response with localized message using MessageSource. This is the recommended method
+     * Builds response with a localized message using MessageSource. This is the recommended method
      * for all new code.
      *
      * @param data Response payload
      * @param messageKey Message key from messages_*.properties
      * @param messageSource Spring MessageSource bean
      * @param status HTTP status
-     * @return ResponseEntity with localized message
+     * @return ResponseEntity with a localized message
      */
     public static <T> ResponseEntity<ApiResponse<T>> buildResponse(
             @Nullable T data, String messageKey, MessageSource messageSource, HttpStatus status) {

@@ -51,7 +51,7 @@ public class KeycloakAdminClient {
     private static final String VERIFY_FAIL = "Failed to verify password";
 
     private final Keycloak keycloak;
-    private final KeycloakProperties properties;
+    private final com.vertyll.freshly.common.config.KeycloakProperties properties;
     private final RestClient restClient;
 
     private RealmResource getRealm() {

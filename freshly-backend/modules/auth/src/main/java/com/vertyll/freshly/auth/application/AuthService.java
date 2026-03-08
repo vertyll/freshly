@@ -12,7 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.vertyll.freshly.auth.api.dto.*;
+import com.vertyll.freshly.auth.api.dto.ChangeEmailRequestDto;
+import com.vertyll.freshly.auth.api.dto.ChangePasswordRequestDto;
+import com.vertyll.freshly.auth.api.dto.ForgotPasswordRequestDto;
+import com.vertyll.freshly.auth.api.dto.LoginRequestDto;
+import com.vertyll.freshly.auth.api.dto.RegisterUserRequestDto;
+import com.vertyll.freshly.auth.api.dto.ResetPasswordRequestDto;
+import com.vertyll.freshly.auth.api.dto.TokenResponseDto;
 import com.vertyll.freshly.auth.domain.VerificationTokenService;
 import com.vertyll.freshly.auth.domain.event.UserRegisteredEvent;
 import com.vertyll.freshly.auth.keycloak.KeycloakAdminClient;
