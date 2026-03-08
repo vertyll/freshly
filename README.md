@@ -17,9 +17,6 @@ Application with air quality data from IoT sensors.
 - Spring Mail
 - OpenAPI (Swagger)
 
-### Front-end:
-- in progress
-
 ### Authentication:
 - Keycloak
 
@@ -35,9 +32,6 @@ Application with air quality data from IoT sensors.
 - optimistic locking for concurrent updates with Etag and If-Match header
 - and many other features that can be found in the application code
 
-### Core front-end:
-- in progress
-
 ### Other:
 - Docker for development environment
 - PMD for static code analysis
@@ -48,6 +42,3 @@ Application with air quality data from IoT sensors.
 - Spotless for code formatting
 
 > **Note:** During application development, SOLID principles, DRY, composition over inheritance, dependency injection, design patterns, architectural patterns were applied, tests were written, and other good programming practices were adopted.
-
-## Preview Screenshots
-- in progress
