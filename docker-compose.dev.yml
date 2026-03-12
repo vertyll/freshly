@@ -3,17 +3,17 @@ services:
     container_name: freshly-mongodb
     image: mongo:8
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-root}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-freshly_db}
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: freshly_db
     ports:
-      - "${MONGO_PORT:-27017}:27017"
+      - "27017:27017"
     volumes:
       - mongodb-data:/data/db
     networks:
       - freshly
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/admin -u ${MONGO_INITDB_ROOT_USERNAME:-root} -p ${MONGO_INITDB_ROOT_PASSWORD:-root} --quiet
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/admin -u root -p root --quiet
       interval: 10s
       timeout: 5s
       retries: 5
@@ -27,7 +27,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: test
       MONGO_INITDB_DATABASE: test_db
     ports:
-      - "${MONGO_TEST_PORT:-27018}:27017"
+      - "27018:27017"
     networks:
       - freshly
     healthcheck:
@@ -42,13 +42,13 @@ services:
     container_name: freshly-mongo-express
     restart: always
     ports:
-      - "${MONGO_EXPRESS_PORT:-8081}:8081"
+      - "8081:8081"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-root}
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME:-root}:${MONGO_INITDB_ROOT_PASSWORD:-root}@mongodb:27017/
-      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USER:-admin}
-      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD:-admin}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root
+      ME_CONFIG_MONGODB_URL: mongodb://root:root@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
     depends_on:
       mongodb:
         condition: service_healthy
@@ -62,18 +62,18 @@ services:
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: keycloak-db
-      KC_DB_URL_DATABASE: ${POSTGRES_KC_DB:-keycloak_db}
-      KC_DB_USERNAME: ${POSTGRES_KC_USER:-keycloak_user}
-      KC_DB_PASSWORD: ${POSTGRES_KC_PASSWORD:-keycloak_pass}
+      KC_DB_URL_DATABASE: keycloak_db
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: keycloak_pass
       KC_DB_SCHEMA: public
-      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME:-admin}
-      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD:-admin}
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_PROXY_HEADERS: xforwarded
       KC_HOSTNAME_STRICT: "false"
       KC_HTTP_ENABLED: "true"
       KC_HEALTH_ENABLED: "true"
     ports:
-      - "${KC_HTTP_PORT:-9000}:8080"
+      - "9000:8080"
     volumes:
       - ./docker/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
     depends_on:
@@ -93,17 +93,17 @@ services:
     container_name: freshly-keycloak-postgres
     restart: always
     ports:
-      - "${POSTGRES_KC_DB_PORT:-5432}:5432"
+      - "5432:5432"
     environment:
-      POSTGRES_DB: ${POSTGRES_KC_DB:-keycloak_db}
-      POSTGRES_USER: ${POSTGRES_KC_USER:-keycloak_user}
-      POSTGRES_PASSWORD: ${POSTGRES_KC_PASSWORD:-keycloak_pass}
+      POSTGRES_DB: keycloak_db
+      POSTGRES_USER: keycloak_user
+      POSTGRES_PASSWORD: keycloak_pass
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - freshly
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_KC_USER:-keycloak_user} -d ${POSTGRES_KC_DB:-keycloak_db}"]
+      test: ["CMD-SHELL", "pg_isready -U keycloak_user -d keycloak_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -114,8 +114,8 @@ services:
     container_name: freshly-mail-dev
     restart: always
     ports:
-      - "${MAIL_SMTP_PORT:-1025}:1025"
-      - "${MAIL_WEB_PORT:-1080}:1080"
+      - "1025:1025"
+      - "1080:1080"
     networks:
       - freshly
 
