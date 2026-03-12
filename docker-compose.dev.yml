@@ -1,7 +1,7 @@
 services:
   mongodb:
     container_name: freshly-mongodb
-    image: mongo:${MONGO_VERSION:-8}
+    image: mongo:8
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-root}
@@ -21,7 +21,7 @@ services:
 
   test-mongodb:
     container_name: freshly-mongodb-test
-    image: mongo:${MONGO_VERSION:-8}
+    image: mongo:8
     environment:
       MONGO_INITDB_ROOT_USERNAME: test
       MONGO_INITDB_ROOT_PASSWORD: test
@@ -38,7 +38,7 @@ services:
       start_period: 30s
 
   mongo-express:
-    image: mongo-express:${MONGO_EXPRESS_VERSION:-latest}
+    image: mongo-express:latest
     container_name: freshly-mongo-express
     restart: always
     ports:
@@ -57,7 +57,7 @@ services:
 
   keycloak:
     container_name: freshly-keycloak
-    image: quay.io/keycloak/keycloak:${KC_VERSION:-26.5.4}
+    image: quay.io/keycloak/keycloak:26.5.5
     command: start-dev --import-realm
     environment:
       KC_DB: postgres
@@ -89,7 +89,7 @@ services:
       start_period: 60s
 
   keycloak-db:
-    image: postgres:${POSTGRES_KC_VERSION:-17}
+    image: postgres:17-alpine
     container_name: freshly-keycloak-postgres
     restart: always
     ports:
@@ -110,7 +110,7 @@ services:
       start_period: 10s
 
   mail-dev:
-    image: maildev/maildev:${MAILDEV_VERSION:-latest}
+    image: maildev/maildev:latest
     container_name: freshly-mail-dev
     restart: always
     ports:
