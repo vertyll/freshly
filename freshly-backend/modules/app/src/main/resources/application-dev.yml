@@ -25,6 +25,7 @@ spring:
     authentication-database: admin
     representation:
       uuid: STANDARD
+    replica-set-name: rs0
 
   mail:
     host: localhost

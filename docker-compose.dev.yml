@@ -2,6 +2,14 @@ services:
   mongodb:
     container_name: freshly-mongodb
     image: mongo:8
+    command: >
+      bash -c "
+        if [ ! -f /data/db/keyfile ]; then
+          openssl rand -base64 756 > /data/db/keyfile
+          chmod 400 /data/db/keyfile
+        fi
+        exec mongod --replSet rs0 --bind_ip_all --keyFile /data/db/keyfile
+      "
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
@@ -19,15 +27,39 @@ services:
       retries: 5
       start_period: 30s
 
+  mongodb-init:
+    image: mongo:8
+    container_name: freshly-mongodb-init
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - freshly
+    restart: "no"
+    entrypoint: >
+      mongosh --host mongodb:27017 -u root -p root --eval
+      "try { rs.status(); print('replica set already initialized'); }
+      catch(e) { rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'mongodb:27017'}]}); print('replica set initialized'); }"
+
   test-mongodb:
     container_name: freshly-mongodb-test
     image: mongo:8
+    command: >
+      bash -c "
+        if [ ! -f /data/db/keyfile ]; then
+          openssl rand -base64 756 > /data/db/keyfile
+          chmod 400 /data/db/keyfile
+        fi
+        exec mongod --replSet rs0 --bind_ip_all --keyFile /data/db/keyfile
+      "
     environment:
       MONGO_INITDB_ROOT_USERNAME: test
       MONGO_INITDB_ROOT_PASSWORD: test
       MONGO_INITDB_DATABASE: test_db
     ports:
       - "27018:27017"
+    volumes:
+      - mongodb-test-data:/data/db
     networks:
       - freshly
     healthcheck:
@@ -36,6 +68,20 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+  test-mongodb-init:
+    image: mongo:8
+    container_name: freshly-mongodb-test-init
+    depends_on:
+      test-mongodb:
+        condition: service_healthy
+    networks:
+      - freshly
+    restart: "no"
+    entrypoint: >
+      mongosh --host test-mongodb:27017 -u test -p test --eval
+      "try { rs.status(); print('replica set already initialized'); }
+      catch(e) { rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'test-mongodb:27017'}]}); print('replica set initialized'); }"
 
   mongo-express:
     image: mongo-express:latest

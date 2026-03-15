@@ -15,6 +15,7 @@ spring:
     authentication-database: ${MONGO_AUTH_DATABASE:admin}
     representation:
       uuid: STANDARD
+    replica-set-name: ${MONGO_REPLICA_SET_NAME}
 
   mail:
     host: ${MAIL_HOST}
