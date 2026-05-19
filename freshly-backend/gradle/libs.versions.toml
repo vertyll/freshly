@@ -69,9 +69,6 @@ httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", versio
 # Thymeleaf
 thymeleaf-extras-springsecurity6 = { module = "org.thymeleaf.extras:thymeleaf-extras-springsecurity6" }
 
-# Apache Commons
-commons-lang3 = { module = "org.apache.commons:commons-lang3" }
-
 # MapStruct
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }

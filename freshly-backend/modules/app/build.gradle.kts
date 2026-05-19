@@ -16,7 +16,6 @@ dependencies {
 
     // Implementation - Spring Boot Starters
     implementation(libs.bundles.spring.boot.starters.common)
-    implementation(libs.bundles.spring.boot.starters.oauth)
     implementation(libs.bundles.spring.boot.starters.aop)
     implementation(libs.spring.boot.starter.actuator)
 
