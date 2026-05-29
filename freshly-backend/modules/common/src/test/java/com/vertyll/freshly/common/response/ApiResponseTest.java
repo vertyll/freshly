@@ -1,10 +1,10 @@
 package com.vertyll.freshly.common.response;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.util.Locale;
-import java.util.Objects;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class ApiResponseTest {
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        ApiResponse<String> body = Objects.requireNonNull(response.getBody());
+        ApiResponse<String> body = requireNonNull(response.getBody());
         assertThat(body.getData()).isEqualTo(data);
         assertThat(body.getMessage()).isEqualTo(localizedMessage);
         assertThat(body.getTimestamp()).isNotNull();
@@ -65,7 +65,7 @@ class ApiResponseTest {
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        ApiResponse<String> body = Objects.requireNonNull(response.getBody());
+        ApiResponse<String> body = requireNonNull(response.getBody());
         assertThat(body.getData()).isEqualTo(data);
         assertThat(body.getMessage()).isEqualTo(localizedMessage);
     }
@@ -87,7 +87,7 @@ class ApiResponseTest {
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        ApiResponse<Void> body = Objects.requireNonNull(response.getBody());
+        ApiResponse<Void> body = requireNonNull(response.getBody());
         assertThat(body.getData()).isNull();
         assertThat(body.getMessage()).isEqualTo(localizedMessage);
     }

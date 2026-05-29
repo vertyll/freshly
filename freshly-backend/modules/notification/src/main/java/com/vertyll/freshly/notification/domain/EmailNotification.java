@@ -1,9 +1,10 @@
 package com.vertyll.freshly.notification.domain;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 import org.jspecify.annotations.Nullable;
@@ -32,10 +33,10 @@ public class EmailNotification {
     public EmailNotification(
             Email recipient, EmailTemplate template, Map<String, Object> templateVariables) {
         this.id = UUID.randomUUID();
-        this.recipient = Objects.requireNonNull(recipient, RECIPIENT_NULL);
-        this.template = Objects.requireNonNull(template, TEMPLATE_NULL);
+        this.recipient = requireNonNull(recipient, RECIPIENT_NULL);
+        this.template = requireNonNull(template, TEMPLATE_NULL);
         this.templateVariables =
-                Map.copyOf(Objects.requireNonNull(templateVariables, TEMPLATE_VARIABLES_NULL));
+                Map.copyOf(requireNonNull(templateVariables, TEMPLATE_VARIABLES_NULL));
         this.createdAt = LocalDateTime.now(ZoneOffset.UTC);
         this.status = EmailStatus.PENDING;
     }

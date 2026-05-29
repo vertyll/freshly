@@ -1,12 +1,12 @@
 package com.vertyll.freshly.common.exception;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,9 +60,9 @@ class GlobalExceptionHandlerTest {
         @SuppressWarnings("unchecked")
         Map<String, List<String>> errors =
                 (Map<String, List<String>>)
-                        Objects.requireNonNull(problemDetail.getProperties()).get("errors");
+                        requireNonNull(problemDetail.getProperties()).get("errors");
         assertThat(errors).isNotNull();
-        assertThat(Objects.requireNonNull(errors).get("username"))
+        assertThat(requireNonNull(errors).get("username"))
                 .containsExactlyInAnyOrder("Username is required", "Username must be unique");
         assertThat(errors.get("email")).containsExactly("Email is invalid");
     }
@@ -89,9 +89,9 @@ class GlobalExceptionHandlerTest {
         @SuppressWarnings("unchecked")
         Map<String, List<String>> errors =
                 (Map<String, List<String>>)
-                        Objects.requireNonNull(problemDetail.getProperties()).get("errors");
+                        requireNonNull(problemDetail.getProperties()).get("errors");
         assertThat(errors).isNotNull();
-        assertThat(Objects.requireNonNull(errors).get("age")).containsExactly("Invalid value");
+        assertThat(requireNonNull(errors).get("age")).containsExactly("Invalid value");
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.vertyll.freshly.permission.domain;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+
 import java.util.UUID;
 
 import org.jspecify.annotations.Nullable;
@@ -27,17 +28,17 @@ public final class RolePermissionMapping {
 
     private RolePermissionMapping(
             UUID id, String keycloakRole, Permission permission, @Nullable Long version) {
-        this.id = Objects.requireNonNull(id, ID_CANNOT_BE_NULL);
-        this.keycloakRole = Objects.requireNonNull(keycloakRole, KEYCLOAK_ROLE_CANNOT_BE_NULL);
-        this.permission = Objects.requireNonNull(permission, PERMISSION_CANNOT_BE_NULL);
+        this.id = requireNonNull(id, ID_CANNOT_BE_NULL);
+        this.keycloakRole = requireNonNull(keycloakRole, KEYCLOAK_ROLE_CANNOT_BE_NULL);
+        this.permission = requireNonNull(permission, PERMISSION_CANNOT_BE_NULL);
         this.version = version;
     }
 
     public static RolePermissionMapping reconstitute(
             UUID id, String keycloakRole, Permission permission, Long version) {
-        Objects.requireNonNull(id, ID_CANNOT_BE_NULL);
-        Objects.requireNonNull(keycloakRole, KEYCLOAK_ROLE_CANNOT_BE_NULL);
-        Objects.requireNonNull(permission, PERMISSION_CANNOT_BE_NULL);
+        requireNonNull(id, ID_CANNOT_BE_NULL);
+        requireNonNull(keycloakRole, KEYCLOAK_ROLE_CANNOT_BE_NULL);
+        requireNonNull(permission, PERMISSION_CANNOT_BE_NULL);
         return new RolePermissionMapping(id, keycloakRole, permission, version);
     }
 }

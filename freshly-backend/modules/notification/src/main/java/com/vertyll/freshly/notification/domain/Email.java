@@ -1,6 +1,7 @@
 package com.vertyll.freshly.notification.domain;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+
 import java.util.regex.Pattern;
 
 import org.jspecify.annotations.NonNull;
@@ -14,7 +15,7 @@ public record Email(String value) {
     private static final String INVALID_EMAIL_FORMAT = "Invalid email format: ";
 
     public Email {
-        Objects.requireNonNull(value, EMAIL_NULL);
+        requireNonNull(value, EMAIL_NULL);
         if (!EMAIL_PATTERN.matcher(value).matches()) {
             throw new IllegalArgumentException(INVALID_EMAIL_FORMAT + value);
         }

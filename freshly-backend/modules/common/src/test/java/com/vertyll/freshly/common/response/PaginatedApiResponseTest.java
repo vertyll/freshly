@@ -1,11 +1,11 @@
 package com.vertyll.freshly.common.response;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,11 +31,11 @@ class PaginatedApiResponseTest {
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        PaginatedApiResponse<String> body = Objects.requireNonNull(response.getBody());
+        PaginatedApiResponse<String> body = requireNonNull(response.getBody());
         assertThat(body.getMessage()).isEqualTo(message);
         assertThat(body.getTimestamp()).isNotNull();
 
-        PageResponse<String> pageResponse = Objects.requireNonNull(body.getData());
+        PageResponse<String> pageResponse = requireNonNull(body.getData());
         assertThat(pageResponse).isNotNull();
         assertThat(pageResponse.getContent()).hasSize(3);
         assertThat(pageResponse.getContent()).containsExactly("item1", "item2", "item3");
@@ -61,9 +61,9 @@ class PaginatedApiResponseTest {
                 PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
-        PaginatedApiResponse<String> body = Objects.requireNonNull(response.getBody());
+        PaginatedApiResponse<String> body = requireNonNull(response.getBody());
 
-        PageResponse<String> pageResponse = Objects.requireNonNull(body.getData());
+        PageResponse<String> pageResponse = requireNonNull(body.getData());
         assertThat(pageResponse.getPageNumber()).isEqualTo(1);
         assertThat(pageResponse.getPageSize()).isEqualTo(5);
         assertThat(pageResponse.getTotalElements()).isEqualTo(12);
@@ -85,9 +85,9 @@ class PaginatedApiResponseTest {
                 PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
-        PaginatedApiResponse<String> body = Objects.requireNonNull(response.getBody());
+        PaginatedApiResponse<String> body = requireNonNull(response.getBody());
 
-        PageResponse<String> pageResponse = Objects.requireNonNull(body.getData());
+        PageResponse<String> pageResponse = requireNonNull(body.getData());
         assertThat(pageResponse.getContent()).isEmpty();
         assertThat(pageResponse.getPageNumber()).isZero();
         assertThat(pageResponse.getTotalElements()).isZero();
@@ -110,9 +110,9 @@ class PaginatedApiResponseTest {
                 PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
-        PaginatedApiResponse<String> body = Objects.requireNonNull(response.getBody());
+        PaginatedApiResponse<String> body = requireNonNull(response.getBody());
 
-        PageResponse<String> pageResponse = Objects.requireNonNull(body.getData());
+        PageResponse<String> pageResponse = requireNonNull(body.getData());
         assertThat(pageResponse.getContent()).hasSize(2);
         assertThat(pageResponse.getPageNumber()).isEqualTo(2);
         assertThat(pageResponse.getTotalPages()).isEqualTo(3);
@@ -135,7 +135,7 @@ class PaginatedApiResponseTest {
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        PaginatedApiResponse<Integer> body = Objects.requireNonNull(response.getBody());
+        PaginatedApiResponse<Integer> body = requireNonNull(response.getBody());
         assertThat(body.getMessage()).isEqualTo(message);
     }
 
@@ -152,7 +152,7 @@ class PaginatedApiResponseTest {
                 PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
-        PaginatedApiResponse<String> body = Objects.requireNonNull(response.getBody());
+        PaginatedApiResponse<String> body = requireNonNull(response.getBody());
         assertThat(body.getTimestamp()).isNotNull();
         assertThat(body.getTimestamp())
                 .isBeforeOrEqualTo(java.time.LocalDateTime.now(ZoneOffset.UTC));
@@ -171,9 +171,9 @@ class PaginatedApiResponseTest {
                 PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
-        PaginatedApiResponse<String> body = Objects.requireNonNull(response.getBody());
+        PaginatedApiResponse<String> body = requireNonNull(response.getBody());
 
-        PageResponse<String> pageResponse = Objects.requireNonNull(body.getData());
+        PageResponse<String> pageResponse = requireNonNull(body.getData());
         assertThat(pageResponse.getContent()).hasSize(1);
         assertThat(pageResponse.getPageSize()).isEqualTo(1);
         assertThat(pageResponse.getTotalElements()).isEqualTo(1);

@@ -1,5 +1,7 @@
 package com.vertyll.freshly.useraccess.domain;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.*;
 
 import org.jspecify.annotations.Nullable;
@@ -27,9 +29,8 @@ public final class SystemUser {
 
     private SystemUser(
             UUID keycloakUserId, boolean isActive, Set<String> roles, @Nullable Long version) {
-        this.keycloakUserId =
-                Objects.requireNonNull(keycloakUserId, KEYCLOAK_USER_ID_CANNOT_BE_NULL);
-        this.roles = Set.copyOf(Objects.requireNonNull(roles, ROLES_CANNOT_BE_NULL));
+        this.keycloakUserId = requireNonNull(keycloakUserId, KEYCLOAK_USER_ID_CANNOT_BE_NULL);
+        this.roles = Set.copyOf(requireNonNull(roles, ROLES_CANNOT_BE_NULL));
         if (this.roles.isEmpty()) {
             throw new UserRolesEmptyException();
         }
@@ -67,8 +68,7 @@ public final class SystemUser {
     }
 
     public void replaceRoles(Set<String> newRoles) {
-        Set<String> copiedRoles =
-                Set.copyOf(Objects.requireNonNull(newRoles, ROLES_CANNOT_BE_NULL));
+        Set<String> copiedRoles = Set.copyOf(requireNonNull(newRoles, ROLES_CANNOT_BE_NULL));
         if (copiedRoles.isEmpty()) {
             throw new UserRolesEmptyException();
         }
