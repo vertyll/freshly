@@ -36,7 +36,6 @@ class GiosAirQualityAdapterTest {
     @Test
     void shouldFallbackToArchivalDataWhenGiosReturns400ForManualStation() {
         // Given
-        int sensorId = 654;
         @SuppressWarnings("rawtypes")
         RestClient.RequestHeadersUriSpec uriSpec = mock(RestClient.RequestHeadersUriSpec.class);
         RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
@@ -59,6 +58,7 @@ class GiosAirQualityAdapterTest {
                 .thenReturn("{\"values\": [{\"date\": \"2026-02-22 07:00:00\", \"value\": 25.5}]}");
 
         // When
+        int sensorId = 654;
         List<SensorMeasurement.Reading> readings = adapter.fetchDataForSensor(sensorId);
 
         // Then

@@ -3,6 +3,10 @@ package com.vertyll.freshly.airquality.infrastructure;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
 class GiosApiDtos {
 
     // Station field aliases

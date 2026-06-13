@@ -76,8 +76,6 @@ class KeycloakAdminClientTest {
         // Given
         String username = "testuser";
         String email = "test@example.com";
-        String password = "password123";
-        String firstName = "John";
         String lastName = "Doe";
         UUID expectedUserId = UUID.randomUUID();
 
@@ -89,6 +87,8 @@ class KeycloakAdminClientTest {
                 .thenReturn("http://localhost:8080/users/" + expectedUserId);
 
         // When
+        String password = "password123";
+        String firstName = "John";
         UUID userId =
                 keycloakAdminClient.createUser(username, email, password, firstName, lastName);
 

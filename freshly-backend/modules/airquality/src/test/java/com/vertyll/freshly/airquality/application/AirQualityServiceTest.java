@@ -319,10 +319,6 @@ class AirQualityServiceTest {
         @DisplayName("Should find nearest stations within radius")
         void shouldFindNearestStationsWithinRadius() {
             // Given
-            double latitude = 52.2297;
-            double longitude = 21.0122;
-            double radius = 10;
-
             Station station1 =
                     new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
             Station station2 =
@@ -330,6 +326,10 @@ class AirQualityServiceTest {
             Station station3 =
                     new Station(125, "Station 3", "Krakow", "Street 3", 50.0647, 19.9450);
             List<Station> allStations = List.of(station1, station2, station3);
+
+            double latitude = 52.2297;
+            double longitude = 21.0122;
+            double radius = 10;
 
             when(airQualityProvider.findAllStations()).thenReturn(allStations);
 
@@ -410,10 +410,6 @@ class AirQualityServiceTest {
         @DisplayName("Should sort stations by distance")
         void shouldSortStationsByDistance() {
             // Given
-            double latitude = 52.2297;
-            double longitude = 21.0122;
-            double radius = 50;
-
             Station nearStation =
                     new Station(123, "Near Station", "Warsaw", "Street 1", 52.2297, 21.0122);
             Station midStation =
@@ -421,6 +417,10 @@ class AirQualityServiceTest {
             Station farStation =
                     new Station(125, "Far Station", "Warsaw", "Street 3", 52.2697, 21.0522);
             List<Station> allStations = List.of(farStation, nearStation, midStation); // Not sorted
+
+            double latitude = 52.2297;
+            double longitude = 21.0122;
+            double radius = 50;
 
             when(airQualityProvider.findAllStations()).thenReturn(allStations);
 
@@ -546,7 +546,6 @@ class AirQualityServiceTest {
         @DisplayName("Should get ranking successfully")
         void shouldGetRankingSuccessfully() {
             // Given
-            int days = 7;
             int limit = 10;
             Station station1 =
                     new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
@@ -557,6 +556,7 @@ class AirQualityServiceTest {
             StationRanking ranking2 =
                     new StationRanking(2, station2, 35.5, AirQualityLevel.MODERATE, 85);
             List<StationRanking> rankings = List.of(ranking1, ranking2);
+            int days = 7;
 
             when(historyRepository.getRanking(
                             any(LocalDateTime.class), any(LocalDateTime.class), eq(limit)))

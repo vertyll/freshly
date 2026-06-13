@@ -117,9 +117,6 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
             return Optional.empty();
         }
 
-        String stationName = measurements.getFirst().getStationName();
-        int count = measurements.size();
-
         // Calculate PM10 statistics
         DoubleSummaryStatistics pm10Stats =
                 measurements.stream()
@@ -175,6 +172,9 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
                         .map(AirQualityMeasurementDocument::getOverallIndexLevel)
                         .filter(Objects::nonNull)
                         .collect(Collectors.groupingBy(level -> level, Collectors.counting()));
+
+        String stationName = measurements.getFirst().getStationName();
+        int count = measurements.size();
 
         return Optional.of(
                 new AirQualityStatistics(
@@ -242,12 +242,8 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
         for (Object resultObj : rawResults.getMappedResults()) {
             @SuppressWarnings("unchecked")
             Map<String, Object> result = (Map<String, Object>) resultObj;
-            Integer stationId = (Integer) result.get(FIELD_ID);
-            String stationName = (String) result.get(FIELD_STATION_NAME);
             Double pm10Avg = (Double) result.get(FIELD_PM10_AVG);
             Double pm25Avg = (Double) result.get(FIELD_PM25_AVG);
-            String dominantQuality = (String) result.get(FIELD_DOMINANT_QUALITY);
-            Integer measurementCount = (Integer) result.get(FIELD_MEASUREMENT_COUNT);
 
             // Calculate average score (lower is better)
             Double avgScore = null;
@@ -260,6 +256,8 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
             }
 
             // Create Station object (simplified - in real scenario you'd fetch full station data)
+            Integer stationId = (Integer) result.get(FIELD_ID);
+            String stationName = (String) result.get(FIELD_STATION_NAME);
             Station station =
                     new Station(
                             stationId,
@@ -270,6 +268,7 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
                             DEFAULT_STATION_COORDINATE);
 
             // Convert dominant quality String to enum (MongoDB returns enum name as String)
+            String dominantQuality = (String) result.get(FIELD_DOMINANT_QUALITY);
             AirQualityLevel dominantLevel = null;
             if (dominantQuality != null) {
                 try {
@@ -279,6 +278,7 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
                 }
             }
 
+            Integer measurementCount = (Integer) result.get(FIELD_MEASUREMENT_COUNT);
             rankings.add(
                     new StationRanking(
                             rank,
