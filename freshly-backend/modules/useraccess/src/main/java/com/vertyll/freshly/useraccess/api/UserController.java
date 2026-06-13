@@ -1,5 +1,7 @@
 package com.vertyll.freshly.useraccess.api;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -129,7 +131,8 @@ public class UserController {
 
         log.info("Deactivating user: {}", userId);
 
-        UUID loggedInUserId = UUID.fromString(jwt.getSubject());
+        UUID loggedInUserId =
+                UUID.fromString(requireNonNull(jwt.getSubject(), "JWT subject cannot be null"));
         userAccessService.deactivateUser(
                 userId, loggedInUserId, ETagUtil.parseIfMatchToVersion(ifMatch));
 

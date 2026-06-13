@@ -14,7 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class EmailNotification {
+public final class EmailNotification {
 
     private static final String RECIPIENT_NULL = "Recipient cannot be null";
     private static final String TEMPLATE_NULL = "Template cannot be null";
