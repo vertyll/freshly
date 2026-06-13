@@ -1,5 +1,6 @@
 package com.vertyll.freshly.auth.api;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.context.MessageSource;
@@ -152,7 +153,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> changePassword(
             @Valid @RequestBody ChangePasswordRequestDto request,
             @AuthenticationPrincipal Jwt jwt) {
-        UUID userId = UUID.fromString(jwt.getSubject());
+        UUID userId = UUID.fromString(Objects.requireNonNull(jwt.getSubject()));
         log.info("Changing password for user: {}", userId);
         authService.changePassword(userId, request);
         return ApiResponse.buildResponse(
@@ -162,7 +163,7 @@ public class AuthController {
     @PutMapping("/change-email")
     public ResponseEntity<ApiResponse<Void>> changeEmail(
             @Valid @RequestBody ChangeEmailRequestDto request, @AuthenticationPrincipal Jwt jwt) {
-        UUID userId = UUID.fromString(jwt.getSubject());
+        UUID userId = UUID.fromString(Objects.requireNonNull(jwt.getSubject()));
         log.info("Changing email for user: {}", userId);
         authService.changeEmail(userId, request);
         return ApiResponse.buildResponse(
