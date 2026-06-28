@@ -83,24 +83,6 @@ services:
       "try { rs.status(); print('replica set already initialized'); }
       catch(e) { rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'test-mongodb:27017'}]}); print('replica set initialized'); }"
 
-  mongo-express:
-    image: mongo-express:latest
-    container_name: freshly-mongo-express
-    restart: always
-    ports:
-      - "8081:8081"
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: root
-      ME_CONFIG_MONGODB_URL: mongodb://root:root@mongodb:27017/
-      ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: admin
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    networks:
-      - freshly
-
   keycloak:
     container_name: freshly-keycloak
     image: quay.io/keycloak/keycloak:26.6.4
@@ -135,7 +117,7 @@ services:
       start_period: 60s
 
   keycloak-db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     container_name: freshly-keycloak-postgres
     restart: always
     ports:
