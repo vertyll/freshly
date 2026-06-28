@@ -127,7 +127,7 @@ services:
       POSTGRES_USER: keycloak_user
       POSTGRES_PASSWORD: keycloak_pass
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql
     networks:
       - freshly
     healthcheck:
