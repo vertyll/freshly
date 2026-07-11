@@ -16,6 +16,16 @@ spring:
     representation:
       uuid: STANDARD
     replica-set-name: ${MONGO_REPLICA_SET_NAME}
+    ssl:
+      enabled: ${MONGO_TLS_ENABLED:false}
+      bundle: internal-ca
+
+  ssl:
+    bundle:
+      pem:
+        internal-ca:
+          truststore:
+            certificate: ${MONGO_TLS_CA_FILE:/tls/ca.crt}
 
   mail:
     host: ${MAIL_HOST}
