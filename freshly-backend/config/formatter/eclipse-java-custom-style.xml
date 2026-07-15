@@ -203,6 +203,16 @@
                 id="org.eclipse.jdt.core.formatter.alignment_for_permitted_types_in_type_declaration"
                 value="52"/>
 
+        <!-- Throws clauses -->
+
+        <setting
+                id="org.eclipse.jdt.core.formatter.alignment_for_throws_clause_in_method_declaration"
+                value="16"/>
+
+        <setting
+                id="org.eclipse.jdt.core.formatter.alignment_for_throws_clause_in_constructor_declaration"
+                value="16"/>
+
         <!-- Chained method calls / streams / builders / fluent API -->
 
         <setting
