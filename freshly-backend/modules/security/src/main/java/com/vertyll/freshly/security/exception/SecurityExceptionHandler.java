@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class SecurityExceptionHandler {
-    private static final String PERMISSION_DENIED_DETAIL =
-            "You do not have permission to access this resource";
+    private static final String PERMISSION_DENIED_DETAIL = "You do not have permission to access this resource";
 
     private static final Logger LOGGER = LogManager.getLogger(SecurityExceptionHandler.class);
 

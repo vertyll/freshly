@@ -44,8 +44,7 @@ public class I18nConfig {
     @Bean
     public LocaleResolver localeResolver() {
         AcceptHeaderLocaleResolver localeResolver = new AcceptHeaderLocaleResolver();
-        localeResolver.setSupportedLocales(
-                List.of(Locale.US, Locale.forLanguageTag(POLISH_LANGUAGE_TAG)));
+        localeResolver.setSupportedLocales(List.of(Locale.US, Locale.forLanguageTag(POLISH_LANGUAGE_TAG)));
         localeResolver.setDefaultLocale(Locale.US);
         return localeResolver;
     }

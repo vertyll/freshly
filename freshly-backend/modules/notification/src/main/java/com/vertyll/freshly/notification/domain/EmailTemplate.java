@@ -9,7 +9,8 @@ public enum EmailTemplate {
 
     private final String templateName;
 
-    @Getter private final String subject;
+    @Getter
+    private final String subject;
 
     EmailTemplate(String templateName, String subject) {
         this.templateName = templateName;

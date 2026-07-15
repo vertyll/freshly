@@ -27,10 +27,8 @@ public class GlobalExceptionHandler {
     private static final String INVALID_VALUE = "Invalid value";
     private static final String INVALID_INPUT_FORMAT = "Invalid input format";
     private static final String RESOURCE_NOT_FOUND = "The requested resource was not found";
-    private static final String UNEXPECTED_ERROR =
-            "An unexpected error occurred. Please contact support.";
-    private static final String OPTIMISTIC_LOCKING_ERROR =
-            "The resource was updated by another user. Please refresh and try again.";
+    private static final String UNEXPECTED_ERROR = "An unexpected error occurred. Please contact support.";
+    private static final String OPTIMISTIC_LOCKING_ERROR = "The resource was updated by another user. Please refresh and try again.";
     private static final String UNKNOWN_TYPE = "unknown";
 
     private static final String ERRORS_PROPERTY = "errors";
@@ -39,20 +37,23 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleValidationExceptions(MethodArgumentNotValidException ex) {
         LOGGER.warn("Validation error: {}", ex.getMessage());
 
-        Map<String, List<String>> errors =
-                ex.getBindingResult().getFieldErrors().stream()
-                        .collect(
-                                Collectors.groupingBy(
-                                        FieldError::getField,
-                                        Collectors.mapping(
-                                                error ->
-                                                        error.getDefaultMessage() != null
-                                                                ? error.getDefaultMessage()
-                                                                : INVALID_VALUE,
-                                                Collectors.toList())));
+        Map<String, List<String>> errors = ex
+            .getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .collect(
+                Collectors
+                    .groupingBy(
+                        FieldError::getField,
+                        Collectors
+                            .mapping(
+                                error -> error.getDefaultMessage() != null ? error.getDefaultMessage() : INVALID_VALUE,
+                                Collectors.toList()
+                            )
+                    )
+            );
 
-        ProblemDetail problemDetail =
-                ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, VALIDATION_FAILED);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, VALIDATION_FAILED);
         problemDetail.setProperty(ERRORS_PROPERTY, errors);
 
         return problemDetail;
@@ -64,15 +65,14 @@ public class GlobalExceptionHandler {
 
         String message = INVALID_INPUT_FORMAT;
 
-        if (ex.getCause() instanceof InvalidFormatException ife
-                && ife.getTargetType() != null
-                && ife.getTargetType().isEnum()) {
-            message =
-                    String.format(
-                            "Invalid value '%s' for type %s. Accepted values: %s",
-                            ife.getValue(),
-                            ife.getTargetType().getSimpleName(),
-                            Arrays.toString(ife.getTargetType().getEnumConstants()));
+        if (ex.getCause() instanceof InvalidFormatException ife && ife.getTargetType() != null && ife.getTargetType().isEnum()) {
+            message = String
+                .format(
+                    "Invalid value '%s' for type %s. Accepted values: %s",
+                    ife.getValue(),
+                    ife.getTargetType().getSimpleName(),
+                    Arrays.toString(ife.getTargetType().getEnumConstants())
+                );
         }
 
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
@@ -83,11 +83,12 @@ public class GlobalExceptionHandler {
         LOGGER.warn("Type mismatch error: {}", ex.getMessage());
 
         Class<?> requiredType = ex.getRequiredType();
-        String message =
-                String.format(
-                        "Parameter '%s' should be of type %s",
-                        ex.getName(),
-                        requiredType != null ? requiredType.getSimpleName() : UNKNOWN_TYPE);
+        String message = String
+            .format(
+                "Parameter '%s' should be of type %s",
+                ex.getName(),
+                requiredType != null ? requiredType.getSimpleName() : UNKNOWN_TYPE
+            );
 
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
@@ -101,8 +102,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OptimisticLockingFailureException.class)
     public ProblemDetail handleOptimisticLockingFailure(OptimisticLockingFailureException ex) {
         LOGGER.warn("Optimistic locking failure: {}", ex.getMessage());
-        return ProblemDetail.forStatusAndDetail(
-                HttpStatus.PRECONDITION_FAILED, OPTIMISTIC_LOCKING_ERROR);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.PRECONDITION_FAILED, OPTIMISTIC_LOCKING_ERROR);
     }
 
     @ExceptionHandler(Exception.class)

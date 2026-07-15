@@ -1,9 +1,5 @@
 package com.vertyll.freshly.permission.api;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -25,20 +21,19 @@ import com.vertyll.freshly.permission.api.dto.CreatePermissionMappingDto;
 import com.vertyll.freshly.permission.api.dto.PermissionMappingResponseDto;
 import com.vertyll.freshly.permission.application.PermissionManagementService;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
 class PermissionManagementControllerTest {
 
     private static final String SUCCESS = "Success";
-    private static final String FETCHING_AVAILABLE_PERMISSIONS_MSG_KEY =
-            "success.permission.availableFetched";
-    private static final String FETCHING_ROLE_PERMISSION_MAPPINGS_MSG_KEY =
-            "success.permission.mappingsFetched";
-    private static final String FETCHING_PERMISSIONS_FOR_ROLE_MSG_KEY =
-            "success.permission.mappingsByRoleFetched";
-    private static final String CREATING_PERMISSION_MAPPING_MSG_KEY =
-            "success.permission.mappingCreated";
-    private static final String DELETING_PERMISSION_MAPPING_MSG_KEY =
-            "success.permission.mappingDeleted";
+    private static final String FETCHING_AVAILABLE_PERMISSIONS_MSG_KEY = "success.permission.availableFetched";
+    private static final String FETCHING_ROLE_PERMISSION_MAPPINGS_MSG_KEY = "success.permission.mappingsFetched";
+    private static final String FETCHING_PERMISSIONS_FOR_ROLE_MSG_KEY = "success.permission.mappingsByRoleFetched";
+    private static final String CREATING_PERMISSION_MAPPING_MSG_KEY = "success.permission.mappingCreated";
+    private static final String DELETING_PERMISSION_MAPPING_MSG_KEY = "success.permission.mappingDeleted";
 
     @Mock
     @SuppressWarnings("NullAway.Init")
@@ -53,8 +48,7 @@ class PermissionManagementControllerTest {
     @BeforeEach
     @SuppressWarnings("NullAway.Init")
     void setUp() {
-        permissionManagementController =
-                new PermissionManagementController(permissionManagementService, messageSource);
+        permissionManagementController = new PermissionManagementController(permissionManagementService, messageSource);
     }
 
     @Test
@@ -64,15 +58,13 @@ class PermissionManagementControllerTest {
         when(messageSource.getMessage(anyString(), any(), any(Locale.class))).thenReturn(SUCCESS);
 
         // When
-        ResponseEntity<ApiResponse<List<String>>> response =
-                permissionManagementController.getAvailablePermissions();
+        ResponseEntity<ApiResponse<List<String>>> response = permissionManagementController.getAvailablePermissions();
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getData()).isNotEmpty();
-        verify(messageSource)
-                .getMessage(eq(FETCHING_AVAILABLE_PERMISSIONS_MSG_KEY), any(), any(Locale.class));
+        verify(messageSource).getMessage(eq(FETCHING_AVAILABLE_PERMISSIONS_MSG_KEY), any(), any(Locale.class));
     }
 
     @Test
@@ -82,17 +74,13 @@ class PermissionManagementControllerTest {
         when(messageSource.getMessage(anyString(), any(), any(Locale.class))).thenReturn(SUCCESS);
 
         // When
-        ResponseEntity<ApiResponse<List<String>>> response =
-                permissionManagementController.getAvailablePermissions();
+        ResponseEntity<ApiResponse<List<String>>> response = permissionManagementController.getAvailablePermissions();
 
         // Then
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getData())
-                .hasSize(Permission.values().length)
-                .containsExactlyInAnyOrderElementsOf(
-                        java.util.Arrays.stream(Permission.values())
-                                .map(Permission::getValue)
-                                .toList());
+            .hasSize(Permission.values().length)
+            .containsExactlyInAnyOrderElementsOf(java.util.Arrays.stream(Permission.values()).map(Permission::getValue).toList());
     }
 
     @Test
@@ -102,14 +90,11 @@ class PermissionManagementControllerTest {
         when(messageSource.getMessage(anyString(), any(), any(Locale.class))).thenReturn(SUCCESS);
         UUID id = UUID.randomUUID();
         List<PermissionMappingResponseDto> mappings =
-                List.of(
-                        new PermissionMappingResponseDto(
-                                id, "ROLE_ADMIN", Permission.USERS_READ, 1L));
+                List.of(new PermissionMappingResponseDto(id, "ROLE_ADMIN", Permission.USERS_READ, 1L));
         when(permissionManagementService.getAllMappings()).thenReturn(mappings);
 
         // When
-        ResponseEntity<ApiResponse<List<PermissionMappingResponseDto>>> response =
-                permissionManagementController.getAllMappings();
+        ResponseEntity<ApiResponse<List<PermissionMappingResponseDto>>> response = permissionManagementController.getAllMappings();
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -117,9 +102,7 @@ class PermissionManagementControllerTest {
         assertThat(response.getBody().getData()).hasSize(1);
         assertThat(response.getBody().getData().getFirst().id()).isEqualTo(id);
         verify(permissionManagementService).getAllMappings();
-        verify(messageSource)
-                .getMessage(
-                        eq(FETCHING_ROLE_PERMISSION_MAPPINGS_MSG_KEY), any(), any(Locale.class));
+        verify(messageSource).getMessage(eq(FETCHING_ROLE_PERMISSION_MAPPINGS_MSG_KEY), any(), any(Locale.class));
     }
 
     @Test
@@ -130,8 +113,7 @@ class PermissionManagementControllerTest {
         when(permissionManagementService.getAllMappings()).thenReturn(List.of());
 
         // When
-        ResponseEntity<ApiResponse<List<PermissionMappingResponseDto>>> response =
-                permissionManagementController.getAllMappings();
+        ResponseEntity<ApiResponse<List<PermissionMappingResponseDto>>> response = permissionManagementController.getAllMappings();
 
         // Then
         assertThat(response.getBody()).isNotNull();
@@ -144,10 +126,7 @@ class PermissionManagementControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any(Locale.class))).thenReturn(SUCCESS);
         UUID id = UUID.randomUUID();
-        List<PermissionMappingResponseDto> mappings =
-                List.of(
-                        new PermissionMappingResponseDto(
-                                id, "ROLE_USER", Permission.USERS_READ, 1L));
+        List<PermissionMappingResponseDto> mappings = List.of(new PermissionMappingResponseDto(id, "ROLE_USER", Permission.USERS_READ, 1L));
         when(permissionManagementService.getMappingsByRole("ROLE_USER")).thenReturn(mappings);
 
         // When
@@ -160,8 +139,7 @@ class PermissionManagementControllerTest {
         assertThat(response.getBody().getData()).hasSize(1);
         assertThat(response.getBody().getData().getFirst().keycloakRole()).isEqualTo("ROLE_USER");
         verify(permissionManagementService).getMappingsByRole("ROLE_USER");
-        verify(messageSource)
-                .getMessage(eq(FETCHING_PERMISSIONS_FOR_ROLE_MSG_KEY), any(), any(Locale.class));
+        verify(messageSource).getMessage(eq(FETCHING_PERMISSIONS_FOR_ROLE_MSG_KEY), any(), any(Locale.class));
     }
 
     @Test
@@ -186,15 +164,12 @@ class PermissionManagementControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any(Locale.class))).thenReturn(SUCCESS);
         UUID id = UUID.randomUUID();
-        CreatePermissionMappingDto request =
-                new CreatePermissionMappingDto("ROLE_USER", Permission.USERS_READ);
-        PermissionMappingResponseDto created =
-                new PermissionMappingResponseDto(id, "ROLE_USER", Permission.USERS_READ, 1L);
+        CreatePermissionMappingDto request = new CreatePermissionMappingDto("ROLE_USER", Permission.USERS_READ);
+        PermissionMappingResponseDto created = new PermissionMappingResponseDto(id, "ROLE_USER", Permission.USERS_READ, 1L);
         when(permissionManagementService.createMapping(request)).thenReturn(created);
 
         // When
-        ResponseEntity<ApiResponse<PermissionMappingResponseDto>> response =
-                permissionManagementController.createMapping(request);
+        ResponseEntity<ApiResponse<PermissionMappingResponseDto>> response = permissionManagementController.createMapping(request);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -203,8 +178,7 @@ class PermissionManagementControllerTest {
         assertThat(response.getBody().getData()).isNotNull();
         assertThat(response.getBody().getData().id()).isEqualTo(id);
         verify(permissionManagementService).createMapping(request);
-        verify(messageSource)
-                .getMessage(eq(CREATING_PERMISSION_MAPPING_MSG_KEY), any(), any(Locale.class));
+        verify(messageSource).getMessage(eq(CREATING_PERMISSION_MAPPING_MSG_KEY), any(), any(Locale.class));
     }
 
     @Test
@@ -213,15 +187,12 @@ class PermissionManagementControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any(Locale.class))).thenReturn(SUCCESS);
         UUID id = UUID.randomUUID();
-        CreatePermissionMappingDto request =
-                new CreatePermissionMappingDto("ROLE_USER", Permission.USERS_READ);
-        PermissionMappingResponseDto created =
-                new PermissionMappingResponseDto(id, "ROLE_USER", Permission.USERS_READ, null);
+        CreatePermissionMappingDto request = new CreatePermissionMappingDto("ROLE_USER", Permission.USERS_READ);
+        PermissionMappingResponseDto created = new PermissionMappingResponseDto(id, "ROLE_USER", Permission.USERS_READ, null);
         when(permissionManagementService.createMapping(request)).thenReturn(created);
 
         // When
-        ResponseEntity<ApiResponse<PermissionMappingResponseDto>> response =
-                permissionManagementController.createMapping(request);
+        ResponseEntity<ApiResponse<PermissionMappingResponseDto>> response = permissionManagementController.createMapping(request);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -237,14 +208,12 @@ class PermissionManagementControllerTest {
         doNothing().when(permissionManagementService).deleteMapping(mappingId, 1L);
 
         // When
-        ResponseEntity<ApiResponse<Void>> response =
-                permissionManagementController.deleteMapping(mappingId, "W/\"1\"");
+        ResponseEntity<ApiResponse<Void>> response = permissionManagementController.deleteMapping(mappingId, "W/\"1\"");
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         verify(permissionManagementService).deleteMapping(mappingId, 1L);
-        verify(messageSource)
-                .getMessage(eq(DELETING_PERMISSION_MAPPING_MSG_KEY), any(), any(Locale.class));
+        verify(messageSource).getMessage(eq(DELETING_PERMISSION_MAPPING_MSG_KEY), any(), any(Locale.class));
     }
 
     @Test
@@ -256,8 +225,7 @@ class PermissionManagementControllerTest {
         doNothing().when(permissionManagementService).deleteMapping(mappingId, null);
 
         // When
-        ResponseEntity<ApiResponse<Void>> response =
-                permissionManagementController.deleteMapping(mappingId, null);
+        ResponseEntity<ApiResponse<Void>> response = permissionManagementController.deleteMapping(mappingId, null);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -273,8 +241,7 @@ class PermissionManagementControllerTest {
         doNothing().when(permissionManagementService).deleteMapping(mappingId, null);
 
         // When
-        ResponseEntity<ApiResponse<Void>> response =
-                permissionManagementController.deleteMapping(mappingId, "not-a-version");
+        ResponseEntity<ApiResponse<Void>> response = permissionManagementController.deleteMapping(mappingId, "not-a-version");
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

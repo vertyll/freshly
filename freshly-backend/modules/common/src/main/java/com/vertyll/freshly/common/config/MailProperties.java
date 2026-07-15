@@ -7,9 +7,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "spring.mail")
 public record MailProperties(
-        String host,
-        @Nullable Integer port,
-        String username,
-        String password,
-        String from,
-        @Nullable Map<String, String> properties) {}
+    String host,
+    @Nullable Integer port,
+    String username,
+    String password,
+    String from,
+    @Nullable Map<String, String> properties
+) {
+}

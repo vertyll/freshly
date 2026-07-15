@@ -5,10 +5,10 @@ import java.util.Set;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import com.vertyll.freshly.common.enums.Permission;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import com.vertyll.freshly.common.enums.Permission;
 
 /**
  * Service responsible for checking user permissions based on their Keycloak roles. Delegates
@@ -21,14 +21,15 @@ public class PermissionService {
 
     private final UserPermissionCache permissionCache;
 
-    private static final String AUTH_NULL_OR_NOT_AUTHENTICATED =
-            "Authentication is null or not authenticated";
+    private static final String AUTH_NULL_OR_NOT_AUTHENTICATED = "Authentication is null or not authenticated";
 
     /**
      * Check if the authenticated user has a specific permission.
      *
-     * @param authentication Spring Security authentication object
-     * @param permission Permission enum value
+     * @param authentication
+     *     Spring Security authentication object
+     * @param permission
+     *     Permission enum value
      * @return true if the user has the permission
      */
     public boolean hasPermission(Authentication authentication, Permission permission) {
@@ -49,7 +50,8 @@ public class PermissionService {
      * Get all permissions for the authenticated user based on their roles. This method delegates to
      * the cache component.
      *
-     * @param authentication Spring Security authentication object
+     * @param authentication
+     *     Spring Security authentication object
      * @return Set of permissions
      */
     public Set<Permission> getUserPermissions(Authentication authentication) {
@@ -59,8 +61,10 @@ public class PermissionService {
     /**
      * Check if the user has any of the specified permissions.
      *
-     * @param authentication Spring Security authentication object
-     * @param permissions Variable number of permission enums to check
+     * @param authentication
+     *     Spring Security authentication object
+     * @param permissions
+     *     Variable number of permission enums to check
      * @return true if the user has at least one of the specified permissions
      */
     public boolean hasAnyPermission(Authentication authentication, Permission... permissions) {

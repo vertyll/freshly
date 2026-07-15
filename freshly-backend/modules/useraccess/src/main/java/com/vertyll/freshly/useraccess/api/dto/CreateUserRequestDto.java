@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 public record CreateUserRequestDto(
-        @NotNull(message = "{validation.user.keycloakId.required}") UUID keycloakUserId,
-        boolean isActive,
-        @NotEmpty(message = "{validation.user.roles.required}") Set<String> roles) {}
+    @NotNull(message = "{validation.user.keycloakId.required}") UUID keycloakUserId,
+    boolean isActive,
+    @NotEmpty(message = "{validation.user.roles.required}") Set<String> roles
+) {
+}

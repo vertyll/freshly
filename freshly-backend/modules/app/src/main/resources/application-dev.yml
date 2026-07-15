@@ -80,9 +80,9 @@ application:
     server-url: http://localhost:9000
     realm: freshly
     admin-client-id: freshly-service-account
-    admin-client-secret: vbo0kypMssWks0BzUy3xuxWzWI7LWPvA
+    admin-client-secret: YC7VIcDcJ0eAeUG2DgpLZu4PzsO1kRKk
     user-client-id: freshly-app-client
-    user-client-secret: O5QhKhb7KcLBCfCxn5812iV8z1hzRc5p
+    user-client-secret: PtIENiWX3IJekLGnb4ht78yk6etSluRE
     roles-claim-path: realm_access.roles
     cookie:
       refresh-token-cookie-name: KEYCLOAK_REFRESH_TOKEN

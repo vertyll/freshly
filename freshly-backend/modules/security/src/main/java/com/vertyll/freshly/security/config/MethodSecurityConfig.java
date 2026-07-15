@@ -27,8 +27,9 @@ public class MethodSecurityConfig {
     private final AnyPermissionAuthorizationManager anyPermissionAuthorizationManager;
 
     public MethodSecurityConfig(
-            @Lazy PermissionAuthorizationManager permissionAuthorizationManager,
-            @Lazy AnyPermissionAuthorizationManager anyPermissionAuthorizationManager) {
+        @Lazy PermissionAuthorizationManager permissionAuthorizationManager,
+        @Lazy AnyPermissionAuthorizationManager anyPermissionAuthorizationManager
+    ) {
         this.permissionAuthorizationManager = permissionAuthorizationManager;
         this.anyPermissionAuthorizationManager = anyPermissionAuthorizationManager;
     }
@@ -39,28 +40,23 @@ public class MethodSecurityConfig {
     public Advisor requirePermissionAuthorizationAdvisor() {
         AspectJExpressionPointcut pointcut = createPointcutForAnnotation(RequirePermission.class);
         AuthorizationManagerBeforeMethodInterceptor interceptor =
-                new AuthorizationManagerBeforeMethodInterceptor(
-                        pointcut, permissionAuthorizationManager);
+                new AuthorizationManagerBeforeMethodInterceptor(pointcut, permissionAuthorizationManager);
         return new DefaultPointcutAdvisor(pointcut, interceptor);
     }
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public Advisor requireAnyPermissionAuthorizationAdvisor() {
-        AspectJExpressionPointcut pointcut =
-                createPointcutForAnnotation(RequireAnyPermission.class);
+        AspectJExpressionPointcut pointcut = createPointcutForAnnotation(RequireAnyPermission.class);
         AuthorizationManagerBeforeMethodInterceptor interceptor =
-                new AuthorizationManagerBeforeMethodInterceptor(
-                        pointcut, anyPermissionAuthorizationManager);
+                new AuthorizationManagerBeforeMethodInterceptor(pointcut, anyPermissionAuthorizationManager);
         return new DefaultPointcutAdvisor(pointcut, interceptor);
     }
 
-    private AspectJExpressionPointcut createPointcutForAnnotation(
-            Class<? extends Annotation> annotationClass) {
+    private AspectJExpressionPointcut createPointcutForAnnotation(Class<? extends Annotation> annotationClass) {
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
         String annotationName = annotationClass.getName();
-        pointcut.setExpression(
-                "@annotation(" + annotationName + ") || @within(" + annotationName + ")");
+        pointcut.setExpression("@annotation(" + annotationName + ") || @within(" + annotationName + ")");
         return pointcut;
     }
 }

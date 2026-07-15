@@ -20,9 +20,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import lombok.extern.slf4j.Slf4j;
-
 import com.vertyll.freshly.common.enums.UserRoleEnum;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
@@ -30,56 +30,44 @@ import com.vertyll.freshly.common.enums.UserRoleEnum;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http, CorsConfigurationSource corsConfigurationSource) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) {
 
-        return http.cors(cors -> cors.configurationSource(corsConfigurationSource))
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(
-                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(
-                        auth ->
-                                auth
-                                        // Auth public endpoints
-                                        .requestMatchers(
-                                                "/auth/register",
-                                                "/auth/login",
-                                                "/auth/refresh",
-                                                "/auth/logout",
-                                                "/auth/verify-email",
-                                                "/auth/forgot-password",
-                                                "/auth/reset-password")
-                                        .permitAll()
+        return http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource))
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(
+                auth -> auth
+                    // Auth public endpoints
+                    .requestMatchers(
+                        "/auth/register",
+                        "/auth/login",
+                        "/auth/refresh",
+                        "/auth/logout",
+                        "/auth/verify-email",
+                        "/auth/forgot-password",
+                        "/auth/reset-password"
+                    )
+                    .permitAll()
 
-                                        // Public AirQuality endpoints
-                                        .requestMatchers("/air-quality/**")
-                                        .permitAll()
+                    // Public AirQuality endpoints
+                    .requestMatchers("/air-quality/**")
+                    .permitAll()
 
-                                        // Swagger UI
-                                        .requestMatchers(
-                                                "/v3/api-docs/**",
-                                                "/swagger-ui/**",
-                                                "/swagger-ui.html")
-                                        .permitAll()
+                    // Swagger UI
+                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                    .permitAll()
 
-                                        // Actuator endpoints
-                                        .requestMatchers(
-                                                "/actuator/health",
-                                                "/actuator/health/**",
-                                                "/api/v1/actuator/health",
-                                                "/api/v1/actuator/health/**")
-                                        .permitAll()
+                    // Actuator endpoints
+                    .requestMatchers("/actuator/health", "/actuator/health/**", "/api/v1/actuator/health", "/api/v1/actuator/health/**")
+                    .permitAll()
 
-                                        // All other endpoints require authentication
-                                        .anyRequest()
-                                        .authenticated())
-                .oauth2ResourceServer(
-                        oauth2 ->
-                                oauth2.jwt(
-                                        jwt ->
-                                                jwt.jwtAuthenticationConverter(
-                                                        jwtAuthenticationConverter())))
-                .build();
+                    // All other endpoints require authentication
+                    .anyRequest()
+                    .authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+            .build();
     }
 
     @Bean
@@ -90,29 +78,27 @@ public class SecurityConfig {
         return jwtConverter;
     }
 
-    static class KeycloakRealmRoleConverter
-            implements Converter<Jwt, Collection<GrantedAuthority>> {
+    static class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
         @Override
         public Collection<GrantedAuthority> convert(Jwt jwt) {
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> realmAccess =
+            @SuppressWarnings("unchecked") final Map<String, Object> realmAccess =
                     (Map<String, Object>) jwt.getClaims().get("realm_access");
 
             if (realmAccess == null || realmAccess.isEmpty()) {
                 return List.of();
             }
 
-            @SuppressWarnings("unchecked")
-            final List<String> roles = (List<String>) realmAccess.get("roles");
+            @SuppressWarnings("unchecked") final List<String> roles = (List<String>) realmAccess.get("roles");
 
             if (roles == null || roles.isEmpty()) {
                 return List.of();
             }
 
-            return roles.stream()
-                    .map(roleName -> UserRoleEnum.ROLE_PREFIX + roleName)
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
+            return roles
+                .stream()
+                .map(roleName -> UserRoleEnum.ROLE_PREFIX + roleName)
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
         }
     }
 }

@@ -1,9 +1,5 @@
 package com.vertyll.freshly.security.authorization;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
@@ -21,11 +17,14 @@ import com.vertyll.freshly.common.annotation.RequireAnyPermission;
 import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.permission.application.PermissionService;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
 class AnyPermissionAuthorizationManagerTest {
     private static final String METHOD_WITHOUT_ANNOTATION = "methodWithoutAnnotation";
-    private static final String METHOD_WITH_DIFFERENT_PERMISSIONS =
-            "methodWithDifferentPermissions";
+    private static final String METHOD_WITH_DIFFERENT_PERMISSIONS = "methodWithDifferentPermissions";
     private static final String METHOD_WITH_MULTIPLE_PERMISSIONS = "methodWithMultiplePermissions";
     private static final String METHOD_WITH_SINGLE_PERMISSION = "methodWithSinglePermission";
 
@@ -51,15 +50,11 @@ class AnyPermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should grant access when user has any of required permissions on method")
-    void shouldGrantAccessWhenUserHasAnyOfRequiredPermissionsOnMethod()
-            throws NoSuchMethodException {
+    void shouldGrantAccessWhenUserHasAnyOfRequiredPermissionsOnMethod() throws NoSuchMethodException {
         // Given
-        Method method =
-                SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_MULTIPLE_PERMISSIONS);
+        Method method = SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_MULTIPLE_PERMISSIONS);
         when(methodInvocation.getMethod()).thenReturn(method);
-        Permission[] permissions = {
-            Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE
-        };
+        Permission[] permissions = {Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE};
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(true);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -75,14 +70,11 @@ class AnyPermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should deny access when user does not have any of required permissions on method")
-    void shouldDenyAccessWhenUserDoesNotHaveAnyOfRequiredPermissionsOnMethod()
-            throws NoSuchMethodException {
+    void shouldDenyAccessWhenUserDoesNotHaveAnyOfRequiredPermissionsOnMethod() throws NoSuchMethodException {
         // Given
         Method method = SecurityMockTarget.class.getDeclaredMethod("methodWithMultiplePermissions");
         when(methodInvocation.getMethod()).thenReturn(method);
-        Permission[] permissions = {
-            Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE
-        };
+        Permission[] permissions = {Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE};
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(false);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -98,8 +90,7 @@ class AnyPermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should check class-level annotation when method annotation is absent")
-    void shouldCheckClassLevelAnnotationWhenMethodAnnotationIsAbsent()
-            throws NoSuchMethodException {
+    void shouldCheckClassLevelAnnotationWhenMethodAnnotationIsAbsent() throws NoSuchMethodException {
         // Given
         Method method = ClassWithAnyPermission.class.getDeclaredMethod(METHOD_WITHOUT_ANNOTATION);
         when(methodInvocation.getMethod()).thenReturn(method);
@@ -119,15 +110,12 @@ class AnyPermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should prioritize method-level annotation over class-level annotation")
-    void shouldPrioritizeMethodLevelAnnotationOverClassLevelAnnotation()
-            throws NoSuchMethodException {
+    void shouldPrioritizeMethodLevelAnnotationOverClassLevelAnnotation() throws NoSuchMethodException {
         // Given
-        Method method =
-                ClassWithAnyPermission.class.getDeclaredMethod(METHOD_WITH_DIFFERENT_PERMISSIONS);
+        Method method = ClassWithAnyPermission.class.getDeclaredMethod(METHOD_WITH_DIFFERENT_PERMISSIONS);
         when(methodInvocation.getMethod()).thenReturn(method);
         Permission[] methodPermissions = {Permission.REPORTS_READ, Permission.REPORTS_GENERATE};
-        when(permissionService.hasAnyPermission(authentication, methodPermissions))
-                .thenReturn(true);
+        when(permissionService.hasAnyPermission(authentication, methodPermissions)).thenReturn(true);
 
         Supplier<Authentication> authSupplier = () -> authentication;
 
@@ -138,8 +126,7 @@ class AnyPermissionAuthorizationManagerTest {
         assertThat(result).isNotNull();
         assertThat(result.isGranted()).isTrue();
         verify(permissionService).hasAnyPermission(authentication, methodPermissions);
-        verify(permissionService, never())
-                .hasAnyPermission(authentication, Permission.USERS_READ, Permission.USERS_CREATE);
+        verify(permissionService, never()).hasAnyPermission(authentication, Permission.USERS_READ, Permission.USERS_CREATE);
     }
 
     @Test
@@ -185,12 +172,9 @@ class AnyPermissionAuthorizationManagerTest {
     @SuppressWarnings("NullAway")
     void shouldHandleNullAuthenticationGracefully() throws NoSuchMethodException {
         // Given
-        Method method =
-                SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_MULTIPLE_PERMISSIONS);
+        Method method = SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_MULTIPLE_PERMISSIONS);
         when(methodInvocation.getMethod()).thenReturn(method);
-        Permission[] permissions = {
-            Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE
-        };
+        Permission[] permissions = {Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE};
         when(permissionService.hasAnyPermission(null, permissions)).thenReturn(false);
 
         Supplier<Authentication> authSupplier = () -> null;
@@ -206,11 +190,7 @@ class AnyPermissionAuthorizationManagerTest {
 
     // Test classes
     static class SecurityMockTarget {
-        @RequireAnyPermission({
-            Permission.USERS_READ,
-            Permission.USERS_CREATE,
-            Permission.USERS_DELETE
-        })
+        @RequireAnyPermission({Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE})
         void methodWithMultiplePermissions() {
             // Empty method used only for testing authorization annotations
         }

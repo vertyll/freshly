@@ -49,11 +49,12 @@ public class AirQualityMeasurement {
 
     /** Factory method to create measurement from index and sensor data */
     public static AirQualityMeasurement create(
-            int stationId,
-            String stationName,
-            AirQualityIndex index,
-            java.util.Map<String, Double> sensorValues,
-            LocalDateTime measurementDate) {
+        int stationId,
+        String stationName,
+        AirQualityIndex index,
+        java.util.Map<String, Double> sensorValues,
+        LocalDateTime measurementDate
+    ) {
         AirQualityMeasurement measurement = new AirQualityMeasurement();
         measurement.stationId = stationId;
         measurement.stationName = stationName;

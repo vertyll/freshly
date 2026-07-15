@@ -18,10 +18,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SystemUserDocument {
 
-    @Id private UUID keycloakUserId;
+    @Id
+    private UUID keycloakUserId;
 
     private boolean isActive;
     private Set<String> roles;
 
-    @Version @Nullable private Long version;
+    @Version
+    @Nullable private Long version;
 }

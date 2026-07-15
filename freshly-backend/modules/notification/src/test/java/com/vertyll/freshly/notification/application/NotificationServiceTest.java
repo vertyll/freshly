@@ -1,9 +1,5 @@
 package com.vertyll.freshly.notification.application;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +16,10 @@ import com.vertyll.freshly.notification.domain.EmailNotification;
 import com.vertyll.freshly.notification.domain.EmailSender;
 import com.vertyll.freshly.notification.domain.EmailTemplate;
 import com.vertyll.freshly.notification.domain.exception.EmailSendingException;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
@@ -61,12 +61,7 @@ class NotificationServiceTest {
     void shouldSendEmailSuccessfully() {
         // Given
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
-        Map<String, Object> variables =
-                Map.of(
-                        USERNAME_KEY,
-                        USERNAME_VALUE_JOHN,
-                        VERIFICATION_LINK_KEY,
-                        VERIFICATION_LINK_VALUE);
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN, VERIFICATION_LINK_KEY, VERIFICATION_LINK_VALUE);
         SendEmailCommand command = new SendEmailCommand(TEST_EMAIL, template, variables);
 
         doNothing().when(emailSender).send(any(EmailNotification.class));
@@ -97,8 +92,8 @@ class NotificationServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> notificationService.sendEmail(command))
-                .isInstanceOf(EmailSendingException.class)
-                .hasMessageContaining(SMTP_ERROR_MESSAGE);
+            .isInstanceOf(EmailSendingException.class)
+            .hasMessageContaining(SMTP_ERROR_MESSAGE);
 
         verify(emailSender).send(notificationCaptor.capture());
         EmailNotification failedNotification = notificationCaptor.getValue();
@@ -113,8 +108,7 @@ class NotificationServiceTest {
         doNothing().when(emailSender).send(any(EmailNotification.class));
 
         // When
-        notificationService.sendEmailVerification(
-                USER_EMAIL, USERNAME_VALUE_JOHN_DOE, VERIFICATION_LINK_VALUE);
+        notificationService.sendEmailVerification(USER_EMAIL, USERNAME_VALUE_JOHN_DOE, VERIFICATION_LINK_VALUE);
 
         // Then
         verify(emailSender).send(notificationCaptor.capture());
@@ -122,10 +116,8 @@ class NotificationServiceTest {
 
         assertThat(sentNotification.getRecipient().value()).isEqualTo(USER_EMAIL);
         assertThat(sentNotification.getTemplate()).isEqualTo(EmailTemplate.EMAIL_VERIFICATION);
-        assertThat(sentNotification.getTemplateVariables())
-                .containsEntry(USERNAME_KEY, USERNAME_VALUE_JOHN_DOE);
-        assertThat(sentNotification.getTemplateVariables())
-                .containsEntry(VERIFICATION_LINK_KEY, VERIFICATION_LINK_VALUE);
+        assertThat(sentNotification.getTemplateVariables()).containsEntry(USERNAME_KEY, USERNAME_VALUE_JOHN_DOE);
+        assertThat(sentNotification.getTemplateVariables()).containsEntry(VERIFICATION_LINK_KEY, VERIFICATION_LINK_VALUE);
     }
 
     @Test
@@ -143,8 +135,7 @@ class NotificationServiceTest {
 
         assertThat(sentNotification.getRecipient().value()).isEqualTo(USER_EMAIL);
         assertThat(sentNotification.getTemplate()).isEqualTo(EmailTemplate.USER_REGISTERED);
-        assertThat(sentNotification.getTemplateVariables())
-                .containsEntry(USERNAME_KEY, USERNAME_VALUE_JOHN_DOE);
+        assertThat(sentNotification.getTemplateVariables()).containsEntry(USERNAME_KEY, USERNAME_VALUE_JOHN_DOE);
         assertThat(sentNotification.getTemplateVariables()).hasSize(EXPECTED_VARIABLE_SIZE_ONE);
     }
 
@@ -155,8 +146,7 @@ class NotificationServiceTest {
         doNothing().when(emailSender).send(any(EmailNotification.class));
 
         // When
-        notificationService.sendPasswordResetEmail(
-                USER_EMAIL, USERNAME_VALUE_JOHN_DOE, RESET_LINK_VALUE);
+        notificationService.sendPasswordResetEmail(USER_EMAIL, USERNAME_VALUE_JOHN_DOE, RESET_LINK_VALUE);
 
         // Then
         verify(emailSender).send(notificationCaptor.capture());
@@ -164,10 +154,8 @@ class NotificationServiceTest {
 
         assertThat(sentNotification.getRecipient().value()).isEqualTo(USER_EMAIL);
         assertThat(sentNotification.getTemplate()).isEqualTo(EmailTemplate.PASSWORD_RESET);
-        assertThat(sentNotification.getTemplateVariables())
-                .containsEntry(USERNAME_KEY, USERNAME_VALUE_JOHN_DOE);
-        assertThat(sentNotification.getTemplateVariables())
-                .containsEntry(RESET_LINK_KEY, RESET_LINK_VALUE);
+        assertThat(sentNotification.getTemplateVariables()).containsEntry(USERNAME_KEY, USERNAME_VALUE_JOHN_DOE);
+        assertThat(sentNotification.getTemplateVariables()).containsEntry(RESET_LINK_KEY, RESET_LINK_VALUE);
     }
 
     @Test
@@ -175,10 +163,7 @@ class NotificationServiceTest {
     void shouldMarkNotificationAsSentAfterSuccessfulSending() {
         // Given
         SendEmailCommand command =
-                new SendEmailCommand(
-                        TEST_EMAIL,
-                        EmailTemplate.USER_REGISTERED,
-                        Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN));
+                new SendEmailCommand(TEST_EMAIL, EmailTemplate.USER_REGISTERED, Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN));
 
         doNothing().when(emailSender).send(any(EmailNotification.class));
 
@@ -198,18 +183,12 @@ class NotificationServiceTest {
     void shouldMarkNotificationAsFailedWhenSendingThrowsException() {
         // Given
         SendEmailCommand command =
-                new SendEmailCommand(
-                        TEST_EMAIL,
-                        EmailTemplate.EMAIL_VERIFICATION,
-                        Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN));
+                new SendEmailCommand(TEST_EMAIL, EmailTemplate.EMAIL_VERIFICATION, Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN));
 
-        doThrow(new EmailSendingException(CONNECTION_TIMEOUT_MESSAGE))
-                .when(emailSender)
-                .send(any(EmailNotification.class));
+        doThrow(new EmailSendingException(CONNECTION_TIMEOUT_MESSAGE)).when(emailSender).send(any(EmailNotification.class));
 
         // When & Then
-        assertThatThrownBy(() -> notificationService.sendEmail(command))
-                .isInstanceOf(EmailSendingException.class);
+        assertThatThrownBy(() -> notificationService.sendEmail(command)).isInstanceOf(EmailSendingException.class);
 
         verify(emailSender).send(notificationCaptor.capture());
         EmailNotification notification = notificationCaptor.getValue();
@@ -223,10 +202,7 @@ class NotificationServiceTest {
     void shouldCallEmailSenderOnceWhenSendingEmail() {
         // Given
         SendEmailCommand command =
-                new SendEmailCommand(
-                        TEST_EMAIL,
-                        EmailTemplate.USER_REGISTERED,
-                        Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN));
+                new SendEmailCommand(TEST_EMAIL, EmailTemplate.USER_REGISTERED, Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN));
 
         doNothing().when(emailSender).send(any(EmailNotification.class));
 

@@ -9,9 +9,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import com.vertyll.freshly.auth.api.dto.ChangeEmailRequestDto;
 import com.vertyll.freshly.auth.api.dto.ChangePasswordRequestDto;
 import com.vertyll.freshly.auth.api.dto.ForgotPasswordRequestDto;
@@ -27,6 +24,9 @@ import com.vertyll.freshly.common.config.ApplicationProperties;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.notification.application.NotificationService;
 import com.vertyll.freshly.useraccess.application.UserAccessService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -52,32 +52,23 @@ public class AuthService {
 
         log.info("Registering user: {}", request.username());
 
-        UUID keycloakUserId =
-                keycloakAdminClient.createUser(
-                        request.username(),
-                        request.email(),
-                        request.password(),
-                        request.firstName(),
-                        request.lastName());
+        UUID keycloakUserId = keycloakAdminClient
+            .createUser(request.username(), request.email(), request.password(), request.firstName(), request.lastName());
 
         try {
-            userAccessService.createUser(
+            userAccessService
+                .createUser(
                     keycloakUserId,
                     false, // Inactive until email verified
-                    Set.of(UserRoleEnum.USER.getValue()));
+                    Set.of(UserRoleEnum.USER.getValue())
+                );
 
-            String verificationToken =
-                    verificationTokenService.generateEmailVerificationToken(
-                            keycloakUserId, request.email());
-            String verificationLink =
-                    applicationProperties.frontend().url()
-                            + String.format(VERIFY_EMAIL_URL_TEMPLATE, verificationToken);
+            String verificationToken = verificationTokenService.generateEmailVerificationToken(keycloakUserId, request.email());
+            String verificationLink = applicationProperties.frontend().url() + String.format(VERIFY_EMAIL_URL_TEMPLATE, verificationToken);
 
-            notificationService.sendEmailVerification(
-                    request.email(), request.username(), verificationLink);
+            notificationService.sendEmailVerification(request.email(), request.username(), verificationLink);
 
-            eventPublisher.publishEvent(
-                    new UserRegisteredEvent(keycloakUserId, request.username(), request.email()));
+            eventPublisher.publishEvent(new UserRegisteredEvent(keycloakUserId, request.username(), request.email()));
 
             log.info("User registered successfully: {}", request.username());
             return keycloakUserId;
@@ -87,8 +78,7 @@ public class AuthService {
             try {
                 keycloakAdminClient.deleteUser(keycloakUserId);
             } catch (Exception rollbackException) {
-                log.error(
-                        "Failed to rollback Keycloak user: {}", keycloakUserId, rollbackException);
+                log.error("Failed to rollback Keycloak user: {}", keycloakUserId, rollbackException);
             }
             throw e;
         }
@@ -139,10 +129,8 @@ public class AuthService {
         UUID userId = UUID.fromString(user.getId());
         String username = user.getUsername();
 
-        String resetToken =
-                verificationTokenService.generatePasswordResetToken(userId, request.email());
-        String resetLink =
-                applicationProperties.frontend().url() + "/reset-password?token=" + resetToken;
+        String resetToken = verificationTokenService.generatePasswordResetToken(userId, request.email());
+        String resetLink = applicationProperties.frontend().url() + "/reset-password?token=" + resetToken;
 
         notificationService.sendPasswordResetEmail(request.email(), username, resetLink);
 
@@ -176,12 +164,9 @@ public class AuthService {
         keycloakAdminClient.changeEmail(userId, request.newEmail());
         userAccessService.deactivateUser(userId, userId, null);
 
-        String verificationToken =
-                verificationTokenService.generateEmailVerificationToken(userId, request.newEmail());
+        String verificationToken = verificationTokenService.generateEmailVerificationToken(userId, request.newEmail());
         String verificationLink =
-                applicationProperties.frontend().url()
-                        + VERIFY_EMAIL_PATH
-                        + String.format(TOKEN_QUERY_PARAM, verificationToken);
+                applicationProperties.frontend().url() + VERIFY_EMAIL_PATH + String.format(TOKEN_QUERY_PARAM, verificationToken);
 
         notificationService.sendEmailVerification(request.newEmail(), USERNAME, verificationLink);
 

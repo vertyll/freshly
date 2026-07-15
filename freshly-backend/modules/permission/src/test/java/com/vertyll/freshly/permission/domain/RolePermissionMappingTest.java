@@ -1,7 +1,5 @@
 package com.vertyll.freshly.permission.domain;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +9,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
+
+import static org.assertj.core.api.Assertions.*;
 
 class RolePermissionMappingTest {
     private static final String ID_CANNOT_BE_NULL = "ID cannot be null";
@@ -42,8 +42,7 @@ class RolePermissionMappingTest {
         Permission permission = Permission.USERS_CREATE;
 
         // When
-        RolePermissionMapping mapping =
-                RolePermissionMapping.reconstitute(id, role, permission, null);
+        RolePermissionMapping mapping = RolePermissionMapping.reconstitute(id, role, permission, null);
 
         // Then
         assertThat(mapping.getId()).isEqualTo(id);
@@ -60,8 +59,7 @@ class RolePermissionMappingTest {
         Permission permission = Permission.REPORTS_READ;
 
         // When
-        RolePermissionMapping mapping =
-                RolePermissionMapping.reconstitute(id, role, permission, 1L);
+        RolePermissionMapping mapping = RolePermissionMapping.reconstitute(id, role, permission, 1L);
 
         // Then
         assertThat(mapping.getId()).isEqualTo(id);
@@ -79,8 +77,8 @@ class RolePermissionMappingTest {
 
         // When & Then
         assertThatThrownBy(() -> RolePermissionMapping.reconstitute(null, role, permission, 1L))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining(ID_CANNOT_BE_NULL);
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining(ID_CANNOT_BE_NULL);
     }
 
     @Test
@@ -93,8 +91,8 @@ class RolePermissionMappingTest {
 
         // When & Then
         assertThatThrownBy(() -> RolePermissionMapping.reconstitute(id, null, permission, 1L))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining(KEYCLOAK_ROLE_CANNOT_BE_NULL);
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining(KEYCLOAK_ROLE_CANNOT_BE_NULL);
     }
 
     @Test
@@ -107,8 +105,8 @@ class RolePermissionMappingTest {
 
         // When & Then
         assertThatThrownBy(() -> RolePermissionMapping.reconstitute(id, role, null, 1L))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining(PERMISSION_CANNOT_BE_NULL);
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining(PERMISSION_CANNOT_BE_NULL);
     }
 
     @Test
@@ -135,8 +133,7 @@ class RolePermissionMappingTest {
         Permission permission = Permission.USERS_READ;
 
         // When
-        RolePermissionMapping mapping =
-                RolePermissionMapping.reconstitute(id, role, permission, null);
+        RolePermissionMapping mapping = RolePermissionMapping.reconstitute(id, role, permission, null);
 
         // Then
         assertThat(mapping.getId()).isEqualTo(id);
@@ -183,8 +180,7 @@ class RolePermissionMappingTest {
         Permission permission = Permission.AUTH_CHANGE_PASSWORD;
 
         // When
-        RolePermissionMapping mapping =
-                RolePermissionMapping.reconstitute(id, role, permission, 1L);
+        RolePermissionMapping mapping = RolePermissionMapping.reconstitute(id, role, permission, 1L);
 
         // Then
         assertThat(mapping.getId()).isEqualTo(id);

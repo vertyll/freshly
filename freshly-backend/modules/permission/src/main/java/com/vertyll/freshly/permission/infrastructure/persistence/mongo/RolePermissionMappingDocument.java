@@ -8,27 +8,26 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.vertyll.freshly.common.enums.Permission;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.vertyll.freshly.common.enums.Permission;
-
 @Document(collection = "role_permission_mapping")
-@CompoundIndex(
-        name = "role_permission_idx",
-        def = "{'keycloakRole': 1, 'permission': 1}",
-        unique = true)
+@CompoundIndex(name = "role_permission_idx", def = "{'keycloakRole': 1, 'permission': 1}", unique = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class RolePermissionMappingDocument {
 
-    @Id private UUID id;
+    @Id
+    private UUID id;
 
     private String keycloakRole;
 
     private Permission permission;
 
-    @Version @Nullable private Long version;
+    @Version
+    @Nullable private Long version;
 }

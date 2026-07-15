@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * services and components. Usage in services:
  *
  * <pre>{@code
- * @Service
+ * &#64;Service
  * public class SomeService {
  *     private final MessageHelper messageHelper;
  *
@@ -39,7 +39,8 @@ public class MessageHelper {
     /**
      * Gets localized message for current request locale.
      *
-     * @param key Message key from messages_*.properties
+     * @param key
+     *     Message key from messages_*.properties
      * @return Localized message
      */
     public String getMessage(String key) {
@@ -49,19 +50,23 @@ public class MessageHelper {
     /**
      * Gets localized message with parameters for current request locale.
      *
-     * @param key Message key from messages_*.properties
-     * @param args Arguments to replace placeholders in message
+     * @param key
+     *     Message key from messages_*.properties
+     * @param args
+     *     Arguments to replace placeholders in message
      * @return Localized message with substituted parameters
      */
-    public String getMessage(String key, Object @Nullable ... args) {
+    public String getMessage(String key, Object @Nullable... args) {
         return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
     }
 
     /**
      * Gets localized message for specific locale.
      *
-     * @param key Message key from messages_*.properties
-     * @param locale Specific locale to use
+     * @param key
+     *     Message key from messages_*.properties
+     * @param locale
+     *     Specific locale to use
      * @return Localized message for given locale
      */
     public String getMessage(String key, Locale locale) {
@@ -71,9 +76,12 @@ public class MessageHelper {
     /**
      * Gets localized message with parameters for specific locale.
      *
-     * @param key Message key from messages_*.properties
-     * @param args Arguments to replace placeholders in message
-     * @param locale Specific locale to use
+     * @param key
+     *     Message key from messages_*.properties
+     * @param args
+     *     Arguments to replace placeholders in message
+     * @param locale
+     *     Specific locale to use
      * @return Localized message with substituted parameters for given locale
      */
     public String getMessage(String key, Object @Nullable [] args, Locale locale) {

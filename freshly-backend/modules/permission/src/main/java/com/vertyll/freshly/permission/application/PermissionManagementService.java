@@ -6,15 +6,15 @@ import java.util.UUID;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.common.util.OptimisticLockingValidator;
 import com.vertyll.freshly.permission.api.dto.CreatePermissionMappingDto;
 import com.vertyll.freshly.permission.api.dto.PermissionMappingResponseDto;
 import com.vertyll.freshly.permission.domain.RolePermissionMapping;
 import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -38,11 +38,8 @@ public class PermissionManagementService {
 
         if (repository.existsByKeycloakRoleAndPermission(role, permission)) {
             throw new IllegalArgumentException(
-                    "Mapping already exists for role '"
-                            + role
-                            + "' and permission '"
-                            + permission.getValue()
-                            + "'");
+                "Mapping already exists for role '" + role + "' and permission '" + permission.getValue() + "'"
+            );
         }
 
         RolePermissionMapping mapping = new RolePermissionMapping(role, permission);
@@ -57,12 +54,7 @@ public class PermissionManagementService {
     @CacheEvict(value = "user-permissions", allEntries = true)
     public void deleteMapping(UUID mappingId, Long expectedVersion) {
         RolePermissionMapping mapping =
-                repository
-                        .findById(mappingId)
-                        .orElseThrow(
-                                () ->
-                                        new IllegalArgumentException(
-                                                "Mapping not found for id: " + mappingId));
+                repository.findById(mappingId).orElseThrow(() -> new IllegalArgumentException("Mapping not found for id: " + mappingId));
 
         OptimisticLockingValidator.validate(mapping.getVersion(), expectedVersion);
 
@@ -71,10 +63,6 @@ public class PermissionManagementService {
     }
 
     private PermissionMappingResponseDto toDto(RolePermissionMapping mapping) {
-        return new PermissionMappingResponseDto(
-                mapping.getId(),
-                mapping.getKeycloakRole(),
-                mapping.getPermission(),
-                mapping.getVersion());
+        return new PermissionMappingResponseDto(mapping.getId(), mapping.getKeycloakRole(), mapping.getPermission(), mapping.getVersion());
     }
 }

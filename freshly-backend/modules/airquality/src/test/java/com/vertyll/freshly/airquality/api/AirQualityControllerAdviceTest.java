@@ -1,9 +1,5 @@
 package com.vertyll.freshly.airquality.api;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
 import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -21,16 +17,17 @@ import com.vertyll.freshly.airquality.domain.exception.GiosApiException;
 import com.vertyll.freshly.airquality.domain.exception.InvalidDateRangeException;
 import com.vertyll.freshly.airquality.domain.exception.StationNotFoundException;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
 class AirQualityControllerAdviceTest {
 
-    private static final String ERROR_STATION_NOT_FOUND_MSG_KEY =
-            "error.airquality.stationNotFound";
+    private static final String ERROR_STATION_NOT_FOUND_MSG_KEY = "error.airquality.stationNotFound";
     private static final String ERROR_DATA_NOT_FOUND_MSG_KEY = "error.airquality.dataNotFound";
-    private static final String ERROR_INVALID_DATE_RANGE_MSG_KEY =
-            "error.airquality.invalidDateRange";
-    private static final String ERROR_GIOS_API_UNAVAILABLE_MSG_KEY =
-            "error.airquality.giosApiUnavailable";
+    private static final String ERROR_INVALID_DATE_RANGE_MSG_KEY = "error.airquality.invalidDateRange";
+    private static final String ERROR_GIOS_API_UNAVAILABLE_MSG_KEY = "error.airquality.giosApiUnavailable";
 
     private static final int TEST_STATION_ID = 123;
 
@@ -60,9 +57,7 @@ class AirQualityControllerAdviceTest {
         // Given
         StationNotFoundException exception = new StationNotFoundException(TEST_STATION_ID);
 
-        when(messageSource.getMessage(
-                        eq(ERROR_STATION_NOT_FOUND_MSG_KEY), isNull(), any(Locale.class)))
-                .thenReturn(STATION_NOT_FOUND);
+        when(messageSource.getMessage(eq(ERROR_STATION_NOT_FOUND_MSG_KEY), isNull(), any(Locale.class))).thenReturn(STATION_NOT_FOUND);
 
         // When
         ProblemDetail result = controllerAdvice.handleStationNotFound(exception);
@@ -70,20 +65,17 @@ class AirQualityControllerAdviceTest {
         // Then
         assertThat(result.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(result.getDetail()).isEqualTo(STATION_NOT_FOUND);
-        verify(messageSource)
-                .getMessage(eq(ERROR_STATION_NOT_FOUND_MSG_KEY), isNull(), any(Locale.class));
+        verify(messageSource).getMessage(eq(ERROR_STATION_NOT_FOUND_MSG_KEY), isNull(), any(Locale.class));
     }
 
     @Test
     @DisplayName("Should handle AirQualityDataNotFoundException")
     void shouldHandleAirQualityDataNotFoundException() {
         // Given
-        AirQualityDataNotFoundException exception =
-                new AirQualityDataNotFoundException(TEST_STATION_ID);
+        AirQualityDataNotFoundException exception = new AirQualityDataNotFoundException(TEST_STATION_ID);
 
-        when(messageSource.getMessage(
-                        eq(ERROR_DATA_NOT_FOUND_MSG_KEY), isNull(), any(Locale.class)))
-                .thenReturn(AIR_QUALITY_DATA_NOT_FOUND);
+        when(messageSource.getMessage(eq(ERROR_DATA_NOT_FOUND_MSG_KEY), isNull(), any(Locale.class)))
+            .thenReturn(AIR_QUALITY_DATA_NOT_FOUND);
 
         // When
         ProblemDetail result = controllerAdvice.handleAirQualityDataNotFound(exception);
@@ -91,8 +83,7 @@ class AirQualityControllerAdviceTest {
         // Then
         assertThat(result.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(result.getDetail()).isEqualTo(AIR_QUALITY_DATA_NOT_FOUND);
-        verify(messageSource)
-                .getMessage(eq(ERROR_DATA_NOT_FOUND_MSG_KEY), isNull(), any(Locale.class));
+        verify(messageSource).getMessage(eq(ERROR_DATA_NOT_FOUND_MSG_KEY), isNull(), any(Locale.class));
     }
 
     @Test
@@ -101,9 +92,8 @@ class AirQualityControllerAdviceTest {
         // Given
         InvalidDateRangeException exception = new InvalidDateRangeException(INVALID_DATE_RANGE);
 
-        when(messageSource.getMessage(
-                        eq(ERROR_INVALID_DATE_RANGE_MSG_KEY), isNull(), any(Locale.class)))
-                .thenReturn(INVALID_DATE_RANGE_PROVIDED);
+        when(messageSource.getMessage(eq(ERROR_INVALID_DATE_RANGE_MSG_KEY), isNull(), any(Locale.class)))
+            .thenReturn(INVALID_DATE_RANGE_PROVIDED);
 
         // When
         ProblemDetail result = controllerAdvice.handleInvalidDateRange(exception);
@@ -111,8 +101,7 @@ class AirQualityControllerAdviceTest {
         // Then
         assertThat(result.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(result.getDetail()).isEqualTo(INVALID_DATE_RANGE_PROVIDED);
-        verify(messageSource)
-                .getMessage(eq(ERROR_INVALID_DATE_RANGE_MSG_KEY), isNull(), any(Locale.class));
+        verify(messageSource).getMessage(eq(ERROR_INVALID_DATE_RANGE_MSG_KEY), isNull(), any(Locale.class));
     }
 
     @Test
@@ -121,9 +110,8 @@ class AirQualityControllerAdviceTest {
         // Given
         GiosApiException exception = new GiosApiException(GIOS_API_ERROR);
 
-        when(messageSource.getMessage(
-                        eq(ERROR_GIOS_API_UNAVAILABLE_MSG_KEY), isNull(), any(Locale.class)))
-                .thenReturn(EXTERNAL_SERVICE_ERROR);
+        when(messageSource.getMessage(eq(ERROR_GIOS_API_UNAVAILABLE_MSG_KEY), isNull(), any(Locale.class)))
+            .thenReturn(EXTERNAL_SERVICE_ERROR);
 
         // When
         ProblemDetail result = controllerAdvice.handleGiosApiException(exception);
@@ -131,20 +119,17 @@ class AirQualityControllerAdviceTest {
         // Then
         assertThat(result.getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
         assertThat(result.getDetail()).isEqualTo(EXTERNAL_SERVICE_ERROR);
-        verify(messageSource)
-                .getMessage(eq(ERROR_GIOS_API_UNAVAILABLE_MSG_KEY), isNull(), any(Locale.class));
+        verify(messageSource).getMessage(eq(ERROR_GIOS_API_UNAVAILABLE_MSG_KEY), isNull(), any(Locale.class));
     }
 
     @Test
     @DisplayName("Should handle AirQualityDataNotFoundException with custom message")
     void shouldHandleAirQualityDataNotFoundExceptionWithCustomMessage() {
         // Given
-        AirQualityDataNotFoundException exception =
-                new AirQualityDataNotFoundException(NO_DATA_AVAILABLE);
+        AirQualityDataNotFoundException exception = new AirQualityDataNotFoundException(NO_DATA_AVAILABLE);
 
-        when(messageSource.getMessage(
-                        eq(ERROR_DATA_NOT_FOUND_MSG_KEY), isNull(), any(Locale.class)))
-                .thenReturn(AIR_QUALITY_DATA_NOT_FOUND);
+        when(messageSource.getMessage(eq(ERROR_DATA_NOT_FOUND_MSG_KEY), isNull(), any(Locale.class)))
+            .thenReturn(AIR_QUALITY_DATA_NOT_FOUND);
 
         // When
         ProblemDetail result = controllerAdvice.handleAirQualityDataNotFound(exception);

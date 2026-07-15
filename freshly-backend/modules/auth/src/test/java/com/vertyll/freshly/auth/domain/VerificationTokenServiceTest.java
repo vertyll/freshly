@@ -1,8 +1,5 @@
 package com.vertyll.freshly.auth.domain;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.lenient;
-
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
@@ -25,6 +22,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
+
 @ExtendWith(MockitoExtension.class)
 class VerificationTokenServiceTest {
 
@@ -43,10 +43,13 @@ class VerificationTokenServiceTest {
 
     private static final String TEST_EMAIL = "test@example.com";
 
-    @Mock private JwtProperties jwtProperties;
-    @Mock private JwtProperties.Expiration expiration;
+    @Mock
+    private JwtProperties jwtProperties;
+    @Mock
+    private JwtProperties.Expiration expiration;
 
-    @InjectMocks private VerificationTokenService verificationTokenService;
+    @InjectMocks
+    private VerificationTokenService verificationTokenService;
 
     @BeforeEach
     @SuppressWarnings("NullAway.Init")
@@ -129,11 +132,8 @@ class VerificationTokenServiceTest {
     @DisplayName("Should throw exception when token is malformed")
     void shouldThrowExceptionWhenTokenIsInvalid() {
         // Given & When & Then
-        assertThatThrownBy(
-                        () ->
-                                verificationTokenService.validateEmailVerificationToken(
-                                        ERROR_TOKEN_INVALID_MSG_KEY))
-                .isInstanceOf(InvalidVerificationTokenException.class);
+        assertThatThrownBy(() -> verificationTokenService.validateEmailVerificationToken(ERROR_TOKEN_INVALID_MSG_KEY))
+            .isInstanceOf(InvalidVerificationTokenException.class);
     }
 
     @Test
@@ -142,21 +142,20 @@ class VerificationTokenServiceTest {
         // Given
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
         Instant now = Instant.now();
-        String expiredToken =
-                Jwts.builder()
-                        .subject(UUID.randomUUID().toString())
-                        .claim(EMAIL_CLAIM_KEY, TEST_EMAIL)
-                        .claim(TYPE_CLAIM_KEY, TYPE_EMAIL_VERIFICATION)
-                        .issuedAt(Date.from(now.minusSeconds(10)))
-                        .expiration(Date.from(now.minusSeconds(5)))
-                        .signWith(key)
-                        .compact();
+        String expiredToken = Jwts
+            .builder()
+            .subject(UUID.randomUUID().toString())
+            .claim(EMAIL_CLAIM_KEY, TEST_EMAIL)
+            .claim(TYPE_CLAIM_KEY, TYPE_EMAIL_VERIFICATION)
+            .issuedAt(Date.from(now.minusSeconds(10)))
+            .expiration(Date.from(now.minusSeconds(5)))
+            .signWith(key)
+            .compact();
 
         // When & Then
-        assertThatThrownBy(
-                        () -> verificationTokenService.validateEmailVerificationToken(expiredToken))
-                .isInstanceOf(InvalidVerificationTokenException.class)
-                .hasMessageContaining(ERROR_TOKEN_EXPIRED_MSG_KEY);
+        assertThatThrownBy(() -> verificationTokenService.validateEmailVerificationToken(expiredToken))
+            .isInstanceOf(InvalidVerificationTokenException.class)
+            .hasMessageContaining(ERROR_TOKEN_EXPIRED_MSG_KEY);
     }
 
     @Test
@@ -167,9 +166,8 @@ class VerificationTokenServiceTest {
         String resetToken = verificationTokenService.generatePasswordResetToken(userId, TEST_EMAIL);
 
         // When & Then
-        assertThatThrownBy(
-                        () -> verificationTokenService.validateEmailVerificationToken(resetToken))
-                .isInstanceOf(InvalidVerificationTokenException.class)
-                .hasMessageContaining(ERROR_TOKEN_INVALID_MSG_KEY);
+        assertThatThrownBy(() -> verificationTokenService.validateEmailVerificationToken(resetToken))
+            .isInstanceOf(InvalidVerificationTokenException.class)
+            .hasMessageContaining(ERROR_TOKEN_INVALID_MSG_KEY);
     }
 }

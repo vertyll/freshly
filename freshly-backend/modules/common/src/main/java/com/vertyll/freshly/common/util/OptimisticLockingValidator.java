@@ -13,9 +13,8 @@ public final class OptimisticLockingValidator {
     public static void validate(Long currentVersion, Long expectedVersion) {
         if (expectedVersion != null && !Objects.equals(currentVersion, expectedVersion)) {
             throw new OptimisticLockingFailureException(
-                    String.format(
-                            "Version mismatch: expected %d but was %d",
-                            expectedVersion, currentVersion));
+                String.format("Version mismatch: expected %d but was %d", expectedVersion, currentVersion)
+            );
         }
     }
 }

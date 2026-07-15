@@ -1,7 +1,5 @@
 package com.vertyll.freshly.notification.domain;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
@@ -9,6 +7,8 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.*;
 
 class EmailNotificationTest {
 
@@ -29,8 +29,7 @@ class EmailNotificationTest {
 
     private static final String RECIPIENT_CANNOT_BE_NULL = "Recipient cannot be null";
     private static final String TEMPLATE_CANNOT_BE_NULL = "Template cannot be null";
-    private static final String TEMPLATE_VARIABLES_CANNOT_BE_NULL =
-            "Template variables cannot be null";
+    private static final String TEMPLATE_VARIABLES_CANNOT_BE_NULL = "Template variables cannot be null";
     private static final String EMAIL_ALREADY_SENT = "Email already sent";
 
     @Test
@@ -65,8 +64,8 @@ class EmailNotificationTest {
 
         // When & Then
         assertThatThrownBy(() -> new EmailNotification(null, template, variables))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining(RECIPIENT_CANNOT_BE_NULL);
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining(RECIPIENT_CANNOT_BE_NULL);
     }
 
     @Test
@@ -79,8 +78,8 @@ class EmailNotificationTest {
 
         // When & Then
         assertThatThrownBy(() -> new EmailNotification(recipient, null, variables))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining(TEMPLATE_CANNOT_BE_NULL);
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining(TEMPLATE_CANNOT_BE_NULL);
     }
 
     @Test
@@ -93,8 +92,8 @@ class EmailNotificationTest {
 
         // When & Then
         assertThatThrownBy(() -> new EmailNotification(recipient, template, null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining(TEMPLATE_VARIABLES_CANNOT_BE_NULL);
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining(TEMPLATE_VARIABLES_CANNOT_BE_NULL);
     }
 
     @Test
@@ -126,9 +125,7 @@ class EmailNotificationTest {
         notification.markAsSent();
 
         // When & Then
-        assertThatThrownBy(notification::markAsSent)
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(EMAIL_ALREADY_SENT);
+        assertThatThrownBy(notification::markAsSent).isInstanceOf(IllegalStateException.class).hasMessageContaining(EMAIL_ALREADY_SENT);
     }
 
     @Test
@@ -170,8 +167,7 @@ class EmailNotificationTest {
         assertThat(notification.getTemplateVariables()).doesNotContainKey(NEW_KEY);
         assertThat(notification.getTemplateVariables()).hasSize(1);
 
-        assertThatThrownBy(() -> notificationVariables.put(FAIL_KEY, FAIL_VALUE))
-                .isInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(() -> notificationVariables.put(FAIL_KEY, FAIL_VALUE)).isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
@@ -182,16 +178,14 @@ class EmailNotificationTest {
         UUID id = UUID.randomUUID();
         Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.PASSWORD_RESET;
-        Map<String, Object> variables =
-                Map.of(USERNAME_KEY, USERNAME_VALUE, RESET_LINK_KEY, RESET_LINK_VALUE);
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE, RESET_LINK_KEY, RESET_LINK_VALUE);
         LocalDateTime createdAt = LocalDateTime.now(ZoneOffset.UTC).minusHours(1);
         EmailNotification.EmailStatus status = EmailNotification.EmailStatus.SENT;
         LocalDateTime sentAt = LocalDateTime.now(ZoneOffset.UTC);
 
         // When
         EmailNotification notification =
-                EmailNotification.reconstitute(
-                        id, recipient, template, variables, createdAt, status, sentAt, null);
+                EmailNotification.reconstitute(id, recipient, template, variables, createdAt, status, sentAt, null);
 
         // Then
         assertThat(notification.getId()).isEqualTo(id);
@@ -218,15 +212,7 @@ class EmailNotificationTest {
 
         // When
         EmailNotification notification =
-                EmailNotification.reconstitute(
-                        id,
-                        recipient,
-                        template,
-                        variables,
-                        createdAt,
-                        status,
-                        null,
-                        CONNECTION_TIMEOUT);
+                EmailNotification.reconstitute(id, recipient, template, variables, createdAt, status, null, CONNECTION_TIMEOUT);
 
         // Then
         assertThat(notification.getStatus()).isEqualTo(EmailNotification.EmailStatus.FAILED);

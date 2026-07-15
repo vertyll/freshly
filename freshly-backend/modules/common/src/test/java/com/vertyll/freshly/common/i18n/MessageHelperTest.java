@@ -1,10 +1,5 @@
 package com.vertyll.freshly.common.i18n;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
 import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,10 +11,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class MessageHelperTest {
 
-    @Mock private MessageSource messageSource;
+    @Mock
+    private MessageSource messageSource;
 
     private MessageHelper messageHelper;
 
@@ -129,12 +130,10 @@ class MessageHelperTest {
         Locale currentLocale = Locale.forLanguageTag("en-US");
         LocaleContextHolder.setLocale(currentLocale);
 
-        when(messageSource.getMessage(eq(key), any(), eq(currentLocale)))
-                .thenReturn(expectedMessage);
+        when(messageSource.getMessage(eq(key), any(), eq(currentLocale))).thenReturn(expectedMessage);
 
         // When
-        @SuppressWarnings("NullAway")
-        String message = messageHelper.getMessage(key, (Object[]) null);
+        @SuppressWarnings("NullAway") String message = messageHelper.getMessage(key, (Object[]) null);
 
         // Then
         assertThat(message).isEqualTo(expectedMessage);

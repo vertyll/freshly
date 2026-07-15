@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import jakarta.ws.rs.core.Response;
+
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
@@ -21,15 +23,13 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import com.vertyll.freshly.auth.domain.exception.EmailAlreadyExistsException;
 import com.vertyll.freshly.auth.domain.exception.InvalidPasswordException;
 import com.vertyll.freshly.auth.domain.exception.UsernameAlreadyExistsException;
 import com.vertyll.freshly.auth.keycloak.exception.KeycloakClientException;
 
-import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -58,8 +58,7 @@ public class KeycloakAdminClient {
         return keycloak.realm(properties.realm());
     }
 
-    public UUID createUser(
-            String username, String email, String password, String firstName, String lastName) {
+    public UUID createUser(String username, String email, String password, String firstName, String lastName) {
         UsersResource usersResource = getRealm().users();
 
         if (!usersResource.searchByUsername(username, true).isEmpty()) {
@@ -86,10 +85,7 @@ public class KeycloakAdminClient {
 
         try (Response response = usersResource.create(user)) {
             if (response.getStatus() != HttpStatus.CREATED.value()) {
-                log.error(
-                        "Failed to create user in Keycloak: status={}, info={}",
-                        response.getStatus(),
-                        response.getStatusInfo());
+                log.error("Failed to create user in Keycloak: status={}, info={}", response.getStatus(), response.getStatusInfo());
                 throw new KeycloakClientException(KEYCLOAK_CREATE_FAIL + response.getStatusInfo());
             }
 
@@ -124,8 +120,7 @@ public class KeycloakAdminClient {
         UserRepresentation user = userResource.toRepresentation();
 
         List<UserRepresentation> existingUsers = getRealm().users().searchByEmail(newEmail, true);
-        if (!existingUsers.isEmpty()
-                && !existingUsers.getFirst().getId().equals(userId.toString())) {
+        if (!existingUsers.isEmpty() && !existingUsers.getFirst().getId().equals(userId.toString())) {
             throw new EmailAlreadyExistsException(newEmail);
         }
 
@@ -152,10 +147,7 @@ public class KeycloakAdminClient {
             if (response.getStatus() >= 200 && response.getStatus() < 300) {
                 log.info("User deleted from Keycloak: {}", userId);
             } else {
-                log.warn(
-                        "Delete user returned non-success status: status={}, userId={}",
-                        response.getStatus(),
-                        userId);
+                log.warn("Delete user returned non-success status: status={}, userId={}", response.getStatus(), userId);
             }
         }
     }
@@ -176,21 +168,17 @@ public class KeycloakAdminClient {
         formData.add(USERNAME_KEY, username);
         formData.add(PASSWORD_KEY, password);
 
-        String tokenUrl =
-                properties.serverUrl()
-                        + "/realms/"
-                        + properties.realm()
-                        + "/protocol/openid-connect/token";
+        String tokenUrl = properties.serverUrl() + "/realms/" + properties.realm() + "/protocol/openid-connect/token";
 
         try {
-            Map<String, Object> response =
-                    restClient
-                            .post()
-                            .uri(tokenUrl)
-                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                            .body(formData)
-                            .retrieve()
-                            .body(new ParameterizedTypeReference<>() {});
+            Map<String, Object> response = restClient
+                .post()
+                .uri(tokenUrl)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(formData)
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
 
             if (response == null || !response.containsKey(ACCESS_TOKEN_KEY)) {
                 log.warn("Password verification failed for user: {} - invalid response", username);

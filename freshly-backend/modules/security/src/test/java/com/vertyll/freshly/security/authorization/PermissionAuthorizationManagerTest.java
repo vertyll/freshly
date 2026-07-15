@@ -1,9 +1,5 @@
 package com.vertyll.freshly.security.authorization;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
@@ -20,6 +16,10 @@ import org.springframework.security.core.Authentication;
 import com.vertyll.freshly.common.annotation.RequirePermission;
 import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.permission.application.PermissionService;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PermissionAuthorizationManagerTest {
@@ -53,8 +53,7 @@ class PermissionAuthorizationManagerTest {
         // Given
         Method method = SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_PERMISSION);
         when(methodInvocation.getMethod()).thenReturn(method);
-        when(permissionService.hasPermission(authentication, Permission.USERS_READ))
-                .thenReturn(true);
+        when(permissionService.hasPermission(authentication, Permission.USERS_READ)).thenReturn(true);
 
         Supplier<Authentication> authSupplier = () -> authentication;
 
@@ -69,13 +68,11 @@ class PermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should deny access when user does not have required permission on method")
-    void shouldDenyAccessWhenUserDoesNotHaveRequiredPermissionOnMethod()
-            throws NoSuchMethodException {
+    void shouldDenyAccessWhenUserDoesNotHaveRequiredPermissionOnMethod() throws NoSuchMethodException {
         // Given
         Method method = SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_PERMISSION);
         when(methodInvocation.getMethod()).thenReturn(method);
-        when(permissionService.hasPermission(authentication, Permission.USERS_READ))
-                .thenReturn(false);
+        when(permissionService.hasPermission(authentication, Permission.USERS_READ)).thenReturn(false);
 
         Supplier<Authentication> authSupplier = () -> authentication;
 
@@ -90,13 +87,11 @@ class PermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should check class-level annotation when method annotation is absent")
-    void shouldCheckClassLevelAnnotationWhenMethodAnnotationIsAbsent()
-            throws NoSuchMethodException {
+    void shouldCheckClassLevelAnnotationWhenMethodAnnotationIsAbsent() throws NoSuchMethodException {
         // Given
         Method method = ClassWithPermission.class.getDeclaredMethod(METHOD_WITHOUT_ANNOTATION);
         when(methodInvocation.getMethod()).thenReturn(method);
-        when(permissionService.hasPermission(authentication, Permission.USERS_CREATE))
-                .thenReturn(true);
+        when(permissionService.hasPermission(authentication, Permission.USERS_CREATE)).thenReturn(true);
 
         Supplier<Authentication> authSupplier = () -> authentication;
 
@@ -111,14 +106,11 @@ class PermissionAuthorizationManagerTest {
 
     @Test
     @DisplayName("Should prioritize method-level annotation over class-level annotation")
-    void shouldPrioritizeMethodLevelAnnotationOverClassLevelAnnotation()
-            throws NoSuchMethodException {
+    void shouldPrioritizeMethodLevelAnnotationOverClassLevelAnnotation() throws NoSuchMethodException {
         // Given
-        Method method =
-                ClassWithPermission.class.getDeclaredMethod(METHOD_WITH_DIFFERENT_PERMISSION);
+        Method method = ClassWithPermission.class.getDeclaredMethod(METHOD_WITH_DIFFERENT_PERMISSION);
         when(methodInvocation.getMethod()).thenReturn(method);
-        when(permissionService.hasPermission(authentication, Permission.USERS_DELETE))
-                .thenReturn(true);
+        when(permissionService.hasPermission(authentication, Permission.USERS_DELETE)).thenReturn(true);
 
         Supplier<Authentication> authSupplier = () -> authentication;
 

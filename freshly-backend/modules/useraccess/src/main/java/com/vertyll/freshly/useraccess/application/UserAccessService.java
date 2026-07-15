@@ -6,14 +6,14 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import com.vertyll.freshly.common.util.OptimisticLockingValidator;
 import com.vertyll.freshly.useraccess.domain.SystemUser;
 import com.vertyll.freshly.useraccess.domain.SystemUserRepository;
 import com.vertyll.freshly.useraccess.domain.exception.UserAlreadyExistsException;
 import com.vertyll.freshly.useraccess.domain.exception.UserNotFoundException;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -35,9 +35,7 @@ public class UserAccessService {
 
     public SystemUser getUserById(UUID userId) {
         log.debug("Fetching user by id: {}", userId);
-        return systemUserRepository
-                .findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        return systemUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     public List<SystemUser> getAllUsers() {
@@ -46,10 +44,7 @@ public class UserAccessService {
     }
 
     public void activateUser(UUID userId, Long expectedVersion) {
-        SystemUser user =
-                systemUserRepository
-                        .findById(userId)
-                        .orElseThrow(() -> new UserNotFoundException(userId));
+        SystemUser user = systemUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
         OptimisticLockingValidator.validate(user.getVersion(), expectedVersion);
         user.activate();
@@ -59,10 +54,7 @@ public class UserAccessService {
     }
 
     public void deactivateUser(UUID userId, UUID loggedInUserId, Long expectedVersion) {
-        SystemUser user =
-                systemUserRepository
-                        .findById(userId)
-                        .orElseThrow(() -> new UserNotFoundException(userId));
+        SystemUser user = systemUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
         OptimisticLockingValidator.validate(user.getVersion(), expectedVersion);
         user.deactivate(loggedInUserId);
@@ -72,10 +64,7 @@ public class UserAccessService {
     }
 
     public void replaceUserRoles(UUID userId, Set<String> roles, Long expectedVersion) {
-        SystemUser user =
-                systemUserRepository
-                        .findById(userId)
-                        .orElseThrow(() -> new UserNotFoundException(userId));
+        SystemUser user = systemUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
         OptimisticLockingValidator.validate(user.getVersion(), expectedVersion);
         user.replaceRoles(roles);

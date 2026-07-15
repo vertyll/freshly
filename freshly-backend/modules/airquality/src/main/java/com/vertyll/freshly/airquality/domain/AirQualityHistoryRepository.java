@@ -20,8 +20,7 @@ public interface AirQualityHistoryRepository {
     Optional<AirQualityMeasurement> findLatestByStationId(int stationId);
 
     /** Find measurements for a station within time range (for charts) */
-    List<AirQualityMeasurement> findByStationIdAndDateRange(
-            int stationId, LocalDateTime from, LocalDateTime to);
+    List<AirQualityMeasurement> findByStationIdAndDateRange(int stationId, LocalDateTime from, LocalDateTime to);
 
     /** Find all measurements within the time range (for general statistics) */
     List<AirQualityMeasurement> findByDateRange(LocalDateTime from, LocalDateTime to);
@@ -33,22 +32,23 @@ public interface AirQualityHistoryRepository {
     void deleteOlderThan(LocalDateTime threshold);
 
     /** Calculate statistics for a station within a time range */
-    Optional<AirQualityStatistics> calculateStatistics(
-            int stationId, LocalDateTime from, LocalDateTime to);
+    Optional<AirQualityStatistics> calculateStatistics(int stationId, LocalDateTime from, LocalDateTime to);
 
     /**
      * Get ranking of stations (best to worst) within time range
      *
-     * @param limit Max number of stations to return
+     * @param limit
+     *     Max number of stations to return
      */
     List<StationRanking> getRanking(LocalDateTime from, LocalDateTime to, int limit);
 
     /** Find measurements for stations within geographic bounds */
     List<AirQualityMeasurement> findByGeoBounds(
-            double minLat,
-            double maxLat,
-            double minLon,
-            double maxLon,
-            LocalDateTime from,
-            LocalDateTime to);
+        double minLat,
+        double maxLat,
+        double minLon,
+        double maxLon,
+        LocalDateTime from,
+        LocalDateTime to
+    );
 }

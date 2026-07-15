@@ -17,5 +17,6 @@ public abstract class BaseResponse<T> implements IResponse<T> {
     protected @Nullable T data;
     @Nullable protected String message;
 
-    @Builder.Default protected LocalDateTime timestamp = LocalDateTime.now(ZoneOffset.UTC);
+    @Builder.Default
+    protected LocalDateTime timestamp = LocalDateTime.now(ZoneOffset.UTC);
 }

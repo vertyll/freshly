@@ -32,36 +32,28 @@ public class AuthControllerAdvice {
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public ProblemDetail handleUsernameAlreadyExists(UsernameAlreadyExistsException ex) {
         LOGGER.warn("Username conflict: {}", ex.getMessage());
-        String message =
-                messageSource.getMessage(
-                        AUTH_USERNAME_EXISTS_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message = messageSource.getMessage(AUTH_USERNAME_EXISTS_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ProblemDetail handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
         LOGGER.warn("Email conflict: {}", ex.getMessage());
-        String message =
-                messageSource.getMessage(
-                        AUTH_EMAIL_EXISTS_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message = messageSource.getMessage(AUTH_EMAIL_EXISTS_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
     }
 
     @ExceptionHandler(InvalidVerificationTokenException.class)
     public ProblemDetail handleInvalidToken(InvalidVerificationTokenException ex) {
         LOGGER.warn("Invalid verification token: {}", ex.getMessage());
-        String message =
-                messageSource.getMessage(
-                        AUTH_INVALID_TOKEN_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message = messageSource.getMessage(AUTH_INVALID_TOKEN_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(InvalidPasswordException.class)
     public ProblemDetail handleInvalidPassword(InvalidPasswordException ex) {
         LOGGER.warn("Invalid password: {}", ex.getMessage());
-        String message =
-                messageSource.getMessage(
-                        AUTH_INVALID_PASSWORD_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message = messageSource.getMessage(AUTH_INVALID_PASSWORD_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, message);
     }
 }

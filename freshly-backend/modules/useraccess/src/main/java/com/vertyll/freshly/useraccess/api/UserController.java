@@ -1,9 +1,9 @@
 package com.vertyll.freshly.useraccess.api;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.validation.Valid;
 
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
@@ -21,9 +21,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import com.vertyll.freshly.common.annotation.RequirePermission;
 import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.common.http.ETagUtil;
@@ -35,7 +32,10 @@ import com.vertyll.freshly.useraccess.api.mapper.UserDtoMapper;
 import com.vertyll.freshly.useraccess.application.UserAccessService;
 import com.vertyll.freshly.useraccess.domain.SystemUser;
 
-import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import static java.util.Objects.requireNonNull;
 
 @RestController
 @RequestMapping("/users")
@@ -55,25 +55,17 @@ public class UserController {
 
     @PostMapping
     @RequirePermission(Permission.USERS_CREATE)
-    public ResponseEntity<ApiResponse<UserResponseDto>> createUser(
-            @Valid @RequestBody CreateUserRequestDto request) {
+    public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@Valid @RequestBody CreateUserRequestDto request) {
 
         log.info("Creating user with keycloak id: {}", request.keycloakUserId());
 
-        SystemUser user =
-                userAccessService.createUser(
-                        request.keycloakUserId(), request.isActive(), request.roles());
+        SystemUser user = userAccessService.createUser(request.keycloakUserId(), request.isActive(), request.roles());
 
         UserResponseDto responseDto = userDtoMapper.toResponse(user);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .header(HttpHeaders.ETAG, ETagUtil.buildWeakETag(responseDto.version()))
-                .body(
-                        ApiResponse.buildResponse(
-                                        responseDto,
-                                        USER_CREATED_MSG_KEY,
-                                        messageSource,
-                                        HttpStatus.CREATED)
-                                .getBody());
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .header(HttpHeaders.ETAG, ETagUtil.buildWeakETag(responseDto.version()))
+            .body(ApiResponse.buildResponse(responseDto, USER_CREATED_MSG_KEY, messageSource, HttpStatus.CREATED).getBody());
     }
 
     @GetMapping("/{userId}")
@@ -84,15 +76,10 @@ public class UserController {
         SystemUser user = userAccessService.getUserById(userId);
         UserResponseDto responseDto = userDtoMapper.toResponse(user);
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.ETAG, ETagUtil.buildWeakETag(responseDto.version()))
-                .body(
-                        ApiResponse.buildResponse(
-                                        responseDto,
-                                        USER_FETCHED_MSG_KEY,
-                                        messageSource,
-                                        HttpStatus.OK)
-                                .getBody());
+        return ResponseEntity
+            .ok()
+            .header(HttpHeaders.ETAG, ETagUtil.buildWeakETag(responseDto.version()))
+            .body(ApiResponse.buildResponse(responseDto, USER_FETCHED_MSG_KEY, messageSource, HttpStatus.OK).getBody());
     }
 
     @GetMapping
@@ -102,57 +89,50 @@ public class UserController {
 
         List<SystemUser> users = userAccessService.getAllUsers();
 
-        return ApiResponse.buildResponse(
-                userDtoMapper.toResponseList(users),
-                USER_LIST_FETCHED_MSG_KEY,
-                messageSource,
-                HttpStatus.OK);
+        return ApiResponse.buildResponse(userDtoMapper.toResponseList(users), USER_LIST_FETCHED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PatchMapping("/{userId}/activate")
     @RequirePermission(Permission.USERS_ACTIVATE)
     public ResponseEntity<ApiResponse<Void>> activateUser(
-            @PathVariable UUID userId,
-            @RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch) {
+        @PathVariable UUID userId,
+        @RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch
+    ) {
         log.info("Activating user: {}", userId);
 
         userAccessService.activateUser(userId, ETagUtil.parseIfMatchToVersion(ifMatch));
 
-        return ApiResponse.buildResponse(
-                null, USER_ACTIVATED_MSG_KEY, messageSource, HttpStatus.OK);
+        return ApiResponse.buildResponse(null, USER_ACTIVATED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PatchMapping("/{userId}/deactivate")
     @RequirePermission(Permission.USERS_DEACTIVATE)
     public ResponseEntity<ApiResponse<Void>> deactivateUser(
-            @PathVariable UUID userId,
-            @AuthenticationPrincipal Jwt jwt,
-            @RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch) {
+        @PathVariable UUID userId,
+        @AuthenticationPrincipal Jwt jwt,
+        @RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch
+    ) {
 
         log.info("Deactivating user: {}", userId);
 
-        UUID loggedInUserId =
-                UUID.fromString(requireNonNull(jwt.getSubject(), "JWT subject cannot be null"));
-        userAccessService.deactivateUser(
-                userId, loggedInUserId, ETagUtil.parseIfMatchToVersion(ifMatch));
+        UUID loggedInUserId = UUID.fromString(requireNonNull(jwt.getSubject(), "JWT subject cannot be null"));
+        userAccessService.deactivateUser(userId, loggedInUserId, ETagUtil.parseIfMatchToVersion(ifMatch));
 
-        return ApiResponse.buildResponse(
-                null, USER_DEACTIVATED_MSG_KEY, messageSource, HttpStatus.OK);
+        return ApiResponse.buildResponse(null, USER_DEACTIVATED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PutMapping("/{userId}/roles")
     @RequirePermission(Permission.USERS_MANAGE_ROLES)
     public ResponseEntity<ApiResponse<Void>> updateUserRoles(
-            @PathVariable UUID userId,
-            @Valid @RequestBody UpdateUserRolesRequestDto request,
-            @RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch) {
+        @PathVariable UUID userId,
+        @Valid @RequestBody UpdateUserRolesRequestDto request,
+        @RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch
+    ) {
 
         log.info("Updating roles for user: {}", userId);
 
-        userAccessService.replaceUserRoles(
-                userId, request.roles(), ETagUtil.parseIfMatchToVersion(ifMatch));
+        userAccessService.replaceUserRoles(userId, request.roles(), ETagUtil.parseIfMatchToVersion(ifMatch));
 
-        return ApiResponse.buildResponse(
-                null, USER_ROLES_UPDATED_MSG_KEY, messageSource, HttpStatus.OK);
+        return ApiResponse.buildResponse(null, USER_ROLES_UPDATED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 }

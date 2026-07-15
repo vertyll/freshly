@@ -8,8 +8,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.vertyll.freshly.common.enums.Permission;
 
-public interface SpringDataRolePermissionRepository
-        extends MongoRepository<RolePermissionMappingDocument, UUID> {
+public interface SpringDataRolePermissionRepository extends MongoRepository<RolePermissionMappingDocument, UUID> {
 
     List<RolePermissionMappingDocument> findByKeycloakRoleIn(Set<String> roles);
 

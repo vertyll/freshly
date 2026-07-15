@@ -1,7 +1,7 @@
 package com.vertyll.freshly.security.resolver;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,8 +15,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import com.vertyll.freshly.common.annotation.RefreshTokenCookie;
 import com.vertyll.freshly.common.config.KeycloakProperties;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RefreshTokenCookieArgumentResolverTest {
@@ -103,11 +103,7 @@ class RefreshTokenCookieArgumentResolverTest {
     @DisplayName("Should resolve refresh token from cookie")
     void shouldResolveRefreshTokenFromCookie() {
         // Given
-        Cookie[] cookies = {
-            new Cookie(SESSION_ID, SESSION_123),
-            new Cookie(REFRESH_TOKEN, TOKEN_123),
-            new Cookie(OTHER, VALUE)
-        };
+        Cookie[] cookies = {new Cookie(SESSION_ID, SESSION_123), new Cookie(REFRESH_TOKEN, TOKEN_123), new Cookie(OTHER, VALUE)};
         when(webRequest.getNativeRequest()).thenReturn(httpServletRequest);
         when(httpServletRequest.getCookies()).thenReturn(cookies);
 
@@ -170,9 +166,7 @@ class RefreshTokenCookieArgumentResolverTest {
         String correctToken = "correct_token";
         when(cookieProperties.refreshTokenCookieName()).thenReturn(customCookieName);
         resolver = new RefreshTokenCookieArgumentResolver(keycloakProperties);
-        Cookie[] cookies = {
-            new Cookie(REFRESH_TOKEN, "wrong_token"), new Cookie(customCookieName, correctToken)
-        };
+        Cookie[] cookies = {new Cookie(REFRESH_TOKEN, "wrong_token"), new Cookie(customCookieName, correctToken)};
         when(webRequest.getNativeRequest()).thenReturn(httpServletRequest);
         when(httpServletRequest.getCookies()).thenReturn(cookies);
 
@@ -188,9 +182,7 @@ class RefreshTokenCookieArgumentResolverTest {
     void shouldReturnFirstMatchingCookieWhenMultipleCookiesWithSameNameExist() {
         // Given
         String firstToken = "first_token";
-        Cookie[] cookies = {
-            new Cookie(REFRESH_TOKEN, firstToken), new Cookie(REFRESH_TOKEN, "second_token")
-        };
+        Cookie[] cookies = {new Cookie(REFRESH_TOKEN, firstToken), new Cookie(REFRESH_TOKEN, "second_token")};
         when(webRequest.getNativeRequest()).thenReturn(httpServletRequest);
         when(httpServletRequest.getCookies()).thenReturn(cookies);
 

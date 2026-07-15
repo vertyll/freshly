@@ -1,7 +1,5 @@
 package com.vertyll.freshly.common.i18n;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +10,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MessageSourceTest {
 
@@ -29,16 +29,13 @@ class MessageSourceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-        "en-US, success.user.created, User created successfully",
-        "pl, success.user.created, Użytkownik został pomyślnie utworzony",
-        "en-US, error.user.notFound, User not found",
-        "pl, error.user.notFound, Nie znaleziono użytkownika",
-        "de, success.user.created, User created successfully"
-    })
+    @CsvSource(
+        {"en-US, success.user.created, User created successfully", "pl, success.user.created, Użytkownik został pomyślnie utworzony",
+                "en-US, error.user.notFound, User not found", "pl, error.user.notFound, Nie znaleziono użytkownika",
+                "de, success.user.created, User created successfully"}
+    )
     @DisplayName("Should load messages for different locales and keys")
-    void shouldLoadMessagesForLocaleAndKey(
-            String localeTag, String messageKey, String expectedMessage) {
+    void shouldLoadMessagesForLocaleAndKey(String localeTag, String messageKey, String expectedMessage) {
         // Given
         Locale locale = Locale.forLanguageTag(localeTag);
         LocaleContextHolder.setLocale(locale);

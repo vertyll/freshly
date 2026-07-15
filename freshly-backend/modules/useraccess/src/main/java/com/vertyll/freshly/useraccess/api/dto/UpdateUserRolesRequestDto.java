@@ -4,5 +4,5 @@ import java.util.Set;
 
 import jakarta.validation.constraints.NotEmpty;
 
-public record UpdateUserRolesRequestDto(
-        @NotEmpty(message = "{validation.user.roles.required}") Set<String> roles) {}
+public record UpdateUserRolesRequestDto(@NotEmpty(message = "{validation.user.roles.required}") Set<String> roles) {
+}

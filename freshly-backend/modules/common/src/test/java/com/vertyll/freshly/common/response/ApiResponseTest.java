@@ -1,9 +1,5 @@
 package com.vertyll.freshly.common.response;
 
-import static java.util.Objects.requireNonNull;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-
 import java.util.Locale;
 
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +11,11 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import static java.util.Objects.requireNonNull;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ApiResponseTest {
@@ -36,8 +37,7 @@ class ApiResponseTest {
         when(messageSource.getMessage(messageKey, null, locale)).thenReturn(localizedMessage);
 
         // When
-        ResponseEntity<ApiResponse<String>> response =
-                ApiResponse.buildResponse(data, messageKey, messageSource, HttpStatus.CREATED);
+        ResponseEntity<ApiResponse<String>> response = ApiResponse.buildResponse(data, messageKey, messageSource, HttpStatus.CREATED);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -60,8 +60,7 @@ class ApiResponseTest {
         when(messageSource.getMessage(messageKey, null, locale)).thenReturn(localizedMessage);
 
         // When
-        ResponseEntity<ApiResponse<String>> response =
-                ApiResponse.buildResponse(data, messageKey, messageSource, HttpStatus.CREATED);
+        ResponseEntity<ApiResponse<String>> response = ApiResponse.buildResponse(data, messageKey, messageSource, HttpStatus.CREATED);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -82,8 +81,7 @@ class ApiResponseTest {
         when(messageSource.getMessage(messageKey, null, locale)).thenReturn(localizedMessage);
 
         // When
-        ResponseEntity<ApiResponse<Void>> response =
-                ApiResponse.buildResponse(null, messageKey, messageSource, HttpStatus.OK);
+        ResponseEntity<ApiResponse<Void>> response = ApiResponse.buildResponse(null, messageKey, messageSource, HttpStatus.OK);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

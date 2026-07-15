@@ -1,7 +1,5 @@
 package com.vertyll.freshly.useraccess.api.mapper;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -14,6 +12,8 @@ import org.mapstruct.factory.Mappers;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.useraccess.api.dto.UserResponseDto;
 import com.vertyll.freshly.useraccess.domain.SystemUser;
+
+import static org.assertj.core.api.Assertions.*;
 
 class UserDtoMapperTest {
     private UserDtoMapper mapper;
@@ -58,19 +58,13 @@ class UserDtoMapperTest {
     void shouldMapUserWithMultipleRolesToUserResponseDto() {
         // Given
         UUID userId = UUID.randomUUID();
-        SystemUser user =
-                new SystemUser(
-                        userId,
-                        true,
-                        Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue()));
+        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue()));
 
         // When
         UserResponseDto result = mapper.toResponse(user);
 
         // Then
-        assertThat(result.roles())
-                .containsExactlyInAnyOrder(
-                        UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
+        assertThat(result.roles()).containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -154,8 +148,7 @@ class UserDtoMapperTest {
     void shouldPreserveUserIdWhenMapping() {
         // Given
         UUID specificUserId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
-        SystemUser user =
-                new SystemUser(specificUserId, true, Set.of(UserRoleEnum.USER.getValue()));
+        SystemUser user = new SystemUser(specificUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When
         UserResponseDto result = mapper.toResponse(user);
@@ -168,15 +161,10 @@ class UserDtoMapperTest {
     @DisplayName("Should map multiple users with different states")
     void shouldMapMultipleUsersWithDifferentStates() {
         // Given
-        SystemUser activeUser =
-                new SystemUser(UUID.randomUUID(), true, Set.of(UserRoleEnum.USER.getValue()));
-        SystemUser inactiveAdmin =
-                new SystemUser(UUID.randomUUID(), false, Set.of(UserRoleEnum.ADMIN.getValue()));
+        SystemUser activeUser = new SystemUser(UUID.randomUUID(), true, Set.of(UserRoleEnum.USER.getValue()));
+        SystemUser inactiveAdmin = new SystemUser(UUID.randomUUID(), false, Set.of(UserRoleEnum.ADMIN.getValue()));
         SystemUser activeMultiRole =
-                new SystemUser(
-                        UUID.randomUUID(),
-                        true,
-                        Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue()));
+                new SystemUser(UUID.randomUUID(), true, Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue()));
         List<SystemUser> users = List.of(activeUser, inactiveAdmin, activeMultiRole);
 
         // When
@@ -189,9 +177,7 @@ class UserDtoMapperTest {
         assertThat(result.get(1).isActive()).isFalse();
         assertThat(result.get(1).roles()).containsExactly(UserRoleEnum.ADMIN.getValue());
         assertThat(result.get(2).isActive()).isTrue();
-        assertThat(result.get(2).roles())
-                .containsExactlyInAnyOrder(
-                        UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
+        assertThat(result.get(2).roles()).containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -199,8 +185,7 @@ class UserDtoMapperTest {
     void shouldHandleReconstituedUser() {
         // Given
         UUID userId = UUID.randomUUID();
-        SystemUser user =
-                SystemUser.reconstitute(userId, false, Set.of(UserRoleEnum.ADMIN.getValue()), 1L);
+        SystemUser user = SystemUser.reconstitute(userId, false, Set.of(UserRoleEnum.ADMIN.getValue()), 1L);
 
         // When
         UserResponseDto result = mapper.toResponse(user);

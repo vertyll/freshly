@@ -1,12 +1,9 @@
 package com.vertyll.freshly.notification.infrastructure.mail;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-
 import java.util.Map;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,8 +23,11 @@ import com.vertyll.freshly.notification.domain.EmailNotification;
 import com.vertyll.freshly.notification.domain.EmailTemplate;
 import com.vertyll.freshly.notification.domain.exception.EmailSendingException;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SmtpEmailSenderTest {
@@ -47,11 +47,9 @@ class SmtpEmailSenderTest {
     private static final String VERIFICATION_LINK = "https://example.com";
     private static final String RESET_LINK = "https://example.com/reset/token123";
 
-    private static final String HTML_VERIFICATION_EMAIL =
-            "<html><body>Verification email</body></html>";
+    private static final String HTML_VERIFICATION_EMAIL = "<html><body>Verification email</body></html>";
     private static final String HTML_WELCOME = "<html><body>Welcome</body></html>";
-    private static final String HTML_PASSWORD_RESET =
-            "<html><body>Reset your password</body></html>";
+    private static final String HTML_PASSWORD_RESET = "<html><body>Reset your password</body></html>";
     private static final String HTML_VERIFY_EMAIL = "<html><body>Verify your email</body></html>";
     private static final String HTML_EMAIL = "<html><body>Email</body></html>";
 
@@ -99,12 +97,10 @@ class SmtpEmailSenderTest {
         // Given
         Email recipient = new Email(TEST_EMAIL);
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
-        Map<String, Object> variables =
-                Map.of(USERNAME_KEY, USERNAME_JOHN, VERIFICATION_LINK_KEY, VERIFICATION_LINK);
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_JOHN, VERIFICATION_LINK_KEY, VERIFICATION_LINK);
         EmailNotification notification = new EmailNotification(recipient, template, variables);
 
-        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenReturn(HTML_VERIFICATION_EMAIL);
+        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class))).thenReturn(HTML_VERIFICATION_EMAIL);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
         doNothing().when(mailSender).send(mimeMessage);
@@ -131,23 +127,19 @@ class SmtpEmailSenderTest {
         Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_JOHN);
         EmailNotification notification = new EmailNotification(recipient, template, variables);
 
-        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenReturn(HTML_WELCOME);
+        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class))).thenReturn(HTML_WELCOME);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
 
-        doAnswer(
-                        _ -> {
-                            throw new MessagingException(SMTP_SERVER_NOT_RESPONDING);
-                        })
-                .when(mailSender)
-                .send(any(MimeMessage.class));
+        doAnswer(_ -> {
+            throw new MessagingException(SMTP_SERVER_NOT_RESPONDING);
+        }).when(mailSender).send(any(MimeMessage.class));
 
         // When & Then
         assertThatThrownBy(() -> smtpEmailSender.send(notification))
-                .isInstanceOf(EmailSendingException.class)
-                .hasMessageContaining(FAILED_TO_SEND_EMAIL)
-                .hasCauseInstanceOf(MessagingException.class);
+            .isInstanceOf(EmailSendingException.class)
+            .hasMessageContaining(FAILED_TO_SEND_EMAIL)
+            .hasCauseInstanceOf(MessagingException.class);
 
         verify(mailSender).send(any(MimeMessage.class));
     }
@@ -158,16 +150,12 @@ class SmtpEmailSenderTest {
         // Given
         Email recipient = new Email(USER_EMAIL);
         EmailTemplate template = EmailTemplate.PASSWORD_RESET;
-        Map<String, Object> variables =
-                Map.of(
-                        USERNAME_KEY, USERNAME_JANE_DOE,
-                        RESET_LINK_KEY, RESET_LINK);
+        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_JANE_DOE, RESET_LINK_KEY, RESET_LINK);
         EmailNotification notification = new EmailNotification(recipient, template, variables);
 
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
-        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenReturn(HTML_PASSWORD_RESET);
+        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class))).thenReturn(HTML_PASSWORD_RESET);
         doNothing().when(mailSender).send(mimeMessage);
 
         // When
@@ -191,8 +179,7 @@ class SmtpEmailSenderTest {
 
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
-        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenReturn(HTML_VERIFY_EMAIL);
+        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class))).thenReturn(HTML_VERIFY_EMAIL);
         doNothing().when(mailSender).send(mimeMessage);
 
         // When
@@ -213,8 +200,7 @@ class SmtpEmailSenderTest {
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
 
-        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenReturn(HTML_WELCOME);
+        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class))).thenReturn(HTML_WELCOME);
         doNothing().when(mailSender).send(mimeMessage);
 
         // When
@@ -237,12 +223,12 @@ class SmtpEmailSenderTest {
         EmailNotification notification = new EmailNotification(recipient, template, variables);
 
         when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenThrow(new RuntimeException(TEMPLATE_NOT_FOUND));
+            .thenThrow(new RuntimeException(TEMPLATE_NOT_FOUND));
 
         // When & Then
         assertThatThrownBy(() -> smtpEmailSender.send(notification))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining(TEMPLATE_NOT_FOUND);
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining(TEMPLATE_NOT_FOUND);
 
         verify(mailSender, never()).send(any(MimeMessage.class));
     }
@@ -260,20 +246,17 @@ class SmtpEmailSenderTest {
         doNothing().when(mailSender).send(mimeMessage);
 
         // When & Then - Email Verification
-        EmailNotification verificationNotification =
-                new EmailNotification(recipient, EmailTemplate.EMAIL_VERIFICATION, variables);
+        EmailNotification verificationNotification = new EmailNotification(recipient, EmailTemplate.EMAIL_VERIFICATION, variables);
         smtpEmailSender.send(verificationNotification);
         verify(templateEngine).process(eq(TEMPLATE_EMAIL_VERIFICATION), any(Context.class));
 
         // When & Then - User Registered
-        EmailNotification registeredNotification =
-                new EmailNotification(recipient, EmailTemplate.USER_REGISTERED, variables);
+        EmailNotification registeredNotification = new EmailNotification(recipient, EmailTemplate.USER_REGISTERED, variables);
         smtpEmailSender.send(registeredNotification);
         verify(templateEngine).process(eq(TEMPLATE_USER_REGISTERED), any(Context.class));
 
         // When & Then - Password Reset
-        EmailNotification resetNotification =
-                new EmailNotification(recipient, EmailTemplate.PASSWORD_RESET, variables);
+        EmailNotification resetNotification = new EmailNotification(recipient, EmailTemplate.PASSWORD_RESET, variables);
         smtpEmailSender.send(resetNotification);
         verify(templateEngine).process(eq(TEMPLATE_PASSWORD_RESET), any(Context.class));
     }
@@ -290,8 +273,7 @@ class SmtpEmailSenderTest {
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
 
-        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
-                .thenReturn(HTML_WELCOME);
+        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class))).thenReturn(HTML_WELCOME);
         doNothing().when(mailSender).send(mimeMessage);
 
         // When

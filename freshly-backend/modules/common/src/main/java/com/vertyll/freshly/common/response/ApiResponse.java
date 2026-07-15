@@ -23,17 +23,14 @@ public class ApiResponse<T> extends BaseResponse<T> {
      * @deprecated Use buildResponse(T, String, MessageSource, HttpStatus) for i18n support
      */
     @Deprecated(since = "1.1")
-    public static <T>
-            ResponseEntity<ApiResponse<T>>
-                    buildResponse( // NOSONAR - Deprecated method retained for backward
-                            // compatibility
-                            @Nullable T data, String message, HttpStatus status) {
-        ApiResponse<T> response =
-                ApiResponse.<T>builder()
-                        .data(data)
-                        .message(message)
-                        .timestamp(LocalDateTime.now(ZoneOffset.UTC))
-                        .build();
+    public static <T> ResponseEntity<ApiResponse<T>> buildResponse(
+        // NOSONAR - Deprecated method retained for backward
+        // compatibility
+        @Nullable T data,
+        String message,
+        HttpStatus status
+    ) {
+        ApiResponse<T> response = ApiResponse.<T>builder().data(data).message(message).timestamp(LocalDateTime.now(ZoneOffset.UTC)).build();
 
         return new ResponseEntity<>(response, status);
     }
@@ -42,23 +39,26 @@ public class ApiResponse<T> extends BaseResponse<T> {
      * Builds response with a localized message using MessageSource. This is the recommended method
      * for all new code.
      *
-     * @param data Response payload
-     * @param messageKey Message key from messages_*.properties
-     * @param messageSource Spring MessageSource bean
-     * @param status HTTP status
+     * @param data
+     *     Response payload
+     * @param messageKey
+     *     Message key from messages_*.properties
+     * @param messageSource
+     *     Spring MessageSource bean
+     * @param status
+     *     HTTP status
      * @return ResponseEntity with a localized message
      */
     public static <T> ResponseEntity<ApiResponse<T>> buildResponse(
-            @Nullable T data, String messageKey, MessageSource messageSource, HttpStatus status) {
-        String localizedMessage =
-                messageSource.getMessage(messageKey, null, LocaleContextHolder.getLocale());
+        @Nullable T data,
+        String messageKey,
+        MessageSource messageSource,
+        HttpStatus status
+    ) {
+        String localizedMessage = messageSource.getMessage(messageKey, null, LocaleContextHolder.getLocale());
 
         ApiResponse<T> response =
-                ApiResponse.<T>builder()
-                        .data(data)
-                        .message(localizedMessage)
-                        .timestamp(LocalDateTime.now(ZoneOffset.UTC))
-                        .build();
+                ApiResponse.<T>builder().data(data).message(localizedMessage).timestamp(LocalDateTime.now(ZoneOffset.UTC)).build();
 
         return new ResponseEntity<>(response, status);
     }

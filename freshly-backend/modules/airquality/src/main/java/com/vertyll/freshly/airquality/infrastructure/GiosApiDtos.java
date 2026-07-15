@@ -28,8 +28,7 @@ class GiosApiDtos {
     private static final String INDEX_NO2_PL = "Indeks NO2";
     private static final String INDEX_NO2_CATEGORY_PL = "Nazwa kategorii indeksu dla wskażnika NO2";
     private static final String INDEX_PM10_PL = "Indeks PM10";
-    private static final String INDEX_PM10_CATEGORY_PL =
-            "Nazwa kategorii indeksu dla wskażnika PM10";
+    private static final String INDEX_PM10_CATEGORY_PL = "Nazwa kategorii indeksu dla wskażnika PM10";
 
     // Sensor field aliases
     private static final String SENSOR_ID_PL = "Identyfikator stanowiska";
@@ -53,31 +52,47 @@ class GiosApiDtos {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     record GiosStationDto(
-            @JsonAlias(STATION_ID_PL) Integer id,
-            @JsonAlias(STATION_NAME_PL) String stationName,
-            @JsonAlias(STATION_LAT_PL) String gegrLat,
-            @JsonAlias(STATION_LON_PL) String gegrLon,
-            @JsonAlias(CITY_NAME_PL) String cityName,
-            @JsonAlias(STREET_PL) String addressStreet) {}
+        @JsonAlias(STATION_ID_PL) Integer id,
+        @JsonAlias(STATION_NAME_PL) String stationName,
+        @JsonAlias(STATION_LAT_PL) String gegrLat,
+        @JsonAlias(STATION_LON_PL) String gegrLon,
+        @JsonAlias(CITY_NAME_PL) String cityName,
+        @JsonAlias(STREET_PL) String addressStreet
+    ) {
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     record GiosAQIndexDto(
-            @JsonAlias(AQ_STATION_ID_PL) Integer id,
-            @JsonAlias({CALC_DATE_PL, CALC_DATE_FULL_PL}) String stCalcDate,
-            @JsonAlias({INDEX_OVERALL_PL, INDEX_CATEGORY_PL}) String stIndexLevel,
-            @JsonAlias({INDEX_SO2_PL, INDEX_SO2_CATEGORY_PL}) String so2IndexLevel,
-            @JsonAlias({INDEX_NO2_PL, INDEX_NO2_CATEGORY_PL}) String no2IndexLevel,
-            @JsonAlias({INDEX_PM10_PL, INDEX_PM10_CATEGORY_PL}) String pm10IndexLevel) {}
+        @JsonAlias(AQ_STATION_ID_PL) Integer id,
+        @JsonAlias(
+            {
+                    CALC_DATE_PL, CALC_DATE_FULL_PL}
+        ) String stCalcDate,
+        @JsonAlias({INDEX_OVERALL_PL, INDEX_CATEGORY_PL}) String stIndexLevel,
+        @JsonAlias({INDEX_SO2_PL, INDEX_SO2_CATEGORY_PL}) String so2IndexLevel,
+        @JsonAlias({INDEX_NO2_PL, INDEX_NO2_CATEGORY_PL}) String no2IndexLevel,
+        @JsonAlias({INDEX_PM10_PL, INDEX_PM10_CATEGORY_PL}) String pm10IndexLevel
+    ) {
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     record GiosSensorDto(
-            @JsonAlias({SENSOR_ID_PL, SENSOR_ID_EN, SENSOR_ID_SHORT_PL}) Integer id,
-            @JsonAlias({PARAM_CODE_PL, PARAM_CODE_EN, PARAM_CODE_SHORT_PL}) String paramCode,
-            @JsonAlias({PARAM_NAME_PL, PARAM_NAME_FULL_PL, PARAM_NAME_EN, PARAM_NAME_ALT_PL})
-                    String paramName) {}
+        @JsonAlias(
+            {
+                    SENSOR_ID_PL, SENSOR_ID_EN, SENSOR_ID_SHORT_PL}
+        ) Integer id,
+        @JsonAlias({PARAM_CODE_PL, PARAM_CODE_EN, PARAM_CODE_SHORT_PL}) String paramCode,
+        @JsonAlias({PARAM_NAME_PL, PARAM_NAME_FULL_PL, PARAM_NAME_EN, PARAM_NAME_ALT_PL}) String paramName
+    ) {
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     record GiosDataValueDto(
-            @JsonAlias({DATE_EN_LOWERCASE, DATE_EN, DATE_PL}) String date,
-            @JsonAlias({VALUE_PL_LOWERCASE, VALUE_EN, VALUE_PL}) Double value) {}
+        @JsonAlias(
+            {
+                    DATE_EN_LOWERCASE, DATE_EN, DATE_PL}
+        ) String date,
+        @JsonAlias({VALUE_PL_LOWERCASE, VALUE_EN, VALUE_PL}) Double value
+    ) {
+    }
 }

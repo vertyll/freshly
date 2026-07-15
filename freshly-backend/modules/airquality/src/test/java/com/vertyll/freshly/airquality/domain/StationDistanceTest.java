@@ -1,9 +1,9 @@
 package com.vertyll.freshly.airquality.domain;
 
-import static org.assertj.core.api.Assertions.*;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.*;
 
 class StationDistanceTest {
 
@@ -45,8 +45,8 @@ class StationDistanceTest {
 
         // When & Then
         assertThatThrownBy(() -> new StationDistance(station, negativeDistance))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Distance cannot be negative");
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Distance cannot be negative");
     }
 
     @Test

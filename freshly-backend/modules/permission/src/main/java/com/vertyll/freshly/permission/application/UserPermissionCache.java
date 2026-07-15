@@ -10,13 +10,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import com.vertyll.freshly.common.enums.Permission;
 import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.permission.domain.RolePermissionMapping;
 import com.vertyll.freshly.permission.domain.RolePermissionMappingRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Component responsible for caching user permissions. Separated from PermissionService to
@@ -34,22 +34,21 @@ public class UserPermissionCache {
      * Get all permissions for the authenticated user based on their roles. Results are cached per
      * username for performance.
      *
-     * @param authentication Spring Security authentication object
+     * @param authentication
+     *     Spring Security authentication object
      * @return Set of permissions
      */
     @Cacheable(value = USER_PERMISSIONS_CACHE, key = "#authentication.name")
     public Set<Permission> getUserPermissions(Authentication authentication) {
         Set<String> roles = extractRoles(authentication);
 
-        log.debug(
-                "Fetching permissions for user '{}' with roles: {}",
-                authentication.getName(),
-                roles);
+        log.debug("Fetching permissions for user '{}' with roles: {}", authentication.getName(), roles);
 
-        Set<Permission> permissions =
-                rolePermissionRepository.findByKeycloakRoleIn(roles).stream()
-                        .map(RolePermissionMapping::getPermission)
-                        .collect(Collectors.toSet());
+        Set<Permission> permissions = rolePermissionRepository
+            .findByKeycloakRoleIn(roles)
+            .stream()
+            .map(RolePermissionMapping::getPermission)
+            .collect(Collectors.toSet());
 
         log.debug("User '{}' has permissions: {}", authentication.getName(), permissions);
         return permissions;
@@ -60,15 +59,16 @@ public class UserPermissionCache {
      * Spring adds and normalizes to uppercase using Locale. ROOT for security.
      */
     private Set<String> extractRoles(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .filter(Objects::nonNull)
-                .map(
-                        authority ->
-                                authority.startsWith(UserRoleEnum.ROLE_PREFIX)
-                                        ? authority.substring(UserRoleEnum.ROLE_PREFIX.length())
-                                        : authority)
-                .map(role -> role.toUpperCase(Locale.ROOT))
-                .collect(Collectors.toSet());
+        return authentication
+            .getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .filter(Objects::nonNull)
+            .map(
+                authority -> authority.startsWith(UserRoleEnum.ROLE_PREFIX) ? authority.substring(UserRoleEnum.ROLE_PREFIX.length())
+                        : authority
+            )
+            .map(role -> role.toUpperCase(Locale.ROOT))
+            .collect(Collectors.toSet());
     }
 }

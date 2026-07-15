@@ -5,9 +5,8 @@ import java.util.Locale;
 
 import org.jspecify.annotations.Nullable;
 
-import lombok.Getter;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.Getter;
 
 /**
  * Enum representing air quality levels as defined by GIOŚ (Polish Air Quality Monitoring System).
@@ -15,9 +14,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * name (e.g., "VERY_GOOD"), and the API returns the same. The polishName is only used for parsing
  * data from GIOŚ API.
  */
-@SuppressFBWarnings(
-        value = "IMPROPER_UNICODE",
-        justification = "Unicode-safe normalization (NFC) and Locale.ROOT are explicitly used")
+@SuppressFBWarnings(value = "IMPROPER_UNICODE", justification = "Unicode-safe normalization (NFC) and Locale.ROOT are explicitly used")
 public enum AirQualityLevel {
     VERY_GOOD("Bardzo dobry", 0),
     GOOD("Dobry", 1),
@@ -32,7 +29,8 @@ public enum AirQualityLevel {
      * -- GETTER -- Returns severity level (0 = best, 5 = worst). Useful for comparisons and
      * calculations.
      */
-    @Getter private final int severity;
+    @Getter
+    private final int severity;
 
     AirQualityLevel(String polishName, int severity) {
         this.polishName = polishName;
@@ -51,8 +49,7 @@ public enum AirQualityLevel {
      * Parses Polish name from GIOŚ API to enum value. Returns null if the name is not recognized.
      * This is only used when receiving data from external GIOŚ API.
      */
-    @Nullable
-    public static AirQualityLevel fromPolishName(@Nullable String polishName) {
+    @Nullable public static AirQualityLevel fromPolishName(@Nullable String polishName) {
         if (polishName == null) {
             return null;
         }

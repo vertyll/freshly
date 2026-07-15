@@ -1,15 +1,14 @@
 package com.vertyll.freshly.notification.domain;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.regex.Pattern;
 
 import org.jspecify.annotations.NonNull;
 
+import static java.util.Objects.requireNonNull;
+
 public record Email(String value) {
 
-    private static final Pattern EMAIL_PATTERN =
-            Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     private static final String EMAIL_NULL = "Email cannot be null";
     private static final String INVALID_EMAIL_FORMAT = "Invalid email format: ";

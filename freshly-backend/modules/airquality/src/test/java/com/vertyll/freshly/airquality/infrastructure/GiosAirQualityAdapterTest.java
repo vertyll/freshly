@@ -1,11 +1,5 @@
 package com.vertyll.freshly.airquality.infrastructure;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -18,6 +12,12 @@ import org.springframework.web.client.RestClient;
 import com.vertyll.freshly.airquality.domain.SensorMeasurement;
 import com.vertyll.freshly.common.config.ExternalServiceProperties;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 class GiosAirQualityAdapterTest {
 
     private GiosAirQualityAdapter adapter;
@@ -26,8 +26,7 @@ class GiosAirQualityAdapterTest {
     @BeforeEach
     void setUp() {
         ExternalServiceProperties properties =
-                new ExternalServiceProperties(
-                        new ExternalServiceProperties.Gios("http://api.gios.gov.pl/pjp-api/rest"));
+                new ExternalServiceProperties(new ExternalServiceProperties.Gios("http://api.gios.gov.pl/pjp-api/rest"));
         restClient = mock(RestClient.class);
         adapter = new GiosAirQualityAdapter(properties);
         adapter.setRestClient(restClient);
@@ -36,8 +35,7 @@ class GiosAirQualityAdapterTest {
     @Test
     void shouldFallbackToArchivalDataWhenGiosReturns400ForManualStation() {
         // Given
-        @SuppressWarnings("rawtypes")
-        RestClient.RequestHeadersUriSpec uriSpec = mock(RestClient.RequestHeadersUriSpec.class);
+        @SuppressWarnings("rawtypes") RestClient.RequestHeadersUriSpec uriSpec = mock(RestClient.RequestHeadersUriSpec.class);
         RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
 
         when(restClient.get()).thenReturn(uriSpec);
@@ -48,14 +46,11 @@ class GiosAirQualityAdapterTest {
         // Drugie wywołanie (archiwalne dane) zwraca sukces
         String errorJson = "{\"error_code\":\"API-ERR-100003\"}";
         when(responseSpec.body(String.class))
-                .thenThrow(
-                        HttpClientErrorException.create(
-                                HttpStatus.BAD_REQUEST,
-                                "Bad Request",
-                                null,
-                                errorJson.getBytes(StandardCharsets.UTF_8),
-                                null))
-                .thenReturn("{\"values\": [{\"date\": \"2026-02-22 07:00:00\", \"value\": 25.5}]}");
+            .thenThrow(
+                HttpClientErrorException
+                    .create(HttpStatus.BAD_REQUEST, "Bad Request", null, errorJson.getBytes(StandardCharsets.UTF_8), null)
+            )
+            .thenReturn("{\"values\": [{\"date\": \"2026-02-22 07:00:00\", \"value\": 25.5}]}");
 
         // When
         int sensorId = 654;

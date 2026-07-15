@@ -1,10 +1,8 @@
 package com.vertyll.freshly.auth.api;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
 import java.util.UUID;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +28,9 @@ import com.vertyll.freshly.auth.application.AuthService;
 import com.vertyll.freshly.common.config.KeycloakProperties;
 import com.vertyll.freshly.common.response.ApiResponse;
 
-import jakarta.servlet.http.HttpServletResponse;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
@@ -43,8 +43,7 @@ class AuthControllerTest {
     private static final String AUTH_RESET_EMAIL_SENT_MSG_KEY = "success.auth.resetEmailSent";
     private static final String AUTH_PASSWORD_RESET_MSG_KEY = "success.auth.passwordReset";
     private static final String AUTH_PASSWORD_CHANGED_MSG_KEY = "success.auth.passwordChanged";
-    private static final String AUTH_EMAIL_CHANGE_INITIATED_MSG_KEY =
-            "success.auth.emailChangeInitiated";
+    private static final String AUTH_EMAIL_CHANGE_INITIATED_MSG_KEY = "success.auth.emailChangeInitiated";
     private static final String AUTH_TOKEN_REFRESHED_MSG_KEY = "success.auth.tokenRefreshed";
 
     @Mock
@@ -94,9 +93,7 @@ class AuthControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
         UUID userId = UUID.randomUUID();
-        RegisterUserRequestDto request =
-                new RegisterUserRequestDto(
-                        "testuser", "test@example.com", "Password1!", "Jan", "Kowalski");
+        RegisterUserRequestDto request = new RegisterUserRequestDto("testuser", "test@example.com", "Password1!", "Jan", "Kowalski");
 
         when(authService.registerUser(request)).thenReturn(userId);
 
@@ -114,9 +111,7 @@ class AuthControllerTest {
     void shouldUseMessageSourceForRegisterResponse() {
         // Given
         UUID userId = UUID.randomUUID();
-        RegisterUserRequestDto request =
-                new RegisterUserRequestDto(
-                        "testuser", "test@example.com", "Password1!", "Jan", "Kowalski");
+        RegisterUserRequestDto request = new RegisterUserRequestDto("testuser", "test@example.com", "Password1!", "Jan", "Kowalski");
 
         when(authService.registerUser(request)).thenReturn(userId);
 
@@ -152,14 +147,12 @@ class AuthControllerTest {
         setupCookieProperties();
 
         LoginRequestDto request = new LoginRequestDto("testuser", "Password1!");
-        TokenResponseDto tokens =
-                new TokenResponseDto("access-token", "refresh-token", 300, 3600, "Bearer");
+        TokenResponseDto tokens = new TokenResponseDto("access-token", "refresh-token", 300, 3600, "Bearer");
 
         when(authService.login(request)).thenReturn(tokens);
 
         // When
-        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response =
-                authController.login(request, httpServletResponse);
+        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response = authController.login(request, httpServletResponse);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -176,14 +169,12 @@ class AuthControllerTest {
         setupCookieProperties();
 
         LoginRequestDto request = new LoginRequestDto("testuser", "Password1!");
-        TokenResponseDto tokens =
-                new TokenResponseDto("my-access-token", "refresh-token", 300, 3600, "Bearer");
+        TokenResponseDto tokens = new TokenResponseDto("my-access-token", "refresh-token", 300, 3600, "Bearer");
 
         when(authService.login(request)).thenReturn(tokens);
 
         // When
-        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response =
-                authController.login(request, httpServletResponse);
+        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response = authController.login(request, httpServletResponse);
 
         // Then
         assertThat(response.getBody()).isNotNull();
@@ -199,14 +190,12 @@ class AuthControllerTest {
         setupCookieProperties();
 
         String refreshToken = "old-refresh-token";
-        TokenResponseDto tokens =
-                new TokenResponseDto("new-access-token", "new-refresh-token", 300, 3600, "Bearer");
+        TokenResponseDto tokens = new TokenResponseDto("new-access-token", "new-refresh-token", 300, 3600, "Bearer");
 
         when(authService.refreshToken(refreshToken)).thenReturn(tokens);
 
         // When
-        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response =
-                authController.refresh(refreshToken, httpServletResponse);
+        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response = authController.refresh(refreshToken, httpServletResponse);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -222,13 +211,11 @@ class AuthControllerTest {
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
         setupCookieProperties();
 
-        TokenResponseDto tokens =
-                new TokenResponseDto("new-access-token", "new-refresh-token", 300, 3600, "Bearer");
+        TokenResponseDto tokens = new TokenResponseDto("new-access-token", "new-refresh-token", 300, 3600, "Bearer");
         when(authService.refreshToken(null)).thenReturn(tokens);
 
         // When
-        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response =
-                authController.refresh(null, httpServletResponse);
+        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response = authController.refresh(null, httpServletResponse);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -246,8 +233,7 @@ class AuthControllerTest {
         doNothing().when(authService).logout(refreshToken);
 
         // When
-        ResponseEntity<ApiResponse<Void>> response =
-                authController.logout(refreshToken, httpServletResponse);
+        ResponseEntity<ApiResponse<Void>> response = authController.logout(refreshToken, httpServletResponse);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -278,8 +264,7 @@ class AuthControllerTest {
     void shouldResetPasswordWithValidToken() {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
-        ResetPasswordRequestDto request =
-                new ResetPasswordRequestDto("reset-token", "NewPassword1!");
+        ResetPasswordRequestDto request = new ResetPasswordRequestDto("reset-token", "NewPassword1!");
         doNothing().when(authService).resetPassword(request);
 
         // When
@@ -297,8 +282,7 @@ class AuthControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
         UUID userId = UUID.randomUUID();
-        ChangePasswordRequestDto request =
-                new ChangePasswordRequestDto("OldPassword1!", "NewPassword1!");
+        ChangePasswordRequestDto request = new ChangePasswordRequestDto("OldPassword1!", "NewPassword1!");
 
         when(jwt.getSubject()).thenReturn(userId.toString());
         doNothing().when(authService).changePassword(userId, request);
@@ -319,8 +303,7 @@ class AuthControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
         UUID userId = UUID.randomUUID();
-        ChangePasswordRequestDto request =
-                new ChangePasswordRequestDto("OldPassword1!", "NewPassword1!");
+        ChangePasswordRequestDto request = new ChangePasswordRequestDto("OldPassword1!", "NewPassword1!");
 
         when(jwt.getSubject()).thenReturn(userId.toString());
         doNothing().when(authService).changePassword(eq(userId), any());

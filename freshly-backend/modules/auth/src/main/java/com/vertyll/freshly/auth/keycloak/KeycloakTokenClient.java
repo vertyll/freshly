@@ -11,12 +11,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import com.vertyll.freshly.auth.api.dto.TokenResponseDto;
 import com.vertyll.freshly.auth.domain.exception.InvalidPasswordException;
 import com.vertyll.freshly.auth.keycloak.exception.KeycloakClientException;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -47,17 +47,11 @@ public class KeycloakTokenClient {
     private final com.vertyll.freshly.common.config.KeycloakProperties properties;
 
     private String getTokenUrl() {
-        return properties.serverUrl()
-                + "/realms/"
-                + properties.realm()
-                + "/protocol/openid-connect/token";
+        return properties.serverUrl() + "/realms/" + properties.realm() + "/protocol/openid-connect/token";
     }
 
     private String getLogoutUrl() {
-        return properties.serverUrl()
-                + "/realms/"
-                + properties.realm()
-                + "/protocol/openid-connect/logout";
+        return properties.serverUrl() + "/realms/" + properties.realm() + "/protocol/openid-connect/logout";
     }
 
     /** Refresh access token using refresh token */
@@ -73,14 +67,14 @@ public class KeycloakTokenClient {
         formData.add(REFRESH_TOKEN, refreshToken);
 
         try {
-            Map<String, Object> response =
-                    restClient
-                            .post()
-                            .uri(getTokenUrl())
-                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                            .body(formData)
-                            .retrieve()
-                            .body(new ParameterizedTypeReference<>() {});
+            Map<String, Object> response = restClient
+                .post()
+                .uri(getTokenUrl())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(formData)
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
 
             if (response == null) {
                 throw new KeycloakClientException(EMPTY_RESPONSE);
@@ -105,14 +99,14 @@ public class KeycloakTokenClient {
         formData.add(PASSWORD_KEY, password);
 
         try {
-            Map<String, Object> response =
-                    restClient
-                            .post()
-                            .uri(getTokenUrl())
-                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                            .body(formData)
-                            .retrieve()
-                            .body(new ParameterizedTypeReference<>() {});
+            Map<String, Object> response = restClient
+                .post()
+                .uri(getTokenUrl())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(formData)
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
 
             if (response == null) {
                 throw new KeycloakClientException(EMPTY_RESPONSE);
@@ -142,12 +136,12 @@ public class KeycloakTokenClient {
 
         try {
             restClient
-                    .post()
-                    .uri(getLogoutUrl())
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .body(formData)
-                    .retrieve()
-                    .toBodilessEntity();
+                .post()
+                .uri(getLogoutUrl())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(formData)
+                .retrieve()
+                .toBodilessEntity();
 
             log.info("User logged out successfully");
 
@@ -159,11 +153,12 @@ public class KeycloakTokenClient {
 
     private TokenResponseDto mapToTokenResponse(Map<String, Object> response) {
         return new TokenResponseDto(
-                (String) response.get(ACCESS_TOKEN_KEY),
-                (String) response.get(REFRESH_TOKEN),
-                getNumber(response, EXPIRES_IN_KEY),
-                getNumber(response, REFRESH_EXPIRES_IN_KEY),
-                (String) response.getOrDefault(TOKEN_TYPE_KEY, BEARER));
+            (String) response.get(ACCESS_TOKEN_KEY),
+            (String) response.get(REFRESH_TOKEN),
+            getNumber(response, EXPIRES_IN_KEY),
+            getNumber(response, REFRESH_EXPIRES_IN_KEY),
+            (String) response.getOrDefault(TOKEN_TYPE_KEY, BEARER)
+        );
     }
 
     private Integer getNumber(Map<String, Object> response, String key) {

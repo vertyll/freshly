@@ -10,10 +10,10 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 
+import com.vertyll.freshly.airquality.domain.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import com.vertyll.freshly.airquality.domain.*;
 
 /**
  * MongoDB implementation of AirQualityHistoryRepository. Adapts Spring Data repository to domain
@@ -60,42 +60,36 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
     @Override
     public List<AirQualityMeasurement> saveAll(List<AirQualityMeasurement> measurements) {
         log.debug("Batch saving {} air quality measurements", measurements.size());
-        List<AirQualityMeasurementDocument> documents =
-                measurements.stream().map(mapper::toDocument).toList();
+        List<AirQualityMeasurementDocument> documents = measurements.stream().map(mapper::toDocument).toList();
         return springDataRepository.saveAll(documents).stream().map(mapper::toDomain).toList();
     }
 
     @Override
     public Optional<AirQualityMeasurement> findLatestByStationId(int stationId) {
-        return springDataRepository
-                .findFirstByStationIdOrderByMeasurementDateDesc(stationId)
-                .map(mapper::toDomain);
+        return springDataRepository.findFirstByStationIdOrderByMeasurementDateDesc(stationId).map(mapper::toDomain);
     }
 
     @Override
-    public List<AirQualityMeasurement> findByStationIdAndDateRange(
-            int stationId, LocalDateTime from, LocalDateTime to) {
+    public List<AirQualityMeasurement> findByStationIdAndDateRange(int stationId, LocalDateTime from, LocalDateTime to) {
         return springDataRepository
-                .findByStationIdAndMeasurementDateBetweenOrderByMeasurementDateAsc(
-                        stationId, from, to)
-                .stream()
-                .map(mapper::toDomain)
-                .toList();
+            .findByStationIdAndMeasurementDateBetweenOrderByMeasurementDateAsc(stationId, from, to)
+            .stream()
+            .map(mapper::toDomain)
+            .toList();
     }
 
     @Override
     public List<AirQualityMeasurement> findByDateRange(LocalDateTime from, LocalDateTime to) {
         return springDataRepository
-                .findByMeasurementDateBetweenOrderByMeasurementDateDesc(from, to)
-                .stream()
-                .map(mapper::toDomain)
-                .toList();
+            .findByMeasurementDateBetweenOrderByMeasurementDateDesc(from, to)
+            .stream()
+            .map(mapper::toDomain)
+            .toList();
     }
 
     @Override
     public boolean hasRecentMeasurement(int stationId, LocalDateTime threshold) {
-        return springDataRepository.countByStationIdAndMeasurementDateAfter(stationId, threshold)
-                > 0;
+        return springDataRepository.countByStationIdAndMeasurementDateAfter(stationId, threshold) > 0;
     }
 
     @Override
@@ -106,142 +100,142 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
 
     @Override
     @SuppressWarnings("PMD.NPathComplexity") // Complex statistics aggregation logic
-    public Optional<AirQualityStatistics> calculateStatistics(
-            int stationId, LocalDateTime from, LocalDateTime to) {
+    public Optional<AirQualityStatistics> calculateStatistics(int stationId, LocalDateTime from, LocalDateTime to) {
         List<AirQualityMeasurementDocument> measurements =
-                springDataRepository
-                        .findByStationIdAndMeasurementDateBetweenOrderByMeasurementDateAsc(
-                                stationId, from, to);
+                springDataRepository.findByStationIdAndMeasurementDateBetweenOrderByMeasurementDateAsc(stationId, from, to);
 
         if (measurements.isEmpty()) {
             return Optional.empty();
         }
 
         // Calculate PM10 statistics
-        DoubleSummaryStatistics pm10Stats =
-                measurements.stream()
-                        .map(AirQualityMeasurementDocument::getPm10Value)
-                        .filter(Objects::nonNull)
-                        .mapToDouble(Double::doubleValue)
-                        .summaryStatistics();
+        DoubleSummaryStatistics pm10Stats = measurements
+            .stream()
+            .map(AirQualityMeasurementDocument::getPm10Value)
+            .filter(Objects::nonNull)
+            .mapToDouble(Double::doubleValue)
+            .summaryStatistics();
 
         // Calculate PM2.5 statistics
-        DoubleSummaryStatistics pm25Stats =
-                measurements.stream()
-                        .map(AirQualityMeasurementDocument::getPm25Value)
-                        .filter(Objects::nonNull)
-                        .mapToDouble(Double::doubleValue)
-                        .summaryStatistics();
+        DoubleSummaryStatistics pm25Stats = measurements
+            .stream()
+            .map(AirQualityMeasurementDocument::getPm25Value)
+            .filter(Objects::nonNull)
+            .mapToDouble(Double::doubleValue)
+            .summaryStatistics();
 
         // Calculate averages for other pollutants
-        double so2Avg =
-                measurements.stream()
-                        .map(AirQualityMeasurementDocument::getSo2Value)
-                        .filter(Objects::nonNull)
-                        .mapToDouble(Double::doubleValue)
-                        .average()
-                        .orElse(DEFAULT_AVG_VALUE);
+        double so2Avg = measurements
+            .stream()
+            .map(AirQualityMeasurementDocument::getSo2Value)
+            .filter(Objects::nonNull)
+            .mapToDouble(Double::doubleValue)
+            .average()
+            .orElse(DEFAULT_AVG_VALUE);
 
-        double no2Avg =
-                measurements.stream()
-                        .map(AirQualityMeasurementDocument::getNo2Value)
-                        .filter(Objects::nonNull)
-                        .mapToDouble(Double::doubleValue)
-                        .average()
-                        .orElse(DEFAULT_AVG_VALUE);
+        double no2Avg = measurements
+            .stream()
+            .map(AirQualityMeasurementDocument::getNo2Value)
+            .filter(Objects::nonNull)
+            .mapToDouble(Double::doubleValue)
+            .average()
+            .orElse(DEFAULT_AVG_VALUE);
 
-        double coAvg =
-                measurements.stream()
-                        .map(AirQualityMeasurementDocument::getCoValue)
-                        .filter(Objects::nonNull)
-                        .mapToDouble(Double::doubleValue)
-                        .average()
-                        .orElse(DEFAULT_AVG_VALUE);
+        double coAvg = measurements
+            .stream()
+            .map(AirQualityMeasurementDocument::getCoValue)
+            .filter(Objects::nonNull)
+            .mapToDouble(Double::doubleValue)
+            .average()
+            .orElse(DEFAULT_AVG_VALUE);
 
-        double o3Avg =
-                measurements.stream()
-                        .map(AirQualityMeasurementDocument::getO3Value)
-                        .filter(Objects::nonNull)
-                        .mapToDouble(Double::doubleValue)
-                        .average()
-                        .orElse(DEFAULT_AVG_VALUE);
+        double o3Avg = measurements
+            .stream()
+            .map(AirQualityMeasurementDocument::getO3Value)
+            .filter(Objects::nonNull)
+            .mapToDouble(Double::doubleValue)
+            .average()
+            .orElse(DEFAULT_AVG_VALUE);
 
         // Count quality levels (stored as enum in MongoDB)
-        Map<AirQualityLevel, Long> qualityCounts =
-                measurements.stream()
-                        .map(AirQualityMeasurementDocument::getOverallIndexLevel)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.groupingBy(level -> level, Collectors.counting()));
+        Map<AirQualityLevel, Long> qualityCounts = measurements
+            .stream()
+            .map(AirQualityMeasurementDocument::getOverallIndexLevel)
+            .filter(Objects::nonNull)
+            .collect(Collectors.groupingBy(level -> level, Collectors.counting()));
 
         String stationName = measurements.getFirst().getStationName();
         int count = measurements.size();
 
-        return Optional.of(
+        return Optional
+            .of(
                 new AirQualityStatistics(
-                        stationId,
-                        stationName,
-                        from,
-                        to,
-                        count,
-                        pm10Stats.getCount() > 0 ? pm10Stats.getAverage() : null,
-                        pm10Stats.getCount() > 0 ? pm10Stats.getMin() : null,
-                        pm10Stats.getCount() > 0 ? pm10Stats.getMax() : null,
-                        pm25Stats.getCount() > 0 ? pm25Stats.getAverage() : null,
-                        pm25Stats.getCount() > 0 ? pm25Stats.getMin() : null,
-                        pm25Stats.getCount() > 0 ? pm25Stats.getMax() : null,
-                        so2Avg > 0 ? so2Avg : null,
-                        no2Avg > 0 ? no2Avg : null,
-                        coAvg > 0 ? coAvg : null,
-                        o3Avg > 0 ? o3Avg : null,
-                        qualityCounts.getOrDefault(AirQualityLevel.VERY_GOOD, 0L).intValue(),
-                        qualityCounts.getOrDefault(AirQualityLevel.GOOD, 0L).intValue(),
-                        qualityCounts.getOrDefault(AirQualityLevel.MODERATE, 0L).intValue(),
-                        qualityCounts.getOrDefault(AirQualityLevel.SUFFICIENT, 0L).intValue(),
-                        qualityCounts.getOrDefault(AirQualityLevel.BAD, 0L).intValue(),
-                        qualityCounts.getOrDefault(AirQualityLevel.VERY_BAD, 0L).intValue()));
+                    stationId,
+                    stationName,
+                    from,
+                    to,
+                    count,
+                    pm10Stats.getCount() > 0 ? pm10Stats.getAverage() : null,
+                    pm10Stats.getCount() > 0 ? pm10Stats.getMin() : null,
+                    pm10Stats.getCount() > 0 ? pm10Stats.getMax() : null,
+                    pm25Stats.getCount() > 0 ? pm25Stats.getAverage() : null,
+                    pm25Stats.getCount() > 0 ? pm25Stats.getMin() : null,
+                    pm25Stats.getCount() > 0 ? pm25Stats.getMax() : null,
+                    so2Avg > 0 ? so2Avg : null,
+                    no2Avg > 0 ? no2Avg : null,
+                    coAvg > 0 ? coAvg : null,
+                    o3Avg > 0 ? o3Avg : null,
+                    qualityCounts.getOrDefault(AirQualityLevel.VERY_GOOD, 0L).intValue(),
+                    qualityCounts.getOrDefault(AirQualityLevel.GOOD, 0L).intValue(),
+                    qualityCounts.getOrDefault(AirQualityLevel.MODERATE, 0L).intValue(),
+                    qualityCounts.getOrDefault(AirQualityLevel.SUFFICIENT, 0L).intValue(),
+                    qualityCounts.getOrDefault(AirQualityLevel.BAD, 0L).intValue(),
+                    qualityCounts.getOrDefault(AirQualityLevel.VERY_BAD, 0L).intValue()
+                )
+            );
     }
 
     @Override
     public List<StationRanking> getRanking(LocalDateTime from, LocalDateTime to, int limit) {
         // MongoDB aggregation to calculate average scores per station
-        Aggregation aggregation =
-                Aggregation.newAggregation(
-                        Aggregation.match(Criteria.where(FIELD_MEASUREMENT_DATE).gte(from).lte(to)),
-                        Aggregation.group(FIELD_STATION_ID)
-                                .first(FIELD_STATION_NAME)
-                                .as(FIELD_STATION_NAME)
-                                .avg(FIELD_PM10_VALUE)
-                                .as(FIELD_PM10_AVG)
-                                .avg(FIELD_PM25_VALUE)
-                                .as(FIELD_PM25_AVG)
-                                .first(FIELD_OVERALL_INDEX_LEVEL)
-                                .as(FIELD_DOMINANT_QUALITY)
-                                .count()
-                                .as(FIELD_MEASUREMENT_COUNT),
-                        Aggregation.sort(
-                                org.springframework.data.domain.Sort.by(
-                                        org.springframework.data.domain.Sort.Order.asc(
-                                                FIELD_PM10_AVG),
-                                        org.springframework.data.domain.Sort.Order.asc(
-                                                FIELD_PM25_AVG))),
-                        Aggregation.limit(limit));
+        Aggregation aggregation = Aggregation
+            .newAggregation(
+                Aggregation.match(Criteria.where(FIELD_MEASUREMENT_DATE).gte(from).lte(to)),
+                Aggregation
+                    .group(FIELD_STATION_ID)
+                    .first(FIELD_STATION_NAME)
+                    .as(FIELD_STATION_NAME)
+                    .avg(FIELD_PM10_VALUE)
+                    .as(FIELD_PM10_AVG)
+                    .avg(FIELD_PM25_VALUE)
+                    .as(FIELD_PM25_AVG)
+                    .first(FIELD_OVERALL_INDEX_LEVEL)
+                    .as(FIELD_DOMINANT_QUALITY)
+                    .count()
+                    .as(FIELD_MEASUREMENT_COUNT),
+                Aggregation
+                    .sort(
+                        org.springframework.data.domain.Sort
+                            .by(
+                                org.springframework.data.domain.Sort.Order.asc(FIELD_PM10_AVG),
+                                org.springframework.data.domain.Sort.Order.asc(FIELD_PM25_AVG)
+                            )
+                    ),
+                Aggregation.limit(limit)
+            );
 
-        AggregationResults<?> rawResults =
-                mongoTemplate.aggregate(
-                        aggregation, COLLECTION_AIR_QUALITY_MEASUREMENTS, Map.class);
+        AggregationResults<?> rawResults = mongoTemplate.aggregate(aggregation, COLLECTION_AIR_QUALITY_MEASUREMENTS, Map.class);
 
         return getStationRankings(rawResults);
     }
 
-    @SuppressWarnings(
-            "PMD.AvoidInstantiatingObjectsInLoops") // Domain objects must be created per iteration
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // Domain objects must be created per iteration
     private List<StationRanking> getStationRankings(AggregationResults<?> rawResults) {
         List<StationRanking> rankings = new ArrayList<>();
         int rank = INITIAL_RANK;
 
         for (Object resultObj : rawResults.getMappedResults()) {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> result = (Map<String, Object>) resultObj;
+            @SuppressWarnings("unchecked") Map<String, Object> result = (Map<String, Object>) resultObj;
             Double pm10Avg = (Double) result.get(FIELD_PM10_AVG);
             Double pm25Avg = (Double) result.get(FIELD_PM25_AVG);
 
@@ -258,14 +252,7 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
             // Create Station object (simplified - in real scenario you'd fetch full station data)
             Integer stationId = (Integer) result.get(FIELD_ID);
             String stationName = (String) result.get(FIELD_STATION_NAME);
-            Station station =
-                    new Station(
-                            stationId,
-                            stationName,
-                            "",
-                            "",
-                            DEFAULT_STATION_COORDINATE,
-                            DEFAULT_STATION_COORDINATE);
+            Station station = new Station(stationId, stationName, "", "", DEFAULT_STATION_COORDINATE, DEFAULT_STATION_COORDINATE);
 
             // Convert dominant quality String to enum (MongoDB returns enum name as String)
             String dominantQuality = (String) result.get(FIELD_DOMINANT_QUALITY);
@@ -279,15 +266,16 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
             }
 
             Integer measurementCount = (Integer) result.get(FIELD_MEASUREMENT_COUNT);
-            rankings.add(
+            rankings
+                .add(
                     new StationRanking(
-                            rank,
-                            station,
-                            avgScore,
-                            dominantLevel,
-                            measurementCount != null
-                                    ? measurementCount
-                                    : DEFAULT_MEASUREMENT_COUNT));
+                        rank,
+                        station,
+                        avgScore,
+                        dominantLevel,
+                        measurementCount != null ? measurementCount : DEFAULT_MEASUREMENT_COUNT
+                    )
+                );
             rank++;
         }
         return rankings;
@@ -295,12 +283,13 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
 
     @Override
     public List<AirQualityMeasurement> findByGeoBounds(
-            double minLat,
-            double maxLat,
-            double minLon,
-            double maxLon,
-            LocalDateTime from,
-            LocalDateTime to) {
+        double minLat,
+        double maxLat,
+        double minLon,
+        double maxLon,
+        LocalDateTime from,
+        LocalDateTime to
+    ) {
         // This would require stations to be embedded in measurements or a join
         // For now, return empty list - can be enhanced later
         log.warn("findByGeoBounds not yet implemented");

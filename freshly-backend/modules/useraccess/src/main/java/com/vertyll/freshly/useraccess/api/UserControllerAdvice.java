@@ -20,8 +20,7 @@ public class UserControllerAdvice {
     private static final String USER_ALREADY_INACTIVE_MSG_KEY = "error.user.alreadyInactive";
     private static final String SELF_DEACTIVATION_MSG_KEY = "error.user.selfDeactivation";
     private static final String USER_ROLES_EMPTY_MSG_KEY = "error.user.rolesEmpty";
-    private static final String OPTIMISTIC_LOCKING_FAILURE_MSG_KEY =
-            "error.common.optimisticLockingFailure";
+    private static final String OPTIMISTIC_LOCKING_FAILURE_MSG_KEY = "error.common.optimisticLockingFailure";
 
     private final MessageSource messageSource;
 
@@ -34,63 +33,49 @@ public class UserControllerAdvice {
     @ExceptionHandler(UserNotFoundException.class)
     public ProblemDetail handleUserNotFound(UserNotFoundException ex) {
         LOGGER.warn("User not found: {}", ex.getMessage());
-        String message =
-                messageSource.getMessage(
-                        USER_NOT_FOUND_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message = messageSource.getMessage(USER_NOT_FOUND_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, message);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ProblemDetail handleUserAlreadyExists(UserAlreadyExistsException ex) {
         LOGGER.warn("User already exists: {}", ex.getMessage());
-        String message =
-                messageSource.getMessage(
-                        USER_ALREADY_EXISTS_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message = messageSource.getMessage(USER_ALREADY_EXISTS_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
     }
 
     @ExceptionHandler(UserAlreadyActiveException.class)
     public ProblemDetail handleUserAlreadyActive(UserAlreadyActiveException ex) {
         LOGGER.warn("User already active: {}", ex.getMessage());
-        String message =
-                messageSource.getMessage(
-                        USER_ALREADY_ACTIVE_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message = messageSource.getMessage(USER_ALREADY_ACTIVE_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(UserAlreadyInactiveException.class)
     public ProblemDetail handleUserAlreadyInactive(UserAlreadyInactiveException ex) {
         LOGGER.warn("User already inactive: {}", ex.getMessage());
-        String message =
-                messageSource.getMessage(
-                        USER_ALREADY_INACTIVE_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message = messageSource.getMessage(USER_ALREADY_INACTIVE_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(SelfDeactivationException.class)
     public ProblemDetail handleSelfDeactivation(SelfDeactivationException ex) {
         LOGGER.warn("Self deactivation attempt: {}", ex.getMessage());
-        String message =
-                messageSource.getMessage(
-                        SELF_DEACTIVATION_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message = messageSource.getMessage(SELF_DEACTIVATION_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, message);
     }
 
     @ExceptionHandler(UserRolesEmptyException.class)
     public ProblemDetail handleUserRolesEmpty(UserRolesEmptyException ex) {
         LOGGER.warn("User roles empty: {}", ex.getMessage());
-        String message =
-                messageSource.getMessage(
-                        USER_ROLES_EMPTY_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message = messageSource.getMessage(USER_ROLES_EMPTY_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(OptimisticLockingFailureException.class)
     public ProblemDetail handleOptimisticLockingFailure(OptimisticLockingFailureException ex) {
         LOGGER.warn("Optimistic locking failure: {}", ex.getMessage());
-        String message =
-                messageSource.getMessage(
-                        OPTIMISTIC_LOCKING_FAILURE_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message = messageSource.getMessage(OPTIMISTIC_LOCKING_FAILURE_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
     }
 }

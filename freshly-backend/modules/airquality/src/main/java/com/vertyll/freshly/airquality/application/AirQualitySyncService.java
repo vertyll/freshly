@@ -13,10 +13,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vertyll.freshly.airquality.domain.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import com.vertyll.freshly.airquality.domain.*;
 
 /**
  * Scheduled service that synchronizes air quality data from GIOŚ API to MongoDB. Runs periodically
@@ -25,10 +25,7 @@ import com.vertyll.freshly.airquality.domain.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(
-        name = "application.airquality.sync.enabled",
-        havingValue = "true",
-        matchIfMissing = true)
+@ConditionalOnProperty(name = "application.airquality.sync.enabled", havingValue = "true", matchIfMissing = true)
 public class AirQualitySyncService {
 
     private static final String SYNC_CRON = "0 5 * * * *";
@@ -87,9 +84,7 @@ public class AirQualitySyncService {
 
     private void syncStationData(Station station) {
         // Check if we already have recent data (within the last 50 minutes)
-        LocalDateTime threshold =
-                LocalDateTime.now(ZoneOffset.UTC)
-                        .minusMinutes(RECENT_MEASUREMENT_THRESHOLD_MINUTES);
+        LocalDateTime threshold = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(RECENT_MEASUREMENT_THRESHOLD_MINUTES);
         if (historyRepository.hasRecentMeasurement(station.id(), threshold)) {
             log.debug("Skipping station {} - has recent measurement", station.id());
             return;
@@ -105,8 +100,7 @@ public class AirQualitySyncService {
         AirQualityIndex index = indexOpt.get();
 
         // Fetch sensor measurements and extract the latest values and their measurement dates
-        List<SensorMeasurement> measurements =
-                airQualityProvider.findMeasurementsByStationId(station.id());
+        List<SensorMeasurement> measurements = airQualityProvider.findMeasurementsByStationId(station.id());
         SensorDataResult sensorData = extractLatestSensorValues(measurements);
 
         // Use the latest sensor measurement date if available, otherwise fallback to index date
@@ -114,19 +108,14 @@ public class AirQualitySyncService {
 
         // Create and save measurement
         AirQualityMeasurement measurement =
-                AirQualityMeasurement.create(
-                        station.id(), station.name(), index, sensorData.values(), measurementDate);
+                AirQualityMeasurement.create(station.id(), station.name(), index, sensorData.values(), measurementDate);
 
         historyRepository.save(measurement);
-        log.debug(
-                "Saved measurement for station {} at {}: {}",
-                station.name(),
-                measurementDate,
-                index.stIndexLevel());
+        log.debug("Saved measurement for station {} at {}: {}", station.name(), measurementDate, index.stIndexLevel());
     }
 
-    private record SensorDataResult(
-            Map<String, Double> values, Optional<LocalDateTime> latestDate) {}
+    private record SensorDataResult(Map<String, Double> values, Optional<LocalDateTime> latestDate) {
+    }
 
     @SuppressWarnings("PMD.UseConcurrentHashMap") // Local variable, no concurrent access
     private SensorDataResult extractLatestSensorValues(List<SensorMeasurement> measurements) {
@@ -134,11 +123,11 @@ public class AirQualitySyncService {
         LocalDateTime latestDate = null;
 
         for (SensorMeasurement sensor : measurements) {
-            if (sensor.readings().isEmpty()) continue;
+            if (sensor.readings().isEmpty())
+                continue;
 
             // Get the most recent reading (first in a list after filtering nulls)
-            Optional<SensorMeasurement.Reading> latestReading =
-                    sensor.readings().stream().filter(r -> r.value() != null).findFirst();
+            Optional<SensorMeasurement.Reading> latestReading = sensor.readings().stream().filter(r -> r.value() != null).findFirst();
 
             if (latestReading.isPresent()) {
                 SensorMeasurement.Reading reading = latestReading.get();
@@ -157,8 +146,7 @@ public class AirQualitySyncService {
     /** Remove measurements older than 90 days to prevent database bloat */
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private void cleanupOldData() {
-        LocalDateTime threshold =
-                LocalDateTime.now(ZoneOffset.UTC).minusDays(OLD_DATA_THRESHOLD_DAYS);
+        LocalDateTime threshold = LocalDateTime.now(ZoneOffset.UTC).minusDays(OLD_DATA_THRESHOLD_DAYS);
         try {
             historyRepository.deleteOlderThan(threshold);
             log.info("Cleaned up measurements older than {}", threshold);

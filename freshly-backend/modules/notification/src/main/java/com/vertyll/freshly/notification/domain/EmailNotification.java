@@ -1,7 +1,5 @@
 package com.vertyll.freshly.notification.domain;
 
-import static java.util.Objects.requireNonNull;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
@@ -12,6 +10,8 @@ import org.jspecify.annotations.Nullable;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+
+import static java.util.Objects.requireNonNull;
 
 @Getter
 public final class EmailNotification {
@@ -30,50 +30,51 @@ public final class EmailNotification {
     @Nullable private LocalDateTime sentAt;
     @Nullable private String errorMessage;
 
-    public EmailNotification(
-            Email recipient, EmailTemplate template, Map<String, Object> templateVariables) {
+    public EmailNotification(Email recipient, EmailTemplate template, Map<String, Object> templateVariables) {
         this.id = UUID.randomUUID();
         this.recipient = requireNonNull(recipient, RECIPIENT_NULL);
         this.template = requireNonNull(template, TEMPLATE_NULL);
-        this.templateVariables =
-                Map.copyOf(requireNonNull(templateVariables, TEMPLATE_VARIABLES_NULL));
+        this.templateVariables = Map.copyOf(requireNonNull(templateVariables, TEMPLATE_VARIABLES_NULL));
         this.createdAt = LocalDateTime.now(ZoneOffset.UTC);
         this.status = EmailStatus.PENDING;
     }
 
     @SuppressWarnings("java:S107")
     public static EmailNotification reconstitute(
-            UUID id,
-            Email recipient,
-            EmailTemplate template,
-            Map<String, Object> templateVariables,
-            LocalDateTime createdAt,
-            EmailStatus status,
-            LocalDateTime sentAt,
-            String errorMessage) {
-        return EmailNotification.builder()
-                .id(id)
-                .recipient(recipient)
-                .template(template)
-                .templateVariables(templateVariables)
-                .createdAt(createdAt)
-                .status(status)
-                .sentAt(sentAt)
-                .errorMessage(errorMessage)
-                .build();
+        UUID id,
+        Email recipient,
+        EmailTemplate template,
+        Map<String, Object> templateVariables,
+        LocalDateTime createdAt,
+        EmailStatus status,
+        LocalDateTime sentAt,
+        String errorMessage
+    ) {
+        return EmailNotification
+            .builder()
+            .id(id)
+            .recipient(recipient)
+            .template(template)
+            .templateVariables(templateVariables)
+            .createdAt(createdAt)
+            .status(status)
+            .sentAt(sentAt)
+            .errorMessage(errorMessage)
+            .build();
     }
 
     @Builder(access = AccessLevel.PRIVATE)
     @SuppressWarnings("java:S107")
     private EmailNotification(
-            UUID id,
-            Email recipient,
-            EmailTemplate template,
-            Map<String, Object> templateVariables,
-            LocalDateTime createdAt,
-            EmailStatus status,
-            @Nullable LocalDateTime sentAt,
-            @Nullable String errorMessage) {
+        UUID id,
+        Email recipient,
+        EmailTemplate template,
+        Map<String, Object> templateVariables,
+        LocalDateTime createdAt,
+        EmailStatus status,
+        @Nullable LocalDateTime sentAt,
+        @Nullable String errorMessage
+    ) {
         this.id = id;
         this.recipient = recipient;
         this.template = template;

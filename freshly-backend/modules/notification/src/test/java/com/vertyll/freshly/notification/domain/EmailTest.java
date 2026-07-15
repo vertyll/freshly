@@ -1,10 +1,10 @@
 package com.vertyll.freshly.notification.domain;
 
-import static org.assertj.core.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.assertj.core.api.Assertions.*;
 
 class EmailTest {
 
@@ -31,8 +31,7 @@ class EmailTest {
     private static final String EMAIL_CANNOT_BE_NULL = "Email cannot be null";
 
     @ParameterizedTest
-    @ValueSource(
-            strings = {VALID_EMAIL_1, VALID_EMAIL_2, VALID_EMAIL_3, VALID_EMAIL_4, VALID_EMAIL_5})
+    @ValueSource(strings = {VALID_EMAIL_1, VALID_EMAIL_2, VALID_EMAIL_3, VALID_EMAIL_4, VALID_EMAIL_5})
     void shouldCreateValidEmail(String emailValue) {
         // When
         Email email = new Email(emailValue);
@@ -44,31 +43,21 @@ class EmailTest {
 
     @ParameterizedTest
     @ValueSource(
-            strings = {
-                INVALID_EMAIL_1,
-                INVALID_EMAIL_2,
-                INVALID_EMAIL_3,
-                INVALID_EMAIL_4,
-                INVALID_EMAIL_5,
-                INVALID_EMAIL_6,
-                INVALID_EMAIL_7,
-                INVALID_EMAIL_8,
-                INVALID_EMAIL_9
-            })
+        strings = {INVALID_EMAIL_1, INVALID_EMAIL_2, INVALID_EMAIL_3, INVALID_EMAIL_4, INVALID_EMAIL_5, INVALID_EMAIL_6, INVALID_EMAIL_7,
+                INVALID_EMAIL_8, INVALID_EMAIL_9}
+    )
     void shouldThrowException_whenEmailIsInvalid(String invalidEmail) {
         // When & Then
         assertThatThrownBy(() -> new Email(invalidEmail))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining(INVALID_EMAIL_FORMAT);
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining(INVALID_EMAIL_FORMAT);
     }
 
     @Test
     @SuppressWarnings("NullAway")
     void shouldThrowException_whenEmailIsNull() {
         // When & Then
-        assertThatThrownBy(() -> new Email(null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining(EMAIL_CANNOT_BE_NULL);
+        assertThatThrownBy(() -> new Email(null)).isInstanceOf(NullPointerException.class).hasMessageContaining(EMAIL_CANNOT_BE_NULL);
     }
 
     @Test

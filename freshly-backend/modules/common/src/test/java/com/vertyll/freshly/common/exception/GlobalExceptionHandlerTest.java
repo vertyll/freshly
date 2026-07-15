@@ -1,10 +1,5 @@
 package com.vertyll.freshly.common.exception;
 
-import static java.util.Objects.requireNonNull;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +17,12 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import static java.util.Objects.requireNonNull;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
@@ -42,13 +43,10 @@ class GlobalExceptionHandlerTest {
         FieldError fieldError3 = new FieldError("userDto", "username", "Username must be unique");
 
         BindingResult bindingResult = mock(BindingResult.class);
-        when(bindingResult.getFieldErrors())
-                .thenReturn(List.of(fieldError1, fieldError2, fieldError3));
+        when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError1, fieldError2, fieldError3));
 
-        MethodParameter methodParameter =
-                new MethodParameter(this.getClass().getDeclaredMethod("setUp"), -1);
-        MethodArgumentNotValidException exception =
-                new MethodArgumentNotValidException(methodParameter, bindingResult);
+        MethodParameter methodParameter = new MethodParameter(this.getClass().getDeclaredMethod("setUp"), -1);
+        MethodArgumentNotValidException exception = new MethodArgumentNotValidException(methodParameter, bindingResult);
 
         // When
         ProblemDetail problemDetail = exceptionHandler.handleValidationExceptions(exception);
@@ -57,13 +55,10 @@ class GlobalExceptionHandlerTest {
         assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(problemDetail.getDetail()).isEqualTo("Validation failed for one or more fields");
 
-        @SuppressWarnings("unchecked")
-        Map<String, List<String>> errors =
-                (Map<String, List<String>>)
-                        requireNonNull(problemDetail.getProperties()).get("errors");
+        @SuppressWarnings("unchecked") Map<String, List<String>> errors =
+                (Map<String, List<String>>) requireNonNull(problemDetail.getProperties()).get("errors");
         assertThat(errors).isNotNull();
-        assertThat(requireNonNull(errors).get("username"))
-                .containsExactlyInAnyOrder("Username is required", "Username must be unique");
+        assertThat(requireNonNull(errors).get("username")).containsExactlyInAnyOrder("Username is required", "Username must be unique");
         assertThat(errors.get("email")).containsExactly("Email is invalid");
     }
 
@@ -71,25 +66,20 @@ class GlobalExceptionHandlerTest {
     @DisplayName("Should handle MethodArgumentNotValidException with null message")
     void shouldHandleMethodArgumentNotValidExceptionWithNullMessage() throws NoSuchMethodException {
         // Given
-        @SuppressWarnings("NullAway")
-        FieldError fieldError = new FieldError("userDto", "age", null);
+        @SuppressWarnings("NullAway") FieldError fieldError = new FieldError("userDto", "age", null);
 
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError));
 
-        MethodParameter methodParameter =
-                new MethodParameter(this.getClass().getDeclaredMethod("setUp"), -1);
-        MethodArgumentNotValidException exception =
-                new MethodArgumentNotValidException(methodParameter, bindingResult);
+        MethodParameter methodParameter = new MethodParameter(this.getClass().getDeclaredMethod("setUp"), -1);
+        MethodArgumentNotValidException exception = new MethodArgumentNotValidException(methodParameter, bindingResult);
 
         // When
         ProblemDetail problemDetail = exceptionHandler.handleValidationExceptions(exception);
 
         // Then
-        @SuppressWarnings("unchecked")
-        Map<String, List<String>> errors =
-                (Map<String, List<String>>)
-                        requireNonNull(problemDetail.getProperties()).get("errors");
+        @SuppressWarnings("unchecked") Map<String, List<String>> errors =
+                (Map<String, List<String>>) requireNonNull(problemDetail.getProperties()).get("errors");
         assertThat(errors).isNotNull();
         assertThat(requireNonNull(errors).get("age")).containsExactly("Invalid value");
     }
@@ -98,8 +88,7 @@ class GlobalExceptionHandlerTest {
     @DisplayName("Should handle MethodArgumentTypeMismatchException")
     void shouldHandleMethodArgumentTypeMismatchException() {
         // Given
-        @SuppressWarnings("NullAway")
-        MethodArgumentTypeMismatchException exception =
+        @SuppressWarnings("NullAway") MethodArgumentTypeMismatchException exception =
                 new MethodArgumentTypeMismatchException("abc", Integer.class, "id", null, null);
 
         // When
@@ -114,8 +103,7 @@ class GlobalExceptionHandlerTest {
     @DisplayName("Should handle MethodArgumentTypeMismatchException with null type")
     void shouldHandleMethodArgumentTypeMismatchExceptionWithNullType() {
         // Given
-        @SuppressWarnings("NullAway")
-        MethodArgumentTypeMismatchException exception =
+        @SuppressWarnings("NullAway") MethodArgumentTypeMismatchException exception =
                 new MethodArgumentTypeMismatchException("abc", null, "id", null, null);
 
         // When
@@ -130,8 +118,7 @@ class GlobalExceptionHandlerTest {
     @DisplayName("Should handle NoResourceFoundException")
     void shouldHandleNoResourceFoundException() {
         // Given
-        NoResourceFoundException exception =
-                new NoResourceFoundException(HttpMethod.GET, "/api/test", "Resource not found");
+        NoResourceFoundException exception = new NoResourceFoundException(HttpMethod.GET, "/api/test", "Resource not found");
 
         // When
         ProblemDetail problemDetail = exceptionHandler.handleNoResourceFound(exception);
@@ -152,8 +139,7 @@ class GlobalExceptionHandlerTest {
 
         // Then
         assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(problemDetail.getDetail())
-                .isEqualTo("An unexpected error occurred. Please contact support.");
+        assertThat(problemDetail.getDetail()).isEqualTo("An unexpected error occurred. Please contact support.");
     }
 
     @Test
@@ -167,8 +153,7 @@ class GlobalExceptionHandlerTest {
 
         // Then
         assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(problemDetail.getDetail())
-                .isEqualTo("An unexpected error occurred. Please contact support.");
+        assertThat(problemDetail.getDetail()).isEqualTo("An unexpected error occurred. Please contact support.");
     }
 
     @Test
@@ -182,7 +167,6 @@ class GlobalExceptionHandlerTest {
 
         // Then
         assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(problemDetail.getDetail())
-                .isEqualTo("An unexpected error occurred. Please contact support.");
+        assertThat(problemDetail.getDetail()).isEqualTo("An unexpected error occurred. Please contact support.");
     }
 }

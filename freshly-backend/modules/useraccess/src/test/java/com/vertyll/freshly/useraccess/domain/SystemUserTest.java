@@ -1,7 +1,5 @@
 package com.vertyll.freshly.useraccess.domain;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.util.Set;
 import java.util.UUID;
 
@@ -10,6 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import com.vertyll.freshly.common.enums.UserRoleEnum;
 import com.vertyll.freshly.useraccess.domain.exception.*;
+
+import static org.assertj.core.api.Assertions.*;
 
 class SystemUserTest {
     private static final String KEYCLOAK_USER_ID_CANNOT_BE_NULL = "Keycloak user ID cannot be null";
@@ -43,9 +43,7 @@ class SystemUserTest {
         SystemUser user = new SystemUser(keycloakUserId, true, roles);
 
         // Then
-        assertThat(user.getRoles())
-                .containsExactlyInAnyOrder(
-                        UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
+        assertThat(user.getRoles()).containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -57,8 +55,8 @@ class SystemUserTest {
 
         // When & Then
         assertThatThrownBy(() -> new SystemUser(null, true, roles))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining(KEYCLOAK_USER_ID_CANNOT_BE_NULL);
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining(KEYCLOAK_USER_ID_CANNOT_BE_NULL);
     }
 
     @Test
@@ -70,8 +68,8 @@ class SystemUserTest {
 
         // When & Then
         assertThatThrownBy(() -> new SystemUser(keycloakUserId, true, null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining(ROLES_CANNOT_BE_NULL);
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining(ROLES_CANNOT_BE_NULL);
     }
 
     @Test
@@ -82,8 +80,7 @@ class SystemUserTest {
         Set<String> emptyRoles = Set.of();
 
         // When & Then
-        assertThatThrownBy(() -> new SystemUser(keycloakUserId, true, emptyRoles))
-                .isInstanceOf(UserRolesEmptyException.class);
+        assertThatThrownBy(() -> new SystemUser(keycloakUserId, true, emptyRoles)).isInstanceOf(UserRolesEmptyException.class);
     }
 
     @Test
@@ -123,13 +120,10 @@ class SystemUserTest {
     void shouldThrowExceptionWhenActivatingAlreadyActiveUser() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user =
-                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
+        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When & Then
-        assertThatThrownBy(user::activate)
-                .isInstanceOf(UserAlreadyActiveException.class)
-                .hasMessageContaining(keycloakUserId.toString());
+        assertThatThrownBy(user::activate).isInstanceOf(UserAlreadyActiveException.class).hasMessageContaining(keycloakUserId.toString());
     }
 
     @Test
@@ -138,8 +132,7 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         UUID loggedInUserId = UUID.randomUUID();
-        SystemUser user =
-                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
+        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When
         user.deactivate(loggedInUserId);
@@ -154,13 +147,12 @@ class SystemUserTest {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
         UUID loggedInUserId = UUID.randomUUID();
-        SystemUser user =
-                new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
+        SystemUser user = new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
 
         // When & Then
         assertThatThrownBy(() -> user.deactivate(loggedInUserId))
-                .isInstanceOf(UserAlreadyInactiveException.class)
-                .hasMessageContaining(keycloakUserId.toString());
+            .isInstanceOf(UserAlreadyInactiveException.class)
+            .hasMessageContaining(keycloakUserId.toString());
     }
 
     @Test
@@ -172,8 +164,8 @@ class SystemUserTest {
 
         // When & Then
         assertThatThrownBy(() -> user.deactivate(userId))
-                .isInstanceOf(SelfDeactivationException.class)
-                .hasMessageContaining(userId.toString());
+            .isInstanceOf(SelfDeactivationException.class)
+            .hasMessageContaining(userId.toString());
     }
 
     @Test
@@ -181,8 +173,7 @@ class SystemUserTest {
     void shouldDeactivateSelf() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user =
-                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
+        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When
         user.deactivateSelf();
@@ -196,8 +187,7 @@ class SystemUserTest {
     void shouldThrowExceptionWhenDeactivatingSelfWhileAlreadyInactive() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user =
-                new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
+        SystemUser user = new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
 
         // When & Then
         assertThatThrownBy(user::deactivateSelf).isInstanceOf(UserAlreadyInactiveException.class);
@@ -208,8 +198,7 @@ class SystemUserTest {
     void shouldReplaceUserRoles() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user =
-                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
+        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
         Set<String> newRoles = Set.of(UserRoleEnum.ADMIN.getValue());
 
         // When
@@ -224,17 +213,14 @@ class SystemUserTest {
     void shouldReplaceSingleRoleWithMultipleRoles() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user =
-                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
+        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
         Set<String> newRoles = Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
 
         // When
         user.replaceRoles(newRoles);
 
         // Then
-        assertThat(user.getRoles())
-                .containsExactlyInAnyOrder(
-                        UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
+        assertThat(user.getRoles()).containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -243,13 +229,12 @@ class SystemUserTest {
     void shouldThrowExceptionWhenReplacingRolesWithNull() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user =
-                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
+        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When & Then
         assertThatThrownBy(() -> user.replaceRoles(null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining(ROLES_CANNOT_BE_NULL);
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining(ROLES_CANNOT_BE_NULL);
     }
 
     @Test
@@ -257,13 +242,11 @@ class SystemUserTest {
     void shouldThrowExceptionWhenReplacingRolesWithEmptySet() {
         // Given
         UUID keycloakUserId = UUID.randomUUID();
-        SystemUser user =
-                new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
+        SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
         Set<String> emptyRoles = Set.of();
 
         // When & Then
-        assertThatThrownBy(() -> user.replaceRoles(emptyRoles))
-                .isInstanceOf(UserRolesEmptyException.class);
+        assertThatThrownBy(() -> user.replaceRoles(emptyRoles)).isInstanceOf(UserRolesEmptyException.class);
     }
 
     @Test

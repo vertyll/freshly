@@ -5,4 +5,5 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties({ExternalServiceProperties.class})
-public class ExternalServiceConfig {}
+public class ExternalServiceConfig {
+}

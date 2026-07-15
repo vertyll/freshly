@@ -1,7 +1,5 @@
 package com.vertyll.freshly.security.exception;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,12 +10,13 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @ExtendWith(MockitoExtension.class)
 class SecurityExceptionHandlerTest {
     private static final String ACCESS_DENIED = "Access denied";
     private static final String INSUFFICIENT_PRIVILEGES = "Insufficient privileges";
-    private static final String PERMISSION_DENIED_DETAIL =
-            "You do not have permission to access this resource";
+    private static final String PERMISSION_DENIED_DETAIL = "You do not have permission to access this resource";
 
     private SecurityExceptionHandler exceptionHandler;
 
@@ -30,8 +29,7 @@ class SecurityExceptionHandlerTest {
     @DisplayName("Should handle AuthorizationDeniedException")
     void shouldHandleAuthorizationDeniedException() {
         // Given
-        AuthorizationDeniedException exception =
-                new AuthorizationDeniedException(ACCESS_DENIED, new AuthorizationDecision(false));
+        AuthorizationDeniedException exception = new AuthorizationDeniedException(ACCESS_DENIED, new AuthorizationDecision(false));
 
         // When
         ProblemDetail problemDetail = exceptionHandler.handleAuthorizationDenied(exception);
@@ -46,8 +44,7 @@ class SecurityExceptionHandlerTest {
     void shouldHandleAuthorizationDeniedExceptionWithCustomMessage() {
         // Given
         AuthorizationDeniedException exception =
-                new AuthorizationDeniedException(
-                        INSUFFICIENT_PRIVILEGES, new AuthorizationDecision(false));
+                new AuthorizationDeniedException(INSUFFICIENT_PRIVILEGES, new AuthorizationDecision(false));
 
         // When
         ProblemDetail problemDetail = exceptionHandler.handleAuthorizationDenied(exception);

@@ -1,17 +1,17 @@
 package com.vertyll.freshly.useraccess.domain;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.*;
 
 import org.jspecify.annotations.Nullable;
-
-import lombok.Getter;
 
 import com.vertyll.freshly.useraccess.domain.exception.SelfDeactivationException;
 import com.vertyll.freshly.useraccess.domain.exception.UserAlreadyActiveException;
 import com.vertyll.freshly.useraccess.domain.exception.UserAlreadyInactiveException;
 import com.vertyll.freshly.useraccess.domain.exception.UserRolesEmptyException;
+
+import lombok.Getter;
+
+import static java.util.Objects.requireNonNull;
 
 @Getter
 public final class SystemUser {
@@ -27,8 +27,7 @@ public final class SystemUser {
         this(keycloakUserId, isActive, roles, null);
     }
 
-    private SystemUser(
-            UUID keycloakUserId, boolean isActive, Set<String> roles, @Nullable Long version) {
+    private SystemUser(UUID keycloakUserId, boolean isActive, Set<String> roles, @Nullable Long version) {
         this.keycloakUserId = requireNonNull(keycloakUserId, KEYCLOAK_USER_ID_CANNOT_BE_NULL);
         this.roles = Set.copyOf(requireNonNull(roles, ROLES_CANNOT_BE_NULL));
         if (this.roles.isEmpty()) {
@@ -38,8 +37,7 @@ public final class SystemUser {
         this.version = version;
     }
 
-    public static SystemUser reconstitute(
-            UUID keycloakUserId, boolean isActive, Set<String> roles, Long version) {
+    public static SystemUser reconstitute(UUID keycloakUserId, boolean isActive, Set<String> roles, Long version) {
         return new SystemUser(keycloakUserId, isActive, roles, version);
     }
 
