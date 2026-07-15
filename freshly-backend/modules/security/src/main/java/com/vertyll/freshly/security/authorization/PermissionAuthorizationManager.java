@@ -28,7 +28,10 @@ public class PermissionAuthorizationManager implements AuthorizationManager<Meth
     private final PermissionService permissionService;
 
     @Override
-    public AuthorizationResult authorize(Supplier<? extends Authentication> authentication, MethodInvocation methodInvocation) {
+    public AuthorizationResult authorize(
+        Supplier<? extends Authentication> authentication,
+        MethodInvocation methodInvocation
+    ) {
         Method method = methodInvocation.getMethod();
 
         // Check method-level annotation first
@@ -45,7 +48,12 @@ public class PermissionAuthorizationManager implements AuthorizationManager<Meth
         if (classAnnotation != null) {
             Permission permission = classAnnotation.value();
             boolean granted = permissionService.hasPermission(authentication.get(), permission);
-            log.debug("Permission check for class {}: {} = {}", method.getDeclaringClass().getSimpleName(), permission, granted);
+            log.debug(
+                "Permission check for class {}: {} = {}",
+                method.getDeclaringClass().getSimpleName(),
+                permission,
+                granted
+            );
             return new AuthorizationDecision(granted);
         }
 

@@ -61,7 +61,8 @@ class NotificationServiceTest {
     void shouldSendEmailSuccessfully() {
         // Given
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
-        Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN, VERIFICATION_LINK_KEY, VERIFICATION_LINK_VALUE);
+        Map<String, Object> variables =
+                Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN, VERIFICATION_LINK_KEY, VERIFICATION_LINK_VALUE);
         SendEmailCommand command = new SendEmailCommand(TEST_EMAIL, template, variables);
 
         doNothing().when(emailSender).send(any(EmailNotification.class));
@@ -116,7 +117,8 @@ class NotificationServiceTest {
         assertThat(sentNotification.getRecipient().value()).isEqualTo(USER_EMAIL);
         assertThat(sentNotification.getTemplate()).isEqualTo(EmailTemplate.EMAIL_VERIFICATION);
         assertThat(sentNotification.getTemplateVariables()).containsEntry(USERNAME_KEY, USERNAME_VALUE_JOHN_DOE);
-        assertThat(sentNotification.getTemplateVariables()).containsEntry(VERIFICATION_LINK_KEY, VERIFICATION_LINK_VALUE);
+        assertThat(sentNotification.getTemplateVariables())
+            .containsEntry(VERIFICATION_LINK_KEY, VERIFICATION_LINK_VALUE);
     }
 
     @Test
@@ -161,8 +163,11 @@ class NotificationServiceTest {
     @DisplayName("Should mark notification as sent after successful sending")
     void shouldMarkNotificationAsSentAfterSuccessfulSending() {
         // Given
-        SendEmailCommand command =
-                new SendEmailCommand(TEST_EMAIL, EmailTemplate.USER_REGISTERED, Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN));
+        SendEmailCommand command = new SendEmailCommand(
+            TEST_EMAIL,
+            EmailTemplate.USER_REGISTERED,
+            Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN)
+        );
 
         doNothing().when(emailSender).send(any(EmailNotification.class));
 
@@ -181,10 +186,14 @@ class NotificationServiceTest {
     @DisplayName("Should mark notification as failed when sending throws exception")
     void shouldMarkNotificationAsFailedWhenSendingThrowsException() {
         // Given
-        SendEmailCommand command =
-                new SendEmailCommand(TEST_EMAIL, EmailTemplate.EMAIL_VERIFICATION, Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN));
+        SendEmailCommand command = new SendEmailCommand(
+            TEST_EMAIL,
+            EmailTemplate.EMAIL_VERIFICATION,
+            Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN)
+        );
 
-        doThrow(new EmailSendingException(CONNECTION_TIMEOUT_MESSAGE)).when(emailSender).send(any(EmailNotification.class));
+        doThrow(new EmailSendingException(CONNECTION_TIMEOUT_MESSAGE)).when(emailSender)
+            .send(any(EmailNotification.class));
 
         // When & Then
         assertThatThrownBy(() -> notificationService.sendEmail(command)).isInstanceOf(EmailSendingException.class);
@@ -200,8 +209,11 @@ class NotificationServiceTest {
     @DisplayName("Should call email sender once when sending email")
     void shouldCallEmailSenderOnceWhenSendingEmail() {
         // Given
-        SendEmailCommand command =
-                new SendEmailCommand(TEST_EMAIL, EmailTemplate.USER_REGISTERED, Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN));
+        SendEmailCommand command = new SendEmailCommand(
+            TEST_EMAIL,
+            EmailTemplate.USER_REGISTERED,
+            Map.of(USERNAME_KEY, USERNAME_VALUE_JOHN)
+        );
 
         doNothing().when(emailSender).send(any(EmailNotification.class));
 

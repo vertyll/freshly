@@ -79,8 +79,14 @@ class AirQualityServiceTest {
         void shouldGetIndexForStationSuccessfully() {
             // Given
             int stationId = 123;
-            AirQualityIndex index =
-                    new AirQualityIndex(stationId, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Umiarkowany", "Dobry");
+            AirQualityIndex index = new AirQualityIndex(
+                stationId,
+                LocalDateTime.now(ZoneOffset.UTC),
+                "Dobry",
+                "Dobry",
+                "Umiarkowany",
+                "Dobry"
+            );
 
             when(airQualityProvider.findIndexByStationId(stationId)).thenReturn(Optional.of(index));
 
@@ -120,8 +126,10 @@ class AirQualityServiceTest {
             // Given
             int stationId = 123;
             SensorMeasurement.Reading reading1 = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
-            SensorMeasurement.Reading reading2 = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC).minusHours(1), 30.2);
-            SensorMeasurement measurement = new SensorMeasurement(1, "PM10", "Pył zawieszony PM10", List.of(reading1, reading2));
+            SensorMeasurement.Reading reading2 =
+                    new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC).minusHours(1), 30.2);
+            SensorMeasurement measurement =
+                    new SensorMeasurement(1, "PM10", "Pył zawieszony PM10", List.of(reading1, reading2));
             List<SensorMeasurement> measurements = List.of(measurement);
 
             when(airQualityProvider.findMeasurementsByStationId(stationId)).thenReturn(measurements);
@@ -208,15 +216,18 @@ class AirQualityServiceTest {
             int days = 7;
 
             List<AirQualityMeasurement> measurements = List.of(new AirQualityMeasurement());
-            when(historyRepository.findByStationIdAndDateRange(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class)))
-                .thenReturn(measurements);
+            when(
+                historyRepository
+                    .findByStationIdAndDateRange(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class))
+            ).thenReturn(measurements);
 
             // When
             List<AirQualityMeasurement> result = airQualityService.getHistoricalMeasurements(stationId, days);
 
             // Then
             assertThat(result).hasSize(1);
-            verify(historyRepository).findByStationIdAndDateRange(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class));
+            verify(historyRepository)
+                .findByStationIdAndDateRange(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class));
         }
 
         @Test
@@ -225,15 +236,18 @@ class AirQualityServiceTest {
             // Given
             int stationId = 123;
             int invalidDays = 0;
-            when(historyRepository.findByStationIdAndDateRange(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class)))
-                .thenReturn(Collections.emptyList());
+            when(
+                historyRepository
+                    .findByStationIdAndDateRange(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class))
+            ).thenReturn(Collections.emptyList());
 
             // When
             List<AirQualityMeasurement> result = airQualityService.getHistoricalMeasurements(stationId, invalidDays);
 
             // Then
             assertThat(result).isEmpty();
-            verify(historyRepository).findByStationIdAndDateRange(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class));
+            verify(historyRepository)
+                .findByStationIdAndDateRange(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class));
         }
 
         @Test
@@ -242,15 +256,18 @@ class AirQualityServiceTest {
             // Given
             int stationId = 123;
             int invalidDays = 100;
-            when(historyRepository.findByStationIdAndDateRange(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class)))
-                .thenReturn(Collections.emptyList());
+            when(
+                historyRepository
+                    .findByStationIdAndDateRange(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class))
+            ).thenReturn(Collections.emptyList());
 
             // When
             List<AirQualityMeasurement> result = airQualityService.getHistoricalMeasurements(stationId, invalidDays);
 
             // Then
             assertThat(result).isEmpty();
-            verify(historyRepository).findByStationIdAndDateRange(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class));
+            verify(historyRepository)
+                .findByStationIdAndDateRange(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class));
         }
     }
 
@@ -427,8 +444,9 @@ class AirQualityServiceTest {
                 2
             );
 
-            when(historyRepository.calculateStatistics(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class)))
-                .thenReturn(Optional.of(statistics));
+            when(
+                historyRepository.calculateStatistics(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class))
+            ).thenReturn(Optional.of(statistics));
 
             // When
             Optional<AirQualityStatistics> result = airQualityService.getStatistics(stationId, days);
@@ -437,7 +455,8 @@ class AirQualityServiceTest {
             assertThat(result).isPresent();
             assertThat(result.get().stationId()).isEqualTo(stationId);
             assertThat(result.get().measurementCount()).isEqualTo(100);
-            verify(historyRepository).calculateStatistics(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class));
+            verify(historyRepository)
+                .calculateStatistics(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class));
         }
 
         @Test
@@ -447,15 +466,17 @@ class AirQualityServiceTest {
             int stationId = 999;
             int days = 7;
 
-            when(historyRepository.calculateStatistics(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class)))
-                .thenReturn(Optional.empty());
+            when(
+                historyRepository.calculateStatistics(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class))
+            ).thenReturn(Optional.empty());
 
             // When
             Optional<AirQualityStatistics> result = airQualityService.getStatistics(stationId, days);
 
             // Then
             assertThat(result).isEmpty();
-            verify(historyRepository).calculateStatistics(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class));
+            verify(historyRepository)
+                .calculateStatistics(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class));
         }
 
         @Test
@@ -465,15 +486,17 @@ class AirQualityServiceTest {
             int stationId = 123;
             int invalidDays = 100;
 
-            when(historyRepository.calculateStatistics(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class)))
-                .thenReturn(Optional.empty());
+            when(
+                historyRepository.calculateStatistics(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class))
+            ).thenReturn(Optional.empty());
 
             // When
             Optional<AirQualityStatistics> result = airQualityService.getStatistics(stationId, invalidDays);
 
             // Then
             assertThat(result).isEmpty();
-            verify(historyRepository).calculateStatistics(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class));
+            verify(historyRepository)
+                .calculateStatistics(eq(stationId), any(LocalDateTime.class), any(LocalDateTime.class));
         }
     }
 
@@ -493,7 +516,8 @@ class AirQualityServiceTest {
             List<StationRanking> rankings = List.of(ranking1, ranking2);
             int days = 7;
 
-            when(historyRepository.getRanking(any(LocalDateTime.class), any(LocalDateTime.class), eq(limit))).thenReturn(rankings);
+            when(historyRepository.getRanking(any(LocalDateTime.class), any(LocalDateTime.class), eq(limit)))
+                .thenReturn(rankings);
 
             // When
             List<StationRanking> result = airQualityService.getRanking(days, limit);

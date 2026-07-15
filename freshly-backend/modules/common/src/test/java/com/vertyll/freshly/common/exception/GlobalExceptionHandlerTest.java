@@ -58,7 +58,8 @@ class GlobalExceptionHandlerTest {
         @SuppressWarnings("unchecked") Map<String, List<String>> errors =
                 (Map<String, List<String>>) requireNonNull(problemDetail.getProperties()).get("errors");
         assertThat(errors).isNotNull();
-        assertThat(requireNonNull(errors).get("username")).containsExactlyInAnyOrder("Username is required", "Username must be unique");
+        assertThat(requireNonNull(errors).get("username"))
+            .containsExactlyInAnyOrder("Username is required", "Username must be unique");
         assertThat(errors.get("email")).containsExactly("Email is invalid");
     }
 
@@ -118,7 +119,8 @@ class GlobalExceptionHandlerTest {
     @DisplayName("Should handle NoResourceFoundException")
     void shouldHandleNoResourceFoundException() {
         // Given
-        NoResourceFoundException exception = new NoResourceFoundException(HttpMethod.GET, "/api/test", "Resource not found");
+        NoResourceFoundException exception =
+                new NoResourceFoundException(HttpMethod.GET, "/api/test", "Resource not found");
 
         // When
         ProblemDetail problemDetail = exceptionHandler.handleNoResourceFound(exception);

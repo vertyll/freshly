@@ -63,8 +63,8 @@ public class UserPermissionCache {
             .map(GrantedAuthority::getAuthority)
             .filter(Objects::nonNull)
             .map(
-                authority -> authority.startsWith(UserRoleEnum.ROLE_PREFIX) ? authority.substring(UserRoleEnum.ROLE_PREFIX.length())
-                        : authority
+                authority -> authority.startsWith(UserRoleEnum.ROLE_PREFIX)
+                        ? authority.substring(UserRoleEnum.ROLE_PREFIX.length()) : authority
             )
             .map(role -> role.toUpperCase(Locale.ROOT))
             .collect(Collectors.toSet());

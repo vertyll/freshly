@@ -37,7 +37,8 @@ class ApiResponseTest {
         when(messageSource.getMessage(messageKey, null, locale)).thenReturn(localizedMessage);
 
         // When
-        ResponseEntity<ApiResponse<String>> response = ApiResponse.buildResponse(data, messageKey, messageSource, HttpStatus.CREATED);
+        ResponseEntity<ApiResponse<String>> response =
+                ApiResponse.buildResponse(data, messageKey, messageSource, HttpStatus.CREATED);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -60,7 +61,8 @@ class ApiResponseTest {
         when(messageSource.getMessage(messageKey, null, locale)).thenReturn(localizedMessage);
 
         // When
-        ResponseEntity<ApiResponse<String>> response = ApiResponse.buildResponse(data, messageKey, messageSource, HttpStatus.CREATED);
+        ResponseEntity<ApiResponse<String>> response =
+                ApiResponse.buildResponse(data, messageKey, messageSource, HttpStatus.CREATED);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -81,7 +83,8 @@ class ApiResponseTest {
         when(messageSource.getMessage(messageKey, null, locale)).thenReturn(localizedMessage);
 
         // When
-        ResponseEntity<ApiResponse<Void>> response = ApiResponse.buildResponse(null, messageKey, messageSource, HttpStatus.OK);
+        ResponseEntity<ApiResponse<Void>> response =
+                ApiResponse.buildResponse(null, messageKey, messageSource, HttpStatus.OK);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

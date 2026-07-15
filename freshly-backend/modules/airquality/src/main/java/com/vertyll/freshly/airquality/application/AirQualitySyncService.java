@@ -127,7 +127,8 @@ public class AirQualitySyncService {
                 continue;
 
             // Get the most recent reading (first in a list after filtering nulls)
-            Optional<SensorMeasurement.Reading> latestReading = sensor.readings().stream().filter(r -> r.value() != null).findFirst();
+            Optional<SensorMeasurement.Reading> latestReading =
+                    sensor.readings().stream().filter(r -> r.value() != null).findFirst();
 
             if (latestReading.isPresent()) {
                 SensorMeasurement.Reading reading = latestReading.get();

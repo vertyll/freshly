@@ -95,7 +95,8 @@ class PermissionServiceTest {
     @DisplayName("Should return user permissions from cache")
     void shouldReturnUserPermissionsFromCache() {
         // Given
-        Set<Permission> expectedPermissions = Set.of(Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_UPDATE);
+        Set<Permission> expectedPermissions =
+                Set.of(Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_UPDATE);
         when(permissionCache.getUserPermissions(authentication)).thenReturn(expectedPermissions);
 
         // When
@@ -114,8 +115,8 @@ class PermissionServiceTest {
         when(permissionCache.getUserPermissions(authentication)).thenReturn(userPermissions);
 
         // When
-        boolean hasAnyPermission =
-                permissionService.hasAnyPermission(authentication, Permission.USERS_CREATE, Permission.USERS_READ, Permission.USERS_DELETE);
+        boolean hasAnyPermission = permissionService
+            .hasAnyPermission(authentication, Permission.USERS_CREATE, Permission.USERS_READ, Permission.USERS_DELETE);
 
         // Then
         assertThat(hasAnyPermission).isTrue();
@@ -130,8 +131,8 @@ class PermissionServiceTest {
         when(permissionCache.getUserPermissions(authentication)).thenReturn(userPermissions);
 
         // When
-        boolean hasAnyPermission =
-                permissionService.hasAnyPermission(authentication, Permission.USERS_CREATE, Permission.USERS_READ, Permission.USERS_DELETE);
+        boolean hasAnyPermission = permissionService
+            .hasAnyPermission(authentication, Permission.USERS_CREATE, Permission.USERS_READ, Permission.USERS_DELETE);
 
         // Then
         assertThat(hasAnyPermission).isFalse();
@@ -186,7 +187,8 @@ class PermissionServiceTest {
     void shouldReturnTrueWhenUserHasAllRequiredPermissions() {
         // Given
         when(authentication.isAuthenticated()).thenReturn(true);
-        Set<Permission> userPermissions = Set.of(Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_UPDATE);
+        Set<Permission> userPermissions =
+                Set.of(Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_UPDATE);
         when(permissionCache.getUserPermissions(authentication)).thenReturn(userPermissions);
 
         // When

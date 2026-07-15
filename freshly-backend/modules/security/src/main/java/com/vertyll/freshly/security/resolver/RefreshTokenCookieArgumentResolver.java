@@ -18,7 +18,10 @@ import com.vertyll.freshly.common.config.KeycloakProperties;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 
-@SuppressFBWarnings(value = "COOKIE_USAGE", justification = "Refresh token is read server-side from a Secure, HttpOnly cookie")
+@SuppressFBWarnings(
+    value = "COOKIE_USAGE",
+    justification = "Refresh token is read server-side from a Secure, HttpOnly cookie"
+)
 @RequiredArgsConstructor
 public class RefreshTokenCookieArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -26,7 +29,8 @@ public class RefreshTokenCookieArgumentResolver implements HandlerMethodArgument
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(RefreshTokenCookie.class) && parameter.getParameterType().equals(String.class);
+        return parameter.hasParameterAnnotation(RefreshTokenCookie.class)
+                && parameter.getParameterType().equals(String.class);
     }
 
     @Override

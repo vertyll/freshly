@@ -19,6 +19,8 @@ public class TestSecurityConfig {
 
     @Bean
     public SecurityFilterChain testSecurityFilterChain(HttpSecurity http) {
-        return http.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(auth -> auth.anyRequest().permitAll()).build();
+        return http.csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+            .build();
     }
 }

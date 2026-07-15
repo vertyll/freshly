@@ -8,11 +8,20 @@ import com.vertyll.freshly.permission.domain.RolePermissionMapping;
 class RolePermissionMappingMapper {
 
     RolePermissionMappingDocument toDocument(RolePermissionMapping mapping) {
-        return new RolePermissionMappingDocument(mapping.getId(), mapping.getKeycloakRole(), mapping.getPermission(), mapping.getVersion());
+        return new RolePermissionMappingDocument(
+            mapping.getId(),
+            mapping.getKeycloakRole(),
+            mapping.getPermission(),
+            mapping.getVersion()
+        );
     }
 
     RolePermissionMapping toDomain(RolePermissionMappingDocument document) {
-        return RolePermissionMapping
-            .reconstitute(document.getId(), document.getKeycloakRole(), document.getPermission(), document.getVersion());
+        return RolePermissionMapping.reconstitute(
+            document.getId(),
+            document.getKeycloakRole(),
+            document.getPermission(),
+            document.getVersion()
+        );
     }
 }

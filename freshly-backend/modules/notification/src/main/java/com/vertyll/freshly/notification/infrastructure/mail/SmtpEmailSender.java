@@ -45,7 +45,11 @@ class SmtpEmailSender implements EmailSender {
 
             mailSender.send(message);
 
-            log.debug("Email sent successfully: template={}, recipient={}", notification.getTemplate(), notification.getRecipient());
+            log.debug(
+                "Email sent successfully: template={}, recipient={}",
+                notification.getTemplate(),
+                notification.getRecipient()
+            );
 
         } catch (MessagingException e) {
             log.error("Failed to send email: {}", e.getMessage());

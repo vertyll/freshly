@@ -43,7 +43,8 @@ class SystemUserTest {
         SystemUser user = new SystemUser(keycloakUserId, true, roles);
 
         // Then
-        assertThat(user.getRoles()).containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
+        assertThat(user.getRoles())
+            .containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -78,7 +79,8 @@ class SystemUserTest {
         Set<String> emptyRoles = Set.of();
 
         // When & Then
-        assertThatThrownBy(() -> new SystemUser(keycloakUserId, true, emptyRoles)).isInstanceOf(UserRolesEmptyException.class);
+        assertThatThrownBy(() -> new SystemUser(keycloakUserId, true, emptyRoles))
+            .isInstanceOf(UserRolesEmptyException.class);
     }
 
     @Test
@@ -121,7 +123,8 @@ class SystemUserTest {
         SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When & Then
-        assertThatThrownBy(user::activate).isInstanceOf(UserAlreadyActiveException.class).hasMessageContaining(keycloakUserId.toString());
+        assertThatThrownBy(user::activate).isInstanceOf(UserAlreadyActiveException.class)
+            .hasMessageContaining(keycloakUserId.toString());
     }
 
     @Test
@@ -216,7 +219,8 @@ class SystemUserTest {
         user.replaceRoles(newRoles);
 
         // Then
-        assertThat(user.getRoles()).containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
+        assertThat(user.getRoles())
+            .containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
     }
 
     @Test

@@ -270,7 +270,8 @@ class GiosAirQualityAdapter implements AirQualityProvider {
                 valuesNode = root.findPath(JSON_PATH_DATA);
 
             if (valuesNode.isArray()) {
-                List<GiosDataValueDto> values = objectMapper.readerForListOf(GiosDataValueDto.class).readValue(valuesNode);
+                List<GiosDataValueDto> values =
+                        objectMapper.readerForListOf(GiosDataValueDto.class).readValue(valuesNode);
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
 
                 return values.stream().filter(v -> v.value() != null).map(v -> {
@@ -300,8 +301,8 @@ class GiosAirQualityAdapter implements AirQualityProvider {
 
     private AirQualityIndex mapToDomain(GiosAQIndexDto dto, int stationId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-        LocalDateTime date =
-                dto.stCalcDate() != null ? LocalDateTime.parse(dto.stCalcDate(), formatter) : LocalDateTime.now(ZoneOffset.UTC);
+        LocalDateTime date = dto.stCalcDate() != null ? LocalDateTime.parse(dto.stCalcDate(), formatter)
+                : LocalDateTime.now(ZoneOffset.UTC);
 
         return new AirQualityIndex(
             stationId,

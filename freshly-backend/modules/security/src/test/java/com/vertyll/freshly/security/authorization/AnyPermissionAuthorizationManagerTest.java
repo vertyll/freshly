@@ -140,7 +140,8 @@ class AnyPermissionAuthorizationManagerTest {
         assertThat(result).isNotNull();
         assertThat(result.isGranted()).isTrue();
         verify(permissionService).hasAnyPermission(authentication, methodPermissions);
-        verify(permissionService, never()).hasAnyPermission(authentication, Permission.USERS_READ, Permission.USERS_CREATE);
+        verify(permissionService, never())
+            .hasAnyPermission(authentication, Permission.USERS_READ, Permission.USERS_CREATE);
     }
 
     @Test

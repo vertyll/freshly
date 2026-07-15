@@ -100,7 +100,8 @@ class SmtpEmailSenderTest {
         Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_JOHN, VERIFICATION_LINK_KEY, VERIFICATION_LINK);
         EmailNotification notification = new EmailNotification(recipient, template, variables);
 
-        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class))).thenReturn(HTML_VERIFICATION_EMAIL);
+        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
+            .thenReturn(HTML_VERIFICATION_EMAIL);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
         doNothing().when(mailSender).send(mimeMessage);
@@ -154,7 +155,8 @@ class SmtpEmailSenderTest {
 
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         when(mailProperties.from()).thenReturn(NOREPLY_EMAIL);
-        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class))).thenReturn(HTML_PASSWORD_RESET);
+        when(templateEngine.process(eq(template.getTemplateName()), any(Context.class)))
+            .thenReturn(HTML_PASSWORD_RESET);
         doNothing().when(mailSender).send(mimeMessage);
 
         // When
@@ -244,12 +246,14 @@ class SmtpEmailSenderTest {
         doNothing().when(mailSender).send(mimeMessage);
 
         // When & Then - Email Verification
-        EmailNotification verificationNotification = new EmailNotification(recipient, EmailTemplate.EMAIL_VERIFICATION, variables);
+        EmailNotification verificationNotification =
+                new EmailNotification(recipient, EmailTemplate.EMAIL_VERIFICATION, variables);
         smtpEmailSender.send(verificationNotification);
         verify(templateEngine).process(eq(TEMPLATE_EMAIL_VERIFICATION), any(Context.class));
 
         // When & Then - User Registered
-        EmailNotification registeredNotification = new EmailNotification(recipient, EmailTemplate.USER_REGISTERED, variables);
+        EmailNotification registeredNotification =
+                new EmailNotification(recipient, EmailTemplate.USER_REGISTERED, variables);
         smtpEmailSender.send(registeredNotification);
         verify(templateEngine).process(eq(TEMPLATE_USER_REGISTERED), any(Context.class));
 

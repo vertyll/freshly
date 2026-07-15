@@ -85,7 +85,11 @@ public class KeycloakAdminClient {
 
         try (Response response = usersResource.create(user)) {
             if (response.getStatus() != HttpStatus.CREATED.value()) {
-                log.error("Failed to create user in Keycloak: status={}, info={}", response.getStatus(), response.getStatusInfo());
+                log.error(
+                    "Failed to create user in Keycloak: status={}, info={}",
+                    response.getStatus(),
+                    response.getStatusInfo()
+                );
                 throw new KeycloakClientException(KEYCLOAK_CREATE_FAIL + response.getStatusInfo());
             }
 

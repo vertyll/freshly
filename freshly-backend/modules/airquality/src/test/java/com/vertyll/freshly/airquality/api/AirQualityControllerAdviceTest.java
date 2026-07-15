@@ -57,7 +57,8 @@ class AirQualityControllerAdviceTest {
         // Given
         StationNotFoundException exception = new StationNotFoundException(TEST_STATION_ID);
 
-        when(messageSource.getMessage(eq(ERROR_STATION_NOT_FOUND_MSG_KEY), isNull(), any(Locale.class))).thenReturn(STATION_NOT_FOUND);
+        when(messageSource.getMessage(eq(ERROR_STATION_NOT_FOUND_MSG_KEY), isNull(), any(Locale.class)))
+            .thenReturn(STATION_NOT_FOUND);
 
         // When
         ProblemDetail result = controllerAdvice.handleStationNotFound(exception);

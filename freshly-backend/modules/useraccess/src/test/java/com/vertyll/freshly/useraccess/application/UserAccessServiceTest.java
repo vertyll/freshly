@@ -80,7 +80,8 @@ class UserAccessServiceTest {
         when(systemUserRepository.findById(keycloakUserId)).thenReturn(Optional.of(existingUser));
 
         // When & Then
-        assertThatThrownBy(() -> userAccessService.createUser(keycloakUserId, true, roles)).isInstanceOf(UserAlreadyExistsException.class)
+        assertThatThrownBy(() -> userAccessService.createUser(keycloakUserId, true, roles))
+            .isInstanceOf(UserAlreadyExistsException.class)
             .hasMessageContaining(keycloakUserId.toString());
 
         verify(systemUserRepository).findById(keycloakUserId);
@@ -102,7 +103,8 @@ class UserAccessServiceTest {
         SystemUser result = userAccessService.createUser(keycloakUserId, true, roles);
 
         // Then
-        assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
+        assertThat(result.getRoles())
+            .containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -199,7 +201,8 @@ class UserAccessServiceTest {
         when(systemUserRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // When & Then
-        assertThatThrownBy(() -> userAccessService.activateUser(userId, VERSION + 1)).isInstanceOf(OptimisticLockingFailureException.class)
+        assertThatThrownBy(() -> userAccessService.activateUser(userId, VERSION + 1))
+            .isInstanceOf(OptimisticLockingFailureException.class)
             .hasMessageContaining("Version mismatch");
 
         verify(systemUserRepository).findById(userId);
@@ -214,7 +217,8 @@ class UserAccessServiceTest {
         when(systemUserRepository.findById(userId)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(() -> userAccessService.activateUser(userId, VERSION)).isInstanceOf(UserNotFoundException.class);
+        assertThatThrownBy(() -> userAccessService.activateUser(userId, VERSION))
+            .isInstanceOf(UserNotFoundException.class);
 
         verify(systemUserRepository).findById(userId);
         verify(systemUserRepository, never()).save(any());
@@ -297,7 +301,8 @@ class UserAccessServiceTest {
         // Then
         verify(systemUserRepository).save(userCaptor.capture());
         SystemUser savedUser = userCaptor.getValue();
-        assertThat(savedUser.getRoles()).containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
+        assertThat(savedUser.getRoles())
+            .containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
         assertThat(savedUser.getVersion()).isEqualTo(VERSION);
     }
 
@@ -309,7 +314,8 @@ class UserAccessServiceTest {
         Set<String> newRoles = Set.of(UserRoleEnum.ADMIN.getValue());
         when(systemUserRepository.findById(userId)).thenReturn(Optional.empty());
         // When & Then
-        assertThatThrownBy(() -> userAccessService.replaceUserRoles(userId, newRoles, VERSION)).isInstanceOf(UserNotFoundException.class);
+        assertThatThrownBy(() -> userAccessService.replaceUserRoles(userId, newRoles, VERSION))
+            .isInstanceOf(UserNotFoundException.class);
 
         verify(systemUserRepository).findById(userId);
         verify(systemUserRepository, never()).save(any());

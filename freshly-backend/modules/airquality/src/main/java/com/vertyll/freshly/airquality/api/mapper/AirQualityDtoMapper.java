@@ -39,7 +39,9 @@ public interface AirQualityDtoMapper {
     @Mapping(target = "pm25IndexLevel", expression = "java(toApiValue(measurement.getPm25IndexLevel()))")
     AirQualityMeasurementResponseDto toAirQualityMeasurementResponse(AirQualityMeasurement measurement);
 
-    List<AirQualityMeasurementResponseDto> toAirQualityMeasurementResponseList(List<AirQualityMeasurement> measurements);
+    List<AirQualityMeasurementResponseDto> toAirQualityMeasurementResponseList(
+        List<AirQualityMeasurement> measurements
+    );
 
     // StationDistance mappings
     StationDistanceResponseDto toStationDistanceResponse(StationDistance stationDistance);
@@ -63,7 +65,12 @@ public interface AirQualityDtoMapper {
     }
 
     default AirQualityStatisticsResponseDto.OtherPollutants mapOtherPollutants(AirQualityStatistics stats) {
-        return new AirQualityStatisticsResponseDto.OtherPollutants(stats.so2Avg(), stats.no2Avg(), stats.coAvg(), stats.o3Avg());
+        return new AirQualityStatisticsResponseDto.OtherPollutants(
+            stats.so2Avg(),
+            stats.no2Avg(),
+            stats.coAvg(),
+            stats.o3Avg()
+        );
     }
 
     default AirQualityStatisticsResponseDto.QualityDistribution mapQualityDistribution(AirQualityStatistics stats) {

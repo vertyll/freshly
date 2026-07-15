@@ -27,7 +27,8 @@ public class NotificationService {
 
         Email recipient = new Email(command.recipientEmail());
 
-        EmailNotification notification = new EmailNotification(recipient, command.template(), command.templateVariables());
+        EmailNotification notification =
+                new EmailNotification(recipient, command.template(), command.templateVariables());
 
         try {
             emailSender.send(notification);

@@ -35,8 +35,10 @@ public record AirQualityStatistics(
     int veryBadCount
 ) {
     public AirQualityLevel getMostCommonQualityLevel() {
-        int max = Math
-            .max(veryGoodCount, Math.max(goodCount, Math.max(moderateCount, Math.max(sufficientCount, Math.max(badCount, veryBadCount)))));
+        int max = Math.max(
+            veryGoodCount,
+            Math.max(goodCount, Math.max(moderateCount, Math.max(sufficientCount, Math.max(badCount, veryBadCount))))
+        );
 
         if (max == veryGoodCount)
             return AirQualityLevel.VERY_GOOD;

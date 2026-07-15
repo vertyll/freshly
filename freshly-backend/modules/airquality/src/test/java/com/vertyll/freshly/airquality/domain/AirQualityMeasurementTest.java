@@ -18,9 +18,11 @@ class AirQualityMeasurementTest {
         int stationId = 123;
         String stationName = "Station 1";
         LocalDateTime calculationDate = LocalDateTime.now(ZoneOffset.UTC);
-        AirQualityIndex index = new AirQualityIndex(stationId, calculationDate, "Dobry", "Bardzo dobry", "Umiarkowany", "Dobry");
+        AirQualityIndex index =
+                new AirQualityIndex(stationId, calculationDate, "Dobry", "Bardzo dobry", "Umiarkowany", "Dobry");
 
-        Map<String, Double> sensorValues = Map.of("PM10", 25.5, "PM2.5", 15.2, "SO2", 8.5, "NO2", 12.3, "CO", 0.5, "O3", 45.2);
+        Map<String, Double> sensorValues =
+                Map.of("PM10", 25.5, "PM2.5", 15.2, "SO2", 8.5, "NO2", 12.3, "CO", 0.5, "O3", 45.2);
 
         // When
         AirQualityMeasurement measurement =
@@ -46,7 +48,8 @@ class AirQualityMeasurementTest {
         // Given
         int stationId = 123;
         String stationName = "Station 1";
-        AirQualityIndex index = new AirQualityIndex(stationId, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
+        AirQualityIndex index =
+                new AirQualityIndex(stationId, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
 
         Map<String, Double> sensorValues = Map.of("PM10", 25.5);
         // Missing other sensor values
@@ -171,7 +174,8 @@ class AirQualityMeasurementTest {
         // Given
         int stationId = 123;
         String stationName = "Station 1";
-        AirQualityIndex index = new AirQualityIndex(stationId, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
+        AirQualityIndex index =
+                new AirQualityIndex(stationId, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
 
         Map<String, Double> emptySensorValues = Map.of();
 

@@ -6,9 +6,20 @@ import java.util.Optional;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.vertyll.freshly.airquality.api.dto.*;
+import com.vertyll.freshly.airquality.api.dto.AirQualityIndexResponseDto;
+import com.vertyll.freshly.airquality.api.dto.AirQualityMeasurementResponseDto;
+import com.vertyll.freshly.airquality.api.dto.AirQualityStatisticsResponseDto;
+import com.vertyll.freshly.airquality.api.dto.SensorMeasurementResponseDto;
+import com.vertyll.freshly.airquality.api.dto.StationDistanceResponseDto;
+import com.vertyll.freshly.airquality.api.dto.StationRankingResponseDto;
+import com.vertyll.freshly.airquality.api.dto.StationResponseDto;
 import com.vertyll.freshly.airquality.api.mapper.AirQualityDtoMapper;
 import com.vertyll.freshly.airquality.application.AirQualityService;
 import com.vertyll.freshly.airquality.application.AirQualitySyncService;
@@ -66,7 +77,9 @@ public class AirQualityController {
 
     /** Get current sensor measurements (live from GIOŚ API) */
     @GetMapping("/stations/{stationId}/sensors")
-    public ResponseEntity<ApiResponse<List<SensorMeasurementResponseDto>>> getMeasurements(@PathVariable int stationId) {
+    public ResponseEntity<ApiResponse<List<SensorMeasurementResponseDto>>> getMeasurements(
+        @PathVariable int stationId
+    ) {
         List<SensorMeasurement> measurements = airQualityService.getMeasurementsForStation(stationId);
         List<SensorMeasurementResponseDto> response = dtoMapper.toSensorMeasurementResponseList(measurements);
         return ApiResponse.buildResponse(response, SUCCESS_MEASUREMENTS_FETCHED_MSG_KEY, messageSource, HttpStatus.OK);
@@ -77,7 +90,9 @@ public class AirQualityController {
      * GIOŚ API
      */
     @GetMapping("/stations/{stationId}/latest")
-    public ResponseEntity<ApiResponse<AirQualityMeasurementResponseDto>> getLatestMeasurement(@PathVariable int stationId) {
+    public ResponseEntity<ApiResponse<AirQualityMeasurementResponseDto>> getLatestMeasurement(
+        @PathVariable int stationId
+    ) {
         return airQualityService.getLatestMeasurement(stationId).map(measurement -> {
             AirQualityMeasurementResponseDto response = dtoMapper.toAirQualityMeasurementResponse(measurement);
             return ApiResponse.buildResponse(response, SUCCESS_LATEST_FETCHED_MSG_KEY, messageSource, HttpStatus.OK);
@@ -109,7 +124,8 @@ public class AirQualityController {
     @PostMapping("/sync/trigger")
     public ResponseEntity<ApiResponse<String>> triggerSync() {
         syncService.ifPresent(AirQualitySyncService::triggerManualSync);
-        return ApiResponse.buildResponse(SYNC_TRIGGERED, SUCCESS_SYNC_TRIGGERED_MSG_KEY, messageSource, HttpStatus.ACCEPTED);
+        return ApiResponse
+            .buildResponse(SYNC_TRIGGERED, SUCCESS_SYNC_TRIGGERED_MSG_KEY, messageSource, HttpStatus.ACCEPTED);
     }
 
     /**
@@ -148,7 +164,8 @@ public class AirQualityController {
     ) {
         return airQualityService.getStatistics(stationId, days).map(stats -> {
             AirQualityStatisticsResponseDto response = dtoMapper.toStatisticsResponse(stats);
-            return ApiResponse.buildResponse(response, SUCCESS_STATISTICS_FETCHED_MSG_KEY, messageSource, HttpStatus.OK);
+            return ApiResponse
+                .buildResponse(response, SUCCESS_STATISTICS_FETCHED_MSG_KEY, messageSource, HttpStatus.OK);
         }).orElseThrow(() -> new AirQualityDataNotFoundException(stationId));
     }
 

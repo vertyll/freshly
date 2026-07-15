@@ -45,7 +45,8 @@ public class PermissionManagementController {
 
         List<String> permissions = Arrays.stream(Permission.values()).map(Permission::getValue).toList();
 
-        return ApiResponse.buildResponse(permissions, FETCHING_AVAILABLE_PERMISSIONS_MSG_KEY, messageSource, HttpStatus.OK);
+        return ApiResponse
+            .buildResponse(permissions, FETCHING_AVAILABLE_PERMISSIONS_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @GetMapping("/mappings")
@@ -54,11 +55,14 @@ public class PermissionManagementController {
 
         List<PermissionMappingResponseDto> mappings = permissionManagementService.getAllMappings();
 
-        return ApiResponse.buildResponse(mappings, FETCHING_ROLE_PERMISSION_MAPPINGS_MSG_KEY, messageSource, HttpStatus.OK);
+        return ApiResponse
+            .buildResponse(mappings, FETCHING_ROLE_PERMISSION_MAPPINGS_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @GetMapping("/mappings/role/{role}")
-    public ResponseEntity<ApiResponse<List<PermissionMappingResponseDto>>> getMappingsByRole(@PathVariable String role) {
+    public ResponseEntity<ApiResponse<List<PermissionMappingResponseDto>>> getMappingsByRole(
+        @PathVariable String role
+    ) {
 
         log.info("Fetching permissions for role: {}", role);
 
@@ -68,7 +72,9 @@ public class PermissionManagementController {
     }
 
     @PostMapping("/mappings")
-    public ResponseEntity<ApiResponse<PermissionMappingResponseDto>> createMapping(@Valid @RequestBody CreatePermissionMappingDto request) {
+    public ResponseEntity<ApiResponse<PermissionMappingResponseDto>> createMapping(
+        @Valid @RequestBody CreatePermissionMappingDto request
+    ) {
 
         log.info("Creating permission mapping: {} -> {}", request.keycloakRole(), request.permission());
 
@@ -76,7 +82,11 @@ public class PermissionManagementController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .header(HttpHeaders.ETAG, ETagUtil.buildWeakETag(mapping.version()))
-            .body(ApiResponse.buildResponse(mapping, CREATING_PERMISSION_MAPPING_MSG_KEY, messageSource, HttpStatus.CREATED).getBody());
+            .body(
+                ApiResponse
+                    .buildResponse(mapping, CREATING_PERMISSION_MAPPING_MSG_KEY, messageSource, HttpStatus.CREATED)
+                    .getBody()
+            );
     }
 
     @DeleteMapping("/mappings/{mappingId}")

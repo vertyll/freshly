@@ -70,8 +70,13 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
     }
 
     @Override
-    public List<AirQualityMeasurement> findByStationIdAndDateRange(int stationId, LocalDateTime from, LocalDateTime to) {
-        return springDataRepository.findByStationIdAndMeasurementDateBetweenOrderByMeasurementDateAsc(stationId, from, to)
+    public List<AirQualityMeasurement> findByStationIdAndDateRange(
+        int stationId,
+        LocalDateTime from,
+        LocalDateTime to
+    ) {
+        return springDataRepository
+            .findByStationIdAndMeasurementDateBetweenOrderByMeasurementDateAsc(stationId, from, to)
             .stream()
             .map(mapper::toDomain)
             .toList();
@@ -99,8 +104,8 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
     @Override
     @SuppressWarnings("PMD.NPathComplexity") // Complex statistics aggregation logic
     public Optional<AirQualityStatistics> calculateStatistics(int stationId, LocalDateTime from, LocalDateTime to) {
-        List<AirQualityMeasurementDocument> measurements =
-                springDataRepository.findByStationIdAndMeasurementDateBetweenOrderByMeasurementDateAsc(stationId, from, to);
+        List<AirQualityMeasurementDocument> measurements = springDataRepository
+            .findByStationIdAndMeasurementDateBetweenOrderByMeasurementDateAsc(stationId, from, to);
 
         if (measurements.isEmpty()) {
             return Optional.empty();
@@ -210,7 +215,8 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
             Aggregation.limit(limit)
         );
 
-        AggregationResults<?> rawResults = mongoTemplate.aggregate(aggregation, COLLECTION_AIR_QUALITY_MEASUREMENTS, Map.class);
+        AggregationResults<?> rawResults =
+                mongoTemplate.aggregate(aggregation, COLLECTION_AIR_QUALITY_MEASUREMENTS, Map.class);
 
         return getStationRankings(rawResults);
     }
@@ -238,7 +244,8 @@ class MongoAirQualityHistoryRepository implements AirQualityHistoryRepository {
             // Create Station object (simplified - in real scenario you'd fetch full station data)
             Integer stationId = (Integer) result.get(FIELD_ID);
             String stationName = (String) result.get(FIELD_STATION_NAME);
-            Station station = new Station(stationId, stationName, "", "", DEFAULT_STATION_COORDINATE, DEFAULT_STATION_COORDINATE);
+            Station station =
+                    new Station(stationId, stationName, "", "", DEFAULT_STATION_COORDINATE, DEFAULT_STATION_COORDINATE);
 
             // Convert dominant quality String to enum (MongoDB returns enum name as String)
             String dominantQuality = (String) result.get(FIELD_DOMINANT_QUALITY);

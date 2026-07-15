@@ -58,13 +58,15 @@ class UserDtoMapperTest {
     void shouldMapUserWithMultipleRolesToUserResponseDto() {
         // Given
         UUID userId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue()));
+        SystemUser user =
+                new SystemUser(userId, true, Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue()));
 
         // When
         UserResponseDto result = mapper.toResponse(user);
 
         // Then
-        assertThat(result.roles()).containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
+        assertThat(result.roles())
+            .containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
     }
 
     @Test
@@ -163,8 +165,11 @@ class UserDtoMapperTest {
         // Given
         SystemUser activeUser = new SystemUser(UUID.randomUUID(), true, Set.of(UserRoleEnum.USER.getValue()));
         SystemUser inactiveAdmin = new SystemUser(UUID.randomUUID(), false, Set.of(UserRoleEnum.ADMIN.getValue()));
-        SystemUser activeMultiRole =
-                new SystemUser(UUID.randomUUID(), true, Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue()));
+        SystemUser activeMultiRole = new SystemUser(
+            UUID.randomUUID(),
+            true,
+            Set.of(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue())
+        );
         List<SystemUser> users = List.of(activeUser, inactiveAdmin, activeMultiRole);
 
         // When
@@ -177,7 +182,8 @@ class UserDtoMapperTest {
         assertThat(result.get(1).isActive()).isFalse();
         assertThat(result.get(1).roles()).containsExactly(UserRoleEnum.ADMIN.getValue());
         assertThat(result.get(2).isActive()).isTrue();
-        assertThat(result.get(2).roles()).containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
+        assertThat(result.get(2).roles())
+            .containsExactlyInAnyOrder(UserRoleEnum.USER.getValue(), UserRoleEnum.ADMIN.getValue());
     }
 
     @Test

@@ -29,7 +29,10 @@ public class AnyPermissionAuthorizationManager implements AuthorizationManager<M
     private final PermissionService permissionService;
 
     @Override
-    public AuthorizationResult authorize(Supplier<? extends Authentication> authentication, MethodInvocation methodInvocation) {
+    public AuthorizationResult authorize(
+        Supplier<? extends Authentication> authentication,
+        MethodInvocation methodInvocation
+    ) {
         Method method = methodInvocation.getMethod();
 
         // Check method-level annotation first
@@ -37,7 +40,12 @@ public class AnyPermissionAuthorizationManager implements AuthorizationManager<M
         if (methodAnnotation != null) {
             Permission[] permissions = methodAnnotation.value(); // Bezpośrednio enum array!
             boolean granted = permissionService.hasAnyPermission(authentication.get(), permissions);
-            log.debug("Any permission check for method {}: {} = {}", method.getName(), Arrays.toString(permissions), granted);
+            log.debug(
+                "Any permission check for method {}: {} = {}",
+                method.getName(),
+                Arrays.toString(permissions),
+                granted
+            );
             return new AuthorizationDecision(granted);
         }
 

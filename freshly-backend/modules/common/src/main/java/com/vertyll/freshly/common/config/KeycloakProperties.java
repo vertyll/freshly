@@ -16,6 +16,12 @@ public record KeycloakProperties(
     CookieProperties cookie
 ) {
 
-    public record CookieProperties(String refreshTokenCookieName, boolean httpOnly, boolean secure, String sameSite, String path) {
+    public record CookieProperties(
+        String refreshTokenCookieName,
+        boolean httpOnly,
+        boolean secure,
+        String sameSite,
+        String path
+    ) {
     }
 }

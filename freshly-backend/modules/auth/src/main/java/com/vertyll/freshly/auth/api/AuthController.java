@@ -62,7 +62,8 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponseDto>> register(@Valid @RequestBody RegisterUserRequestDto request) {
         log.info("Registering new user: {}", request.username());
         UUID userId = authService.registerUser(request);
-        return ApiResponse.buildResponse(new AuthResponseDto(userId), AUTH_REGISTERED_MSG_KEY, messageSource, HttpStatus.CREATED);
+        return ApiResponse
+            .buildResponse(new AuthResponseDto(userId), AUTH_REGISTERED_MSG_KEY, messageSource, HttpStatus.CREATED);
     }
 
     @GetMapping("/verify-email")
@@ -87,7 +88,8 @@ public class AuthController {
         AccessTokenResponseDto accessTokenResponse =
                 new AccessTokenResponseDto(tokens.accessToken(), tokens.expiresIn(), tokens.tokenType());
 
-        return ApiResponse.buildResponse(accessTokenResponse, AUTH_LOGIN_SUCCESSFUL_MSG_KEY, messageSource, HttpStatus.OK);
+        return ApiResponse
+            .buildResponse(accessTokenResponse, AUTH_LOGIN_SUCCESSFUL_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PostMapping("/refresh")
@@ -105,11 +107,15 @@ public class AuthController {
         AccessTokenResponseDto accessTokenResponse =
                 new AccessTokenResponseDto(tokens.accessToken(), tokens.expiresIn(), tokens.tokenType());
 
-        return ApiResponse.buildResponse(accessTokenResponse, AUTH_TOKEN_REFRESHED_MSG_KEY, messageSource, HttpStatus.OK);
+        return ApiResponse
+            .buildResponse(accessTokenResponse, AUTH_TOKEN_REFRESHED_MSG_KEY, messageSource, HttpStatus.OK);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(@RefreshTokenCookie String refreshToken, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<Void>> logout(
+        @RefreshTokenCookie String refreshToken,
+        HttpServletResponse response
+    ) {
         log.info("User logout");
 
         authService.logout(refreshToken);

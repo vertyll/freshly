@@ -14,7 +14,10 @@ import lombok.Getter;
  * name (e.g., "VERY_GOOD"), and the API returns the same. The polishName is only used for parsing
  * data from GIOŚ API.
  */
-@SuppressFBWarnings(value = "IMPROPER_UNICODE", justification = "Unicode-safe normalization (NFC) and Locale.ROOT are explicitly used")
+@SuppressFBWarnings(
+    value = "IMPROPER_UNICODE",
+    justification = "Unicode-safe normalization (NFC) and Locale.ROOT are explicitly used"
+)
 public enum AirQualityLevel {
     VERY_GOOD("Bardzo dobry", 0),
     GOOD("Dobry", 1),

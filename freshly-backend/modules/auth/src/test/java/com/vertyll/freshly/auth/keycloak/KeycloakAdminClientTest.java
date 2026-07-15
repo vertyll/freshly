@@ -120,8 +120,9 @@ class KeycloakAdminClientTest {
         when(usersResource.searchByUsername(username, true)).thenReturn(List.of(existingUser));
 
         // When & Then
-        assertThatThrownBy(() -> keycloakAdminClient.createUser(username, "test@example.com", "password", "John", "Doe"))
-            .isInstanceOf(UsernameAlreadyExistsException.class);
+        assertThatThrownBy(
+            () -> keycloakAdminClient.createUser(username, "test@example.com", "password", "John", "Doe")
+        ).isInstanceOf(UsernameAlreadyExistsException.class);
 
         verify(usersResource, never()).create(any());
     }
@@ -158,8 +159,8 @@ class KeycloakAdminClientTest {
         // Then
         verify(userResource).resetPassword(
             argThat(
-                credential -> CredentialRepresentation.PASSWORD.equals(credential.getType()) && credential.getValue().equals(newPassword)
-                        && !credential.isTemporary()
+                credential -> CredentialRepresentation.PASSWORD.equals(credential.getType())
+                        && credential.getValue().equals(newPassword) && !credential.isTemporary()
             )
         );
     }
@@ -182,7 +183,8 @@ class KeycloakAdminClientTest {
         keycloakAdminClient.changeEmail(userId, newEmail);
 
         // Then
-        verify(userResource).update(argThat(updatedUser -> updatedUser.getEmail().equals(newEmail) && !updatedUser.isEmailVerified()));
+        verify(userResource)
+            .update(argThat(updatedUser -> updatedUser.getEmail().equals(newEmail) && !updatedUser.isEmailVerified()));
     }
 
     @Test
@@ -204,7 +206,8 @@ class KeycloakAdminClientTest {
         when(usersResource.searchByEmail(newEmail, true)).thenReturn(List.of(existingUser));
 
         // When & Then
-        assertThatThrownBy(() -> keycloakAdminClient.changeEmail(userId, newEmail)).isInstanceOf(EmailAlreadyExistsException.class);
+        assertThatThrownBy(() -> keycloakAdminClient.changeEmail(userId, newEmail))
+            .isInstanceOf(EmailAlreadyExistsException.class);
 
         verify(userResource, never()).update(any());
     }

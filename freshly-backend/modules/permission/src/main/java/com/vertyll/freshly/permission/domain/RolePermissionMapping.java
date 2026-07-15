@@ -33,7 +33,12 @@ public final class RolePermissionMapping {
         this.version = version;
     }
 
-    public static RolePermissionMapping reconstitute(UUID id, String keycloakRole, Permission permission, Long version) {
+    public static RolePermissionMapping reconstitute(
+        UUID id,
+        String keycloakRole,
+        Permission permission,
+        Long version
+    ) {
         requireNonNull(id, ID_CANNOT_BE_NULL);
         requireNonNull(keycloakRole, KEYCLOAK_ROLE_CANNOT_BE_NULL);
         requireNonNull(permission, PERMISSION_CANNOT_BE_NULL);

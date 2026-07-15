@@ -76,7 +76,8 @@ class RolePermissionMappingTest {
         Permission permission = Permission.USERS_READ;
 
         // When & Then
-        assertThatThrownBy(() -> RolePermissionMapping.reconstitute(null, role, permission, 1L)).isInstanceOf(NullPointerException.class)
+        assertThatThrownBy(() -> RolePermissionMapping.reconstitute(null, role, permission, 1L))
+            .isInstanceOf(NullPointerException.class)
             .hasMessageContaining(ID_CANNOT_BE_NULL);
     }
 
@@ -89,7 +90,8 @@ class RolePermissionMappingTest {
         Permission permission = Permission.USERS_READ;
 
         // When & Then
-        assertThatThrownBy(() -> RolePermissionMapping.reconstitute(id, null, permission, 1L)).isInstanceOf(NullPointerException.class)
+        assertThatThrownBy(() -> RolePermissionMapping.reconstitute(id, null, permission, 1L))
+            .isInstanceOf(NullPointerException.class)
             .hasMessageContaining(KEYCLOAK_ROLE_CANNOT_BE_NULL);
     }
 
@@ -102,7 +104,8 @@ class RolePermissionMappingTest {
         String role = UserRoleEnum.ADMIN.getValue();
 
         // When & Then
-        assertThatThrownBy(() -> RolePermissionMapping.reconstitute(id, role, null, 1L)).isInstanceOf(NullPointerException.class)
+        assertThatThrownBy(() -> RolePermissionMapping.reconstitute(id, role, null, 1L))
+            .isInstanceOf(NullPointerException.class)
             .hasMessageContaining(PERMISSION_CANNOT_BE_NULL);
     }
 

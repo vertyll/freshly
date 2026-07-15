@@ -12,6 +12,11 @@ class SystemUserMapper {
     }
 
     SystemUser toDomain(SystemUserDocument document) {
-        return SystemUser.reconstitute(document.getKeycloakUserId(), document.isActive(), document.getRoles(), document.getVersion());
+        return SystemUser.reconstitute(
+            document.getKeycloakUserId(),
+            document.isActive(),
+            document.getRoles(),
+            document.getVersion()
+        );
     }
 }

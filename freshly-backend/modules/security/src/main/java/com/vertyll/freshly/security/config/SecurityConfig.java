@@ -63,14 +63,21 @@ public class SecurityConfig {
                     .permitAll()
 
                     // Actuator endpoints
-                    .requestMatchers("/actuator/health", "/actuator/health/**", "/api/v1/actuator/health", "/api/v1/actuator/health/**")
+                    .requestMatchers(
+                        "/actuator/health",
+                        "/actuator/health/**",
+                        "/api/v1/actuator/health",
+                        "/api/v1/actuator/health/**"
+                    )
                     .permitAll()
 
                     // All other endpoints require authentication
                     .anyRequest()
                     .authenticated()
             )
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+            .oauth2ResourceServer(
+                oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+            )
             .build();
     }
 

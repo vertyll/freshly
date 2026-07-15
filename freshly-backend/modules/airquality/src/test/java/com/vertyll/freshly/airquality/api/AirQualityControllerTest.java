@@ -154,12 +154,28 @@ class AirQualityControllerTest {
         @DisplayName("Should get all stations successfully")
         void shouldGetAllStationsSuccessfully() throws Exception {
             // Given
-            Station station1 = new Station(STATION_ID_123, STATION_1_NAME, CITY_WARSAW, STREET_1, LAT_WARSAW, LON_WARSAW);
-            Station station2 = new Station(STATION_ID_124, STATION_2_NAME, CITY_KRAKOW, STREET_2, LAT_KRAKOW, LON_KRAKOW);
+            Station station1 =
+                    new Station(STATION_ID_123, STATION_1_NAME, CITY_WARSAW, STREET_1, LAT_WARSAW, LON_WARSAW);
+            Station station2 =
+                    new Station(STATION_ID_124, STATION_2_NAME, CITY_KRAKOW, STREET_2, LAT_KRAKOW, LON_KRAKOW);
             List<Station> stations = List.of(station1, station2);
 
-            StationResponseDto dto1 = new StationResponseDto(STATION_ID_123, STATION_1_NAME, CITY_WARSAW, STREET_1, LAT_WARSAW, LON_WARSAW);
-            StationResponseDto dto2 = new StationResponseDto(STATION_ID_124, STATION_2_NAME, CITY_KRAKOW, STREET_2, LAT_KRAKOW, LON_KRAKOW);
+            StationResponseDto dto1 = new StationResponseDto(
+                STATION_ID_123,
+                STATION_1_NAME,
+                CITY_WARSAW,
+                STREET_1,
+                LAT_WARSAW,
+                LON_WARSAW
+            );
+            StationResponseDto dto2 = new StationResponseDto(
+                STATION_ID_124,
+                STATION_2_NAME,
+                CITY_KRAKOW,
+                STREET_2,
+                LAT_KRAKOW,
+                LON_KRAKOW
+            );
             List<StationResponseDto> responseDtos = List.of(dto1, dto2);
 
             when(airQualityService.getAllStations()).thenReturn(stations);
@@ -258,10 +274,12 @@ class AirQualityControllerTest {
         @DisplayName("Should get sensor measurements successfully")
         void shouldGetSensorMeasurementsSuccessfully() throws Exception {
             // Given
-            SensorMeasurement.Reading reading1 = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), PM10_VALUE_25_5);
+            SensorMeasurement.Reading reading1 =
+                    new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), PM10_VALUE_25_5);
             SensorMeasurement.Reading reading2 =
                     new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC).minusHours(1), PM10_VALUE_30_2);
-            SensorMeasurement measurement = new SensorMeasurement(SENSOR_ID_1, PARAM_PM10, PARAM_PM10_NAME, List.of(reading1, reading2));
+            SensorMeasurement measurement =
+                    new SensorMeasurement(SENSOR_ID_1, PARAM_PM10, PARAM_PM10_NAME, List.of(reading1, reading2));
             List<SensorMeasurement> measurements = List.of(measurement);
 
             SensorMeasurementResponseDto responseDto =
@@ -287,7 +305,8 @@ class AirQualityControllerTest {
         void shouldReturnEmptyListWhenNoMeasurements() throws Exception {
             // Given
             when(airQualityService.getMeasurementsForStation(STATION_ID_123)).thenReturn(Collections.emptyList());
-            when(dtoMapper.toSensorMeasurementResponseList(Collections.emptyList())).thenReturn(Collections.emptyList());
+            when(dtoMapper.toSensorMeasurementResponseList(Collections.emptyList()))
+                .thenReturn(Collections.emptyList());
 
             // When & Then
             mockMvc.perform(get(ENDPOINT_STATION_SENSORS, STATION_ID_123).contentType(MediaType.APPLICATION_JSON))
@@ -475,7 +494,8 @@ class AirQualityControllerTest {
         @DisplayName("Should get nearest stations with default radius")
         void shouldGetNearestStationsWithDefaultRadius() throws Exception {
             // Given
-            Station station = new Station(STATION_ID_123, STATION_1_NAME, CITY_WARSAW, STREET_1, LAT_WARSAW, LON_WARSAW);
+            Station station =
+                    new Station(STATION_ID_123, STATION_1_NAME, CITY_WARSAW, STREET_1, LAT_WARSAW, LON_WARSAW);
             StationDistance stationDistance = new StationDistance(station, DISTANCE_5_5_KM);
             List<StationDistance> stationsWithDistance = List.of(stationDistance);
 
@@ -485,7 +505,8 @@ class AirQualityControllerTest {
             );
             List<StationDistanceResponseDto> responseDtos = List.of(responseDto);
 
-            when(airQualityService.findNearestStations(LAT_WARSAW, LON_WARSAW, DEFAULT_RADIUS)).thenReturn(stationsWithDistance);
+            when(airQualityService.findNearestStations(LAT_WARSAW, LON_WARSAW, DEFAULT_RADIUS))
+                .thenReturn(stationsWithDistance);
             when(dtoMapper.toStationDistanceResponseList(stationsWithDistance)).thenReturn(responseDtos);
 
             // When & Then
@@ -509,7 +530,8 @@ class AirQualityControllerTest {
             // Given
             List<StationDistance> stationsWithDistance = List.of();
 
-            when(airQualityService.findNearestStations(LAT_WARSAW, LON_WARSAW, CUSTOM_RADIUS_50)).thenReturn(stationsWithDistance);
+            when(airQualityService.findNearestStations(LAT_WARSAW, LON_WARSAW, CUSTOM_RADIUS_50))
+                .thenReturn(stationsWithDistance);
             when(dtoMapper.toStationDistanceResponseList(stationsWithDistance)).thenReturn(List.of());
 
             // When & Then
@@ -615,13 +637,26 @@ class AirQualityControllerTest {
         @DisplayName("Should get ranking with default parameters")
         void shouldGetRankingWithDefaultParameters() throws Exception {
             // Given
-            Station station = new Station(STATION_ID_123, STATION_1_NAME, CITY_WARSAW, STREET_1, LAT_WARSAW, LON_WARSAW);
-            StationRanking ranking = new StationRanking(RANK_1, station, PM10_VALUE_25_5, AirQualityLevel.GOOD, MEASUREMENT_COUNT_90);
+            Station station =
+                    new Station(STATION_ID_123, STATION_1_NAME, CITY_WARSAW, STREET_1, LAT_WARSAW, LON_WARSAW);
+            StationRanking ranking =
+                    new StationRanking(RANK_1, station, PM10_VALUE_25_5, AirQualityLevel.GOOD, MEASUREMENT_COUNT_90);
             List<StationRanking> rankings = List.of(ranking);
-            StationResponseDto stationDto =
-                    new StationResponseDto(STATION_ID_123, STATION_1_NAME, CITY_WARSAW, STREET_1, LAT_WARSAW, LON_WARSAW);
-            StationRankingResponseDto responseDto =
-                    new StationRankingResponseDto(RANK_1, stationDto, PM10_VALUE_25_5, QUALITY_GOOD_EN, MEASUREMENT_COUNT_90);
+            StationResponseDto stationDto = new StationResponseDto(
+                STATION_ID_123,
+                STATION_1_NAME,
+                CITY_WARSAW,
+                STREET_1,
+                LAT_WARSAW,
+                LON_WARSAW
+            );
+            StationRankingResponseDto responseDto = new StationRankingResponseDto(
+                RANK_1,
+                stationDto,
+                PM10_VALUE_25_5,
+                QUALITY_GOOD_EN,
+                MEASUREMENT_COUNT_90
+            );
             List<StationRankingResponseDto> responseDtos = List.of(responseDto);
 
             when(airQualityService.getRanking(DEFAULT_DAYS, DEFAULT_LIMIT)).thenReturn(rankings);

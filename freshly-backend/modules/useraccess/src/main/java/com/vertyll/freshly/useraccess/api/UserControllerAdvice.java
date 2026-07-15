@@ -75,7 +75,8 @@ public class UserControllerAdvice {
     @ExceptionHandler(OptimisticLockingFailureException.class)
     public ProblemDetail handleOptimisticLockingFailure(OptimisticLockingFailureException ex) {
         LOGGER.warn("Optimistic locking failure: {}", ex.getMessage());
-        String message = messageSource.getMessage(OPTIMISTIC_LOCKING_FAILURE_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message =
+                messageSource.getMessage(OPTIMISTIC_LOCKING_FAILURE_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
     }
 }

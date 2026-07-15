@@ -93,7 +93,8 @@ class AuthControllerTest {
         // Given
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(SUCCESS);
         UUID userId = UUID.randomUUID();
-        RegisterUserRequestDto request = new RegisterUserRequestDto("testuser", "test@example.com", "Password1!", "Jan", "Kowalski");
+        RegisterUserRequestDto request =
+                new RegisterUserRequestDto("testuser", "test@example.com", "Password1!", "Jan", "Kowalski");
 
         when(authService.registerUser(request)).thenReturn(userId);
 
@@ -111,7 +112,8 @@ class AuthControllerTest {
     void shouldUseMessageSourceForRegisterResponse() {
         // Given
         UUID userId = UUID.randomUUID();
-        RegisterUserRequestDto request = new RegisterUserRequestDto("testuser", "test@example.com", "Password1!", "Jan", "Kowalski");
+        RegisterUserRequestDto request =
+                new RegisterUserRequestDto("testuser", "test@example.com", "Password1!", "Jan", "Kowalski");
 
         when(authService.registerUser(request)).thenReturn(userId);
 
@@ -152,7 +154,8 @@ class AuthControllerTest {
         when(authService.login(request)).thenReturn(tokens);
 
         // When
-        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response = authController.login(request, httpServletResponse);
+        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response =
+                authController.login(request, httpServletResponse);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -174,7 +177,8 @@ class AuthControllerTest {
         when(authService.login(request)).thenReturn(tokens);
 
         // When
-        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response = authController.login(request, httpServletResponse);
+        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response =
+                authController.login(request, httpServletResponse);
 
         // Then
         assertThat(response.getBody()).isNotNull();
@@ -195,7 +199,8 @@ class AuthControllerTest {
         when(authService.refreshToken(refreshToken)).thenReturn(tokens);
 
         // When
-        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response = authController.refresh(refreshToken, httpServletResponse);
+        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response =
+                authController.refresh(refreshToken, httpServletResponse);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -215,7 +220,8 @@ class AuthControllerTest {
         when(authService.refreshToken(null)).thenReturn(tokens);
 
         // When
-        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response = authController.refresh(null, httpServletResponse);
+        ResponseEntity<ApiResponse<AccessTokenResponseDto>> response =
+                authController.refresh(null, httpServletResponse);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

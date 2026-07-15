@@ -33,7 +33,8 @@ public class AirQualityControllerAdvice {
     @ExceptionHandler(StationNotFoundException.class)
     public ProblemDetail handleStationNotFound(StationNotFoundException ex) {
         LOGGER.warn("Station not found: {}", ex.getMessage());
-        String message = messageSource.getMessage(ERROR_STATION_NOT_FOUND_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message =
+                messageSource.getMessage(ERROR_STATION_NOT_FOUND_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, message);
     }
 
@@ -47,14 +48,16 @@ public class AirQualityControllerAdvice {
     @ExceptionHandler(InvalidDateRangeException.class)
     public ProblemDetail handleInvalidDateRange(InvalidDateRangeException ex) {
         LOGGER.warn("Invalid date range: {}", ex.getMessage());
-        String message = messageSource.getMessage(ERROR_INVALID_DATE_RANGE_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message =
+                messageSource.getMessage(ERROR_INVALID_DATE_RANGE_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(GiosApiException.class)
     public ProblemDetail handleGiosApiException(GiosApiException ex) {
         LOGGER.error("GIOS API error: {}", ex.getMessage(), ex);
-        String message = messageSource.getMessage(ERROR_GIOS_API_UNAVAILABLE_MSG_KEY, null, LocaleContextHolder.getLocale());
+        String message =
+                messageSource.getMessage(ERROR_GIOS_API_UNAVAILABLE_MSG_KEY, null, LocaleContextHolder.getLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, message);
     }
 }

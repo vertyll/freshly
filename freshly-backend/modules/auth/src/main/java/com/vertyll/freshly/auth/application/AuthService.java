@@ -52,8 +52,13 @@ public class AuthService {
 
         log.info("Registering user: {}", request.username());
 
-        UUID keycloakUserId = keycloakAdminClient
-            .createUser(request.username(), request.email(), request.password(), request.firstName(), request.lastName());
+        UUID keycloakUserId = keycloakAdminClient.createUser(
+            request.username(),
+            request.email(),
+            request.password(),
+            request.firstName(),
+            request.lastName()
+        );
 
         try {
             userAccessService.createUser(
@@ -62,8 +67,10 @@ public class AuthService {
                 Set.of(UserRoleEnum.USER.getValue())
             );
 
-            String verificationToken = verificationTokenService.generateEmailVerificationToken(keycloakUserId, request.email());
-            String verificationLink = applicationProperties.frontend().url() + String.format(VERIFY_EMAIL_URL_TEMPLATE, verificationToken);
+            String verificationToken =
+                    verificationTokenService.generateEmailVerificationToken(keycloakUserId, request.email());
+            String verificationLink = applicationProperties.frontend().url()
+                    + String.format(VERIFY_EMAIL_URL_TEMPLATE, verificationToken);
 
             notificationService.sendEmailVerification(request.email(), request.username(), verificationLink);
 
@@ -164,8 +171,8 @@ public class AuthService {
         userAccessService.deactivateUser(userId, userId, null);
 
         String verificationToken = verificationTokenService.generateEmailVerificationToken(userId, request.newEmail());
-        String verificationLink =
-                applicationProperties.frontend().url() + VERIFY_EMAIL_PATH + String.format(TOKEN_QUERY_PARAM, verificationToken);
+        String verificationLink = applicationProperties.frontend().url() + VERIFY_EMAIL_PATH
+                + String.format(TOKEN_QUERY_PARAM, verificationToken);
 
         notificationService.sendEmailVerification(request.newEmail(), USERNAME, verificationLink);
 

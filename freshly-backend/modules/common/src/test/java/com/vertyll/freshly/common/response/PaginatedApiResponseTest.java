@@ -27,7 +27,8 @@ class PaginatedApiResponseTest {
         String message = "Success";
 
         // When
-        ResponseEntity<PaginatedApiResponse<String>> response = PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
+        ResponseEntity<PaginatedApiResponse<String>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -57,7 +58,8 @@ class PaginatedApiResponseTest {
         String message = "Page 2 of results";
 
         // When
-        ResponseEntity<PaginatedApiResponse<String>> response = PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
+        ResponseEntity<PaginatedApiResponse<String>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
         PaginatedApiResponse<String> body = requireNonNull(response.getBody());
@@ -80,7 +82,8 @@ class PaginatedApiResponseTest {
         String message = "No results found";
 
         // When
-        ResponseEntity<PaginatedApiResponse<String>> response = PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
+        ResponseEntity<PaginatedApiResponse<String>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
         PaginatedApiResponse<String> body = requireNonNull(response.getBody());
@@ -104,7 +107,8 @@ class PaginatedApiResponseTest {
         String message = "Last page";
 
         // When
-        ResponseEntity<PaginatedApiResponse<String>> response = PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
+        ResponseEntity<PaginatedApiResponse<String>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
         PaginatedApiResponse<String> body = requireNonNull(response.getBody());
@@ -127,7 +131,8 @@ class PaginatedApiResponseTest {
         String message = "Created successfully";
 
         // When
-        ResponseEntity<PaginatedApiResponse<Integer>> response = PaginatedApiResponse.buildResponse(page, message, HttpStatus.CREATED);
+        ResponseEntity<PaginatedApiResponse<Integer>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.CREATED);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -144,7 +149,8 @@ class PaginatedApiResponseTest {
         String message = "Success";
 
         // When
-        ResponseEntity<PaginatedApiResponse<String>> response = PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
+        ResponseEntity<PaginatedApiResponse<String>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
         PaginatedApiResponse<String> body = requireNonNull(response.getBody());
@@ -161,7 +167,8 @@ class PaginatedApiResponseTest {
         String message = "Single item";
 
         // When
-        ResponseEntity<PaginatedApiResponse<String>> response = PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
+        ResponseEntity<PaginatedApiResponse<String>> response =
+                PaginatedApiResponse.buildResponse(page, message, HttpStatus.OK);
 
         // Then
         PaginatedApiResponse<String> body = requireNonNull(response.getBody());

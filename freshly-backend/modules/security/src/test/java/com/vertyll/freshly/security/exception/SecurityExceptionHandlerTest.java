@@ -29,7 +29,8 @@ class SecurityExceptionHandlerTest {
     @DisplayName("Should handle AuthorizationDeniedException")
     void shouldHandleAuthorizationDeniedException() {
         // Given
-        AuthorizationDeniedException exception = new AuthorizationDeniedException(ACCESS_DENIED, new AuthorizationDecision(false));
+        AuthorizationDeniedException exception =
+                new AuthorizationDeniedException(ACCESS_DENIED, new AuthorizationDecision(false));
 
         // When
         ProblemDetail problemDetail = exceptionHandler.handleAuthorizationDenied(exception);

@@ -73,7 +73,8 @@ class EmailTest {
     @SuppressWarnings("NullAway")
     void shouldThrowException_whenEmailIsNull() {
         // When & Then
-        assertThatThrownBy(() -> new Email(null)).isInstanceOf(NullPointerException.class).hasMessageContaining(EMAIL_CANNOT_BE_NULL);
+        assertThatThrownBy(() -> new Email(null)).isInstanceOf(NullPointerException.class)
+            .hasMessageContaining(EMAIL_CANNOT_BE_NULL);
     }
 
     @Test

@@ -64,7 +64,10 @@ public class UserController {
         UserResponseDto responseDto = userDtoMapper.toResponse(user);
         return ResponseEntity.status(HttpStatus.CREATED)
             .header(HttpHeaders.ETAG, ETagUtil.buildWeakETag(responseDto.version()))
-            .body(ApiResponse.buildResponse(responseDto, USER_CREATED_MSG_KEY, messageSource, HttpStatus.CREATED).getBody());
+            .body(
+                ApiResponse.buildResponse(responseDto, USER_CREATED_MSG_KEY, messageSource, HttpStatus.CREATED)
+                    .getBody()
+            );
     }
 
     @GetMapping("/{userId}")
@@ -87,7 +90,12 @@ public class UserController {
 
         List<SystemUser> users = userAccessService.getAllUsers();
 
-        return ApiResponse.buildResponse(userDtoMapper.toResponseList(users), USER_LIST_FETCHED_MSG_KEY, messageSource, HttpStatus.OK);
+        return ApiResponse.buildResponse(
+            userDtoMapper.toResponseList(users),
+            USER_LIST_FETCHED_MSG_KEY,
+            messageSource,
+            HttpStatus.OK
+        );
     }
 
     @PatchMapping("/{userId}/activate")

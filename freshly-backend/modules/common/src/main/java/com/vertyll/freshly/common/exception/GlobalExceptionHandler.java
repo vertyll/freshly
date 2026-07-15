@@ -28,7 +28,8 @@ public class GlobalExceptionHandler {
     private static final String INVALID_INPUT_FORMAT = "Invalid input format";
     private static final String RESOURCE_NOT_FOUND = "The requested resource was not found";
     private static final String UNEXPECTED_ERROR = "An unexpected error occurred. Please contact support.";
-    private static final String OPTIMISTIC_LOCKING_ERROR = "The resource was updated by another user. Please refresh and try again.";
+    private static final String OPTIMISTIC_LOCKING_ERROR =
+            "The resource was updated by another user. Please refresh and try again.";
     private static final String UNKNOWN_TYPE = "unknown";
 
     private static final String ERRORS_PROPERTY = "errors";
@@ -62,7 +63,8 @@ public class GlobalExceptionHandler {
 
         String message = INVALID_INPUT_FORMAT;
 
-        if (ex.getCause() instanceof InvalidFormatException ife && ife.getTargetType() != null && ife.getTargetType().isEnum()) {
+        if (ex.getCause() instanceof InvalidFormatException ife && ife.getTargetType() != null
+                && ife.getTargetType().isEnum()) {
             message = String.format(
                 "Invalid value '%s' for type %s. Accepted values: %s",
                 ife.getValue(),

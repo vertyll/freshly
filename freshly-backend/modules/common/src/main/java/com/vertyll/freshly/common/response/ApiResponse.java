@@ -30,7 +30,11 @@ public class ApiResponse<T> extends BaseResponse<T> {
         String message,
         HttpStatus status
     ) {
-        ApiResponse<T> response = ApiResponse.<T>builder().data(data).message(message).timestamp(LocalDateTime.now(ZoneOffset.UTC)).build();
+        ApiResponse<T> response = ApiResponse.<T>builder()
+            .data(data)
+            .message(message)
+            .timestamp(LocalDateTime.now(ZoneOffset.UTC))
+            .build();
 
         return new ResponseEntity<>(response, status);
     }
@@ -57,8 +61,11 @@ public class ApiResponse<T> extends BaseResponse<T> {
     ) {
         String localizedMessage = messageSource.getMessage(messageKey, null, LocaleContextHolder.getLocale());
 
-        ApiResponse<T> response =
-                ApiResponse.<T>builder().data(data).message(localizedMessage).timestamp(LocalDateTime.now(ZoneOffset.UTC)).build();
+        ApiResponse<T> response = ApiResponse.<T>builder()
+            .data(data)
+            .message(localizedMessage)
+            .timestamp(LocalDateTime.now(ZoneOffset.UTC))
+            .build();
 
         return new ResponseEntity<>(response, status);
     }

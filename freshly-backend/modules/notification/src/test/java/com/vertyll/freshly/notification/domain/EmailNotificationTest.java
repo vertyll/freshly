@@ -63,7 +63,8 @@ class EmailNotificationTest {
         Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE);
 
         // When & Then
-        assertThatThrownBy(() -> new EmailNotification(null, template, variables)).isInstanceOf(NullPointerException.class)
+        assertThatThrownBy(() -> new EmailNotification(null, template, variables))
+            .isInstanceOf(NullPointerException.class)
             .hasMessageContaining(RECIPIENT_CANNOT_BE_NULL);
     }
 
@@ -76,7 +77,8 @@ class EmailNotificationTest {
         Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE);
 
         // When & Then
-        assertThatThrownBy(() -> new EmailNotification(recipient, null, variables)).isInstanceOf(NullPointerException.class)
+        assertThatThrownBy(() -> new EmailNotification(recipient, null, variables))
+            .isInstanceOf(NullPointerException.class)
             .hasMessageContaining(TEMPLATE_CANNOT_BE_NULL);
     }
 
@@ -89,7 +91,8 @@ class EmailNotificationTest {
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
 
         // When & Then
-        assertThatThrownBy(() -> new EmailNotification(recipient, template, null)).isInstanceOf(NullPointerException.class)
+        assertThatThrownBy(() -> new EmailNotification(recipient, template, null))
+            .isInstanceOf(NullPointerException.class)
             .hasMessageContaining(TEMPLATE_VARIABLES_CANNOT_BE_NULL);
     }
 
@@ -122,7 +125,8 @@ class EmailNotificationTest {
         notification.markAsSent();
 
         // When & Then
-        assertThatThrownBy(notification::markAsSent).isInstanceOf(IllegalStateException.class).hasMessageContaining(EMAIL_ALREADY_SENT);
+        assertThatThrownBy(notification::markAsSent).isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining(EMAIL_ALREADY_SENT);
     }
 
     @Test
@@ -164,7 +168,8 @@ class EmailNotificationTest {
         assertThat(notification.getTemplateVariables()).doesNotContainKey(NEW_KEY);
         assertThat(notification.getTemplateVariables()).hasSize(1);
 
-        assertThatThrownBy(() -> notificationVariables.put(FAIL_KEY, FAIL_VALUE)).isInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(() -> notificationVariables.put(FAIL_KEY, FAIL_VALUE))
+            .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
@@ -208,8 +213,8 @@ class EmailNotificationTest {
         EmailNotification.EmailStatus status = EmailNotification.EmailStatus.FAILED;
 
         // When
-        EmailNotification notification =
-                EmailNotification.reconstitute(id, recipient, template, variables, createdAt, status, null, CONNECTION_TIMEOUT);
+        EmailNotification notification = EmailNotification
+            .reconstitute(id, recipient, template, variables, createdAt, status, null, CONNECTION_TIMEOUT);
 
         // Then
         assertThat(notification.getStatus()).isEqualTo(EmailNotification.EmailStatus.FAILED);

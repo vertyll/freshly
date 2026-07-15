@@ -53,8 +53,8 @@ public class PermissionManagementService {
 
     @CacheEvict(value = "user-permissions", allEntries = true)
     public void deleteMapping(UUID mappingId, Long expectedVersion) {
-        RolePermissionMapping mapping =
-                repository.findById(mappingId).orElseThrow(() -> new IllegalArgumentException("Mapping not found for id: " + mappingId));
+        RolePermissionMapping mapping = repository.findById(mappingId)
+            .orElseThrow(() -> new IllegalArgumentException("Mapping not found for id: " + mappingId));
 
         OptimisticLockingValidator.validate(mapping.getVersion(), expectedVersion);
 
@@ -63,6 +63,11 @@ public class PermissionManagementService {
     }
 
     private PermissionMappingResponseDto toDto(RolePermissionMapping mapping) {
-        return new PermissionMappingResponseDto(mapping.getId(), mapping.getKeycloakRole(), mapping.getPermission(), mapping.getVersion());
+        return new PermissionMappingResponseDto(
+            mapping.getId(),
+            mapping.getKeycloakRole(),
+            mapping.getPermission(),
+            mapping.getVersion()
+        );
     }
 }

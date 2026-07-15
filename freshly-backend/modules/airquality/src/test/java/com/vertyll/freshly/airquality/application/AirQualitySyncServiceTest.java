@@ -70,9 +70,16 @@ class AirQualitySyncServiceTest {
         Station station2 = new Station(124, "Station 2", "Krakow", "Street 2", 50.0647, 19.9450);
         List<Station> stations = List.of(station1, station2);
 
-        AirQualityIndex index1 = new AirQualityIndex(123, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Umiarkowany", "Dobry");
-        AirQualityIndex index2 =
-                new AirQualityIndex(124, LocalDateTime.now(ZoneOffset.UTC), "Umiarkowany", "Dobry", "Umiarkowany", "Dobry");
+        AirQualityIndex index1 =
+                new AirQualityIndex(123, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Umiarkowany", "Dobry");
+        AirQualityIndex index2 = new AirQualityIndex(
+            124,
+            LocalDateTime.now(ZoneOffset.UTC),
+            "Umiarkowany",
+            "Dobry",
+            "Umiarkowany",
+            "Dobry"
+        );
 
         SensorMeasurement.Reading reading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
         SensorMeasurement measurement = new SensorMeasurement(1, "PM10", "Pył zawieszony PM10", List.of(reading));
@@ -144,7 +151,8 @@ class AirQualitySyncServiceTest {
         Station station2 = new Station(124, "Station 2", "Krakow", "Street 2", 50.0647, 19.9450);
         List<Station> stations = List.of(station1, station2);
 
-        AirQualityIndex index2 = new AirQualityIndex(124, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
+        AirQualityIndex index2 =
+                new AirQualityIndex(124, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
 
         SensorMeasurement.Reading reading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
         SensorMeasurement measurement = new SensorMeasurement(1, "PM10", "Pył zawieszony PM10", List.of(reading));
@@ -174,7 +182,8 @@ class AirQualitySyncServiceTest {
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
         List<Station> stations = List.of(station);
 
-        AirQualityIndex index = new AirQualityIndex(123, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Umiarkowany", "Dobry");
+        AirQualityIndex index =
+                new AirQualityIndex(123, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Umiarkowany", "Dobry");
 
         SensorMeasurement.Reading pm10Reading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
         SensorMeasurement.Reading pm25Reading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 15.2);
@@ -220,7 +229,8 @@ class AirQualitySyncServiceTest {
     void shouldHandleCleanupExceptionGracefully() {
         // Given
         when(airQualityProvider.findAllStations()).thenReturn(Collections.emptyList());
-        doThrow(new RuntimeException("Cleanup error")).when(historyRepository).deleteOlderThan(any(LocalDateTime.class));
+        doThrow(new RuntimeException("Cleanup error")).when(historyRepository)
+            .deleteOlderThan(any(LocalDateTime.class));
 
         // When & Then
         assertThatCode(syncService::syncAirQualityData).doesNotThrowAnyException();
@@ -235,11 +245,13 @@ class AirQualitySyncServiceTest {
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
         List<Station> stations = List.of(station);
 
-        AirQualityIndex index = new AirQualityIndex(123, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
+        AirQualityIndex index =
+                new AirQualityIndex(123, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
 
         // Multiple readings with different timestamps - should pick the first non-null
         SensorMeasurement.Reading reading1 = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
-        SensorMeasurement.Reading reading2 = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC).minusHours(1), 30.2);
+        SensorMeasurement.Reading reading2 =
+                new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC).minusHours(1), 30.2);
         SensorMeasurement measurement = new SensorMeasurement(1, "PM10", "PM10", List.of(reading1, reading2));
 
         when(airQualityProvider.findAllStations()).thenReturn(stations);
@@ -305,7 +317,8 @@ class AirQualitySyncServiceTest {
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
         List<Station> stations = List.of(station);
 
-        AirQualityIndex index = new AirQualityIndex(123, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
+        AirQualityIndex index =
+                new AirQualityIndex(123, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
 
         SensorMeasurement emptyMeasurement = new SensorMeasurement(1, "PM10", "PM10", Collections.emptyList());
 
@@ -334,7 +347,8 @@ class AirQualitySyncServiceTest {
         Station station = new Station(123, "Station 1", "Warsaw", "Street 1", 52.2297, 21.0122);
         List<Station> stations = List.of(station);
 
-        AirQualityIndex index = new AirQualityIndex(123, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
+        AirQualityIndex index =
+                new AirQualityIndex(123, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
 
         SensorMeasurement.Reading nullReading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), null);
         SensorMeasurement.Reading validReading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
@@ -366,7 +380,8 @@ class AirQualitySyncServiceTest {
         Station station3 = new Station(125, "Station 3", "Gdansk", "Street 3", 54.3520, 18.6466);
         List<Station> stations = List.of(station1, station2, station3);
 
-        AirQualityIndex index3 = new AirQualityIndex(125, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
+        AirQualityIndex index3 =
+                new AirQualityIndex(125, LocalDateTime.now(ZoneOffset.UTC), "Dobry", "Dobry", "Dobry", "Dobry");
 
         SensorMeasurement.Reading reading = new SensorMeasurement.Reading(LocalDateTime.now(ZoneOffset.UTC), 25.5);
         SensorMeasurement measurement = new SensorMeasurement(1, "PM10", "PM10", List.of(reading));
