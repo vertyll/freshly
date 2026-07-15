@@ -54,7 +54,11 @@ class AnyPermissionAuthorizationManagerTest {
         // Given
         Method method = SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_MULTIPLE_PERMISSIONS);
         when(methodInvocation.getMethod()).thenReturn(method);
-        Permission[] permissions = {Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE};
+        Permission[] permissions = {
+            Permission.USERS_READ,
+            Permission.USERS_CREATE,
+            Permission.USERS_DELETE
+        };
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(true);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -74,7 +78,11 @@ class AnyPermissionAuthorizationManagerTest {
         // Given
         Method method = SecurityMockTarget.class.getDeclaredMethod("methodWithMultiplePermissions");
         when(methodInvocation.getMethod()).thenReturn(method);
-        Permission[] permissions = {Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE};
+        Permission[] permissions = {
+            Permission.USERS_READ,
+            Permission.USERS_CREATE,
+            Permission.USERS_DELETE
+        };
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(false);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -94,7 +102,10 @@ class AnyPermissionAuthorizationManagerTest {
         // Given
         Method method = ClassWithAnyPermission.class.getDeclaredMethod(METHOD_WITHOUT_ANNOTATION);
         when(methodInvocation.getMethod()).thenReturn(method);
-        Permission[] permissions = {Permission.USERS_READ, Permission.USERS_CREATE};
+        Permission[] permissions = {
+            Permission.USERS_READ,
+            Permission.USERS_CREATE
+        };
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(true);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -114,7 +125,10 @@ class AnyPermissionAuthorizationManagerTest {
         // Given
         Method method = ClassWithAnyPermission.class.getDeclaredMethod(METHOD_WITH_DIFFERENT_PERMISSIONS);
         when(methodInvocation.getMethod()).thenReturn(method);
-        Permission[] methodPermissions = {Permission.REPORTS_READ, Permission.REPORTS_GENERATE};
+        Permission[] methodPermissions = {
+            Permission.REPORTS_READ,
+            Permission.REPORTS_GENERATE
+        };
         when(permissionService.hasAnyPermission(authentication, methodPermissions)).thenReturn(true);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -153,7 +167,9 @@ class AnyPermissionAuthorizationManagerTest {
         // Given
         Method method = SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_SINGLE_PERMISSION);
         when(methodInvocation.getMethod()).thenReturn(method);
-        Permission[] permissions = {Permission.USERS_UPDATE};
+        Permission[] permissions = {
+            Permission.USERS_UPDATE
+        };
         when(permissionService.hasAnyPermission(authentication, permissions)).thenReturn(true);
 
         Supplier<Authentication> authSupplier = () -> authentication;
@@ -174,7 +190,11 @@ class AnyPermissionAuthorizationManagerTest {
         // Given
         Method method = SecurityMockTarget.class.getDeclaredMethod(METHOD_WITH_MULTIPLE_PERMISSIONS);
         when(methodInvocation.getMethod()).thenReturn(method);
-        Permission[] permissions = {Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE};
+        Permission[] permissions = {
+            Permission.USERS_READ,
+            Permission.USERS_CREATE,
+            Permission.USERS_DELETE
+        };
         when(permissionService.hasAnyPermission(null, permissions)).thenReturn(false);
 
         Supplier<Authentication> authSupplier = () -> null;
@@ -190,7 +210,13 @@ class AnyPermissionAuthorizationManagerTest {
 
     // Test classes
     static class SecurityMockTarget {
-        @RequireAnyPermission({Permission.USERS_READ, Permission.USERS_CREATE, Permission.USERS_DELETE})
+        @RequireAnyPermission(
+            {
+                Permission.USERS_READ,
+                Permission.USERS_CREATE,
+                Permission.USERS_DELETE
+            }
+        )
         void methodWithMultiplePermissions() {
             // Empty method used only for testing authorization annotations
         }
@@ -207,14 +233,24 @@ class AnyPermissionAuthorizationManagerTest {
         }
     }
 
-    @RequireAnyPermission({Permission.USERS_READ, Permission.USERS_CREATE})
+    @RequireAnyPermission(
+        {
+            Permission.USERS_READ,
+            Permission.USERS_CREATE
+        }
+    )
     static class ClassWithAnyPermission {
         @SuppressWarnings("unused")
         void methodWithoutAnnotation() {
             // Empty method used only for testing class-level authorization annotations
         }
 
-        @RequireAnyPermission({Permission.REPORTS_READ, Permission.REPORTS_GENERATE})
+        @RequireAnyPermission(
+            {
+                Permission.REPORTS_READ,
+                Permission.REPORTS_GENERATE
+            }
+        )
         @SuppressWarnings("unused")
         void methodWithDifferentPermissions() {
             // Empty method used only for testing method-level vs class-level annotation priority

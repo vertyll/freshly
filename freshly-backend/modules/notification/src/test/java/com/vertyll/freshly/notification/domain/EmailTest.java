@@ -31,7 +31,15 @@ class EmailTest {
     private static final String EMAIL_CANNOT_BE_NULL = "Email cannot be null";
 
     @ParameterizedTest
-    @ValueSource(strings = {VALID_EMAIL_1, VALID_EMAIL_2, VALID_EMAIL_3, VALID_EMAIL_4, VALID_EMAIL_5})
+    @ValueSource(
+        strings = {
+            VALID_EMAIL_1,
+            VALID_EMAIL_2,
+            VALID_EMAIL_3,
+            VALID_EMAIL_4,
+            VALID_EMAIL_5
+        }
+    )
     void shouldCreateValidEmail(String emailValue) {
         // When
         Email email = new Email(emailValue);
@@ -43,8 +51,17 @@ class EmailTest {
 
     @ParameterizedTest
     @ValueSource(
-        strings = {INVALID_EMAIL_1, INVALID_EMAIL_2, INVALID_EMAIL_3, INVALID_EMAIL_4, INVALID_EMAIL_5, INVALID_EMAIL_6, INVALID_EMAIL_7,
-                INVALID_EMAIL_8, INVALID_EMAIL_9}
+        strings = {
+            INVALID_EMAIL_1,
+            INVALID_EMAIL_2,
+            INVALID_EMAIL_3,
+            INVALID_EMAIL_4,
+            INVALID_EMAIL_5,
+            INVALID_EMAIL_6,
+            INVALID_EMAIL_7,
+            INVALID_EMAIL_8,
+            INVALID_EMAIL_9
+        }
     )
     void shouldThrowException_whenEmailIsInvalid(String invalidEmail) {
         // When & Then

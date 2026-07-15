@@ -11,7 +11,12 @@ import com.vertyll.freshly.common.enums.Permission;
  * Annotation to secure endpoints with permission-based authorization.
  * Usage: @RequirePermission(Permission.USERS_READ) public ResponseEntity<?> getUser(...) { }
  */
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target(
+    {
+        ElementType.METHOD,
+        ElementType.TYPE
+    }
+)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequirePermission {
     /** The permission required to access the method. */

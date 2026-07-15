@@ -26,9 +26,9 @@ import tools.jackson.databind.ObjectMapper;
 @Slf4j
 @Component
 @SuppressWarnings(
-    {"PMD.GodClass", // Adapter requires complex mapping logic for external API integration
-            "PMD.AvoidCatchingGenericException" // External API - Jackson can throw various unknown
-    // exceptions
+    {
+        "PMD.GodClass", // Adapter requires complex mapping logic for external API integration
+        "PMD.AvoidCatchingGenericException" // External API - Jackson can throw various unknow exceptions
     }
 )
 class GiosAirQualityAdapter implements AirQualityProvider {

@@ -66,12 +66,34 @@ class GiosApiDtos {
         @JsonAlias(AQ_STATION_ID_PL) Integer id,
         @JsonAlias(
             {
-                    CALC_DATE_PL, CALC_DATE_FULL_PL}
+                CALC_DATE_PL,
+                CALC_DATE_FULL_PL
+            }
         ) String stCalcDate,
-        @JsonAlias({INDEX_OVERALL_PL, INDEX_CATEGORY_PL}) String stIndexLevel,
-        @JsonAlias({INDEX_SO2_PL, INDEX_SO2_CATEGORY_PL}) String so2IndexLevel,
-        @JsonAlias({INDEX_NO2_PL, INDEX_NO2_CATEGORY_PL}) String no2IndexLevel,
-        @JsonAlias({INDEX_PM10_PL, INDEX_PM10_CATEGORY_PL}) String pm10IndexLevel
+        @JsonAlias(
+            {
+                INDEX_OVERALL_PL,
+                INDEX_CATEGORY_PL
+            }
+        ) String stIndexLevel,
+        @JsonAlias(
+            {
+                INDEX_SO2_PL,
+                INDEX_SO2_CATEGORY_PL
+            }
+        ) String so2IndexLevel,
+        @JsonAlias(
+            {
+                INDEX_NO2_PL,
+                INDEX_NO2_CATEGORY_PL
+            }
+        ) String no2IndexLevel,
+        @JsonAlias(
+            {
+                INDEX_PM10_PL,
+                INDEX_PM10_CATEGORY_PL
+            }
+        ) String pm10IndexLevel
     ) {
     }
 
@@ -79,10 +101,26 @@ class GiosApiDtos {
     record GiosSensorDto(
         @JsonAlias(
             {
-                    SENSOR_ID_PL, SENSOR_ID_EN, SENSOR_ID_SHORT_PL}
+                SENSOR_ID_PL,
+                SENSOR_ID_EN,
+                SENSOR_ID_SHORT_PL
+            }
         ) Integer id,
-        @JsonAlias({PARAM_CODE_PL, PARAM_CODE_EN, PARAM_CODE_SHORT_PL}) String paramCode,
-        @JsonAlias({PARAM_NAME_PL, PARAM_NAME_FULL_PL, PARAM_NAME_EN, PARAM_NAME_ALT_PL}) String paramName
+        @JsonAlias(
+            {
+                PARAM_CODE_PL,
+                PARAM_CODE_EN,
+                PARAM_CODE_SHORT_PL
+            }
+        ) String paramCode,
+        @JsonAlias(
+            {
+                PARAM_NAME_PL,
+                PARAM_NAME_FULL_PL,
+                PARAM_NAME_EN,
+                PARAM_NAME_ALT_PL
+            }
+        ) String paramName
     ) {
     }
 
@@ -90,9 +128,18 @@ class GiosApiDtos {
     record GiosDataValueDto(
         @JsonAlias(
             {
-                    DATE_EN_LOWERCASE, DATE_EN, DATE_PL}
+                DATE_EN_LOWERCASE,
+                DATE_EN,
+                DATE_PL
+            }
         ) String date,
-        @JsonAlias({VALUE_PL_LOWERCASE, VALUE_EN, VALUE_PL}) Double value
+        @JsonAlias(
+            {
+                VALUE_PL_LOWERCASE,
+                VALUE_EN,
+                VALUE_PL
+            }
+        ) Double value
     ) {
     }
 }

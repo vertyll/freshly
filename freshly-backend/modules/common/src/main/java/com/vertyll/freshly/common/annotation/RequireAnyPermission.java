@@ -12,7 +12,12 @@ import com.vertyll.freshly.common.enums.Permission;
  * Usage: @RequireAnyPermission({Permission.USERS_READ, Permission.USERS_WRITE}) public
  * ResponseEntity<?> manageUser(...) { }
  */
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target(
+    {
+        ElementType.METHOD,
+        ElementType.TYPE
+    }
+)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequireAnyPermission {
     /** Array of permissions - user needs at least one. */

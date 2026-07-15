@@ -30,9 +30,13 @@ class MessageSourceTest {
 
     @ParameterizedTest
     @CsvSource(
-        {"en-US, success.user.created, User created successfully", "pl, success.user.created, Użytkownik został pomyślnie utworzony",
-                "en-US, error.user.notFound, User not found", "pl, error.user.notFound, Nie znaleziono użytkownika",
-                "de, success.user.created, User created successfully"}
+        {
+            "en-US, success.user.created, User created successfully",
+            "pl, success.user.created, Użytkownik został pomyślnie utworzony",
+            "en-US, error.user.notFound, User not found",
+            "pl, error.user.notFound, Nie znaleziono użytkownika",
+            "de, success.user.created, User created successfully"
+        }
     )
     @DisplayName("Should load messages for different locales and keys")
     void shouldLoadMessagesForLocaleAndKey(String localeTag, String messageKey, String expectedMessage) {

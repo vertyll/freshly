@@ -53,7 +53,10 @@ class MessageHelperTest {
     void shouldGetMessageWithParameters() {
         // Given
         String key = "success.user.welcomed";
-        Object[] args = {"John", "Doe"};
+        Object[] args = {
+            "John",
+            "Doe"
+        };
         String expectedMessage = "Welcome John Doe";
         Locale currentLocale = Locale.forLanguageTag("en-US");
         LocaleContextHolder.setLocale(currentLocale);
@@ -89,7 +92,10 @@ class MessageHelperTest {
     void shouldGetMessageWithParametersForSpecificLocale() {
         // Given
         String key = "success.user.welcomed";
-        Object[] args = {"Jan", "Kowalski"};
+        Object[] args = {
+            "Jan",
+            "Kowalski"
+        };
         Locale specificLocale = Locale.forLanguageTag("pl");
         String expectedMessage = "Witaj Jan Kowalski";
 

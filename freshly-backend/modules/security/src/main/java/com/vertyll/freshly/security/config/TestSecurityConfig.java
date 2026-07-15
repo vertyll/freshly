@@ -9,7 +9,12 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @Profile("test")
-@SuppressWarnings({"PMD.TestClassWithoutTestCases", "PMD.UnitTestShouldUseTestAnnotation"}) // Configuration for test profile
+@SuppressWarnings(
+    {
+        "PMD.TestClassWithoutTestCases",
+        "PMD.UnitTestShouldUseTestAnnotation"
+    }
+) // Configuration for test profile
 public class TestSecurityConfig {
 
     @Bean
