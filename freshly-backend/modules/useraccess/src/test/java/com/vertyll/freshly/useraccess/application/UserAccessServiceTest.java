@@ -80,8 +80,7 @@ class UserAccessServiceTest {
         when(systemUserRepository.findById(keycloakUserId)).thenReturn(Optional.of(existingUser));
 
         // When & Then
-        assertThatThrownBy(() -> userAccessService.createUser(keycloakUserId, true, roles))
-            .isInstanceOf(UserAlreadyExistsException.class)
+        assertThatThrownBy(() -> userAccessService.createUser(keycloakUserId, true, roles)).isInstanceOf(UserAlreadyExistsException.class)
             .hasMessageContaining(keycloakUserId.toString());
 
         verify(systemUserRepository).findById(keycloakUserId);
@@ -131,8 +130,7 @@ class UserAccessServiceTest {
         when(systemUserRepository.findById(userId)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(() -> userAccessService.getUserById(userId))
-            .isInstanceOf(UserNotFoundException.class)
+        assertThatThrownBy(() -> userAccessService.getUserById(userId)).isInstanceOf(UserNotFoundException.class)
             .hasMessageContaining(userId.toString());
 
         verify(systemUserRepository).findById(userId);
@@ -201,8 +199,7 @@ class UserAccessServiceTest {
         when(systemUserRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // When & Then
-        assertThatThrownBy(() -> userAccessService.activateUser(userId, VERSION + 1))
-            .isInstanceOf(OptimisticLockingFailureException.class)
+        assertThatThrownBy(() -> userAccessService.activateUser(userId, VERSION + 1)).isInstanceOf(OptimisticLockingFailureException.class)
             .hasMessageContaining("Version mismatch");
 
         verify(systemUserRepository).findById(userId);

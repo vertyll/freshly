@@ -62,8 +62,7 @@ public class UserController {
         SystemUser user = userAccessService.createUser(request.keycloakUserId(), request.isActive(), request.roles());
 
         UserResponseDto responseDto = userDtoMapper.toResponse(user);
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.CREATED)
             .header(HttpHeaders.ETAG, ETagUtil.buildWeakETag(responseDto.version()))
             .body(ApiResponse.buildResponse(responseDto, USER_CREATED_MSG_KEY, messageSource, HttpStatus.CREATED).getBody());
     }
@@ -76,8 +75,7 @@ public class UserController {
         SystemUser user = userAccessService.getUserById(userId);
         UserResponseDto responseDto = userDtoMapper.toResponse(user);
 
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .header(HttpHeaders.ETAG, ETagUtil.buildWeakETag(responseDto.version()))
             .body(ApiResponse.buildResponse(responseDto, USER_FETCHED_MSG_KEY, messageSource, HttpStatus.OK).getBody());
     }

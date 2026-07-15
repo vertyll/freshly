@@ -217,7 +217,7 @@
 
         <setting
                 id="org.eclipse.jdt.core.formatter.alignment_for_selector_in_method_invocation"
-                value="52"/>
+                value="84"/>
 
         <setting
                 id="org.eclipse.jdt.core.formatter.wrap_before_selector_in_method_invocation"

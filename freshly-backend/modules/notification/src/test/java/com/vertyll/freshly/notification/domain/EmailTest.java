@@ -48,8 +48,7 @@ class EmailTest {
     )
     void shouldThrowException_whenEmailIsInvalid(String invalidEmail) {
         // When & Then
-        assertThatThrownBy(() -> new Email(invalidEmail))
-            .isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() -> new Email(invalidEmail)).isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining(INVALID_EMAIL_FORMAT);
     }
 

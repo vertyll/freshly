@@ -67,8 +67,7 @@ public class KeycloakTokenClient {
         formData.add(REFRESH_TOKEN, refreshToken);
 
         try {
-            Map<String, Object> response = restClient
-                .post()
+            Map<String, Object> response = restClient.post()
                 .uri(getTokenUrl())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(formData)
@@ -99,8 +98,7 @@ public class KeycloakTokenClient {
         formData.add(PASSWORD_KEY, password);
 
         try {
-            Map<String, Object> response = restClient
-                .post()
+            Map<String, Object> response = restClient.post()
                 .uri(getTokenUrl())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(formData)
@@ -135,8 +133,7 @@ public class KeycloakTokenClient {
         formData.add(REFRESH_TOKEN, refreshToken);
 
         try {
-            restClient
-                .post()
+            restClient.post()
                 .uri(getLogoutUrl())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(formData)

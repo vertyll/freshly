@@ -300,8 +300,7 @@ class AirQualityServiceTest {
             List<StationDistance> result = airQualityService.findNearestStations(latitude, longitude, radius);
 
             // Then
-            assertThat(result)
-                .isNotEmpty()
+            assertThat(result).isNotEmpty()
                 .allMatch(sd -> sd.distanceInKm() <= radius)
                 .isSortedAccordingTo(Comparator.comparingDouble(StationDistance::distanceInKm));
             verify(airQualityProvider).findAllStations();

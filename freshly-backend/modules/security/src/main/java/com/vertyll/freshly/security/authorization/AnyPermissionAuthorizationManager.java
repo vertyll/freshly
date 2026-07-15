@@ -46,13 +46,12 @@ public class AnyPermissionAuthorizationManager implements AuthorizationManager<M
         if (classAnnotation != null) {
             Permission[] permissions = classAnnotation.value();
             boolean granted = permissionService.hasAnyPermission(authentication.get(), permissions);
-            log
-                .debug(
-                    "Any permission check for class {}: {} = {}",
-                    method.getDeclaringClass().getSimpleName(),
-                    Arrays.toString(permissions),
-                    granted
-                );
+            log.debug(
+                "Any permission check for class {}: {} = {}",
+                method.getDeclaringClass().getSimpleName(),
+                Arrays.toString(permissions),
+                granted
+            );
             return new AuthorizationDecision(granted);
         }
 

@@ -122,8 +122,7 @@ class PermissionManagementServiceTest {
         when(repository.existsByKeycloakRoleAndPermission(request.keycloakRole(), Permission.USERS_CREATE)).thenReturn(true);
 
         // When & Then
-        assertThatThrownBy(() -> service.createMapping(request))
-            .isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() -> service.createMapping(request)).isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Mapping already exists")
             .hasMessageContaining(UserRoleEnum.ADMIN.name())
             .hasMessageContaining(Permission.USERS_CREATE.getValue());

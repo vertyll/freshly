@@ -156,13 +156,12 @@ class KeycloakAdminClientTest {
         keycloakAdminClient.changePassword(userId, newPassword);
 
         // Then
-        verify(userResource)
-            .resetPassword(
-                argThat(
-                    credential -> CredentialRepresentation.PASSWORD.equals(credential.getType())
-                            && credential.getValue().equals(newPassword) && !credential.isTemporary()
-                )
-            );
+        verify(userResource).resetPassword(
+            argThat(
+                credential -> CredentialRepresentation.PASSWORD.equals(credential.getType()) && credential.getValue().equals(newPassword)
+                        && !credential.isTemporary()
+            )
+        );
     }
 
     @Test

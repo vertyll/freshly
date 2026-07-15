@@ -78,8 +78,7 @@ class PermissionManagementControllerTest {
 
         // Then
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getData())
-            .hasSize(Permission.values().length)
+        assertThat(response.getBody().getData()).hasSize(Permission.values().length)
             .containsExactlyInAnyOrderElementsOf(java.util.Arrays.stream(Permission.values()).map(Permission::getValue).toList());
     }
 

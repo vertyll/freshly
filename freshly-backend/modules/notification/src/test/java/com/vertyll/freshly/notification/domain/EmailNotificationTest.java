@@ -63,8 +63,7 @@ class EmailNotificationTest {
         Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE);
 
         // When & Then
-        assertThatThrownBy(() -> new EmailNotification(null, template, variables))
-            .isInstanceOf(NullPointerException.class)
+        assertThatThrownBy(() -> new EmailNotification(null, template, variables)).isInstanceOf(NullPointerException.class)
             .hasMessageContaining(RECIPIENT_CANNOT_BE_NULL);
     }
 
@@ -77,8 +76,7 @@ class EmailNotificationTest {
         Map<String, Object> variables = Map.of(USERNAME_KEY, USERNAME_VALUE);
 
         // When & Then
-        assertThatThrownBy(() -> new EmailNotification(recipient, null, variables))
-            .isInstanceOf(NullPointerException.class)
+        assertThatThrownBy(() -> new EmailNotification(recipient, null, variables)).isInstanceOf(NullPointerException.class)
             .hasMessageContaining(TEMPLATE_CANNOT_BE_NULL);
     }
 
@@ -91,8 +89,7 @@ class EmailNotificationTest {
         EmailTemplate template = EmailTemplate.EMAIL_VERIFICATION;
 
         // When & Then
-        assertThatThrownBy(() -> new EmailNotification(recipient, template, null))
-            .isInstanceOf(NullPointerException.class)
+        assertThatThrownBy(() -> new EmailNotification(recipient, template, null)).isInstanceOf(NullPointerException.class)
             .hasMessageContaining(TEMPLATE_VARIABLES_CANNOT_BE_NULL);
     }
 

@@ -37,20 +37,17 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleValidationExceptions(MethodArgumentNotValidException ex) {
         LOGGER.warn("Validation error: {}", ex.getMessage());
 
-        Map<String, List<String>> errors = ex
-            .getBindingResult()
+        Map<String, List<String>> errors = ex.getBindingResult()
             .getFieldErrors()
             .stream()
             .collect(
-                Collectors
-                    .groupingBy(
-                        FieldError::getField,
-                        Collectors
-                            .mapping(
-                                error -> error.getDefaultMessage() != null ? error.getDefaultMessage() : INVALID_VALUE,
-                                Collectors.toList()
-                            )
+                Collectors.groupingBy(
+                    FieldError::getField,
+                    Collectors.mapping(
+                        error -> error.getDefaultMessage() != null ? error.getDefaultMessage() : INVALID_VALUE,
+                        Collectors.toList()
                     )
+                )
             );
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, VALIDATION_FAILED);
@@ -66,13 +63,12 @@ public class GlobalExceptionHandler {
         String message = INVALID_INPUT_FORMAT;
 
         if (ex.getCause() instanceof InvalidFormatException ife && ife.getTargetType() != null && ife.getTargetType().isEnum()) {
-            message = String
-                .format(
-                    "Invalid value '%s' for type %s. Accepted values: %s",
-                    ife.getValue(),
-                    ife.getTargetType().getSimpleName(),
-                    Arrays.toString(ife.getTargetType().getEnumConstants())
-                );
+            message = String.format(
+                "Invalid value '%s' for type %s. Accepted values: %s",
+                ife.getValue(),
+                ife.getTargetType().getSimpleName(),
+                Arrays.toString(ife.getTargetType().getEnumConstants())
+            );
         }
 
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
@@ -83,12 +79,11 @@ public class GlobalExceptionHandler {
         LOGGER.warn("Type mismatch error: {}", ex.getMessage());
 
         Class<?> requiredType = ex.getRequiredType();
-        String message = String
-            .format(
-                "Parameter '%s' should be of type %s",
-                ex.getName(),
-                requiredType != null ? requiredType.getSimpleName() : UNKNOWN_TYPE
-            );
+        String message = String.format(
+            "Parameter '%s' should be of type %s",
+            ex.getName(),
+            requiredType != null ? requiredType.getSimpleName() : UNKNOWN_TYPE
+        );
 
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
     }

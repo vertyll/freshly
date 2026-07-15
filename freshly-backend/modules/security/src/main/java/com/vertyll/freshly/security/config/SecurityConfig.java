@@ -32,8 +32,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) {
 
-        return http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource))
+        return http.cors(cors -> cors.configurationSource(corsConfigurationSource))
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(
@@ -94,8 +93,7 @@ public class SecurityConfig {
                 return List.of();
             }
 
-            return roles
-                .stream()
+            return roles.stream()
                 .map(roleName -> UserRoleEnum.ROLE_PREFIX + roleName)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());

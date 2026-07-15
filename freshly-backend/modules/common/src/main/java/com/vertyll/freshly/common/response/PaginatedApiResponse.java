@@ -16,8 +16,7 @@ public class PaginatedApiResponse<T> extends BaseResponse<PageResponse<T>> {
 
     public static <T> ResponseEntity<PaginatedApiResponse<T>> buildResponse(Page<T> page, String message, HttpStatus status) {
 
-        PageResponse<T> pageResponse = PageResponse
-            .<T>builder()
+        PageResponse<T> pageResponse = PageResponse.<T>builder()
             .content(page.getContent())
             .pageNumber(page.getNumber())
             .pageSize(page.getSize())

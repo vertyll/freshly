@@ -50,8 +50,7 @@ public final class EmailNotification {
         LocalDateTime sentAt,
         String errorMessage
     ) {
-        return EmailNotification
-            .builder()
+        return EmailNotification.builder()
             .id(id)
             .recipient(recipient)
             .template(template)

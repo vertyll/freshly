@@ -74,8 +74,7 @@ public class PermissionManagementController {
 
         PermissionMappingResponseDto mapping = permissionManagementService.createMapping(request);
 
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.CREATED)
             .header(HttpHeaders.ETAG, ETagUtil.buildWeakETag(mapping.version()))
             .body(ApiResponse.buildResponse(mapping, CREATING_PERMISSION_MAPPING_MSG_KEY, messageSource, HttpStatus.CREATED).getBody());
     }

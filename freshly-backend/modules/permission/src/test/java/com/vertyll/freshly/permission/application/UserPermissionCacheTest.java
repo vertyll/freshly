@@ -47,11 +47,10 @@ class UserPermissionCacheTest {
     void shouldGetUserPermissionsFromRepository() {
         // Given
         when(authentication.getName()).thenReturn(TEST_USER);
-        Collection<GrantedAuthority> authorities = List
-            .of(
-                new SimpleGrantedAuthority(UserRoleEnum.ADMIN.getRoleWithPrefix()),
-                new SimpleGrantedAuthority(UserRoleEnum.USER.getRoleWithPrefix())
-            );
+        Collection<GrantedAuthority> authorities = List.of(
+            new SimpleGrantedAuthority(UserRoleEnum.ADMIN.getRoleWithPrefix()),
+            new SimpleGrantedAuthority(UserRoleEnum.USER.getRoleWithPrefix())
+        );
         when(authentication.getAuthorities()).thenAnswer(_ -> authorities);
 
         RolePermissionMapping mapping1 = new RolePermissionMapping(UserRoleEnum.ADMIN.getValue(), Permission.USERS_READ);
@@ -74,11 +73,10 @@ class UserPermissionCacheTest {
     void shouldStripRolePrefixFromAuthorities() {
         // Given
         when(authentication.getName()).thenReturn(TEST_USER);
-        Collection<GrantedAuthority> authorities = List
-            .of(
-                new SimpleGrantedAuthority(UserRoleEnum.ADMIN.getRoleWithPrefix()),
-                new SimpleGrantedAuthority(UserRoleEnum.MODERATOR.getRoleWithPrefix())
-            );
+        Collection<GrantedAuthority> authorities = List.of(
+            new SimpleGrantedAuthority(UserRoleEnum.ADMIN.getRoleWithPrefix()),
+            new SimpleGrantedAuthority(UserRoleEnum.MODERATOR.getRoleWithPrefix())
+        );
         when(authentication.getAuthorities()).thenAnswer(_ -> authorities);
 
         RolePermissionMapping mapping = new RolePermissionMapping(UserRoleEnum.ADMIN.getValue(), Permission.USERS_READ);
@@ -145,11 +143,10 @@ class UserPermissionCacheTest {
     void shouldDeduplicatePermissionsFromMultipleRoles() {
         // Given
         when(authentication.getName()).thenReturn(TEST_USER);
-        Collection<GrantedAuthority> authorities = List
-            .of(
-                new SimpleGrantedAuthority(UserRoleEnum.ADMIN.getRoleWithPrefix()),
-                new SimpleGrantedAuthority(UserRoleEnum.SUPERADMIN.getRoleWithPrefix())
-            );
+        Collection<GrantedAuthority> authorities = List.of(
+            new SimpleGrantedAuthority(UserRoleEnum.ADMIN.getRoleWithPrefix()),
+            new SimpleGrantedAuthority(UserRoleEnum.SUPERADMIN.getRoleWithPrefix())
+        );
         when(authentication.getAuthorities()).thenAnswer(_ -> authorities);
 
         RolePermissionMapping mapping1 = new RolePermissionMapping(UserRoleEnum.ADMIN.getValue(), Permission.USERS_READ);

@@ -158,8 +158,7 @@ public class AuthController {
 
     private ResponseCookie buildRefreshTokenCookie(String value, int maxAge) {
         KeycloakProperties.CookieProperties cookie = keycloakProperties.cookie();
-        return ResponseCookie
-            .from(cookie.refreshTokenCookieName(), value)
+        return ResponseCookie.from(cookie.refreshTokenCookieName(), value)
             .httpOnly(cookie.httpOnly())
             .secure(cookie.secure())
             .sameSite(cookie.sameSite())

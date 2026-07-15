@@ -91,8 +91,7 @@ class NotificationServiceTest {
         doThrow(exception).when(emailSender).send(any(EmailNotification.class));
 
         // When & Then
-        assertThatThrownBy(() -> notificationService.sendEmail(command))
-            .isInstanceOf(EmailSendingException.class)
+        assertThatThrownBy(() -> notificationService.sendEmail(command)).isInstanceOf(EmailSendingException.class)
             .hasMessageContaining(SMTP_ERROR_MESSAGE);
 
         verify(emailSender).send(notificationCaptor.capture());

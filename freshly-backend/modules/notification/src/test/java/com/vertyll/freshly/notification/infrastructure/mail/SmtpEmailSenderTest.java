@@ -136,8 +136,7 @@ class SmtpEmailSenderTest {
         }).when(mailSender).send(any(MimeMessage.class));
 
         // When & Then
-        assertThatThrownBy(() -> smtpEmailSender.send(notification))
-            .isInstanceOf(EmailSendingException.class)
+        assertThatThrownBy(() -> smtpEmailSender.send(notification)).isInstanceOf(EmailSendingException.class)
             .hasMessageContaining(FAILED_TO_SEND_EMAIL)
             .hasCauseInstanceOf(MessagingException.class);
 
@@ -226,8 +225,7 @@ class SmtpEmailSenderTest {
             .thenThrow(new RuntimeException(TEMPLATE_NOT_FOUND));
 
         // When & Then
-        assertThatThrownBy(() -> smtpEmailSender.send(notification))
-            .isInstanceOf(RuntimeException.class)
+        assertThatThrownBy(() -> smtpEmailSender.send(notification)).isInstanceOf(RuntimeException.class)
             .hasMessageContaining(TEMPLATE_NOT_FOUND);
 
         verify(mailSender, never()).send(any(MimeMessage.class));

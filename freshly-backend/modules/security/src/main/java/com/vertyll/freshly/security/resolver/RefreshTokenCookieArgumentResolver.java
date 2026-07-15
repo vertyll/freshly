@@ -43,8 +43,7 @@ public class RefreshTokenCookieArgumentResolver implements HandlerMethodArgument
         if (request.getCookies() == null)
             return null;
 
-        return Arrays
-            .stream(request.getCookies())
+        return Arrays.stream(request.getCookies())
             .filter(c -> cookieName.equals(c.getName()))
             .map(this::extractCookieValue)
             .findFirst()

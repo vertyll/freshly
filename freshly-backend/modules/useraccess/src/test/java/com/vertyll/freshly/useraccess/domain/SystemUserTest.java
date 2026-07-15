@@ -54,8 +54,7 @@ class SystemUserTest {
         Set<String> roles = Set.of(UserRoleEnum.USER.getValue());
 
         // When & Then
-        assertThatThrownBy(() -> new SystemUser(null, true, roles))
-            .isInstanceOf(NullPointerException.class)
+        assertThatThrownBy(() -> new SystemUser(null, true, roles)).isInstanceOf(NullPointerException.class)
             .hasMessageContaining(KEYCLOAK_USER_ID_CANNOT_BE_NULL);
     }
 
@@ -67,8 +66,7 @@ class SystemUserTest {
         UUID keycloakUserId = UUID.randomUUID();
 
         // When & Then
-        assertThatThrownBy(() -> new SystemUser(keycloakUserId, true, null))
-            .isInstanceOf(NullPointerException.class)
+        assertThatThrownBy(() -> new SystemUser(keycloakUserId, true, null)).isInstanceOf(NullPointerException.class)
             .hasMessageContaining(ROLES_CANNOT_BE_NULL);
     }
 
@@ -150,8 +148,7 @@ class SystemUserTest {
         SystemUser user = new SystemUser(keycloakUserId, false, Set.of(UserRoleEnum.USER.getValue()));
 
         // When & Then
-        assertThatThrownBy(() -> user.deactivate(loggedInUserId))
-            .isInstanceOf(UserAlreadyInactiveException.class)
+        assertThatThrownBy(() -> user.deactivate(loggedInUserId)).isInstanceOf(UserAlreadyInactiveException.class)
             .hasMessageContaining(keycloakUserId.toString());
     }
 
@@ -163,8 +160,7 @@ class SystemUserTest {
         SystemUser user = new SystemUser(userId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When & Then
-        assertThatThrownBy(() -> user.deactivate(userId))
-            .isInstanceOf(SelfDeactivationException.class)
+        assertThatThrownBy(() -> user.deactivate(userId)).isInstanceOf(SelfDeactivationException.class)
             .hasMessageContaining(userId.toString());
     }
 
@@ -232,8 +228,7 @@ class SystemUserTest {
         SystemUser user = new SystemUser(keycloakUserId, true, Set.of(UserRoleEnum.USER.getValue()));
 
         // When & Then
-        assertThatThrownBy(() -> user.replaceRoles(null))
-            .isInstanceOf(NullPointerException.class)
+        assertThatThrownBy(() -> user.replaceRoles(null)).isInstanceOf(NullPointerException.class)
             .hasMessageContaining(ROLES_CANNOT_BE_NULL);
     }
 

@@ -44,8 +44,7 @@ public class UserPermissionCache {
 
         log.debug("Fetching permissions for user '{}' with roles: {}", authentication.getName(), roles);
 
-        Set<Permission> permissions = rolePermissionRepository
-            .findByKeycloakRoleIn(roles)
+        Set<Permission> permissions = rolePermissionRepository.findByKeycloakRoleIn(roles)
             .stream()
             .map(RolePermissionMapping::getPermission)
             .collect(Collectors.toSet());
@@ -59,8 +58,7 @@ public class UserPermissionCache {
      * Spring adds and normalizes to uppercase using Locale. ROOT for security.
      */
     private Set<String> extractRoles(Authentication authentication) {
-        return authentication
-            .getAuthorities()
+        return authentication.getAuthorities()
             .stream()
             .map(GrantedAuthority::getAuthority)
             .filter(Objects::nonNull)

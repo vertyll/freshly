@@ -76,8 +76,7 @@ class EmailTemplateTest {
         EmailTemplate[] templates = EmailTemplate.values();
 
         // Then
-        assertThat(templates)
-            .hasSize(EXPECTED_TEMPLATE_COUNT)
+        assertThat(templates).hasSize(EXPECTED_TEMPLATE_COUNT)
             .containsExactlyInAnyOrder(EmailTemplate.USER_REGISTERED, EmailTemplate.EMAIL_VERIFICATION, EmailTemplate.PASSWORD_RESET);
     }
 }

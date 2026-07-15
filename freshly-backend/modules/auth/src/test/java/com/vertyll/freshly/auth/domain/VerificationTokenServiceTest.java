@@ -142,8 +142,7 @@ class VerificationTokenServiceTest {
         // Given
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
         Instant now = Instant.now();
-        String expiredToken = Jwts
-            .builder()
+        String expiredToken = Jwts.builder()
             .subject(UUID.randomUUID().toString())
             .claim(EMAIL_CLAIM_KEY, TEST_EMAIL)
             .claim(TYPE_CLAIM_KEY, TYPE_EMAIL_VERIFICATION)

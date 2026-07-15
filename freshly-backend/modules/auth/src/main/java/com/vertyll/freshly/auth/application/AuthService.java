@@ -56,12 +56,11 @@ public class AuthService {
             .createUser(request.username(), request.email(), request.password(), request.firstName(), request.lastName());
 
         try {
-            userAccessService
-                .createUser(
-                    keycloakUserId,
-                    false, // Inactive until email verified
-                    Set.of(UserRoleEnum.USER.getValue())
-                );
+            userAccessService.createUser(
+                keycloakUserId,
+                false, // Inactive until email verified
+                Set.of(UserRoleEnum.USER.getValue())
+            );
 
             String verificationToken = verificationTokenService.generateEmailVerificationToken(keycloakUserId, request.email());
             String verificationLink = applicationProperties.frontend().url() + String.format(VERIFY_EMAIL_URL_TEMPLATE, verificationToken);

@@ -44,8 +44,7 @@ class StationDistanceTest {
         double negativeDistance = -1.0;
 
         // When & Then
-        assertThatThrownBy(() -> new StationDistance(station, negativeDistance))
-            .isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() -> new StationDistance(station, negativeDistance)).isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Distance cannot be negative");
     }
 

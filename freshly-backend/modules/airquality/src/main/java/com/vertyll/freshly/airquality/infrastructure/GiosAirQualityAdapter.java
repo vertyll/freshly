@@ -70,8 +70,7 @@ class GiosAirQualityAdapter implements AirQualityProvider {
     private final ObjectMapper objectMapper;
 
     GiosAirQualityAdapter(ExternalServiceProperties externalServiceProperties) {
-        this.restClient = RestClient
-            .builder()
+        this.restClient = RestClient.builder()
             .baseUrl(externalServiceProperties.gios().apiUrl())
             .defaultHeader(USER_AGENT_HEADER, USER_AGENT_VALUE)
             .build();
@@ -177,15 +176,14 @@ class GiosAirQualityAdapter implements AirQualityProvider {
 
             List<SensorMeasurement.Reading> readings = fetchDataForSensor(sensor.id());
 
-            measurements
-                .add(
-                    new SensorMeasurement(
-                        sensor.id(),
-                        sensor.paramCode() != null ? sensor.paramCode() : PARAM_NA,
-                        sensor.paramName() != null ? sensor.paramName() : UNKNOWN_PARAMETER,
-                        readings
-                    )
-                );
+            measurements.add(
+                new SensorMeasurement(
+                    sensor.id(),
+                    sensor.paramCode() != null ? sensor.paramCode() : PARAM_NA,
+                    sensor.paramName() != null ? sensor.paramName() : UNKNOWN_PARAMETER,
+                    readings
+                )
+            );
         }
 
         return measurements;

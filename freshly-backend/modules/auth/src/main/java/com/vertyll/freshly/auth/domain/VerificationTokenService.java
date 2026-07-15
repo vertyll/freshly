@@ -48,8 +48,7 @@ public class VerificationTokenService {
         Instant now = Instant.now();
         Instant expiration = now.plusMillis(jwtProperties.expiration().emailVerification());
 
-        return Jwts
-            .builder()
+        return Jwts.builder()
             .subject(userId.toString())
             .claim(EMAIL_CLAIM, email)
             .claim(TYPE_CLAIM, EMAIL_VERIFICATION_TYPE)
@@ -63,8 +62,7 @@ public class VerificationTokenService {
         Instant now = Instant.now();
         Instant expiration = now.plusMillis(jwtProperties.expiration().passwordReset());
 
-        return Jwts
-            .builder()
+        return Jwts.builder()
             .subject(userId.toString())
             .claim(EMAIL_CLAIM, email)
             .claim(TYPE_CLAIM, PASSWORD_RESET_TYPE)

@@ -15,8 +15,7 @@ public class KeycloakConfig {
 
     @Bean
     public Keycloak keycloak(KeycloakProperties properties) {
-        return KeycloakBuilder
-            .builder()
+        return KeycloakBuilder.builder()
             .serverUrl(properties.serverUrl())
             .realm(properties.realm())
             .clientId(properties.adminClientId())

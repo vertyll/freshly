@@ -141,8 +141,7 @@ class AirQualityControllerTest {
 
         when(messageSource.getMessage(anyString(), any(), any())).thenReturn(MESSAGE_SUCCESS);
 
-        mockMvc = MockMvcBuilders
-            .standaloneSetup(airQualityController)
+        mockMvc = MockMvcBuilders.standaloneSetup(airQualityController)
             .setControllerAdvice(new AirQualityControllerAdvice(messageSource), new GlobalExceptionHandler())
             .build();
     }
@@ -167,8 +166,7 @@ class AirQualityControllerTest {
             when(dtoMapper.toStationResponseList(stations)).thenReturn(responseDtos);
 
             // When & Then
-            mockMvc
-                .perform(get(ENDPOINT_STATIONS).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATIONS).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JSON_PATH_DATA, hasSize(2)))
@@ -188,8 +186,7 @@ class AirQualityControllerTest {
             when(dtoMapper.toStationResponseList(Collections.emptyList())).thenReturn(Collections.emptyList());
 
             // When & Then
-            mockMvc
-                .perform(get(ENDPOINT_STATIONS).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATIONS).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JSON_PATH_DATA, hasSize(0)));
@@ -227,8 +224,7 @@ class AirQualityControllerTest {
             when(dtoMapper.toAirQualityIndexResponse(index)).thenReturn(responseDto);
 
             // When & Then
-            mockMvc
-                .perform(get(ENDPOINT_STATION_INDEX, STATION_ID_123).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATION_INDEX, STATION_ID_123).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JSON_PATH_DATA_STATION_ID).value(STATION_ID_123))
@@ -245,8 +241,7 @@ class AirQualityControllerTest {
             when(airQualityService.getIndexForStation(STATION_ID_999)).thenReturn(Optional.empty());
 
             // When & Then
-            mockMvc
-                .perform(get(ENDPOINT_STATION_INDEX, STATION_ID_999).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATION_INDEX, STATION_ID_999).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
 
@@ -277,8 +272,7 @@ class AirQualityControllerTest {
             when(dtoMapper.toSensorMeasurementResponseList(measurements)).thenReturn(responseDtos);
 
             // When & Then
-            mockMvc
-                .perform(get(ENDPOINT_STATION_SENSORS, STATION_ID_123).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATION_SENSORS, STATION_ID_123).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JSON_PATH_DATA, hasSize(1)))
@@ -296,8 +290,7 @@ class AirQualityControllerTest {
             when(dtoMapper.toSensorMeasurementResponseList(Collections.emptyList())).thenReturn(Collections.emptyList());
 
             // When & Then
-            mockMvc
-                .perform(get(ENDPOINT_STATION_SENSORS, STATION_ID_123).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATION_SENSORS, STATION_ID_123).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JSON_PATH_DATA, hasSize(0)));
@@ -343,8 +336,7 @@ class AirQualityControllerTest {
             when(dtoMapper.toAirQualityMeasurementResponse(measurement)).thenReturn(responseDto);
 
             // When & Then
-            mockMvc
-                .perform(get(ENDPOINT_STATION_LATEST, STATION_ID_123).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATION_LATEST, STATION_ID_123).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JSON_PATH_DATA_STATION_ID).value(STATION_ID_123))
@@ -361,8 +353,7 @@ class AirQualityControllerTest {
             when(airQualityService.getLatestMeasurement(STATION_ID_999)).thenReturn(Optional.empty());
 
             // When & Then
-            mockMvc
-                .perform(get(ENDPOINT_STATION_LATEST, STATION_ID_999).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATION_LATEST, STATION_ID_999).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
 
@@ -380,34 +371,32 @@ class AirQualityControllerTest {
         void shouldGetHistoricalMeasurementsWithDefaultDays() throws Exception {
             // Given
             List<AirQualityMeasurement> measurements = List.of(new AirQualityMeasurement());
-            List<AirQualityMeasurementResponseDto> responseDtos = List
-                .of(
-                    new AirQualityMeasurementResponseDto(
-                        MEASUREMENT_ID,
-                        STATION_ID_123,
-                        STATION_1_NAME,
-                        LocalDateTime.now(ZoneOffset.UTC),
-                        QUALITY_GOOD_EN,
-                        null,
-                        null,
-                        null,
-                        null,
-                        PM10_VALUE_25_5,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        LocalDateTime.now(ZoneOffset.UTC)
-                    )
-                );
+            List<AirQualityMeasurementResponseDto> responseDtos = List.of(
+                new AirQualityMeasurementResponseDto(
+                    MEASUREMENT_ID,
+                    STATION_ID_123,
+                    STATION_1_NAME,
+                    LocalDateTime.now(ZoneOffset.UTC),
+                    QUALITY_GOOD_EN,
+                    null,
+                    null,
+                    null,
+                    null,
+                    PM10_VALUE_25_5,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    LocalDateTime.now(ZoneOffset.UTC)
+                )
+            );
 
             when(airQualityService.getHistoricalMeasurements(STATION_ID_123, DEFAULT_DAYS)).thenReturn(measurements);
             when(dtoMapper.toAirQualityMeasurementResponseList(measurements)).thenReturn(responseDtos);
 
             // When & Then
-            mockMvc
-                .perform(get(ENDPOINT_STATION_HISTORY, STATION_ID_123).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATION_HISTORY, STATION_ID_123).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JSON_PATH_DATA, hasSize(1)));
@@ -420,27 +409,26 @@ class AirQualityControllerTest {
         void shouldGetHistoricalMeasurementsWithCustomDays() throws Exception {
             // Given
             List<AirQualityMeasurement> measurements = List.of(new AirQualityMeasurement());
-            List<AirQualityMeasurementResponseDto> responseDtos = List
-                .of(
-                    new AirQualityMeasurementResponseDto(
-                        MEASUREMENT_ID,
-                        STATION_ID_123,
-                        STATION_1_NAME,
-                        LocalDateTime.now(ZoneOffset.UTC),
-                        QUALITY_GOOD_EN,
-                        null,
-                        null,
-                        null,
-                        null,
-                        PM10_VALUE_25_5,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        LocalDateTime.now(ZoneOffset.UTC)
-                    )
-                );
+            List<AirQualityMeasurementResponseDto> responseDtos = List.of(
+                new AirQualityMeasurementResponseDto(
+                    MEASUREMENT_ID,
+                    STATION_ID_123,
+                    STATION_1_NAME,
+                    LocalDateTime.now(ZoneOffset.UTC),
+                    QUALITY_GOOD_EN,
+                    null,
+                    null,
+                    null,
+                    null,
+                    PM10_VALUE_25_5,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    LocalDateTime.now(ZoneOffset.UTC)
+                )
+            );
 
             when(airQualityService.getHistoricalMeasurements(STATION_ID_123, CUSTOM_DAYS_30)).thenReturn(measurements);
             when(dtoMapper.toAirQualityMeasurementResponseList(measurements)).thenReturn(responseDtos);
@@ -448,8 +436,7 @@ class AirQualityControllerTest {
             // When & Then
             mockMvc
                 .perform(
-                    get(ENDPOINT_STATION_HISTORY, STATION_ID_123)
-                        .param(PARAM_DAYS, String.valueOf(CUSTOM_DAYS_30))
+                    get(ENDPOINT_STATION_HISTORY, STATION_ID_123).param(PARAM_DAYS, String.valueOf(CUSTOM_DAYS_30))
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
@@ -471,8 +458,7 @@ class AirQualityControllerTest {
             doNothing().when(syncService).triggerManualSync();
 
             // When & Then
-            mockMvc
-                .perform(post(ENDPOINT_SYNC_TRIGGER).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(post(ENDPOINT_SYNC_TRIGGER).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath(JSON_PATH_DATA).value(SYNC_TRIGGERED_MESSAGE));
@@ -505,8 +491,7 @@ class AirQualityControllerTest {
             // When & Then
             mockMvc
                 .perform(
-                    get(ENDPOINT_STATIONS_NEAREST)
-                        .param(PARAM_LATITUDE, String.valueOf(LAT_WARSAW))
+                    get(ENDPOINT_STATIONS_NEAREST).param(PARAM_LATITUDE, String.valueOf(LAT_WARSAW))
                         .param(PARAM_LONGITUDE, String.valueOf(LON_WARSAW))
                         .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -530,8 +515,7 @@ class AirQualityControllerTest {
             // When & Then
             mockMvc
                 .perform(
-                    get(ENDPOINT_STATIONS_NEAREST)
-                        .param(PARAM_LATITUDE, String.valueOf(LAT_WARSAW))
+                    get(ENDPOINT_STATIONS_NEAREST).param(PARAM_LATITUDE, String.valueOf(LAT_WARSAW))
                         .param(PARAM_LONGITUDE, String.valueOf(LON_WARSAW))
                         .param(PARAM_RADIUS, String.valueOf(CUSTOM_RADIUS_50))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -599,8 +583,7 @@ class AirQualityControllerTest {
             when(dtoMapper.toStatisticsResponse(statistics)).thenReturn(responseDto);
 
             // When & Then
-            mockMvc
-                .perform(get(ENDPOINT_STATION_STATISTICS, STATION_ID_123).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATION_STATISTICS, STATION_ID_123).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JSON_PATH_DATA_STATION_ID).value(STATION_ID_123))
@@ -616,8 +599,7 @@ class AirQualityControllerTest {
             when(airQualityService.getStatistics(STATION_ID_999, DEFAULT_DAYS)).thenReturn(Optional.empty());
 
             // When & Then
-            mockMvc
-                .perform(get(ENDPOINT_STATION_STATISTICS, STATION_ID_999).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATION_STATISTICS, STATION_ID_999).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
 
@@ -646,8 +628,7 @@ class AirQualityControllerTest {
             when(dtoMapper.toRankingResponseList(rankings)).thenReturn(responseDtos);
 
             // When & Then
-            mockMvc
-                .perform(get(ENDPOINT_STATIONS_RANKING).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get(ENDPOINT_STATIONS_RANKING).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JSON_PATH_DATA, hasSize(1)))
@@ -668,8 +649,7 @@ class AirQualityControllerTest {
             // When & Then
             mockMvc
                 .perform(
-                    get(ENDPOINT_STATIONS_RANKING)
-                        .param(PARAM_DAYS, String.valueOf(CUSTOM_DAYS_30))
+                    get(ENDPOINT_STATIONS_RANKING).param(PARAM_DAYS, String.valueOf(CUSTOM_DAYS_30))
                         .param(PARAM_LIMIT, String.valueOf(CUSTOM_LIMIT_20))
                         .contentType(MediaType.APPLICATION_JSON)
                 )

@@ -171,8 +171,7 @@ public class KeycloakAdminClient {
         String tokenUrl = properties.serverUrl() + "/realms/" + properties.realm() + "/protocol/openid-connect/token";
 
         try {
-            Map<String, Object> response = restClient
-                .post()
+            Map<String, Object> response = restClient.post()
                 .uri(tokenUrl)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(formData)
