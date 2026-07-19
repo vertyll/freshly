@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * Helper class for retrieving internationalized messages. Simplifies access to MessageSource in
  * services and components. Usage in services:
  *
- * <pre>{@code
+ * <pre>
  * &#64;Service
  * public class SomeService {
  *     private final MessageHelper messageHelper;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
  *         // Use message...
  *     }
  * }
- * }</pre>
+ * </pre>
  */
 @Component
 public class MessageHelper {
