@@ -41,4 +41,5 @@ Application with air quality data from IoT sensors.
 - Error Prone for static code analysis
 - Spotless for code formatting
 
-> **Note:** During application development, SOLID principles, DRY, composition over inheritance, dependency injection, design patterns, architectural patterns were applied, tests were written, and other good programming practices were adopted.
+> [!NOTE]
+> During application development, SOLID principles, DRY, composition over inheritance, dependency injection, design patterns, architectural patterns were applied, tests were written, and other good programming practices were adopted.
