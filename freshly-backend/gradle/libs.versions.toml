@@ -22,7 +22,7 @@ beta-checker = "1.0"
 jspecify = "1.0.1"
 eclipse-jdt = "4.40"
 springdoc = "3.0.1"
-spotbugs = "6.5.10"
+spotbugs = "6.5.11"
 spotbugs-annotations = "4.10.3"
 findsecbugs = "1.14.0"
 
