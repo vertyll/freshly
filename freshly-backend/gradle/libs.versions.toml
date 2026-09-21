@@ -13,7 +13,6 @@ testcontainers = "1.21.3"
 jjwt = "0.13.0"
 guava = "33.6.0-jre"
 keycloak = "26.0.8"
-httpclient5 = "5.6"
 lombok = "1.18.46"
 lombok-mapstruct-binding = "0.2.0"
 errorprone = "2.50.0"
@@ -25,6 +24,9 @@ springdoc = "3.0.1"
 spotbugs = "6.5.11"
 spotbugs-annotations = "4.10.3"
 findsecbugs = "1.14.0"
+archunit = "1.4.1"
+icu4j = "76.1"
+poi = "5.4.1"
 
 [libraries]
 # Spring Boot Starters
@@ -64,7 +66,6 @@ jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
 keycloak-admin-client = { module = "org.keycloak:keycloak-admin-client", version.ref = "keycloak" }
 
 # Apache HTTP Client
-httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpclient5" }
 
 # Thymeleaf
 thymeleaf-extras-springsecurity6 = { module = "org.thymeleaf.extras:thymeleaf-extras-springsecurity6" }
@@ -84,6 +85,12 @@ guava-beta-checker = { module = "com.google.guava:guava-beta-checker", version.r
 # JSpecify
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 
+# ICU4J
+icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
+
+# Apache POI
+poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi" }
+
 # OpenAPI/Swagger
 springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 
@@ -99,7 +106,25 @@ findsecbugs = { module = "com.h3xstream.findsecbugs:findsecbugs-plugin", version
 testcontainers-mongodb = { module = "org.testcontainers:mongodb", version.ref = "testcontainers" }
 testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
 
+
+# Referenced by platform/shared-infra, which needs Spring's transaction and context support without pulling in a whole starter.
+spring-tx = { module = "org.springframework:spring-tx" }
+spring-context = { module = "org.springframework:spring-context" }
+slf4j-api = { module = "org.slf4j:slf4j-api" }
+
+# Jackson annotations, declared where used.
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations" }
+
+# ArchUnit
+archunit-junit5 = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
+
+# Framework-free test libraries
+assertj-core = { module = "org.assertj:assertj-core" }
+mockito-core = { module = "org.mockito:mockito-core" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter" }
+
 # JUnit
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 
 # BOMs
@@ -114,6 +139,14 @@ nullaway = { id = "net.ltgt.nullaway", version.ref = "nullaway-plugin" }
 spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugs" }
 
 [bundles]
+# Framework-free unit testing.
+test-unit = [
+    "junit-jupiter",
+    "assertj-core",
+    "mockito-core",
+    "mockito-junit-jupiter"
+]
+
 spring-boot-starters-common = [
     "spring-boot-starter-data-mongodb",
     "spring-boot-starter-validation",

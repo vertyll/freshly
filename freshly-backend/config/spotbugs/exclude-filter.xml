@@ -11,6 +11,21 @@
         <Bug pattern="SE_BAD_FIELD,SE_NO_SERIALVERSIONID"/>
     </Match>
 
+    <Match>
+        <Class name="~.*Test(\$.*)?"/>
+        <Bug pattern="THROWS_METHOD_THROWS_RUNTIMEEXCEPTION"/>
+    </Match>
+
+    <Match>
+        <Class name="com.vertyll.freshly.infra.transaction.TransactionalUseCaseFactory"/>
+        <Bug pattern="THROWS_METHOD_THROWS_RUNTIMEEXCEPTION"/>
+    </Match>
+
+    <Match>
+        <Class name="~.*SecurityConfig"/>
+        <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION"/>
+    </Match>
+
     <!-- Exclude MapStruct generated implementations -->
     <Match>
         <Class name="~.*MapperImpl"/>

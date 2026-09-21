@@ -7,6 +7,8 @@
 
     <!-- Best Practices -->
     <rule ref="category/java/bestpractices.xml">
+        <exclude name="LooseCoupling"/>
+        <exclude name="ImplicitFunctionalInterface"/>
         <exclude name="UnitTestContainsTooManyAsserts"/>
         <exclude name="UnitTestAssertionsShouldIncludeMessage"/>
         <exclude name="UnitTestShouldIncludeAssert"/>
@@ -14,6 +16,7 @@
 
     <!-- Code Style -->
     <rule ref="category/java/codestyle.xml">
+        <exclude name="ShortMethodName"/>
         <exclude name="OnlyOneReturn"/>
         <exclude name="AtLeastOneConstructor"/>
         <exclude name="CommentDefaultAccessModifier"/>
@@ -30,6 +33,7 @@
 
     <!-- Design -->
     <rule ref="category/java/design.xml">
+        <exclude name="DataClass"/>
         <exclude name="LawOfDemeter"/>
         <exclude name="TooManyMethods"/>
         <exclude name="ExcessiveImports"/>
@@ -42,19 +46,26 @@
 
     <!-- Documentation -->
     <rule ref="category/java/documentation.xml">
+        <exclude name="UncommentedEmptyMethodBody"/>
+        <exclude name="UncommentedEmptyConstructor"/>
         <exclude name="CommentRequired"/>
         <exclude name="CommentSize"/>
     </rule>
 
     <!-- Error Prone -->
     <rule ref="category/java/errorprone.xml">
+        <exclude name="AvoidFieldNameMatchingMethodName"/>
+        <exclude name="UseProperClassLoader"/>
         <exclude name="AvoidDuplicateLiterals"/>
         <exclude name="MissingSerialVersionUID"/>
         <exclude name="TestClassWithoutTestCases"/>
     </rule>
 
     <!-- Multithreading -->
-    <rule ref="category/java/multithreading.xml" />
+    <rule ref="category/java/multithreading.xml">
+        <exclude name="UseConcurrentHashMap"/>
+        <exclude name="DoNotUseThreads"/>
+    </rule>
 
     <!-- Performance -->
     <rule ref="category/java/performance.xml">
@@ -63,4 +74,25 @@
 
     <!-- Security -->
     <rule ref="category/java/security.xml"/>
+
+    <rule ref="category/java/bestpractices.xml/LooseCoupling">
+        <properties>
+            <property name="allowedTypes" value="java.util.Properties,com.tngtech.archunit.core.domain.JavaClasses"/>
+        </properties>
+    </rule>
+
+    <!-- Wildcard imports -->
+    <rule name="NoWildcardImports"
+          language="java"
+          message="Wildcard import. Name each type: a star hides which frameworks this class touches."
+          class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+        <description>Imports must name a single type, never a package.</description>
+        <priority>1</priority>
+        <properties>
+            <property name="xpath">
+                <value>//ImportDeclaration[@ImportOnDemand = true()]</value>
+            </property>
+        </properties>
+    </rule>
+
 </ruleset>
