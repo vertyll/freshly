@@ -1,13 +1,3 @@
-# Stops wildcard imports being written in the first place.
-#
-# The PMD rule `NoWildcardImports` rejects them at build time, which is the enforcement;
-# this is what keeps anyone from having to hit it. IntelliJ collapses imports into a star
-# once a package crosses a threshold, and its default is five — low enough that ordinary
-# code trips it without the author choosing anything.
-#
-# Spotless cannot help here: expanding a star means knowing which types the file uses, and
-# a text formatter has no classpath.
-
 root = true
 
 [*]
@@ -21,12 +11,8 @@ indent_style = space
 indent_size = 4
 max_line_length = 120
 
-# The two settings that matter. Anything above zero eventually collapses to a star.
 ij_java_class_count_to_use_import_on_demand = 999
-ij_java_names_count_to_use_static_import_on_demand = 999
 
-# Matches the order Spotless enforces, so the IDE and the build agree and a save does not
-# produce a diff the formatter then reverts.
 ij_java_imports_layout = java.**, javax.**, jakarta.**, org.**, com.vertyll.**, com.**, *, |, $java.**, $javax.**, $jakarta.**, $org.**, $com.vertyll.**, $com.**, $*
 
 [*.{kts,gradle}]
@@ -36,6 +22,3 @@ indent_size = 4
 [*.{yml,yaml,json}]
 indent_style = space
 indent_size = 2
-
-[*.properties]
-charset = utf-8

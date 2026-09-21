@@ -200,8 +200,8 @@ class PermissionServicesTest {
         @DisplayName("is grouped by the module that owns it, with a description key")
         void groupsByModule() {
             assertThat(queries.declaredPermissions()).hasSize(1);
-            assertThat(queries.declaredPermissions().get(0).context()).isEqualTo("useraccess");
-            assertThat(queries.declaredPermissions().get(0).permissions().get(0).descriptionKey())
+            assertThat(queries.declaredPermissions().getFirst().context()).isEqualTo("useraccess");
+            assertThat(queries.declaredPermissions().getFirst().permissions().getFirst().descriptionKey())
                 .isEqualTo("permission.users.delete");
         }
     }

@@ -10,7 +10,7 @@ package com.vertyll.freshly.lang.i18n;
  * on the next start-up.
  *
  * <p>
- * An id is permanent. Change it and the migration runs a second time; reuse one and it
+ * An id is permanent. Change it and the migration runs a second time; reuse one, and it
  * never runs at all. Dating it and naming what it does — {@code
  * "2026-09-auth-rename-token-expired"} — makes both mistakes visible in review.
  */
