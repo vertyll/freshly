@@ -16,7 +16,7 @@ import jakarta.validation.metadata.ConstraintDescriptor;
  *
  * <p>
  * The obvious approach is {@code @Size(message = "{validation.username.tooLong}")}. It
- * works and it keeps the text outside the store forever: Hibernate Validator resolves
+ * works, and it keeps the text outside the store forever: Hibernate Validator resolves
  * {@code {...}} through its own {@code ResourceBundle} mechanism, not through Spring's
  * {@code MessageSource}, so those messages can never be edited at runtime. It also means a
  * key per field per constraint — hundreds of them, each written by hand.

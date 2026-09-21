@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * changes the caller's own data.
  *
  * <p>
- * Carries no behaviour. It exists so that "this endpoint is guarded elsewhere"
+ * Carries no behavior. It exists so that "this endpoint is guarded elsewhere"
  * and "nobody remembered to guard this endpoint" stop looking identical in the
  * source — a distinction that otherwise only surfaces when a caller reaches
  * something they should not.

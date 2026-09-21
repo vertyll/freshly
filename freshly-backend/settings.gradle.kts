@@ -1,29 +1,17 @@
 rootProject.name = "freshly"
 
 include(
-    // Framework-free. An application or domain layer may depend on these two and
-    // nothing else; `checkHexagonalDependencies` enforces it.
     "platform:shared-lang",
     "platform:shared-authz",
     "platform:shared-i18n",
 
-    // Spring-bound. Only `*-infrastructure` and `bootstrap` may depend on these.
     "platform:shared-infra",
     "platform:shared-web",
     "platform:shared-security",
 
-    // Test-only.
     "platform:shared-archunit"
 )
 
-// ---------------------------------------------------------------------------
-// Bounded contexts.
-//
-// Each is three Gradle projects, not one. The dependency rule
-// (infrastructure -> application -> domain) is a build fact here, not a naming
-// convention: `useraccess-domain` cannot see `useraccess-infrastructure`
-// because nothing declares that edge.
-// ---------------------------------------------------------------------------
 include(
     "modules:useraccess:useraccess-domain",
     "modules:useraccess:useraccess-application",
@@ -50,10 +38,4 @@ include(
     "modules:auth:auth-infrastructure"
 )
 
-// ---------------------------------------------------------------------------
-// The only project that produces a runnable jar.
-//
-// One process means one composition root. Every `*-infrastructure` is a plain library and
-// `bootstrap` is the only project that produces a runnable jar.
-// ---------------------------------------------------------------------------
 include("bootstrap")

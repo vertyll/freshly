@@ -57,7 +57,6 @@ object HexagonalClasspathCheck {
             description = "Asserts that no framework is on the $layerDescription compile classpath."
 
             val classpath = project.configurations.named("compileClasspath")
-            val layer = layerDescription
 
             doLast {
                 val offenders = classpath.get()
@@ -74,7 +73,7 @@ object HexagonalClasspathCheck {
                 if (offenders.isNotEmpty()) {
                     throw GradleException(
                         buildString {
-                            appendLine("The $layer must not depend on a framework.")
+                            appendLine("The $layerDescription must not depend on a framework.")
                             appendLine("Found on its compile classpath:")
                             offenders.forEach { appendLine("  - $it") }
                             appendLine()

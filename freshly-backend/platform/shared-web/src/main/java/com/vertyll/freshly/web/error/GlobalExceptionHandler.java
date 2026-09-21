@@ -133,7 +133,7 @@ public class GlobalExceptionHandler {
             try {
                 code = annotationNameOf(error);
                 params = attributesOf(error);
-            } catch (IllegalArgumentException notBeanValidation) {
+            } catch (IllegalArgumentException _) {
                 code = VALIDATION_INVALID;
                 params = Map.of();
             }
@@ -163,7 +163,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ProblemDetail handleTypeMismatch(MethodArgumentTypeMismatchException exception, WebRequest request) {
-        // The submitted value is deliberately not echoed back: it is unsanitised request
+        // The submitted value is deliberately not echoed back: it is un sanitised request
         // content, and reflecting it into a response body is how that becomes somebody's
         // problem.
         log.debug("Unparseable request parameter '{}'", exception.getName());
@@ -181,7 +181,7 @@ public class GlobalExceptionHandler {
      * <p>
      * No field list: the parse failed, so there is nothing reliable to name, and
      * Jackson's own message can quote the offending input back — which is a way to
-     * reflect unsanitised request content into a response.
+     * reflect un sanitised request content into a response.
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail handleUnreadableBody(HttpMessageNotReadableException exception, WebRequest request) {
@@ -210,7 +210,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * A unique index refused the write.
+     * A unique index refused to write.
      *
      * <p>
      * Every path that can raise this checks for the clash first, so reaching here means
@@ -241,7 +241,7 @@ public class GlobalExceptionHandler {
      * Because this advice runs ahead of Boot's, Spring's own failures arrive here too.
      * Those already carry the status they deserve — an unknown path is a 404, not a 500 —
      * and their document is Spring's to build, so it is passed through untouched. Only
-     * what nothing recognised becomes a 500.
+     * what nothing recognized becomes a 500.
      *
      * <p>
      * Such a document carries no {@code code}: that member names an entry in a

@@ -15,7 +15,7 @@ import org.springframework.http.ProblemDetail;
  * client and the front end handles all of them one way. What changes is the key.
  *
  * <p>
- * The members, and why each is there:
+ * The members and why each is there:
  *
  * <ul>
  * <li>{@code type} — a URN identifying the problem. Stable, and the thing a client

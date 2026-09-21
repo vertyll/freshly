@@ -1,13 +1,3 @@
-/**
- * The composition root, and the only project that produces a runnable jar.
- *
- * One process means one composition root. Every `*-infrastructure` is a plain library and
- * this project assembles them.
- *
- * It also owns the resources, because configuration belongs to whoever composes the
- * application. A library reaching into another project's resource directory inverts the
- * dependency at the file level and leaves the library unbuildable on its own.
- */
 plugins {
     id("freshly.java-conventions")
     alias(libs.plugins.spring.boot)

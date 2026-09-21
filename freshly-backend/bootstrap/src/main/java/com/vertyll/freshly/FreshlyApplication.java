@@ -15,14 +15,6 @@ import com.vertyll.freshly.translation.infrastructure.config.TranslationModuleCo
 import com.vertyll.freshly.useraccess.infrastructure.config.UserAccessModuleConfig;
 import com.vertyll.freshly.web.WebPlatformConfig;
 
-/**
- * The one process.
- *
- * <p>
- * Here each module states its own contribution in a {@code *ModuleConfig}, and
- * this class names the modules it assembles. Adding a bounded context is one line
- * here, which is also the moment somebody notices it is being added.
- */
 @SpringBootApplication
 @EnableScheduling
 @Import(

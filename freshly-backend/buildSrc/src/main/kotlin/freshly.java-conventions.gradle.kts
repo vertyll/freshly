@@ -7,17 +7,6 @@ import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 
-/**
- * What every project in the build gets, whichever layer it is.
- *
- * Carries no dependency on Spring, MongoDB or any other framework: a `*-domain` project
- * applies this and must still come out with nothing but the JDK on its compile classpath.
- *
- * A convention plugin rather than a `subprojects { }` block in the root build: that block
- * configures projects before they are evaluated, so it cannot use the version catalogue's
- * generated accessors and has to reach through `rootProject.libs` everywhere.
- */
-
 plugins {
     java
     pmd
@@ -45,14 +34,6 @@ java {
 
 val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
 
-/**
- * The Spring Boot BOM, for version alignment only.
- *
- * Importing a BOM adds no artifacts to any configuration — it pins versions for coordinates
- * that are actually declared. A domain project that declares no Spring dependency therefore
- * still has no Spring on its classpath, which `checkHexagonalDependencies` verifies rather
- * than assumes.
- */
 configure<DependencyManagementExtension> {
     imports {
         mavenBom(libs.findLibrary("spring-boot-dependencies").get().get().toString())
@@ -76,43 +57,18 @@ dependencies {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    /**
-     * Retains parameter names in the class file.
-     *
-     * Spring Boot's plugin adds this, but only to projects applying it — here that is
-     * `bootstrap` alone. Without it every library project's constructor parameters erase to
-     * `arg0`, and any injection point Spring can only resolve by name fails at start-up.
-     */
     options.compilerArgs.add("-parameters")
 
     options.errorprone {
         enabled.set(true)
 
-        /**
-         * NullAway refuses to initialize unless told which code is annotated, and it fails
-         * by crashing the compiler with an assertion error rather than a readable message.
-         *
-         * `OnlyNullMarked` means NullAway checks exactly what JSpecify marks — and JSpecify
-         * does not treat a package as containing its subpackages, so every package needs its
-         * own `package-info.java`. `checkNullMarkedPackages` is what keeps that true; without
-         * it, a package added later is simply not checked and nothing says so.
-         *
-         * The alternative, `AnnotatedPackages=com.vertyll.freshly`, is one line and covers
-         * subpackages by prefix. It is not used because the marking would then live only in
-         * the build file: an IDE, or any other tool reading JSpecify, would still see the
-         * code as unannotated.
-         */
         check("NullAway", CheckSeverity.ERROR)
         option("NullAway:OnlyNullMarked", "true")
         option("NullAway:JSpecifyMode", "true")
         option("NullAway:CustomContractAnnotations", "org.springframework.lang.Contract")
-
-        // Both name an annotation Lombok only emits when `lombok.config` at the root asks
-        // it to; without that file they match nothing and quietly do nothing.
         option("NullAway:ExcludedFieldAnnotations", "lombok.Generated")
         option("NullAway:TreatGeneratedAsUnannotated", "true")
         option("NullAway:ExternalInitAnnotations", "org.springframework.data.mongodb.core.mapping.Document")
-
         option("NullAway:AcknowledgeRestrictiveAnnotations", "true")
         option("NullAway:CheckOptionalEmptiness", "true")
         option("NullAway:HandleTestAssertionLibraries", "true")
@@ -155,9 +111,6 @@ configure<SpotlessExtension> {
         target("src/main/java/**/*.java", "src/test/java/**/*.java")
         targetExclude("**/build/generated/**/*.java", "**/*Impl.java")
 
-        // Removes unused imports and sorts the rest. It cannot expand a wildcard —
-        // that needs type resolution — so the `NoWildcardImports` rule in
-        // `config/pmd` rejects them instead.
         removeUnusedImports()
 
         importOrder(
@@ -176,7 +129,6 @@ configure<SpotlessExtension> {
 
     format("gradle") {
         target("*.gradle.kts", "**/*.gradle.kts")
-        // IntelliJ inserts this import by itself; Gradle already imports the accessors.
         replaceRegex(
             "IDE-generated Kotlin DSL accessor import",
             "(?m)^import gradle\\.kotlin\\.dsl\\.accessors\\._[0-9a-f]+\\.\\*\\R",

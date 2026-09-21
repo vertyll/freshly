@@ -14,7 +14,7 @@ import com.vertyll.freshly.lang.i18n.TranslationCatalogue;
  * These are <em>defaults</em>. The {@code translation} context stores them and
  * overwrites them on every start-up, so improving a sentence here reaches everyone who has
  * not overridden that key. An administrator's override is kept separately and is never
- * touched by a redeploy.
+ * touched by a redeployment.
  */
 @Component
 public class PlatformTranslationCatalogue implements TranslationCatalogue {

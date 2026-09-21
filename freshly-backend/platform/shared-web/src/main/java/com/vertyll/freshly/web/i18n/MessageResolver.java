@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
  * <p>
  * Reads from the {@code translation} context through the {@link TranslationResolver} SPI
  * rather than from {@code messages_*.properties}, so the text is data an administrator can
- * correct rather than a build artifact that needs a deploy to change.
+ * correct rather than a build artifact that needs a deployment to change.
  *
  * <p>
  * The platform still does not depend on that module: it names the interface,

@@ -97,8 +97,7 @@ public class TranslationMessageSource implements MessageSource {
     }
 
     @Nullable private String render(String code, @Nullable Object @Nullable [] args, @Nullable Locale locale) {
-        // The primary language: the store is keyed that way, and the resolver's cache key
-        // is whatever it is handed.
+        // The primary language: the store is keyed that way, and the resolver's cache key is whatever it is handed.
         String languageTag = localeOf(locale).getLanguage();
         String pattern = translations.resolve(code, languageTag).orElse(null);
 

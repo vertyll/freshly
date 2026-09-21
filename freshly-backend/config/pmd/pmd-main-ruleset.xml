@@ -65,7 +65,7 @@
 
     <!-- Performance -->
     <rule ref="category/java/performance.xml">
-        <exclude name="RedundantFieldInitializer" />
+        <exclude name="RedundantFieldInitializer"/>
     </rule>
 
     <!-- Security -->
