@@ -68,6 +68,8 @@ tasks.register("docs") {
     dependsOn(libraries.map { ":platform:${it.name}:javadoc" })
 
     val site = layout.buildDirectory.dir("docs/javadoc")
+    val template = layout.projectDirectory.file("gradle/docs/landing.html")
+    inputs.file(template)
     val sources = libraries.associate { it.name to project(":platform:${it.name}").layout.buildDirectory.dir("docs/javadoc") }
 
     doLast {
@@ -80,66 +82,16 @@ tasks.register("docs") {
                 """      <li><a href="${it.name}/index.html"><code>${it.name}</code></a><span>${it.blurb}</span></li>"""
             }
 
-        val template =
-            """
-            <!doctype html>
-            <html lang="en">
-              <head>
-                <meta charset="utf-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-                <title>freshly — platform API documentation</title>
-                <style>
-                  :root {
-                    color-scheme: light dark;
-                    --fg: #1a1a1a; --muted: #5b5b5b; --line: #e2e2e2; --accent: #1f6feb;
-                  }
-                  @media (prefers-color-scheme: dark) {
-                    :root { --fg: #e8e8e8; --muted: #a0a0a0; --line: #303030; --accent: #6aa9ff; }
-                  }
-                  body {
-                    font-family: system-ui, -apple-system, sans-serif;
-                    max-width: 46rem; margin: 0 auto; padding: 4rem 1.25rem;
-                    line-height: 1.6; color: var(--fg);
-                  }
-                  h1 { font-size: 1.5rem; margin: 0 0 .25rem; }
-                  h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em;
-                       color: var(--muted); margin: 2.5rem 0 .75rem; font-weight: 600; }
-                  p.lede { color: var(--muted); margin: 0 0 .5rem; }
-                  ul { list-style: none; padding: 0; margin: 0; }
-                  li { display: flex; flex-direction: column; gap: .15rem;
-                       padding: .7rem 0; border-bottom: 1px solid var(--line); }
-                  li span { color: var(--muted); font-size: .92rem; }
-                  a { color: var(--accent); text-decoration: none; font-weight: 600; }
-                  a:hover { text-decoration: underline; }
-                  code { font-size: .95rem; }
-                  footer { margin-top: 2.5rem; color: var(--muted); font-size: .88rem; }
-                </style>
-              </head>
-              <body>
-                <h1>freshly — platform libraries</h1>
-                <p class="lede">API documentation generated from Javadoc.</p>
-
-                <h2>Framework-free — safe for a domain or application layer</h2>
-                <ul>
-            @@PURE@@
-                </ul>
-
-                <h2>Spring — infrastructure layer only</h2>
-                <ul>
-            @@SPRING@@
-                </ul>
-
-                <footer>
-                  What each library is responsible for, and why they are separate, is described in
-                  <code>docs/shared-modules.md</code>.
-                </footer>
-              </body>
-            </html>
-            """.trimIndent()
-
         val landingPage = root.resolve("index.html")
         landingPage.writeText(
-            template
+            template.asFile
+                .readText()
+                .replace("@@PROJECT@@", "freshly")
+                .replace("@@SUBJECT@@", "platform")
+                .replace("@@HEADING@@", "platform libraries")
+                .replace("@@LEDE@@", "API documentation generated from Javadoc.")
+                .replace("@@PURE_SCOPE@@", "safe for a domain or application layer")
+                .replace("@@UNIT@@", "library")
                 .replace("@@PURE@@", cards(libraries.filter { it.frameworkFree }))
                 .replace("@@SPRING@@", cards(libraries.filterNot { it.frameworkFree }))
         )
