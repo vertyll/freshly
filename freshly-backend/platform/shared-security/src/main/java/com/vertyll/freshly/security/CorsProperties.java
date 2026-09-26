@@ -3,6 +3,7 @@ package com.vertyll.freshly.security;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Which origins the browser API accepts.
@@ -18,11 +19,11 @@ public record CorsProperties(List<String> allowedOrigins, List<String> allowedMe
     private static final String ORIGINS_REQUIRED = "application.cors.allowed-origins must name at least one origin";
 
     public CorsProperties {
-        if (allowedOrigins == null || allowedOrigins.isEmpty()) {
+        if (CollectionUtils.isEmpty(allowedOrigins)) {
             throw new IllegalArgumentException(ORIGINS_REQUIRED);
         }
         allowedOrigins = List.copyOf(allowedOrigins);
-        allowedMethods = allowedMethods == null || allowedMethods.isEmpty()
+        allowedMethods = CollectionUtils.isEmpty(allowedMethods)
                 ? List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS") : List.copyOf(allowedMethods);
     }
 }
