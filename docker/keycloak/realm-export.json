@@ -725,7 +725,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "local-app-client-secret",
       "redirectUris": [
         "http://localhost:8080/*",
         "http://localhost:4200/*"
@@ -838,7 +838,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "local-service-account-secret",
       "redirectUris": [
         "/*"
       ],

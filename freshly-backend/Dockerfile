@@ -1,47 +1,32 @@
-ARG GRADLE_VERSION=9.7.1
-ARG JAVA_VERSION=25
+ARG JDK_IMAGE=azul/zulu-openjdk:25-latest
+ARG JRE_IMAGE=azul/zulu-openjdk:25-jre-headless-latest
 
-# Build stage
-FROM gradle:${GRADLE_VERSION}-jdk${JAVA_VERSION}-alpine AS build
+FROM ${JDK_IMAGE} AS build
+WORKDIR /workspace
+COPY freshly-backend/ ./
+RUN --mount=type=cache,target=/root/.gradle ./gradlew --no-daemon :bootstrap:bootJar
+
+FROM ${JDK_IMAGE} AS extract
+WORKDIR /extract
+COPY --from=build /workspace/bootstrap/build/libs/freshly-backend.jar app.jar
+RUN java -Djarmode=tools -jar app.jar extract --layers --launcher --destination layers
+
+FROM ${JRE_IMAGE} AS runtime
 WORKDIR /app
+RUN groupadd --system --gid 1001 freshly && useradd --system --uid 1001 --gid freshly freshly
 
-# Copy the entire backend folder (including modules, gradlew, and kts files)
-COPY freshly-backend/ .
+COPY --from=extract --chown=freshly:freshly /extract/layers/dependencies/ ./
+COPY --from=extract --chown=freshly:freshly /extract/layers/spring-boot-loader/ ./
+COPY --from=extract --chown=freshly:freshly /extract/layers/snapshot-dependencies/ ./
+COPY --from=extract --chown=freshly:freshly /extract/layers/application/ ./
 
-# Add execute permissions to gradlew
-RUN chmod +x gradlew
-
-# Build application JAR
-RUN ./gradlew bootJar --no-daemon --parallel
-
-# Production stage
-FROM azul/zulu-openjdk-alpine:${JAVA_VERSION}-jre AS production
-WORKDIR /app
-
-# Install system dependencies, create a non-root user, and set permissions for uploads directory
-RUN apk add --no-cache \
-    bash \
-    netcat-openbsd \
-    curl \
-    dos2unix \
-    postgresql-client && \
-    addgroup --system --gid 1001 appuser && \
-    adduser --system --uid 1001 --ingroup appuser appuser && \
-    mkdir -p /var/app/uploads && \
-    chown -R appuser:appuser /var/app/uploads
-
-# Copy the built JAR from the build stage
-COPY --from=build /app/modules/app/build/libs/*.jar app.jar
-
-USER appuser
-
-ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
-ENV SPRING_PROFILES_ACTIVE=prod
-ENV SERVER_PORT=8080
-
+USER freshly
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8080/api/v1/actuator/health || exit 1
+ENV SPRING_PROFILES_ACTIVE=prod \
+    JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError"
 
-CMD ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD ["bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /api/v1/actuator/health/liveness HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3"]
+
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

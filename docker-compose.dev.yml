@@ -1,157 +1,82 @@
+name: freshly
+
 services:
   mongodb:
-    container_name: freshly-mongodb
-    image: mongo:8
-    command: >
-      bash -c "
-        if [ ! -f /data/db/keyfile ]; then
-          openssl rand -base64 756 > /data/db/keyfile
-          chmod 400 /data/db/keyfile
-        fi
-        exec mongod --replSet rs0 --bind_ip_all --keyFile /data/db/keyfile
-      "
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
-      MONGO_INITDB_DATABASE: freshly_db
+    image: docker.io/library/mongo:8
+    restart: unless-stopped
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
       - mongodb-data:/data/db
-    networks:
-      - freshly
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/admin -u root -p root --quiet
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
 
   mongodb-init:
-    image: mongo:8
-    container_name: freshly-mongodb-init
+    image: docker.io/library/mongo:8
     depends_on:
       mongodb:
         condition: service_healthy
-    networks:
-      - freshly
     restart: "no"
-    entrypoint: >
-      mongosh --host mongodb:27017 -u root -p root --eval
-      "try { rs.status(); print('replica set already initialized'); }
-      catch(e) { rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'mongodb:27017'}]}); print('replica set initialized'); }"
-
-  test-mongodb:
-    container_name: freshly-mongodb-test
-    image: mongo:8
-    command: >
-      bash -c "
-        if [ ! -f /data/db/keyfile ]; then
-          openssl rand -base64 756 > /data/db/keyfile
-          chmod 400 /data/db/keyfile
-        fi
-        exec mongod --replSet rs0 --bind_ip_all --keyFile /data/db/keyfile
-      "
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: test
-      MONGO_INITDB_ROOT_PASSWORD: test
-      MONGO_INITDB_DATABASE: test_db
-    ports:
-      - "27018:27017"
-    volumes:
-      - mongodb-test-data:/data/db
-    networks:
-      - freshly
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/admin -u test -p test --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
-  test-mongodb-init:
-    image: mongo:8
-    container_name: freshly-mongodb-test-init
-    depends_on:
-      test-mongodb:
-        condition: service_healthy
-    networks:
-      - freshly
-    restart: "no"
-    entrypoint: >
-      mongosh --host test-mongodb:27017 -u test -p test --eval
-      "try { rs.status(); print('replica set already initialized'); }
-      catch(e) { rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'test-mongodb:27017'}]}); print('replica set initialized'); }"
+    entrypoint:
+      - mongosh
+      - --host
+      - mongodb:27017
+      - --quiet
+      - --eval
+      - "try { rs.status(); } catch (e) { rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]}); }"
 
   keycloak:
-    container_name: freshly-keycloak
     image: quay.io/keycloak/keycloak:26.6.4
-    command: start-dev --import-realm
+    restart: unless-stopped
+    command: ["start-dev", "--import-realm"]
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: keycloak-db
-      KC_DB_URL_DATABASE: keycloak_db
-      KC_DB_USERNAME: keycloak_user
-      KC_DB_PASSWORD: keycloak_pass
-      KC_DB_SCHEMA: public
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
-      KC_PROXY_HEADERS: xforwarded
-      KC_HOSTNAME_STRICT: "false"
-      KC_HTTP_ENABLED: "true"
       KC_HEALTH_ENABLED: "true"
     ports:
-      - "9000:8080"
+      - "127.0.0.1:9000:8080"
     volumes:
       - ./docker/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
     depends_on:
       keycloak-db:
         condition: service_healthy
-    networks:
-      - freshly
     healthcheck:
-      test: [ "CMD-SHELL", "{ printf 'HEAD /health/ready HTTP/1.0\\r\\n\\r\\n' >&0; grep 'HTTP/1.0 200'; } 0<>/dev/tcp/localhost/9000" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
+      test: ["CMD-SHELL", "{ printf 'HEAD /health/ready HTTP/1.0\\r\\n\\r\\n' >&0; grep 'HTTP/1.0 200'; } 0<>/dev/tcp/localhost/9000"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
 
   keycloak-db:
-    image: postgres:18-alpine
-    container_name: freshly-keycloak-postgres
-    restart: always
-    ports:
-      - "5432:5432"
+    image: docker.io/library/postgres:18-alpine
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: keycloak_db
-      POSTGRES_USER: keycloak_user
-      POSTGRES_PASSWORD: keycloak_pass
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
     volumes:
-      - postgres-data:/var/lib/postgresql
-    networks:
-      - freshly
+      - keycloak-db-data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U keycloak_user -d keycloak_db"]
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
 
-  mail-dev:
-    image: maildev/maildev:latest
-    container_name: freshly-mail-dev
-    restart: always
+  maildev:
+    image: docker.io/maildev/maildev:3.0.0
+    restart: unless-stopped
     ports:
-      - "1025:1025"
-      - "1080:1080"
-    networks:
-      - freshly
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:1080:1080"
 
 volumes:
   mongodb-data:
-  mongodb-test-data:
-  postgres-data:
-
-networks:
-  freshly:
-    driver: bridge
+  keycloak-db-data:
