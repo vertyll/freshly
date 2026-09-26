@@ -28,6 +28,7 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
 
     private static final String GRANT_TYPE = "grant_type";
     private static final String CLIENT_ID = "client_id";
+    private static final String CLIENT_SECRET = "client_secret";
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final String REFRESH_TOKEN = "refresh_token";
@@ -45,9 +46,8 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
 
     @Override
     public AuthTokens issue(String username, String password) {
-        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        MultiValueMap<String, String> form = clientForm();
         form.add(GRANT_TYPE, PASSWORD);
-        form.add(CLIENT_ID, properties.publicClientId());
         form.add(USERNAME, username);
         form.add(PASSWORD, password);
 
@@ -56,9 +56,8 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
 
     @Override
     public AuthTokens refresh(String refreshToken) {
-        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        MultiValueMap<String, String> form = clientForm();
         form.add(GRANT_TYPE, REFRESH_TOKEN);
-        form.add(CLIENT_ID, properties.publicClientId());
         form.add(REFRESH_TOKEN, refreshToken);
 
         return post(TOKEN_PATH, form, AuthError.REFRESH_TOKEN_INVALID);
@@ -66,8 +65,7 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
 
     @Override
     public void revoke(String refreshToken) {
-        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add(CLIENT_ID, properties.publicClientId());
+        MultiValueMap<String, String> form = clientForm();
         form.add(REFRESH_TOKEN, refreshToken);
 
         try {
@@ -80,6 +78,13 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
         } catch (RestClientResponseException e) {
             log.warn("Keycloak refused a logout with status {}", e.getStatusCode());
         }
+    }
+
+    private MultiValueMap<String, String> clientForm() {
+        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add(CLIENT_ID, properties.userClientId());
+        form.add(CLIENT_SECRET, properties.userClientSecret());
+        return form;
     }
 
     private AuthTokens post(String path, MultiValueMap<String, String> form, AuthError onRejection) {

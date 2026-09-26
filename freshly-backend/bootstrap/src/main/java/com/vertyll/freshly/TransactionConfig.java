@@ -5,8 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 
-@Configuration
-public class TransactionConfig {
+@Configuration(proxyBeanMethods = false)
+class TransactionConfig {
 
     @Bean
     MongoTransactionManager mongoTransactionManager(MongoDatabaseFactory databaseFactory) {

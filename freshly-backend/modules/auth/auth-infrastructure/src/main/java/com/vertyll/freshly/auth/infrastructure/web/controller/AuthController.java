@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.vertyll.freshly.auth.application.dto.AuthTokens;
 import com.vertyll.freshly.auth.application.port.inbound.command.CredentialsUseCase;
@@ -44,7 +45,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
     private static final String REFRESH_COOKIE = "refresh_token";
-    private static final String REFRESH_COOKIE_PATH = "/auth";
+    private static final String AUTH_PATH = "/auth";
     private static final String SUBJECT_CLAIM = "sub";
 
     private final RegistrationUseCase registration;
@@ -147,10 +148,14 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Lax")
-                .path(REFRESH_COOKIE_PATH)
+                .path(refreshCookiePath())
                 .maxAge(Duration.ofSeconds(tokens.refreshExpiresInSeconds()))
                 .build()
         );
+    }
+
+    private static String refreshCookiePath() {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(AUTH_PATH).build().getPath();
     }
 
     private static ResponseCookie expiredRefreshCookie() {
@@ -158,7 +163,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(true)
             .sameSite("Lax")
-            .path(REFRESH_COOKIE_PATH)
+            .path(refreshCookiePath())
             .maxAge(Duration.ZERO)
             .build();
     }

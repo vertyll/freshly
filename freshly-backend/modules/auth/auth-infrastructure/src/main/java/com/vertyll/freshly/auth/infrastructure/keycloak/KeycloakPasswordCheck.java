@@ -26,7 +26,8 @@ final class KeycloakPasswordCheck {
     static boolean succeeds(RestClient restClient, KeycloakProperties properties, String username, String password) {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
         form.add("grant_type", "password");
-        form.add("client_id", properties.publicClientId());
+        form.add("client_id", properties.userClientId());
+        form.add("client_secret", properties.userClientSecret());
         form.add("username", username);
         form.add("password", password);
 

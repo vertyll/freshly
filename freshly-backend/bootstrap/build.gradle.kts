@@ -26,10 +26,17 @@ dependencies {
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
 
-    runtimeOnly(libs.spring.boot.devtools)
-    developmentOnly(libs.spring.boot.docker.compose)
+    developmentOnly(libs.spring.boot.devtools)
 
     testImplementation(libs.bundles.test.starters)
     testImplementation(project(":platform:shared-archunit"))
     testImplementation(libs.bundles.testcontainers)
+}
+
+tasks.bootJar {
+    archiveFileName.set("freshly-backend.jar")
+}
+
+tasks.jar {
+    enabled = false
 }

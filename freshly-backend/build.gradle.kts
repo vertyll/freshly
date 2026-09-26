@@ -3,12 +3,7 @@ plugins {
     id("com.diffplug.spotless")
 }
 
-group = "com.vertyll"
-version = "0.0.1-SNAPSHOT"
 description = "Air Quality Monitoring System - API"
-
-extra["author"] = "Mikołaj Gawron"
-extra["email"] = "gawrmiko@gmail.com"
 
 spotless {
     format("buildLogic") {

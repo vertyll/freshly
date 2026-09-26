@@ -78,6 +78,7 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 configure<SpotBugsExtension> {
+    toolVersion.set(libs.findVersion("spotbugs").get().requiredVersion)
     ignoreFailures.set(false)
     effort.set(Effort.MAX)
     reportLevel.set(Confidence.LOW)

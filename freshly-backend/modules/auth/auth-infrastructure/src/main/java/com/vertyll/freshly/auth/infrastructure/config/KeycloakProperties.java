@@ -10,7 +10,8 @@ public record KeycloakProperties(
     String realm,
     String adminClientId,
     String adminClientSecret,
-    String publicClientId
+    String userClientId,
+    String userClientSecret
 ) {
 
     public KeycloakProperties {
@@ -18,12 +19,13 @@ public record KeycloakProperties(
         requireNonNull(realm, "application.keycloak.realm must be configured");
         requireNonNull(adminClientId, "application.keycloak.admin-client-id must be configured");
         requireNonNull(adminClientSecret, "application.keycloak.admin-client-secret must be configured");
-        requireNonNull(publicClientId, "application.keycloak.public-client-id must be configured");
+        requireNonNull(userClientId, "application.keycloak.user-client-id must be configured");
+        requireNonNull(userClientSecret, "application.keycloak.user-client-secret must be configured");
     }
 
     @Override
     public String toString() {
         return "KeycloakProperties[serverUrl=" + serverUrl + ", realm=" + realm + ", adminClientId=" + adminClientId
-                + ", adminClientSecret=***" + ", publicClientId=" + publicClientId + "]";
+                + ", adminClientSecret=***, userClientId=" + userClientId + ", userClientSecret=***]";
     }
 }
