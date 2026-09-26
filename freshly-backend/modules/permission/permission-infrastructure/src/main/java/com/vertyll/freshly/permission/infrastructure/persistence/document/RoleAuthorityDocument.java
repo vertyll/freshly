@@ -8,28 +8,11 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 @Document(collection = "role_authority")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class RoleAuthorityDocument {
-    @Id
-    @Field("role")
-    private String role;
-
-    @Field("unrestricted")
-    private boolean unrestricted;
-
-    @Field("permissions")
-    private Set<String> permissions;
-
-    @Version
-    @Field("version")
-    @Nullable private Long version;
+public record RoleAuthorityDocument(
+    @Id String role,
+    @Field("unrestricted") boolean unrestricted,
+    @Field("permissions") Set<String> permissions,
+    @Version @Field("version") @Nullable Long version
+) {
 }

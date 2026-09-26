@@ -99,20 +99,20 @@ public class AirQualityHistoryPersistenceAdapter implements AirQualityHistoryRep
 
     private static AirQualityMeasurement toDomain(AirQualityMeasurementDocument document) {
         Map<Pollutant, AirQualityLevel> levels = new EnumMap<>(Pollutant.class);
-        document.getIndexLevels()
+        document.indexLevels()
             .forEach((pollutant, level) -> levels.put(Pollutant.valueOf(pollutant), AirQualityLevel.valueOf(level)));
 
         Map<Pollutant, Double> readings = new EnumMap<>(Pollutant.class);
-        document.getReadings().forEach((pollutant, value) -> readings.put(Pollutant.valueOf(pollutant), value));
+        document.readings().forEach((pollutant, value) -> readings.put(Pollutant.valueOf(pollutant), value));
 
-        String overall = document.getOverallLevel();
+        String overall = document.overallLevel();
 
         return AirQualityMeasurement.reconstitute(
-            document.getId(),
-            document.getStationId(),
-            document.getStationName(),
-            document.getMeasuredAt(),
-            document.getRecordedAt(),
+            document.id(),
+            document.stationId(),
+            document.stationName(),
+            document.measuredAt(),
+            document.recordedAt(),
             overall == null ? null : AirQualityLevel.valueOf(overall),
             levels,
             readings

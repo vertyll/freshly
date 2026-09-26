@@ -49,7 +49,7 @@ public class TranslationPersistenceAdapter implements TranslationRepository {
     @Override
     public Map<String, TranslationKey> findAllByKeys(Collection<String> keys) {
         Map<String, TranslationKey> found = new LinkedHashMap<>();
-        repository.findAllById(keys).forEach(document -> found.put(document.getKey(), toDomain(document)));
+        repository.findAllById(keys).forEach(document -> found.put(document.key(), toDomain(document)));
         return found;
     }
 
@@ -126,7 +126,7 @@ public class TranslationPersistenceAdapter implements TranslationRepository {
 
     private static TranslationKey toDomain(TranslationKeyDocument document) {
         Map<String, TranslationKey.LanguageOverride> overrides = new LinkedHashMap<>();
-        document.getOverrides()
+        document.overrides()
             .forEach(
                 (language, value) -> overrides.put(
                     language,
@@ -135,12 +135,12 @@ public class TranslationPersistenceAdapter implements TranslationRepository {
             );
 
         return TranslationKey.reconstitute(
-            document.getKey(),
-            document.getContext(),
-            document.isDeclared(),
-            document.getDefaults(),
+            document.key(),
+            document.context(),
+            document.declared(),
+            document.defaults(),
             overrides,
-            document.getVersion()
+            document.version()
         );
     }
 }

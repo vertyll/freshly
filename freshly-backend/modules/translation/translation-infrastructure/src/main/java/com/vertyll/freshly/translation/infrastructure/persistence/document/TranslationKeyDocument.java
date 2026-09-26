@@ -10,38 +10,15 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 @Document(collection = "translation_key")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class TranslationKeyDocument {
-    @Id
-    @Field("key")
-    private String key;
-
-    @Field("context")
-    @Indexed
-    private String context;
-
-    @Field("declared")
-    @Indexed
-    private boolean declared;
-
-    @Field("defaults")
-    private Map<String, String> defaults;
-
-    @Field("overrides")
-    private Map<String, OverrideValue> overrides;
-
-    @Version
-    @Field("version")
-    @Nullable private Long version;
+public record TranslationKeyDocument(
+    @Id String key,
+    @Field("context") @Indexed String context,
+    @Field("declared") @Indexed boolean declared,
+    @Field("defaults") Map<String, String> defaults,
+    @Field("overrides") Map<String, OverrideValue> overrides,
+    @Version @Field("version") @Nullable Long version
+) {
 
     public record OverrideValue(String text, @Nullable String sourceDefault, String author, Instant at) {
     }

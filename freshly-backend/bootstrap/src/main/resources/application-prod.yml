@@ -1,6 +1,12 @@
 spring:
   mongodb:
-    uri: ${MONGODB_URI}
+    host: ${MONGO_HOST}
+    port: ${MONGO_PORT}
+    database: ${MONGO_DATABASE}
+    username: ${MONGO_USERNAME}
+    password: ${MONGO_PASSWORD}
+    authentication-database: ${MONGO_AUTH_DATABASE}
+    replica-set-name: ${MONGO_REPLICA_SET_NAME}
     ssl:
       bundle: internal-ca
   ssl:

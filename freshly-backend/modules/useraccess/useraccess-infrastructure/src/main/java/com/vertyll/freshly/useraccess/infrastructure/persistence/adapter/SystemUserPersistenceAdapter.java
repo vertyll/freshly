@@ -68,11 +68,7 @@ public class SystemUserPersistenceAdapter implements SystemUserRepository {
     }
 
     private static SystemUser toDomain(SystemUserDocument document) {
-        return SystemUser.reconstitute(
-            document.getKeycloakUserId(),
-            document.isActive(),
-            document.getRoles(),
-            document.getVersion()
-        );
+        return SystemUser
+            .reconstitute(document.keycloakUserId(), document.active(), document.roles(), document.version());
     }
 }

@@ -8,9 +8,18 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 5MB
+  mongodb:
+    representation:
+      uuid: standard
   data:
     mongodb:
       auto-index-creation: true
+  ssl:
+    bundle:
+      pem:
+        gios:
+          truststore:
+            certificate: classpath:certs/certum-trusted-root-ca.pem
   mail:
     properties:
       mail:
@@ -51,5 +60,6 @@ application:
   airquality:
     gios:
       base-url: https://api.gios.gov.pl/pjp-api/v1/rest
+      ssl-bundle: gios
       connect-timeout: 5s
       read-timeout: 20s

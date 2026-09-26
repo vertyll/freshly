@@ -10,28 +10,11 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 @Document(collection = "useraccess_system_user")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class SystemUserDocument {
-    @Id
-    private UUID keycloakUserId;
-
-    @Field("is_active")
-    @Indexed
-    private boolean active;
-
-    @Field("roles")
-    private Set<String> roles;
-
-    @Version
-    @Field("version")
-    @Nullable private Long version;
+public record SystemUserDocument(
+    @Id UUID keycloakUserId,
+    @Field("is_active") @Indexed boolean active,
+    @Field("roles") Set<String> roles,
+    @Version @Field("version") @Nullable Long version
+) {
 }

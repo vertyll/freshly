@@ -22,9 +22,9 @@ application:
   jwt:
     secret: bG9jYWwtb25seS1kZXZlbG9wbWVudC1rZXktbm90LWEtc2VjcmV0
   frontend:
-    url: http://localhost:4200
+    url: http://localhost:8080/api/v1/auth
   cors:
-    allowed-origins: http://localhost:4200
+    allowed-origins: http://localhost:8080
   airquality:
     sync:
       enabled: true

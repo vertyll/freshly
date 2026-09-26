@@ -48,10 +48,10 @@ public class RoleAuthorityPersistenceAdapter implements RoleAuthorityRepository 
         }
 
         List<RoleAuthorityDocument> found = repository.findAllById(roles);
-        boolean anyUnrestricted = found.stream().anyMatch(RoleAuthorityDocument::isUnrestricted);
+        boolean anyUnrestricted = found.stream().anyMatch(RoleAuthorityDocument::unrestricted);
 
         Set<String> permissions = new LinkedHashSet<>();
-        found.forEach(document -> permissions.addAll(document.getPermissions()));
+        found.forEach(document -> permissions.addAll(document.permissions()));
 
         return new RoleGrants(anyUnrestricted, permissions);
     }
@@ -98,11 +98,7 @@ public class RoleAuthorityPersistenceAdapter implements RoleAuthorityRepository 
     }
 
     private static RoleAuthority toDomain(RoleAuthorityDocument document) {
-        return RoleAuthority.reconstitute(
-            document.getRole(),
-            document.isUnrestricted(),
-            document.getPermissions(),
-            document.getVersion()
-        );
+        return RoleAuthority
+            .reconstitute(document.role(), document.unrestricted(), document.permissions(), document.version());
     }
 }

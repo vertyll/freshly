@@ -24,15 +24,13 @@ repositories {
     mavenCentral()
 }
 
+val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(25))
+        languageVersion.set(JavaLanguageVersion.of(libs.findVersion("java").get().requiredVersion))
     }
-    sourceCompatibility = JavaVersion.VERSION_25
-    targetCompatibility = JavaVersion.VERSION_25
 }
-
-val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
 
 configure<DependencyManagementExtension> {
     imports {
@@ -153,6 +151,10 @@ tasks.withType<Pmd>().configureEach {
     if (name == "pmdTest") {
         ruleSetFiles = files(rootProject.file("config/pmd/pmd-test-ruleset.xml"))
     }
+}
+
+tasks.withType<Javadoc>().configureEach {
+    (options as StandardJavadocDocletOptions).addBooleanOption("Xdoclint:all,-missing", true)
 }
 
 tasks.withType<Test>().configureEach {

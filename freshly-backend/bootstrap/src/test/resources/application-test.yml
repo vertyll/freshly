@@ -1,0 +1,29 @@
+spring:
+  mail:
+    host: localhost
+    port: 1025
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000/realms/freshly
+
+application:
+  mail:
+    from: test@freshly.local
+  jwt:
+    secret: dGVzdC1vbmx5LWtleS10aGF0LWlzLWxvbmctZW5vdWdoLWZvci1obWFjLXNoYTM4NA
+  frontend:
+    url: http://localhost:8080/api/v1/auth
+  cors:
+    allowed-origins: http://localhost:8080
+  airquality:
+    sync:
+      enabled: false
+  keycloak:
+    server-url: http://localhost:9000
+    realm: freshly
+    admin-client-id: test-admin
+    admin-client-secret: test-admin-secret
+    user-client-id: test-user
+    user-client-secret: test-user-secret

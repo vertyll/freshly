@@ -1,12 +1,14 @@
-name: Build and Publish Freshly Backend
+name: Backend
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main]
+    tags: ["v*"]
+    paths:
+      - "freshly-backend/**"
+      - ".github/workflows/backend.yml"
   pull_request:
-    branches:
-      - main
+    branches: [main]
     paths:
       - "freshly-backend/**"
       - ".github/workflows/backend.yml"
@@ -15,14 +17,50 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   REGISTRY: zot.vertyll.dev
   IMAGE_NAME: vertyll/freshly-backend
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-24.04-arm
+  verify:
+    name: Spotless, Error Prone + NullAway, PMD, SpotBugs, architecture, tests
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: freshly-backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
 
+      - name: Set up Java 25 (Azul Zulu)
+        uses: actions/setup-java@v6
+        with:
+          distribution: zulu
+          java-version: "25"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Verify
+        run: ./gradlew build checkArchitecture
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-reports
+          path: freshly-backend/**/build/reports/
+          if-no-files-found: ignore
+
+  image:
+    name: Build and publish
+    needs: verify
+    if: github.event_name != 'push' || github.ref_type == 'tag'
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -33,10 +71,8 @@ jobs:
         run: |
           if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
             echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
-          elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
-            echo "version=pr-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
           else
-            echo "version=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+            echo "version=pr-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Set up Docker Buildx
@@ -50,15 +86,14 @@ jobs:
           username: ${{ secrets.ZOT_USERNAME }}
           password: ${{ secrets.ZOT_PASSWORD }}
 
-      - name: Build and push backend
+      - name: Build and push
         uses: docker/build-push-action@v7
         with:
-          context: .
-          file: ./freshly-backend/Dockerfile
+          context: freshly-backend
           platforms: linux/arm64
           push: ${{ github.ref_type == 'tag' }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          cache-from: type=gha,scope=backend
-          cache-to: type=gha,mode=max,scope=backend
+          cache-from: type=gha,scope=${{ env.IMAGE_NAME }}
+          cache-to: type=gha,mode=max,scope=${{ env.IMAGE_NAME }}

@@ -3,6 +3,7 @@ package com.vertyll.freshly.airquality.infrastructure.config;
 import java.net.http.HttpClient;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.ssl.SslBundles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
@@ -14,9 +15,10 @@ public class GiosRestClientConfig {
     public static final String GIOS_HTTP_CLIENT = "giosHttpClient";
 
     @Bean(name = GIOS_HTTP_CLIENT, destroyMethod = "close")
-    HttpClient giosHttpClient(GiosProperties properties) {
+    HttpClient giosHttpClient(GiosProperties properties, SslBundles sslBundles) {
         return HttpClient.newBuilder()
             .connectTimeout(properties.connectTimeout())
+            .sslContext(sslBundles.getBundle(properties.sslBundle()).createSslContext())
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
     }

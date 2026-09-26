@@ -13,7 +13,7 @@ package com.vertyll.freshly.infra.cache;
  * first call, which is a start-up problem discovered at request time.
  *
  * <p>
- * The shape is the same as {@link com.vertyll.freshly.authz.PermissionCatalogue}: the
+ * The shape is the same as {@code PermissionCatalogue}: the
  * platform owns the single manager and the contract, each context contributes a bean
  * saying what it needs, and no context knows about any other's caches.
  *

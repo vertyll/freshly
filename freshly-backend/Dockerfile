@@ -3,7 +3,7 @@ ARG JRE_IMAGE=azul/zulu-openjdk:25-jre-headless-latest
 
 FROM ${JDK_IMAGE} AS build
 WORKDIR /workspace
-COPY freshly-backend/ ./
+COPY . ./
 RUN --mount=type=cache,target=/root/.gradle ./gradlew --no-daemon :bootstrap:bootJar
 
 FROM ${JDK_IMAGE} AS extract
