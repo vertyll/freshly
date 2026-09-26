@@ -14,7 +14,7 @@ import com.vertyll.freshly.useraccess.application.service.query.RoleDirectoryQue
 import com.vertyll.freshly.useraccess.application.service.query.UserAccessQueryService;
 import com.vertyll.freshly.useraccess.domain.repository.SystemUserRepository;
 
-@Configuration
+@Configuration("useraccessApplicationBeansConfig")
 public class ApplicationBeansConfig {
     @Bean
     UserAccessCommandUseCase userAccessCommandUseCase(

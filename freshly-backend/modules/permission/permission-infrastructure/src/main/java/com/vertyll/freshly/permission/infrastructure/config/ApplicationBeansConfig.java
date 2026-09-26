@@ -14,7 +14,7 @@ import com.vertyll.freshly.permission.application.service.command.RoleAuthorityC
 import com.vertyll.freshly.permission.application.service.query.PermissionQueryService;
 import com.vertyll.freshly.permission.domain.repository.RoleAuthorityRepository;
 
-@Configuration
+@Configuration("permissionApplicationBeansConfig")
 public class ApplicationBeansConfig {
     @Bean
     PermissionQueryUseCase permissionQueryUseCase(RoleAuthorityRepository roles, List<PermissionCatalogue> catalogues) {

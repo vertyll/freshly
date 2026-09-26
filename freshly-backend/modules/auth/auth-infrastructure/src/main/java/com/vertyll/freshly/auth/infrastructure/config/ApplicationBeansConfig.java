@@ -17,7 +17,7 @@ import com.vertyll.freshly.auth.application.service.command.RegistrationService;
 import com.vertyll.freshly.auth.application.service.command.SessionService;
 import com.vertyll.freshly.infra.logging.Slf4jUseCaseLogger;
 
-@Configuration
+@Configuration("authApplicationBeansConfig")
 public class ApplicationBeansConfig {
     @Bean
     @SuppressWarnings("java:S107")

@@ -8,7 +8,7 @@ import com.vertyll.freshly.notification.application.port.inbound.NotificationCom
 import com.vertyll.freshly.notification.application.port.outbound.EmailDispatchPort;
 import com.vertyll.freshly.notification.application.service.NotificationCommandService;
 
-@Configuration
+@Configuration("notificationApplicationBeansConfig")
 public class ApplicationBeansConfig {
     @Bean
     NotificationCommandUseCase notificationCommandUseCase(EmailDispatchPort dispatch) {

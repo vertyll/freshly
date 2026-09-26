@@ -14,7 +14,7 @@ import com.vertyll.freshly.airquality.domain.repository.StationCatalogue;
 import com.vertyll.freshly.infra.logging.Slf4jUseCaseLogger;
 import com.vertyll.freshly.infra.transaction.TransactionalUseCaseFactory;
 
-@Configuration
+@Configuration("airqualityApplicationBeansConfig")
 public class ApplicationBeansConfig {
     @Bean
     AirQualityQueryUseCase airQualityQueryUseCase(

@@ -21,7 +21,7 @@ import com.vertyll.freshly.translation.domain.model.MessageGrammar;
 import com.vertyll.freshly.translation.domain.repository.AppliedMigrationRepository;
 import com.vertyll.freshly.translation.domain.repository.TranslationRepository;
 
-@Configuration
+@Configuration("translationApplicationBeansConfig")
 public class ApplicationBeansConfig {
     @Bean
     TranslationQueryUseCase translationQueryUseCase(

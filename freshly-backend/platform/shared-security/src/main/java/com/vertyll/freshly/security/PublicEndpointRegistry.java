@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
@@ -34,7 +35,9 @@ import lombok.extern.slf4j.Slf4j;
 public class PublicEndpointRegistry {
     private final List<RequestMatcher> matchers;
 
-    public PublicEndpointRegistry(RequestMappingHandlerMapping handlerMapping) {
+    public PublicEndpointRegistry(
+        @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping handlerMapping
+    ) {
         this.matchers = discover(handlerMapping);
     }
 
