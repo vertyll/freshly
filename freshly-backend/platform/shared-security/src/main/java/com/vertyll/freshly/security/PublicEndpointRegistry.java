@@ -32,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class PublicEndpointRegistry {
-
     private final List<RequestMatcher> matchers;
 
     public PublicEndpointRegistry(RequestMappingHandlerMapping handlerMapping) {
@@ -58,9 +57,6 @@ public class PublicEndpointRegistry {
                     described.add("ANY " + pattern);
                     return;
                 }
-                // Per verb, not per path. A path matcher alone permits every method on the
-                // path, so marking a GET public would also let an anonymous PUT past the
-                // filter chain and leave method security as the only thing refusing it.
                 methods.forEach(method -> {
                     discovered.add(
                         PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.valueOf(method.name()), pattern)
@@ -70,9 +66,6 @@ public class PublicEndpointRegistry {
             });
         });
 
-        // Logged at info at every start-up, deliberately. The set of endpoints reachable
-        // without a token is worth being able to read out of a boot log rather than
-        // reconstruct from source.
         log.info("Public endpoints ({}): {}", described.size(), described);
 
         return List.copyOf(discovered);
@@ -85,8 +78,6 @@ public class PublicEndpointRegistry {
 
     private static Set<String> patternsOf(RequestMappingInfo info) {
         PathPatternsRequestCondition condition = info.getPathPatternsCondition();
-        // Null only when MVC is configured for AntPathMatcher instead of parsed patterns.
-        // An empty set would make every @PublicEndpoint silently require a token.
         if (condition == null) {
             throw new IllegalStateException(
                 "Handler " + info + " has no parsed path patterns; @PublicEndpoint needs PathPatternParser"

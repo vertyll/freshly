@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Puts a transaction around a use case without the use case knowing.
  *
@@ -32,7 +34,6 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 @Component
 public class TransactionalUseCaseFactory {
-
     private final TransactionTemplate readWrite;
     private final TransactionTemplate readOnly;
 
@@ -52,6 +53,7 @@ public class TransactionalUseCaseFactory {
         return wrap(contract, target, readOnly);
     }
 
+    @SuppressWarnings("PMD.UseProperClassLoader")
     private <T> T wrap(Class<T> contract, T target, TransactionTemplate template) {
         Object proxy = Proxy.newProxyInstance(
             contract.getClassLoader(),
@@ -72,23 +74,25 @@ public class TransactionalUseCaseFactory {
     ) throws IllegalAccessException, InvocationTargetException {
         Object[] arguments = args == null ? new Object[0] : args;
 
-        // equals, hashCode and toString route through the handler too. Left to fall
-        // through, printing a proxied use case in a log line opens a transaction.
         if (method.getDeclaringClass() == Object.class) {
             return method.invoke(target, arguments);
         }
 
-        return template.execute(status -> {
-            try {
-                return method.invoke(target, arguments);
-            } catch (InvocationTargetException e) {
-                // Unwrap, or every DomainException reaches the exception handler
-                // disguised as a reflection failure and maps to 500.
-                throw sneakyThrow(e.getTargetException());
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException(e);
-            }
-        });
+        return template.execute(status -> proceed(target, method, arguments));
+    }
+
+    @SuppressFBWarnings(
+        value = "THROWS_METHOD_THROWS_RUNTIMEEXCEPTION",
+        justification = "Rethrows the use case's own exception unwrapped from reflection"
+    )
+    @Nullable private static Object proceed(Object target, Method method, Object... arguments) {
+        try {
+            return method.invoke(target, arguments);
+        } catch (InvocationTargetException e) {
+            throw sneakyThrow(e.getTargetException());
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @SuppressWarnings("unchecked")

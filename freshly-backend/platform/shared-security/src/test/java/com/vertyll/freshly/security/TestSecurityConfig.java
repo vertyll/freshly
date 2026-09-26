@@ -19,8 +19,7 @@ public class TestSecurityConfig {
 
     @Bean
     @Primary
-    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-    SecurityFilterChain permissiveFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain permissiveFilterChain(HttpSecurity http) {
         return http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
             .build();

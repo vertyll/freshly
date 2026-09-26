@@ -9,18 +9,7 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 
-/**
- * Checks the platform against its own rules.
- *
- * <p>
- * Lives in {@code bootstrap} because that is the only project whose classpath carries
- * both the whole platform and every module — which is exactly what
- * {@code platformDoesNotDependOnAnyModule} needs in order to be able to fail. Run it
- * anywhere narrower and the forbidden classes are simply absent, and it passes for the
- * wrong reason.
- */
 class PlatformArchitectureTest {
-
     private final JavaClasses classes =
             new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
                 .importPackages("com.vertyll.freshly");

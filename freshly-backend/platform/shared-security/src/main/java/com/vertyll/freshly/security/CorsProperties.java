@@ -15,12 +15,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "application.cors")
 public record CorsProperties(List<String> allowedOrigins, List<String> allowedMethods) {
-
     private static final String ORIGINS_REQUIRED = "application.cors.allowed-origins must name at least one origin";
 
     public CorsProperties {
-        // Enforced, not merely documented: an empty list binds without complaint and the
-        // API answers every browser request with a CORS failure instead of failing here.
         if (allowedOrigins == null || allowedOrigins.isEmpty()) {
             throw new IllegalArgumentException(ORIGINS_REQUIRED);
         }

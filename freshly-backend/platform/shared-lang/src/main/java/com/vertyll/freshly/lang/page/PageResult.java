@@ -21,7 +21,6 @@ import static java.util.Objects.requireNonNull;
  * @param <T> a domain model
  */
 public record PageResult<T>(List<T> content, int page, int size, long totalElements) {
-
     private static final String CONTENT_CANNOT_BE_NULL = "Content cannot be null";
     private static final String PAGE_NEGATIVE = "Page index must not be negative";
     private static final String SIZE_NOT_POSITIVE = "Page size must be positive";
@@ -30,8 +29,6 @@ public record PageResult<T>(List<T> content, int page, int size, long totalEleme
     public PageResult {
         content = List.copyOf(requireNonNull(content, CONTENT_CANNOT_BE_NULL));
 
-        // The same bounds PageRequest enforces on the way in. Without them a negative
-        // size reaches totalPages, and a negative page count is answered to the client.
         if (page < 0) {
             throw new IllegalArgumentException(PAGE_NEGATIVE);
         }

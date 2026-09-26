@@ -24,24 +24,7 @@ import com.tngtech.archunit.core.importer.ImportOption;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Every {@code DomainError} key is declared by some module's catalogue, in every language.
- *
- * <p>
- * At run time a missing text renders as its key, which is visible but only to whoever
- * reaches that screen. This catches the same gap before anything is deployed.
- *
- * <p>
- * It checks the catalogues rather than a properties file, because the catalogues are now
- * the source of truth. Both sides are discovered reflectively, so a new module is covered
- * the moment it exists rather than when somebody remembers to extend a list.
- *
- * <p>
- * It does <em>not</em> check the database. Overrides are an administrator's business and
- * may legitimately be missing; what must always exist is a default.
- */
 class ErrorMessageCoverageTest {
-
     private static final List<String> LANGUAGES = List.of("en", "pl");
 
     private final JavaClasses classes =
@@ -79,9 +62,6 @@ class ErrorMessageCoverageTest {
     void keysAreDeclaredOnce() {
         List<String> keys = catalogues().stream().flatMap(catalogue -> catalogue.defaults().keySet().stream()).toList();
 
-        // Two modules declaring one key would overwrite each other's text on alternate
-        // boots. `TranslationKey.refreshDefaults` refuses it at runtime; this fails the
-        // build instead, which is a much better place to find out.
         List<String> duplicated =
                 keys.stream().filter(key -> keys.stream().filter(key::equals).count() > 1).distinct().toList();
 
@@ -223,10 +203,6 @@ class ErrorMessageCoverageTest {
             .collect(Collectors.toUnmodifiableSet());
     }
 
-    /**
-     * Catalogues are {@code @Component}s but carry no constructor dependencies, so they can
-     * be built without a container — which keeps this test in milliseconds.
-     */
     private static TranslationCatalogue instantiate(Class<?> type) {
         try {
             return (TranslationCatalogue) type.getDeclaredConstructor().newInstance();

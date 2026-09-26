@@ -37,14 +37,11 @@ import lombok.extern.slf4j.Slf4j;
 @EnableCaching
 @Slf4j
 public class CacheConfig {
-
     @Bean
     CacheManager cacheManager(List<CacheSpec> specs) {
         Set<String> names = specs.stream().map(CacheSpec::name).collect(Collectors.toUnmodifiableSet());
 
         if (names.size() != specs.size()) {
-            // Two modules asking for the same cache name would share entries without
-            // either knowing, which is why the naming convention prefixes the context.
             log.warn("Duplicate cache names among {} declarations: {}", specs.size(), names);
         }
 

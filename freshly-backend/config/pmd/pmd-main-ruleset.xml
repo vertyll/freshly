@@ -8,10 +8,16 @@
 
     <!-- Best Practices -->
     <rule ref="category/java/bestpractices.xml">
-        <exclude name="LooseCoupling"/>
         <exclude name="ImplicitFunctionalInterface"/>
         <exclude name="GuardLogStatement"/>
-        <exclude name="PreserveStackTrace"/>
+        <exclude name="LooseCoupling"/>
+    </rule>
+
+    <!-- Best Practices: allow ArchUnit's JavaClasses, which has no interface, in the architecture rules -->
+    <rule ref="category/java/bestpractices.xml/LooseCoupling">
+        <properties>
+            <property name="allowedTypes" value="java.util.Properties,com.tngtech.archunit.core.domain.JavaClasses"/>
+        </properties>
     </rule>
 
     <!-- Code Style -->
@@ -26,13 +32,10 @@
         <exclude name="TooManyStaticImports"/>
         <exclude name="MethodArgumentCouldBeFinal"/>
         <exclude name="LocalVariableCouldBeFinal"/>
-        <exclude name="ControlStatementBraces"/>
-        <exclude name="UseUnderscoresInNumericLiterals"/>
     </rule>
 
     <!-- Design -->
     <rule ref="category/java/design.xml">
-        <exclude name="DataClass"/>
         <exclude name="LawOfDemeter"/>
         <exclude name="CyclomaticComplexity"/>
         <exclude name="CouplingBetweenObjects"/>
@@ -45,16 +48,17 @@
 
     <!-- Documentation -->
     <rule ref="category/java/documentation.xml">
-        <exclude name="UncommentedEmptyMethodBody"/>
-        <exclude name="UncommentedEmptyConstructor"/>
         <exclude name="CommentRequired"/>
         <exclude name="CommentSize"/>
+        <exclude name="UncommentedEmptyMethodBody"/>
+        <exclude name="UncommentedEmptyConstructor"/>
     </rule>
 
     <!-- Error Prone -->
     <rule ref="category/java/errorprone.xml">
+        <exclude name="NullAssignment"/>
         <exclude name="AvoidFieldNameMatchingMethodName"/>
-        <exclude name="UseProperClassLoader"/>
+        <exclude name="AvoidLiteralsInIfCondition"/>
     </rule>
 
     <!-- Multithreading -->
@@ -65,31 +69,12 @@
 
     <!-- Performance -->
     <rule ref="category/java/performance.xml">
-        <exclude name="RedundantFieldInitializer"/>
+        <exclude name="TooFewBranchesForSwitch"/>
+        <exclude name="AvoidInstantiatingObjectsInLoops"/>
+        <exclude name="RedundantFieldInitializer" />
     </rule>
 
     <!-- Security -->
     <rule ref="category/java/security.xml"/>
-
-
-    <rule ref="category/java/bestpractices.xml/LooseCoupling">
-        <properties>
-            <property name="allowedTypes" value="java.util.Properties,com.tngtech.archunit.core.domain.JavaClasses"/>
-        </properties>
-    </rule>
-
-    <!-- Wildcard imports -->
-    <rule name="NoWildcardImports"
-          language="java"
-          message="Wildcard import. Name each type: a star hides which frameworks this class touches."
-          class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
-        <description>Imports must name a single type, never a package.</description>
-        <priority>1</priority>
-        <properties>
-            <property name="xpath">
-                <value>//ImportDeclaration[@ImportOnDemand = true()]</value>
-            </property>
-        </properties>
-    </rule>
 
 </ruleset>

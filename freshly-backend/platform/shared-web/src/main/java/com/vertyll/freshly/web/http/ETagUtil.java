@@ -19,14 +19,11 @@ import com.vertyll.freshly.lang.error.DomainException;
  * {@code OptimisticLockingFailureException} from inside the hexagon.
  */
 public final class ETagUtil {
-
     private static final String WEAK_PREFIX = "W/\"";
     private static final String QUOTE = "\"";
 
     private static final String ANY = "*";
 
-    // One entity-tag, weak or strong, and nothing else. RFC 9110 also allows a
-    // comma-separated list, which carries no single version and is refused as malformed.
     private static final Pattern ENTITY_TAG = Pattern.compile("^(?:W/)?\"(\\d{1,18})\"$");
 
     private ETagUtil() {
@@ -77,7 +74,6 @@ public final class ETagUtil {
         if (!matcher.matches()) {
             throw new DomainException(IfMatchError.MALFORMED, Map.of("value", value));
         }
-        // At most 18 digits, so this cannot overflow a long.
         return Long.valueOf(matcher.group(1));
     }
 }

@@ -4,7 +4,6 @@ plugins {
 
 dependencies {
     api(project(":modules:auth:auth-application"))
-    implementation(project(":modules:auth:auth-domain"))
 
     implementation(project(":modules:useraccess:useraccess-application"))
     implementation(project(":modules:notification:notification-application"))

@@ -50,7 +50,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class GlobalExceptionHandler {
-
     static final int ADVICE_ORDER = Ordered.HIGHEST_PRECEDENCE + 10;
 
     private static final String ACCESS_DENIED = "error.security.accessDenied";
@@ -75,7 +74,6 @@ public class GlobalExceptionHandler {
         HttpStatus status = ErrorHttpStatusMapper.statusOf(exception.error().kind());
 
         if (exception.error().kind() == ErrorKind.MISCONFIGURED) {
-            // Our fault, not the caller's, and the only 5xx worth a stack trace here.
             log.error("Misconfiguration: {} params={}", exception.error().key(), exception.params(), exception);
         } else {
             log.debug("Rejected request: {} params={}", exception.error().key(), exception.params());
@@ -86,8 +84,6 @@ public class GlobalExceptionHandler {
             exception.error().key(),
             exception.params(),
             request,
-            // The interpolation arguments also travel as an extension member, so a client
-            // that wants its own wording has the values and not just the sentence.
             exception.params().isEmpty() ? Map.of() : Map.of(PARAMS, exception.params())
         );
     }
@@ -125,9 +121,6 @@ public class GlobalExceptionHandler {
         List<FieldViolation> fields = new ArrayList<>();
 
         for (FieldError error : exception.getBindingResult().getFieldErrors()) {
-            // A field error can also come from a programmatic `reject`, which has no
-            // constraint behind it. Falling back keeps one such error from turning the
-            // whole 400 into a 500.
             String code;
             Map<String, Object> params;
             try {
@@ -163,9 +156,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ProblemDetail handleTypeMismatch(MethodArgumentTypeMismatchException exception, WebRequest request) {
-        // The submitted value is deliberately not echoed back: it is un sanitised request
-        // content, and reflecting it into a response body is how that becomes somebody's
-        // problem.
         log.debug("Unparseable request parameter '{}'", exception.getName());
 
         Map<String, Object> params = Map.of("parameter", exception.getName());
@@ -307,15 +297,7 @@ public class GlobalExceptionHandler {
         WebRequest request,
         Map<String, Object> properties
     ) {
-        return Problems.of(
-            status,
-            code,
-            // Falls back to the key when no bundle has it. Ugly and diagnosable, which
-            // beats a 500 or a generic sentence that loses the only useful information.
-            messages.resolve(code, arguments),
-            instanceOf(request),
-            properties
-        );
+        return Problems.of(status, code, messages.resolve(code, arguments), instanceOf(request), properties);
     }
 
     private static String instanceOf(WebRequest request) {

@@ -35,7 +35,6 @@ import static com.tngtech.archunit.library.GeneralCodingRules.NO_CLASSES_SHOULD_
  */
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class FreshlyArchitectureTest {
-
     private final String basePackage;
     private final JavaClasses classes;
 
@@ -104,8 +103,6 @@ public abstract class FreshlyArchitectureTest {
     void domainDoesNotUseLombok() {
         FreshlyArchitectureRules.domainDoesNotUseLombok(basePackage).check(classes);
     }
-
-    // --- ArchUnit's own general coding rules ---
 
     @Test
     @DisplayName("nothing writes to standard streams")

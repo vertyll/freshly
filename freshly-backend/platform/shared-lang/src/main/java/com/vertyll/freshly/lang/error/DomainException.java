@@ -17,16 +17,12 @@ import static java.util.Objects.requireNonNull;
  * subclass overriding it would change how every module's refusals are answered.
  */
 public final class DomainException extends RuntimeException {
-
     @Serial
     private static final long serialVersionUID = 1L;
 
     private static final String ERROR_CANNOT_BE_NULL = "Domain error cannot be null";
     private static final String PARAMS_CANNOT_BE_NULL = "Params cannot be null";
 
-    // Not transient, deliberately. Every DomainError is an enum and Map.copyOf is
-    // serializable, so both survive a round trip — and transient would leave the two
-    // accessors returning null from methods this package's @NullMarked declares non-null.
     private final DomainError error;
 
     /** Values the translated message interpolates, e.g. the id that was not found. */

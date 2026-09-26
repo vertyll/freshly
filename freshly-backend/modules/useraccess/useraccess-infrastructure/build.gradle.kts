@@ -4,9 +4,7 @@ plugins {
 
 dependencies {
     api(project(":modules:useraccess:useraccess-application"))
-    implementation(project(":modules:useraccess:useraccess-domain"))
 
-    implementation(libs.spring.boot.starter.data.mongodb)
     implementation(libs.bundles.spring.boot.starters.oauth)
     implementation(libs.spring.boot.starter.security)
     implementation(libs.springdoc.openapi.starter.webmvc.ui)

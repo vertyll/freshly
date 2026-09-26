@@ -33,7 +33,6 @@ import jakarta.validation.metadata.ConstraintDescriptor;
  * attribute.
  */
 final class ConstraintCodes {
-
     private static final String PREFIX = "validation.";
     private static final String FALLBACK = PREFIX + "invalid";
 
@@ -70,8 +69,6 @@ final class ConstraintCodes {
 
     static String codeOf(String annotationSimpleName) {
         String suffix = BY_ANNOTATION.get(annotationSimpleName);
-        // An unmapped constraint — a custom one, or one added to Jakarta later — falls back
-        // rather than failing. A generic sentence beats a 500 raised while reporting a 400.
         return suffix == null ? FALLBACK : PREFIX + suffix;
     }
 
@@ -80,7 +77,6 @@ final class ConstraintCodes {
     }
 
     static Map<String, Object> paramsOf(Map<String, Object> attributes) {
-        // No null check on the value: an annotation member cannot hold null.
         Map<String, Object> params = new LinkedHashMap<>();
         attributes.forEach((name, value) -> {
             if (INTERESTING.contains(name)) {
@@ -90,7 +86,6 @@ final class ConstraintCodes {
         return params;
     }
 
-    // Every descriptor carries its annotation; Bean Validation builds one from the other.
     private static String annotationNameOf(ConstraintDescriptor<?> descriptor) {
         return descriptor.getAnnotation().annotationType().getSimpleName();
     }

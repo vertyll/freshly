@@ -25,7 +25,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
  * domain concept, so no module should own it.
  */
 public class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
-
     private static final String REALM_ACCESS_CLAIM = "realm_access";
     private static final String ROLES_KEY = "roles";
     private static final String ROLE_PREFIX = "ROLE_";
@@ -42,8 +41,6 @@ public class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<Gra
             return List.of();
         }
 
-        // Pattern-matched rather than cast: an unchecked cast on a claim controlled by an
-        // external issuer is a ClassCastException waiting for a Keycloak upgrade.
         return roleNames.stream()
             .map(KeycloakRealmRoleConverter::nonBlankString)
             .filter(Objects::nonNull)

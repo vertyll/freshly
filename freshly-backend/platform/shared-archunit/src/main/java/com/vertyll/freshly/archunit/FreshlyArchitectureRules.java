@@ -26,7 +26,6 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
  * clearer message; ArchUnit covers the cases it structurally cannot reach.
  */
 public final class FreshlyArchitectureRules {
-
     private static final String DOMAIN = "Domain";
     private static final String APPLICATION = "Application";
     private static final String INFRASTRUCTURE = "Infrastructure";
@@ -56,10 +55,6 @@ public final class FreshlyArchitectureRules {
 
     private FreshlyArchitectureRules() {
     }
-
-    // ------------------------------------------------------------------
-    // Inside one bounded context
-    // ------------------------------------------------------------------
 
     public static ArchRule layering(String base) {
         return layeredArchitecture().consideringOnlyDependenciesInLayers()
@@ -193,10 +188,6 @@ public final class FreshlyArchitectureRules {
             );
     }
 
-    // ------------------------------------------------------------------
-    // Between bounded contexts
-    // ------------------------------------------------------------------
-
     /**
      * The rule a distributed system gets for free.
      *
@@ -251,8 +242,6 @@ public final class FreshlyArchitectureRules {
                         + "the anti-corruption adapter in infrastructure satisfies it"
             );
     }
-
-    // ------------------------------------------------------------------
 
     public static List<ArchRule> all(String base) {
         return List.of(

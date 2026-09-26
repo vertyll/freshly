@@ -31,7 +31,6 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class PermissionMethodAuthorizationManager implements AuthorizationManager<MethodInvocation> {
-
     private final PermissionEvaluator permissions;
 
     @Override
@@ -49,14 +48,9 @@ public class PermissionMethodAuthorizationManager implements AuthorizationManage
 
         RequireAnyPermission anyOf = find(method, invocation, RequireAnyPermission.class);
         if (anyOf != null) {
-            // copyOf, not Set.of: the latter throws on a repeated value, so an annotation
-            // naming one permission twice would fail every request to that handler.
             return new AuthorizationDecision(permissions.permitsAny(roles, Set.copyOf(Arrays.asList(anyOf.value()))));
         }
 
-        // No annotation means this manager should not have been consulted. Abstaining
-        // (null) rather than denying lets the filter chain's own rules decide, which is
-        // what happens for `@PublicEndpoint` and `@ScopedToCaller` handlers.
         return null;
     }
 

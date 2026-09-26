@@ -26,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class MessageResolver {
-
     private final TranslationResolver translations;
 
     /**
@@ -52,9 +51,6 @@ public class MessageResolver {
      * the wrong way round produces a sentence that is wrong rather than one that is broken.
      */
     public String resolve(String key, Map<String, Object> arguments) {
-        // The primary language, not the full tag. The store is keyed by language, and the
-        // resolver caches by what it is handed — so a full tag would give `en`, `en-US`
-        // and `en-GB` three entries holding the same text, keyed off a request header.
         String languageTag = LocaleContextHolder.getLocale().getLanguage();
 
         String pattern = translations.resolve(key, languageTag).orElse(key);

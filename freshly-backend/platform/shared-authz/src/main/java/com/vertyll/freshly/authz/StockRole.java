@@ -22,7 +22,6 @@ import static java.util.Objects.requireNonNull;
  *     rather than when somebody remembers to tick its boxes.
  */
 public record StockRole(String role, boolean unrestricted, Set<String> permissions) {
-
     private static final Pattern ROLE_FORMAT = Pattern.compile("^[A-Z][A-Z0-9_]*$");
 
     public StockRole {
@@ -32,8 +31,6 @@ public record StockRole(String role, boolean unrestricted, Set<String> permissio
         }
         permissions = Set.copyOf(requireNonNull(permissions, "Stock role permissions cannot be null"));
 
-        // An unrestricted role holds everything, so a list alongside the flag is a list
-        // nothing reads — and the author of it believes those are the permissions granted.
         if (unrestricted && !permissions.isEmpty()) {
             throw new IllegalArgumentException(
                 "Unrestricted role '" + role + "' must not also name permissions: " + permissions
@@ -47,8 +44,6 @@ public record StockRole(String role, boolean unrestricted, Set<String> permissio
     }
 
     public static StockRole granting(String role, String... permissions) {
-        // copyOf, not Set.of: a module naming one permission twice is a harmless typo,
-        // and Set.of would turn it into a boot failure naming neither role nor value.
         return new StockRole(role, false, Set.copyOf(Arrays.asList(permissions)));
     }
 }

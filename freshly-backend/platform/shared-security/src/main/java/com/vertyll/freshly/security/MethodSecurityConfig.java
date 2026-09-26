@@ -34,7 +34,6 @@ import com.vertyll.freshly.web.security.RequirePermission;
 @EnableMethodSecurity
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class MethodSecurityConfig {
-
     @Bean
     PermissionMethodAuthorizationManager permissionMethodAuthorizationManager(@Lazy PermissionEvaluator permissions) {
         return new PermissionMethodAuthorizationManager(permissions);
@@ -58,7 +57,6 @@ public class MethodSecurityConfig {
     ) {
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
         String name = annotation.getName();
-        // Both forms, so the annotation works on a class as well as on a method.
         pointcut.setExpression("@annotation(" + name + ") || @within(" + name + ")");
 
         return new DefaultPointcutAdvisor(pointcut, new AuthorizationManagerBeforeMethodInterceptor(pointcut, manager));
