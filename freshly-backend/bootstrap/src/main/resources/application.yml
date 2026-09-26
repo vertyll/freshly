@@ -1,8 +1,6 @@
 spring:
   application:
     name: freshly-backend
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:local}
   mvc:
     problemdetails:
       enabled: true
@@ -10,20 +8,48 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 5MB
+  data:
+    mongodb:
+      auto-index-creation: true
+  mail:
+    properties:
+      mail:
+        smtp:
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+server:
+  port: 8080
+  shutdown: graceful
+  servlet:
+    context-path: /api/v1
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,metrics,info
+        include: health
   endpoint:
     health:
+      show-details: never
       probes:
         enabled: true
 
 springdoc:
   default-produces-media-type: application/json
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 
-server:
-  servlet:
-    context-path: /api/v1/
+application:
+  jwt:
+    expiration:
+      email-verification: 24h
+      password-reset: 30m
+  airquality:
+    gios:
+      base-url: https://api.gios.gov.pl/pjp-api/v1/rest
+      connect-timeout: 5s
+      read-timeout: 20s

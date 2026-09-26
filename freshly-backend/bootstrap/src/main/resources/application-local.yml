@@ -1,23 +1,9 @@
 spring:
-  data:
-    mongodb:
-      uri: mongodb://freshly:freshly@localhost:27017/freshly?authSource=admin
-      auto-index-creation: true
+  mongodb:
+    uri: mongodb://localhost:27017/freshly
   mail:
     host: localhost
     port: 1025
-    username: vertyll
-    password: vertyll
-    properties:
-      mail:
-        smtp:
-          trust: "*"
-          auth: false
-          starttls:
-            enable: false
-          connectiontimeout: 5000
-          timeout: 3000
-          writetimeout: 5000
   security:
     oauth2:
       resourceserver:
@@ -34,34 +20,22 @@ application:
   mail:
     from: no-reply@freshly.local
   jwt:
-    secret: ${APP_JWT_SECRET:bG9jYWwtb25seS1kZXZlbG9wbWVudC1rZXktbm90LWEtc2VjcmV0}
-    expiration:
-      email-verification: 24h
-      password-reset: 30m
+    secret: bG9jYWwtb25seS1kZXZlbG9wbWVudC1rZXktbm90LWEtc2VjcmV0
   frontend:
     url: http://localhost:4200
+  cors:
+    allowed-origins: http://localhost:4200
+  airquality:
+    sync:
+      enabled: true
   keycloak:
     server-url: http://localhost:9000
     realm: freshly
     admin-client-id: freshly-service-account
-    admin-client-secret: ${APP_KEYCLOAK_ADMIN_SECRET}
-    public-client-id: freshly-app-client
-  airquality:
-    sync:
-      enabled: ${APP_AIRQUALITY_SYNC_ENABLED:true}
-    gios:
-      base-url: https://api.gios.gov.pl/pjp-api/v1/rest
-      connect-timeout: 5s
-      read-timeout: 20s
-  cors:
-    allowed-origins:
-      - http://localhost:4200
-
-server:
-  port: 8080
+    admin-client-secret: local-service-account-secret
+    user-client-id: freshly-app-client
+    user-client-secret: local-app-client-secret
 
 logging:
   level:
-    root: INFO
     com.vertyll.freshly: DEBUG
-    org.springframework.mail: DEBUG
