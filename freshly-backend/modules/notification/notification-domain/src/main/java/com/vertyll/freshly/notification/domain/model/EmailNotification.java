@@ -11,6 +11,7 @@ import com.vertyll.freshly.notification.domain.error.NotificationError;
 
 import static java.util.Objects.requireNonNull;
 
+@SuppressWarnings("PMD.DataClass")
 public final class EmailNotification {
     private static final String RECIPIENT_NULL = "Recipient cannot be null";
     private static final String TEMPLATE_NULL = "Template cannot be null";

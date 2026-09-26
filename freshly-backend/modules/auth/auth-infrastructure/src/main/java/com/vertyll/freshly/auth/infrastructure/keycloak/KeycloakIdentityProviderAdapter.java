@@ -127,7 +127,7 @@ public class KeycloakIdentityProviderAdapter implements IdentityProviderPort {
         try {
             users().get(userId.toString()).resetPassword(passwordOf(newPassword));
         } catch (NotFoundException e) {
-            throw new DomainException(AuthError.USER_NOT_FOUND, Map.of(USER_ID, userId));
+            throw new DomainException(AuthError.USER_NOT_FOUND, Map.of(USER_ID, userId), e);
         } catch (BadRequestException e) {
             log.warn("Keycloak refused the new password for user {}", userId, e);
             throw new DomainException(AuthError.WEAK_PASSWORD, Map.of(), e);
@@ -151,7 +151,7 @@ public class KeycloakIdentityProviderAdapter implements IdentityProviderPort {
         try {
             users().get(userId.toString()).update(representation);
         } catch (NotFoundException e) {
-            throw new DomainException(AuthError.USER_NOT_FOUND, Map.of(USER_ID, userId));
+            throw new DomainException(AuthError.USER_NOT_FOUND, Map.of(USER_ID, userId), e);
         } catch (WebApplicationException | ProcessingException e) {
             log.error("Keycloak update failed for user {}", userId, e);
             throw new DomainException(AuthError.IDENTITY_PROVIDER_UNAVAILABLE, Map.of(), e);

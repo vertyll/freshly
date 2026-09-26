@@ -1,5 +1,7 @@
 package com.vertyll.freshly.auth.infrastructure.keycloak;
 
+import java.util.Map;
+
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
@@ -110,10 +112,10 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
 
         } catch (RestClientResponseException e) {
             if (e.getStatusCode().is4xxClientError()) {
-                throw new DomainException(onRejection);
+                throw new DomainException(onRejection, Map.of(), e);
             }
             log.error("Keycloak token endpoint failed with {}", e.getStatusCode(), e);
-            throw new DomainException(AuthError.IDENTITY_PROVIDER_UNAVAILABLE);
+            throw new DomainException(AuthError.IDENTITY_PROVIDER_UNAVAILABLE, Map.of(), e);
         }
     }
 

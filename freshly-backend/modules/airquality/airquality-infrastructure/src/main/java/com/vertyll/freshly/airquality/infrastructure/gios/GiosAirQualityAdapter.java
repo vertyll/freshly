@@ -121,6 +121,7 @@ public class GiosAirQualityAdapter implements AirQualityProviderPort {
             try {
                 return fetch(path, type, variables);
             } catch (RestClientException e) {
+                e.addSuppressed(throttled);
                 throw unavailable(path, e);
             }
         } catch (RestClientException e) {

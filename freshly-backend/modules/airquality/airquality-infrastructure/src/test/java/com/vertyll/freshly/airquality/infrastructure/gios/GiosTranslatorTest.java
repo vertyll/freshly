@@ -148,7 +148,7 @@ class GiosTranslatorTest {
 
             assertThat(station.city()).isEqualTo("Warszawa");
             assertThat(station.address()).isEqualTo("ul. Kondratowicza 8");
-            assertThat(station.coordinates().longitude()).isEqualTo(21.042458);
+            assertThat(station.coordinates().longitude()).isEqualTo(21.042_458);
         }
 
         @Test

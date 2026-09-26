@@ -40,6 +40,8 @@ import com.vertyll.freshly.web.security.ScopedToCaller;
 
 import lombok.RequiredArgsConstructor;
 
+import static java.util.Objects.requireNonNull;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -155,7 +157,7 @@ public class AuthController {
     }
 
     private static String refreshCookiePath() {
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path(AUTH_PATH).build().getPath();
+        return requireNonNull(ServletUriComponentsBuilder.fromCurrentContextPath().path(AUTH_PATH).build().getPath());
     }
 
     private static ResponseCookie expiredRefreshCookie() {

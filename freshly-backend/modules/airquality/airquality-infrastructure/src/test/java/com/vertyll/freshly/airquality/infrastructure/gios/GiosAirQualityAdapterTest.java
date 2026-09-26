@@ -58,7 +58,7 @@ class GiosAirQualityAdapterTest {
         assertThat(first.name()).isEqualTo("Warszawa, ul. Kondratowicza");
         assertThat(first.city()).isEqualTo("Warszawa");
         assertThat(first.address()).isEqualTo("ul. Kondratowicza 8");
-        assertThat(first.coordinates().latitude()).isEqualTo(52.290864);
+        assertThat(first.coordinates().latitude()).isEqualTo(52.290_864);
         server.verify();
     }
 

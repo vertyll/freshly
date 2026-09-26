@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.crypto.SecretKey;
@@ -77,7 +78,7 @@ public final class JwtVerificationTokenAdapter implements VerificationTokenPort 
             return new VerificationToken(UUID.fromString(subject), email, expectedPurpose);
         } catch (IllegalArgumentException e) {
             log.warn("Token subject is not a UUID");
-            throw new DomainException(AuthError.TOKEN_MALFORMED);
+            throw new DomainException(AuthError.TOKEN_MALFORMED, Map.of(), e);
         }
     }
 
@@ -85,12 +86,12 @@ public final class JwtVerificationTokenAdapter implements VerificationTokenPort 
         try {
             return Jwts.parser().verifyWith(signingKey).build().parseSignedClaims(token).getPayload();
         } catch (ExpiredJwtException e) {
-            throw new DomainException(AuthError.TOKEN_EXPIRED);
+            throw new DomainException(AuthError.TOKEN_EXPIRED, Map.of(), e);
         } catch (JwtException e) {
             log.warn("Rejected verification token: {}", e.getClass().getSimpleName());
-            throw new DomainException(AuthError.TOKEN_INVALID);
+            throw new DomainException(AuthError.TOKEN_INVALID, Map.of(), e);
         } catch (IllegalArgumentException e) {
-            throw new DomainException(AuthError.TOKEN_MALFORMED);
+            throw new DomainException(AuthError.TOKEN_MALFORMED, Map.of(), e);
         }
     }
 
