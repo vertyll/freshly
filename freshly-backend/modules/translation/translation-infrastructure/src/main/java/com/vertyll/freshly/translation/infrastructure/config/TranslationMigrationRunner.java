@@ -25,7 +25,7 @@ public class TranslationMigrationRunner {
         TranslationMigrationUseCase migrations,
         List<TranslationMigration> declared
     ) {
-        return args -> {
+        return _ -> {
             int ran = 0;
 
             for (TranslationMigration migration : declared.stream()

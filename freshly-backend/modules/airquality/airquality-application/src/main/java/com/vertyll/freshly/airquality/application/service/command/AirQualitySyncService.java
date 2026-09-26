@@ -112,7 +112,8 @@ public class AirQualitySyncService implements AirQualitySyncUseCase {
                 .stream()
                 .filter(reading -> reading.value() != null)
                 .max(Comparator.comparing(SensorMeasurement.Reading::measuredAt))
-                .ifPresent(reading -> readings.put(sensor.pollutant(), reading.value()));
+                .map(SensorMeasurement.Reading::value)
+                .ifPresent(value -> readings.put(sensor.pollutant(), value));
         }
 
         return readings;

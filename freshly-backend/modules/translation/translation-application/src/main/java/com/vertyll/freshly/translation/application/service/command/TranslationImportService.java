@@ -102,7 +102,7 @@ public class TranslationImportService implements TranslationImportUseCase {
         String importedBy,
         List<ImportReport.RejectedRow> rejected
     ) {
-        @Nullable String currentDefault = key.defaults().get(row.language());
+        String currentDefault = key.defaults().get(row.language());
 
         if (row.text().equals(currentDefault)) {
             if (!key.overrides().containsKey(row.language())) {

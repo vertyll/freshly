@@ -26,7 +26,7 @@ public class TranslationCatalogueRegistrar {
         TranslationRegistrationUseCase registration,
         List<TranslationCatalogue> catalogues
     ) {
-        return args -> {
+        return _ -> {
             Set<String> declaredKeys = new HashSet<>();
             boolean complete = true;
             int total = 0;

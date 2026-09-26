@@ -53,7 +53,7 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
         form.add(USERNAME, username);
         form.add(PASSWORD, password);
 
-        return post(TOKEN_PATH, form, AuthError.INVALID_CREDENTIALS);
+        return post(form, AuthError.INVALID_CREDENTIALS);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
         form.add(GRANT_TYPE, REFRESH_TOKEN);
         form.add(REFRESH_TOKEN, refreshToken);
 
-        return post(TOKEN_PATH, form, AuthError.REFRESH_TOKEN_INVALID);
+        return post(form, AuthError.REFRESH_TOKEN_INVALID);
     }
 
     @Override
@@ -89,10 +89,10 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
         return form;
     }
 
-    private AuthTokens post(String path, MultiValueMap<String, String> form, AuthError onRejection) {
+    private AuthTokens post(MultiValueMap<String, String> form, AuthError onRejection) {
         try {
             KeycloakTokenResponse response = restClient.post()
-                .uri(path, properties.realm())
+                .uri(TOKEN_PATH, properties.realm())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body(form)
                 .retrieve()

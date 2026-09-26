@@ -60,7 +60,7 @@ public class TransactionalUseCaseFactory {
             new Class<?>[] {
                 contract
             },
-            (instance, method, args) -> invoke(target, template, method, args)
+            (_, method, args) -> invoke(target, template, method, args)
         );
         return contract.cast(proxy);
     }
@@ -78,7 +78,7 @@ public class TransactionalUseCaseFactory {
             return method.invoke(target, arguments);
         }
 
-        return template.execute(status -> proceed(target, method, arguments));
+        return template.execute(_ -> proceed(target, method, arguments));
     }
 
     @SuppressFBWarnings(

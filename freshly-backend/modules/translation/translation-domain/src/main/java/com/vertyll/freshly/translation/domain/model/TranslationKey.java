@@ -90,10 +90,6 @@ public final class TranslationKey {
         declared = false;
     }
 
-    public boolean isOrphanWithoutEdits() {
-        return !declared && overrides.isEmpty();
-    }
-
     public void reassignTo(String newContext) {
         context = requireNonNull(newContext, CONTEXT_NULL);
     }

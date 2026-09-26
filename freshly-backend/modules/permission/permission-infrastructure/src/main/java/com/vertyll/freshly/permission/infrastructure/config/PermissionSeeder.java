@@ -21,7 +21,7 @@ public class PermissionSeeder {
 
     @Bean
     ApplicationRunner seedStockRoles(RoleAuthorityCommandUseCase roles, List<PermissionCatalogue> catalogues) {
-        return args -> {
+        return _ -> {
             catalogues.forEach(PermissionSeeder::requireOwnPermissions);
 
             Set<StockRole> stockRoles = catalogues.stream()
