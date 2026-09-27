@@ -39,12 +39,12 @@ registrar populate their collections on first boot.
 
 **Mongo has to run as a replica set**, a single node included. Every inbound port goes through
 a transaction, and multi-document transactions are not available on a standalone server — so a
-standalone one starts and then fails at the first write. `docker-compose.dev.yml` starts it as
+standalone one starts and then fails at the first write. `docker-compose.local.yml` starts it as
 one, together with Keycloak (realm and client secrets from `docker/keycloak/realm-export.json`)
 and maildev:
 
 ```bash
-docker compose -f ../docker-compose.dev.yml up -d   # Mongo :27017, Keycloak :9000, maildev :1025/:1080
+docker compose -f ../docker-compose.local.yml up -d   # Mongo :27017, Keycloak :9000, maildev :1025/:1080
 SPRING_PROFILES_ACTIVE=local ./gradlew :bootstrap:bootRun
 ```
 

@@ -14,10 +14,10 @@
         <exclude name="LooseCoupling"/>
     </rule>
 
-    <!-- Best Practices: allow ArchUnit's JavaClasses, which has no interface, in tests -->
+    <!-- Best Practices: allow types that have no interface (MongoDB's Document, ArchUnit's JavaClasses) -->
     <rule ref="category/java/bestpractices.xml/LooseCoupling">
         <properties>
-            <property name="allowedTypes" value="java.util.Properties,com.tngtech.archunit.core.domain.JavaClasses"/>
+            <property name="allowedTypes" value="java.util.Properties,org.bson.Document,com.tngtech.archunit.core.domain.JavaClasses"/>
         </properties>
     </rule>
 

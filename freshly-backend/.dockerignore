@@ -31,7 +31,6 @@ LICENSE
 
 ### Cache & Package Managers ###
 **/.gradle/
-**/.mvn/
 **/.m2/
 **/node_modules/
 
@@ -43,4 +42,3 @@ LICENSE
 **/Dockerfile
 **/docker-compose*.yml
 **/docker/
-**/docker-entrypoint.sh

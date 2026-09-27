@@ -1,6 +1,7 @@
-### Code editor files ###
-.idea
-.vscode
+### IDE ###
+.idea/
+.vscode/
+*.iml
 
 ### OS ###
 .DS_Store
@@ -8,3 +9,5 @@ Thumbs.db
 
 ### Environment ###
 .env
+.env.*
+!.env.example
