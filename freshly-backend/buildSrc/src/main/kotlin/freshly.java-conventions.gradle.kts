@@ -159,6 +159,12 @@ tasks.withType<Javadoc>().configureEach {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    jvmArgumentProviders.add(
+        CommandLineArgumentProvider {
+            classpath.filter { it.name.startsWith("mockito-core") }.files.map { "-javaagent:${it.absolutePath}" } +
+                "-Xshare:off"
+        },
+    )
 
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
 
