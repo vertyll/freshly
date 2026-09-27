@@ -26,8 +26,6 @@ public final class VersionGuard {
         @Nullable Long expected,
         Supplier<DomainException> onMismatch
     ) {
-        Objects.requireNonNull(onMismatch, "onMismatch supplier cannot be null");
-
         if (expected == null) {
             return;
         }

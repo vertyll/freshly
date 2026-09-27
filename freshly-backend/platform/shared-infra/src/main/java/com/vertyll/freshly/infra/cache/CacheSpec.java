@@ -25,7 +25,7 @@ public record CacheSpec(String name) {
     private static final String NAME_BLANK = "Cache name cannot be blank";
 
     public CacheSpec {
-        if (name == null || name.isBlank()) {
+        if (name.isBlank()) {
             throw new IllegalArgumentException(NAME_BLANK);
         }
     }
