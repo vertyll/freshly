@@ -1,15 +1,13 @@
 [versions]
 java = "25"
 
-# Plugins
 spring-boot = "4.1.1"
 spring-dependency-management = "1.1.7"
 spotless = "8.10.3"
 errorprone-gradle-plugin = "5.1.1"
 nullaway-gradle-plugin = "3.2.0"
-spotbugs-gradle-plugin = "6.5.11"
+spotbugs-gradle-plugin = "6.5.12"
 
-# Dependencies
 errorprone = "2.50.0"
 nullaway = "0.14.2"
 beta-checker = "1.0"
@@ -30,17 +28,14 @@ archunit = "1.5.1"
 testcontainers = "2.0.5"
 
 [libraries]
-# Build plugins used by buildSrc
 spring-dependency-management-gradle-plugin = { module = "io.spring.gradle:dependency-management-plugin", version.ref = "spring-dependency-management" }
 spotless-gradle-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 errorprone-gradle-plugin = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorprone-gradle-plugin" }
 nullaway-gradle-plugin = { module = "net.ltgt.gradle:gradle-nullaway-plugin", version.ref = "nullaway-gradle-plugin" }
 spotbugs-gradle-plugin = { module = "com.github.spotbugs.snom:spotbugs-gradle-plugin", version.ref = "spotbugs-gradle-plugin" }
 
-# BOM
 spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 
-# Spring Boot starters
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 spring-boot-starter-data-mongodb = { module = "org.springframework.boot:spring-boot-starter-data-mongodb" }
 spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
@@ -51,7 +46,6 @@ spring-boot-starter-validation = { module = "org.springframework.boot:spring-boo
 spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
 spring-boot-devtools = { module = "org.springframework.boot:spring-boot-devtools" }
 
-# Spring Boot test starters
 spring-boot-starter-data-mongodb-test = { module = "org.springframework.boot:spring-boot-starter-data-mongodb-test" }
 spring-boot-starter-mail-test = { module = "org.springframework.boot:spring-boot-starter-mail-test" }
 spring-boot-starter-security-oauth2-resource-server-test = { module = "org.springframework.boot:spring-boot-starter-security-oauth2-resource-server-test" }
@@ -61,7 +55,6 @@ spring-boot-starter-validation-test = { module = "org.springframework.boot:sprin
 spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
 spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
 
-# Spring Framework without a starter
 spring-aop = { module = "org.springframework:spring-aop" }
 spring-context = { module = "org.springframework:spring-context" }
 spring-tx = { module = "org.springframework:spring-tx" }
@@ -70,7 +63,6 @@ jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations
 slf4j-api = { module = "org.slf4j:slf4j-api" }
 thymeleaf-extras-springsecurity6 = { module = "org.thymeleaf.extras:thymeleaf-extras-springsecurity6" }
 
-# Libraries
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
@@ -84,14 +76,12 @@ springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openap
 icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
 poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi" }
 
-# Static analysis
 errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
 nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
 guava-beta-checker = { module = "com.google.guava:guava-beta-checker", version.ref = "beta-checker" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs" }
 findsecbugs = { module = "com.h3xstream.findsecbugs:findsecbugs-plugin", version.ref = "findsecbugs" }
 
-# Testing
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 assertj-core = { module = "org.assertj:assertj-core" }
