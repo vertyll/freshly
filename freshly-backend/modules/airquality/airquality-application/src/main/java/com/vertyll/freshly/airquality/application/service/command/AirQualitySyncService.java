@@ -94,7 +94,7 @@ public class AirQualitySyncService implements AirQualitySyncUseCase {
 
             Map<Pollutant, Double> readings = latestReadings(station.id());
 
-            history.save(AirQualityMeasurement.record(station, index.get(), readings, index.get().calculatedAt()));
+            history.save(AirQualityMeasurement.of(station, index.get(), readings, index.get().calculatedAt()));
 
             return Outcome.SYNCED;
 

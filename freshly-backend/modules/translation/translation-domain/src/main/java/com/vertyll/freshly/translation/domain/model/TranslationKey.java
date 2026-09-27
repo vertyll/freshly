@@ -19,8 +19,8 @@ import static java.util.Objects.requireNonNull;
 public final class TranslationKey {
     private static final String KEY_NULL = "Translation key cannot be null";
     private static final String CONTEXT_NULL = "Owning context cannot be null";
-    private static final String KEY = "key";
-    private static final String LANGUAGE = "language";
+    private static final String KEY_PARAM = "key";
+    private static final String LANGUAGE_PARAM = "language";
 
     private static final Pattern SEGMENT_SEPARATOR = Pattern.compile("\\.");
     private static final Pattern FIRST_SEGMENT = Pattern.compile("[a-z][a-zA-Z0-9]*");
@@ -76,7 +76,7 @@ public final class TranslationKey {
         if (!context.equals(owningContext)) {
             throw new DomainException(
                 TranslationError.KEY_OWNED_BY_ANOTHER_CONTEXT,
-                Map.of(KEY, key, "owner", context, "claimant", owningContext)
+                Map.of(KEY_PARAM, key, "owner", context, "claimant", owningContext)
             );
         }
         requireRenderable(key, newDefaults, grammar);
@@ -102,12 +102,12 @@ public final class TranslationKey {
         SupportedLanguage.require(languageTag);
 
         if (text.isBlank()) {
-            throw new DomainException(TranslationError.BLANK_OVERRIDE, Map.of(KEY, key));
+            throw new DomainException(TranslationError.BLANK_OVERRIDE, Map.of(KEY_PARAM, key));
         }
         grammar.rejectionReason(languageTag, text).ifPresent(reason -> {
             throw new DomainException(
                 TranslationError.INVALID_PATTERN,
-                Map.of(KEY, key, LANGUAGE, languageTag, "reason", reason)
+                Map.of(KEY_PARAM, key, LANGUAGE_PARAM, languageTag, "reason", reason)
             );
         });
         requireSamePlaceholders(languageTag, text, grammar);
@@ -119,7 +119,10 @@ public final class TranslationKey {
         SupportedLanguage.require(languageTag);
 
         if (overrides.remove(languageTag) == null) {
-            throw new DomainException(TranslationError.OVERRIDE_NOT_FOUND, Map.of(KEY, key, LANGUAGE, languageTag));
+            throw new DomainException(
+                TranslationError.OVERRIDE_NOT_FOUND,
+                Map.of(KEY_PARAM, key, LANGUAGE_PARAM, languageTag)
+            );
         }
     }
 
@@ -189,9 +192,9 @@ public final class TranslationKey {
         throw new DomainException(
             TranslationError.PLACEHOLDER_MISMATCH,
             Map.of(
-                KEY,
+                KEY_PARAM,
                 key,
-                LANGUAGE,
+                LANGUAGE_PARAM,
                 languageTag,
                 "expected",
                 new TreeSet<>(expected).toString(),
@@ -205,7 +208,7 @@ public final class TranslationKey {
         texts.forEach((languageTag, text) -> grammar.rejectionReason(languageTag, text).ifPresent(reason -> {
             throw new DomainException(
                 TranslationError.INVALID_PATTERN,
-                Map.of(KEY, key, LANGUAGE, languageTag, "reason", reason)
+                Map.of(KEY_PARAM, key, LANGUAGE_PARAM, languageTag, "reason", reason)
             );
         }));
     }
@@ -213,7 +216,7 @@ public final class TranslationKey {
     private static String requireValidKey(String candidate) {
         String value = requireNonNull(candidate, KEY_NULL).trim();
         if (!isValidKey(value)) {
-            throw new DomainException(TranslationError.INVALID_KEY_FORMAT, Map.of(KEY, value));
+            throw new DomainException(TranslationError.INVALID_KEY_FORMAT, Map.of(KEY_PARAM, value));
         }
         return value;
     }

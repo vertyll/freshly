@@ -35,12 +35,13 @@ import jakarta.validation.metadata.ConstraintDescriptor;
 final class ConstraintCodes {
     private static final String PREFIX = "validation.";
     private static final String FALLBACK = PREFIX + "invalid";
+    private static final String REQUIRED = "required";
 
     /** Constraint annotation simple name to key suffix. */
     private static final Map<String, String> BY_ANNOTATION = Map.ofEntries(
-        Map.entry("NotNull", "required"),
-        Map.entry("NotBlank", "required"),
-        Map.entry("NotEmpty", "required"),
+        Map.entry("NotNull", REQUIRED),
+        Map.entry("NotBlank", REQUIRED),
+        Map.entry("NotEmpty", REQUIRED),
         Map.entry("Size", "size"),
         Map.entry("Min", "min"),
         Map.entry("Max", "max"),

@@ -14,6 +14,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
  * source set, so the platform is checked on every build like any module.
  */
 public final class PlatformArchitectureRules {
+    private static final String LANG_PACKAGES = "com.vertyll.freshly.lang..";
 
     /**
      * Listed rather than written as one alternation.
@@ -26,7 +27,7 @@ public final class PlatformArchitectureRules {
      * mode an architecture test must not have.
      */
     private static final String[] PLATFORM = {
-        "com.vertyll.freshly.lang..",
+        LANG_PACKAGES,
         "com.vertyll.freshly.authz..",
         "com.vertyll.freshly.i18n..",
         "com.vertyll.freshly.infra..",
@@ -46,7 +47,7 @@ public final class PlatformArchitectureRules {
 
     /** The framework-free platform modules, which an application layer may depend on. */
     private static final String[] FRAMEWORK_FREE_PLATFORM = {
-        "com.vertyll.freshly.lang..",
+        LANG_PACKAGES,
         "com.vertyll.freshly.authz..",
         "com.vertyll.freshly.i18n.."
     };
@@ -135,7 +136,7 @@ public final class PlatformArchitectureRules {
      */
     public static ArchRule sharedLanguageHoldsNoDomainConcept() {
         return noClasses().that()
-            .resideInAPackage("com.vertyll.freshly.lang..")
+            .resideInAPackage(LANG_PACKAGES)
             .should()
             .haveSimpleNameContaining("User")
             .orShould()

@@ -45,7 +45,7 @@ public final class AirQualityMeasurement {
         this.readings = copyReadings(readings);
     }
 
-    public static AirQualityMeasurement record(
+    public static AirQualityMeasurement of(
         Station station,
         AirQualityIndex index,
         Map<Pollutant, Double> readings,

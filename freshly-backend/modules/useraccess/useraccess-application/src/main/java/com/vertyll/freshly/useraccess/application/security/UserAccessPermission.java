@@ -4,13 +4,13 @@ import com.vertyll.freshly.authz.PermissionDescriptor;
 import com.vertyll.freshly.authz.PermissionScope;
 
 public enum UserAccessPermission implements PermissionDescriptor {
-    USERS_READ("users:read"),
-    USERS_CREATE("users:create"),
-    USERS_UPDATE("users:update"),
-    USERS_DELETE("users:delete"),
-    USERS_ACTIVATE("users:activate"),
-    USERS_DEACTIVATE("users:deactivate"),
-    USERS_MANAGE_ROLES("users:manageRoles");
+    USERS_READ(Values.USERS_READ),
+    USERS_CREATE(Values.USERS_CREATE),
+    USERS_UPDATE(Values.USERS_UPDATE),
+    USERS_DELETE(Values.USERS_DELETE),
+    USERS_ACTIVATE(Values.USERS_ACTIVATE),
+    USERS_DEACTIVATE(Values.USERS_DEACTIVATE),
+    USERS_MANAGE_ROLES(Values.USERS_MANAGE_ROLES);
 
     public static final String CONTEXT = "useraccess";
 

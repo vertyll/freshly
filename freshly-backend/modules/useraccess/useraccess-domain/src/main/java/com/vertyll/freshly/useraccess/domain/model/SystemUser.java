@@ -13,6 +13,8 @@ import com.vertyll.freshly.useraccess.domain.error.UserAccessError;
 import static java.util.Objects.requireNonNull;
 
 public final class SystemUser {
+    private static final String USER_ID_PARAM = "userId";
+
     private static final String KEYCLOAK_USER_ID_CANNOT_BE_NULL = "Keycloak user ID cannot be null";
     private static final String ROLES_CANNOT_BE_NULL = "Roles cannot be null";
 
@@ -43,21 +45,21 @@ public final class SystemUser {
 
     public void activate() {
         if (active) {
-            throw new DomainException(UserAccessError.USER_ALREADY_ACTIVE, Map.of("userId", keycloakUserId));
+            throw new DomainException(UserAccessError.USER_ALREADY_ACTIVE, Map.of(USER_ID_PARAM, keycloakUserId));
         }
         active = true;
     }
 
     public void deactivateBy(UUID actorId) {
         if (Objects.equals(keycloakUserId, actorId)) {
-            throw new DomainException(UserAccessError.SELF_DEACTIVATION, Map.of("userId", actorId));
+            throw new DomainException(UserAccessError.SELF_DEACTIVATION, Map.of(USER_ID_PARAM, actorId));
         }
         deactivate();
     }
 
     public void deactivate() {
         if (!active) {
-            throw new DomainException(UserAccessError.USER_ALREADY_INACTIVE, Map.of("userId", keycloakUserId));
+            throw new DomainException(UserAccessError.USER_ALREADY_INACTIVE, Map.of(USER_ID_PARAM, keycloakUserId));
         }
         active = false;
     }
