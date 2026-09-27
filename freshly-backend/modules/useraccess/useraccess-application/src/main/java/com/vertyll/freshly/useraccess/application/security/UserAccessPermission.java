@@ -12,7 +12,7 @@ public enum UserAccessPermission implements PermissionDescriptor {
     USERS_DEACTIVATE(Values.USERS_DEACTIVATE),
     USERS_MANAGE_ROLES(Values.USERS_MANAGE_ROLES);
 
-    public static final String CONTEXT = "useraccess";
+    public static final String CONTEXT_NAME = "useraccess";
 
     private final String value;
 
@@ -32,7 +32,7 @@ public enum UserAccessPermission implements PermissionDescriptor {
 
     @Override
     public String context() {
-        return CONTEXT;
+        return CONTEXT_NAME;
     }
 
     @SuppressWarnings("PMD.DataClass")

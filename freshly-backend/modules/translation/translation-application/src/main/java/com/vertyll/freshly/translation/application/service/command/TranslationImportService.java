@@ -1,6 +1,7 @@
 package com.vertyll.freshly.translation.application.service.command;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,36 +44,26 @@ public class TranslationImportService implements TranslationImportUseCase {
         List<ImportReport.RejectedRow> rejected = new ArrayList<>();
         Map<String, TranslationKey> touched = new LinkedHashMap<>();
 
-        int applied = 0;
-        int cleared = 0;
-        int unchanged = 0;
+        Map<Outcome, Integer> outcomes = new EnumMap<>(Outcome.class);
 
         for (ImportedTranslation row : command.rows()) {
             TranslationKey key = known.get(row.key());
             if (key == null) {
                 unknownKeys.add(row.key());
-                continue;
-            }
-            if (!languages.contains(row.language())) {
+            } else if (languages.contains(row.language())) {
+                Outcome outcome = apply(key, row, command.importedBy(), rejected);
+                outcomes.merge(outcome, 1, Integer::sum);
+                if (outcome == Outcome.APPLIED || outcome == Outcome.CLEARED) {
+                    touched.put(key.key(), key);
+                }
+            } else {
                 unknownLanguages.add(row.language());
-                continue;
-            }
-
-            Outcome outcome = apply(key, row, command.importedBy(), rejected);
-            switch (outcome) {
-                case APPLIED -> {
-                    applied++;
-                    touched.put(key.key(), key);
-                }
-                case CLEARED -> {
-                    cleared++;
-                    touched.put(key.key(), key);
-                }
-                case UNCHANGED -> unchanged++;
-                case REJECTED -> {
-                }
             }
         }
+
+        int applied = outcomes.getOrDefault(Outcome.APPLIED, 0);
+        int cleared = outcomes.getOrDefault(Outcome.CLEARED, 0);
+        int unchanged = outcomes.getOrDefault(Outcome.UNCHANGED, 0);
 
         translations.saveAll(touched.values());
         logger.info(

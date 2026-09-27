@@ -7,7 +7,7 @@ import com.vertyll.freshly.authz.CallerRoles;
 
 @Configuration(proxyBeanMethods = false)
 class OpenApiConfig {
-    static {
+    OpenApiConfig() {
         SpringDocUtils.getConfig().addRequestWrapperToIgnore(CallerRoles.class);
     }
 }

@@ -133,22 +133,31 @@ public class TranslationSpreadsheet {
 
         for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
             Row row = sheet.getRow(rowIndex);
-            if (row == null) {
-                continue;
-            }
-            String key = stringAt(formatter, row, KEY_COLUMN);
-            if (key.isEmpty()) {
-                continue;
-            }
-
-            for (int column = 0; column < languages.size(); column++) {
-                String text = stringAt(formatter, row, FIRST_LANGUAGE_COLUMN + column);
-                if (!text.isEmpty()) {
-                    rows.add(new ImportedTranslation(key, languages.get(column), text, rowIndex + 1));
-                }
+            if (row != null) {
+                rows.addAll(translationsOf(formatter, row, rowIndex + 1, languages));
             }
         }
         return rows;
+    }
+
+    private static List<ImportedTranslation> translationsOf(
+        DataFormatter formatter,
+        Row row,
+        int rowNumber,
+        List<String> languages
+    ) {
+        String key = stringAt(formatter, row, KEY_COLUMN);
+        if (key.isEmpty()) {
+            return List.of();
+        }
+        List<ImportedTranslation> translations = new ArrayList<>();
+        for (int column = 0; column < languages.size(); column++) {
+            String text = stringAt(formatter, row, FIRST_LANGUAGE_COLUMN + column);
+            if (!text.isEmpty()) {
+                translations.add(new ImportedTranslation(key, languages.get(column), text, rowNumber));
+            }
+        }
+        return translations;
     }
 
     private static String stringAt(DataFormatter formatter, Row row, int column) {

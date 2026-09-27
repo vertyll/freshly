@@ -15,7 +15,7 @@ public class AirQualityPermissionCatalogue implements PermissionCatalogue {
 
     @Override
     public String context() {
-        return AirQualityPermission.CONTEXT;
+        return AirQualityPermission.CONTEXT_NAME;
     }
 
     @Override

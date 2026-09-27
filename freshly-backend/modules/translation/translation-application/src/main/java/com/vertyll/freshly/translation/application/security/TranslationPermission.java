@@ -7,7 +7,7 @@ public enum TranslationPermission implements PermissionDescriptor {
     TRANSLATIONS_READ(Values.TRANSLATIONS_READ),
     TRANSLATIONS_EDIT(Values.TRANSLATIONS_EDIT);
 
-    public static final String CONTEXT = "translation";
+    public static final String CONTEXT_NAME = "translation";
 
     private final String value;
 
@@ -27,7 +27,7 @@ public enum TranslationPermission implements PermissionDescriptor {
 
     @Override
     public String context() {
-        return CONTEXT;
+        return CONTEXT_NAME;
     }
 
     public static final class Values {

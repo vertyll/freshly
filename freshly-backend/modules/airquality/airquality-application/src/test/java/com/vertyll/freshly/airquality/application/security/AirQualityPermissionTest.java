@@ -32,7 +32,7 @@ class AirQualityPermissionTest {
     void scopeAndContext() {
         assertThat(AirQualityPermission.values()).allSatisfy(permission -> {
             assertThat(permission.scope()).isEqualTo(PermissionScope.GLOBAL);
-            assertThat(permission.context()).isEqualTo(AirQualityPermission.CONTEXT);
+            assertThat(permission.context()).isEqualTo(AirQualityPermission.CONTEXT_NAME);
         });
     }
 

@@ -32,7 +32,7 @@ class UserAccessPermissionTest {
     void scopeAndContext() {
         assertThat(UserAccessPermission.values()).allSatisfy(permission -> {
             assertThat(permission.scope()).isEqualTo(PermissionScope.GLOBAL);
-            assertThat(permission.context()).isEqualTo(UserAccessPermission.CONTEXT);
+            assertThat(permission.context()).isEqualTo(UserAccessPermission.CONTEXT_NAME);
         });
     }
 

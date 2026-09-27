@@ -15,7 +15,7 @@ public class TranslationPermissionCatalogue implements PermissionCatalogue {
 
     @Override
     public String context() {
-        return TranslationPermission.CONTEXT;
+        return TranslationPermission.CONTEXT_NAME;
     }
 
     @Override

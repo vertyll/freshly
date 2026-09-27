@@ -32,7 +32,7 @@ class TranslationPermissionTest {
     void scopeAndContext() {
         assertThat(TranslationPermission.values()).allSatisfy(permission -> {
             assertThat(permission.scope()).isEqualTo(PermissionScope.GLOBAL);
-            assertThat(permission.context()).isEqualTo(TranslationPermission.CONTEXT);
+            assertThat(permission.context()).isEqualTo(TranslationPermission.CONTEXT_NAME);
         });
     }
 

@@ -7,7 +7,7 @@ public enum PermissionAdminPermission implements PermissionDescriptor {
     PERMISSIONS_READ(Values.PERMISSIONS_READ),
     PERMISSIONS_MANAGE(Values.PERMISSIONS_MANAGE);
 
-    public static final String CONTEXT = "permission";
+    public static final String CONTEXT_NAME = "permission";
 
     private final String value;
 
@@ -27,7 +27,7 @@ public enum PermissionAdminPermission implements PermissionDescriptor {
 
     @Override
     public String context() {
-        return CONTEXT;
+        return CONTEXT_NAME;
     }
 
     public static final class Values {

@@ -14,7 +14,7 @@ import com.vertyll.freshly.useraccess.application.security.UserAccessPermission;
 public class UserAccessPermissionCatalogue implements PermissionCatalogue {
     @Override
     public String context() {
-        return UserAccessPermission.CONTEXT;
+        return UserAccessPermission.CONTEXT_NAME;
     }
 
     @Override

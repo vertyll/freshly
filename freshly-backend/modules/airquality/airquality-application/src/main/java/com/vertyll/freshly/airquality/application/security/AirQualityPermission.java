@@ -7,7 +7,7 @@ public enum AirQualityPermission implements PermissionDescriptor {
     AIRQUALITY_SYNC(Values.AIRQUALITY_SYNC),
     AIRQUALITY_PURGE(Values.AIRQUALITY_PURGE);
 
-    public static final String CONTEXT = "airquality";
+    public static final String CONTEXT_NAME = "airquality";
 
     private final String value;
 
@@ -27,7 +27,7 @@ public enum AirQualityPermission implements PermissionDescriptor {
 
     @Override
     public String context() {
-        return CONTEXT;
+        return CONTEXT_NAME;
     }
 
     public static final class Values {

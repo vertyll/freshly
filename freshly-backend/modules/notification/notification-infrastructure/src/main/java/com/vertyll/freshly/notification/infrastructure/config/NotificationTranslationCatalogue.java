@@ -9,6 +9,13 @@ import com.vertyll.freshly.lang.i18n.TranslationCatalogue;
 
 @Component
 public class NotificationTranslationCatalogue implements TranslationCatalogue {
+    private static final String AUTOMATED_MESSAGE_EN =
+            "This is an automated message, please do not reply to this email.";
+    private static final String AUTOMATED_MESSAGE_PL =
+            "To jest wiadomość wygenerowana automatycznie, prosimy na nią nie odpowiadać.";
+    private static final String GREETING_EN = "Hi";
+    private static final String GREETING_PL = "Witaj,";
+
     @Override
     public String context() {
         return "notification";
@@ -37,16 +44,8 @@ public class NotificationTranslationCatalogue implements TranslationCatalogue {
                 "Link do resetowania hasła wygaśnie za godzinę."
             )
         );
-        defaults.put(
-            "email.passwordReset.footer",
-            Map.of(
-                "en",
-                "This is an automated message, please do not reply to this email.",
-                "pl",
-                "To jest wiadomość wygenerowana automatycznie, prosimy na nią nie odpowiadać."
-            )
-        );
-        defaults.put("email.passwordReset.greeting", Map.of("en", "Hi", "pl", "Witaj,"));
+        defaults.put("email.passwordReset.footer", Map.of("en", AUTOMATED_MESSAGE_EN, "pl", AUTOMATED_MESSAGE_PL));
+        defaults.put("email.passwordReset.greeting", Map.of("en", GREETING_EN, "pl", GREETING_PL));
         defaults.put(
             "email.passwordReset.ignore",
             Map.of(
@@ -66,16 +65,8 @@ public class NotificationTranslationCatalogue implements TranslationCatalogue {
             )
         );
         defaults.put("email.passwordReset.title", Map.of("en", "Reset Your Password", "pl", "Zresetuj swoje hasło"));
-        defaults.put(
-            "email.userRegistered.footer",
-            Map.of(
-                "en",
-                "This is an automated message, please do not reply to this email.",
-                "pl",
-                "To jest wiadomość wygenerowana automatycznie, prosimy na nią nie odpowiadać."
-            )
-        );
-        defaults.put("email.userRegistered.greeting", Map.of("en", "Hi", "pl", "Witaj,"));
+        defaults.put("email.userRegistered.footer", Map.of("en", AUTOMATED_MESSAGE_EN, "pl", AUTOMATED_MESSAGE_PL));
+        defaults.put("email.userRegistered.greeting", Map.of("en", GREETING_EN, "pl", GREETING_PL));
         defaults.put(
             "email.userRegistered.intro",
             Map.of(
@@ -119,16 +110,8 @@ public class NotificationTranslationCatalogue implements TranslationCatalogue {
                 "Ten link weryfikacyjny wygaśnie za 24 godziny."
             )
         );
-        defaults.put(
-            "email.verification.footer",
-            Map.of(
-                "en",
-                "This is an automated message, please do not reply to this email.",
-                "pl",
-                "To jest wiadomość wygenerowana automatycznie, prosimy na nią nie odpowiadać."
-            )
-        );
-        defaults.put("email.verification.greeting", Map.of("en", "Hi", "pl", "Witaj,"));
+        defaults.put("email.verification.footer", Map.of("en", AUTOMATED_MESSAGE_EN, "pl", AUTOMATED_MESSAGE_PL));
+        defaults.put("email.verification.greeting", Map.of("en", GREETING_EN, "pl", GREETING_PL));
         defaults.put(
             "email.verification.ignore",
             Map.of(

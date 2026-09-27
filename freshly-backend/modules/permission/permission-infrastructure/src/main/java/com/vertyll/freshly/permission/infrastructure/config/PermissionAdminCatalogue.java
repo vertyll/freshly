@@ -17,7 +17,7 @@ public class PermissionAdminCatalogue implements PermissionCatalogue {
 
     @Override
     public String context() {
-        return PermissionAdminPermission.CONTEXT;
+        return PermissionAdminPermission.CONTEXT_NAME;
     }
 
     @Override
