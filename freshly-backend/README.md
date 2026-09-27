@@ -45,7 +45,7 @@ and maildev:
 
 ```bash
 docker compose -f ../docker-compose.local.yml up -d   # Mongo :27017, Keycloak :9000, maildev :1025/:1080
-SPRING_PROFILES_ACTIVE=local ./gradlew :bootstrap:bootRun
+./gradlew :bootstrap:bootRun
 ```
 
 `application-local.yml` holds every value the local profile needs; `application-prod.yml`

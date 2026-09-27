@@ -1,6 +1,8 @@
 spring:
   application:
     name: freshly-backend
+  profiles:
+    default: local
   mvc:
     problemdetails:
       enabled: true
