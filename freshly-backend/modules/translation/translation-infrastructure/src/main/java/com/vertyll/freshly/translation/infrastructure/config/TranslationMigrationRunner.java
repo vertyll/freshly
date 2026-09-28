@@ -36,7 +36,8 @@ public class TranslationMigrationRunner {
                         ran++;
                     }
                 } catch (RuntimeException e) {
-                    log.error("Translation migration {} failed", migration.id(), e);
+                    log.error("Translation migration {} failed; later migrations wait for it", migration.id(), e);
+                    break;
                 }
             }
 
