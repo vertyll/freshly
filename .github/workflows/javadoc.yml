@@ -1,4 +1,4 @@
-name: Publish Javadoc
+name: Javadoc
 
 on:
   push:
@@ -21,6 +21,7 @@ concurrency:
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -29,7 +30,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Set up Java 25 (Azul Zulu)
+      - name: Set up Java 25
         uses: actions/setup-java@v6
         with:
           distribution: zulu
@@ -50,6 +51,7 @@ jobs:
           path: freshly-backend/build/docs/javadoc
 
   deploy:
+    name: Deploy
     needs: build
     runs-on: ubuntu-24.04
     environment:
