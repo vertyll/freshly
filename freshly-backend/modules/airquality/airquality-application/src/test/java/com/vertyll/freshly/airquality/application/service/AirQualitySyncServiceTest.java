@@ -47,7 +47,12 @@ class AirQualitySyncServiceTest {
     void setUp() {
         provider = new FakeProvider();
         history = new InMemoryHistory();
-        service = new AirQualitySyncService(provider, new ProviderCatalogue(provider), history, new RecordingUseCaseLogger());
+        service = new AirQualitySyncService(
+            provider,
+            new ProviderCatalogue(provider),
+            history,
+            new RecordingUseCaseLogger()
+        );
     }
 
     @Test

@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.vertyll.freshly.lang.error.DomainException;
+import com.vertyll.freshly.lang.logging.RecordingUseCaseLogger;
 import com.vertyll.freshly.useraccess.application.FakeRoleDirectory;
 import com.vertyll.freshly.useraccess.application.InMemorySystemUserRepository;
-import com.vertyll.freshly.lang.logging.RecordingUseCaseLogger;
 import com.vertyll.freshly.useraccess.application.command.CreateUserCommand;
 import com.vertyll.freshly.useraccess.application.command.ReplaceUserRolesCommand;
 import com.vertyll.freshly.useraccess.application.dto.UserResponse;

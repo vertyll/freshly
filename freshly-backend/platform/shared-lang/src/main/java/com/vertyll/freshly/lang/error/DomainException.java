@@ -26,7 +26,8 @@ public final class DomainException extends RuntimeException {
     private final DomainError error;
 
     /** Values the translated message interpolates, e.g. the id that was not found. */
-    private final transient Map<String, Object> params;
+    @SuppressWarnings("java:S1948")
+    private final Map<String, Object> params;
 
     public DomainException(DomainError error) {
         this(error, Map.of());
