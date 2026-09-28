@@ -180,6 +180,7 @@ class RegistrationServiceTest {
         }
     }
 
+    @SuppressWarnings("java:S1186")
     private static final class FakeIdentityProvider implements IdentityProviderPort {
         private final Map<UUID, NewIdentity> created = new HashMap<>();
         private final Set<UUID> enabled = new HashSet<>();
@@ -243,6 +244,7 @@ class RegistrationServiceTest {
         }
     }
 
+    @SuppressWarnings("java:S1186")
     private final class FakeProvisioning implements UserProvisioningPort {
         private final Map<UUID, Provisioned> provisioned = new HashMap<>();
         private final Set<UUID> activated = new HashSet<>();
@@ -279,6 +281,7 @@ class RegistrationServiceTest {
         }
     }
 
+    @SuppressWarnings("java:S1186")
     private static final class FakeNotifications implements UserNotificationPort {
         private final List<String> verificationsSent = new ArrayList<>();
         private final List<String> welcomesSent = new ArrayList<>();

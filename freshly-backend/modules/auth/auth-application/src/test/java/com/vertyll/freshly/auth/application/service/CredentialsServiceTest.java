@@ -177,6 +177,7 @@ class CredentialsServiceTest {
         }
     }
 
+    @SuppressWarnings("java:S1186")
     private static final class FakeIdentityProvider implements IdentityProviderPort {
         private final java.util.Map<UUID, IdentityUser> users = new java.util.HashMap<>();
         private final List<UUID> passwordChanges = new ArrayList<>();
@@ -226,6 +227,7 @@ class CredentialsServiceTest {
         }
     }
 
+    @SuppressWarnings("java:S1186")
     private static final class FakeNotifications implements UserNotificationPort {
         private final List<String> resetsSent = new ArrayList<>();
         private final List<String> verificationRecipients = new ArrayList<>();
@@ -279,6 +281,7 @@ class CredentialsServiceTest {
         }
     }
 
+    @SuppressWarnings("java:S1186")
     private static final class RecordingProvisioning implements UserProvisioningPort {
         private final List<UUID> deactivated = new ArrayList<>();
 

@@ -59,8 +59,9 @@ class UserAccessCommandServiceTest {
         void refusesDuplicate() {
             users.seed(SystemUser.create(USER, true, ROLES));
 
-            assertThatThrownBy(() -> service.createUser(new CreateUserCommand(USER, true, ROLES)))
-                .isInstanceOf(DomainException.class)
+            CreateUserCommand command = new CreateUserCommand(USER, true, ROLES);
+
+            assertThatThrownBy(() -> service.createUser(command)).isInstanceOf(DomainException.class)
                 .extracting(e -> ((DomainException) e).error())
                 .isEqualTo(UserAccessError.USER_ALREADY_EXISTS);
         }
@@ -71,8 +72,9 @@ class UserAccessCommandServiceTest {
             users.seed(SystemUser.create(USER, true, ROLES));
             int before = users.saveCount();
 
-            assertThatThrownBy(() -> service.createUser(new CreateUserCommand(USER, true, ROLES)))
-                .isInstanceOf(DomainException.class);
+            CreateUserCommand command = new CreateUserCommand(USER, true, ROLES);
+
+            assertThatThrownBy(() -> service.createUser(command)).isInstanceOf(DomainException.class);
 
             assertThat(users.saveCount()).isEqualTo(before);
         }
@@ -82,7 +84,9 @@ class UserAccessCommandServiceTest {
         void refusalCarriesTheId() {
             users.seed(SystemUser.create(USER, true, ROLES));
 
-            assertThatThrownBy(() -> service.createUser(new CreateUserCommand(USER, true, ROLES)))
+            CreateUserCommand command = new CreateUserCommand(USER, true, ROLES);
+
+            assertThatThrownBy(() -> service.createUser(command))
                 .asInstanceOf(InstanceOfAssertFactories.type(DomainException.class))
                 .extracting(DomainException::params)
                 .isEqualTo(Map.of("userId", USER));
