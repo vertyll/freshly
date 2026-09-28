@@ -28,7 +28,7 @@ import com.vertyll.freshly.airquality.domain.model.Station;
 import com.vertyll.freshly.airquality.domain.model.StationDistance;
 import com.vertyll.freshly.airquality.domain.repository.AirQualityHistoryRepository;
 import com.vertyll.freshly.airquality.domain.repository.StationCatalogue;
-import com.vertyll.freshly.lang.logging.UseCaseLogger;
+import com.vertyll.freshly.lang.logging.RecordingUseCaseLogger;
 import com.vertyll.freshly.lang.page.PageRequest;
 import com.vertyll.freshly.lang.page.PageResult;
 
@@ -47,7 +47,7 @@ class AirQualitySyncServiceTest {
     void setUp() {
         provider = new FakeProvider();
         history = new InMemoryHistory();
-        service = new AirQualitySyncService(provider, new ProviderCatalogue(provider), history, new NoOpLogger());
+        service = new AirQualitySyncService(provider, new ProviderCatalogue(provider), history, new RecordingUseCaseLogger());
     }
 
     @Test
@@ -232,24 +232,6 @@ class AirQualitySyncServiceTest {
         @Override
         public long deleteOlderThan(Instant threshold) {
             return 0L;
-        }
-    }
-
-    private static final class NoOpLogger implements UseCaseLogger {
-        @Override
-        public void debug(String message, Object... args) {
-        }
-
-        @Override
-        public void info(String message, Object... args) {
-        }
-
-        @Override
-        public void warn(String message, Object... args) {
-        }
-
-        @Override
-        public void error(String message, Object... args) {
         }
     }
 }

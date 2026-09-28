@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class VerificationLinks implements VerificationLinkFactory {
+    @SuppressWarnings("java:S1075")
     private static final String VERIFY_EMAIL_PATH = "/verify-email?token=";
+    @SuppressWarnings("java:S1075")
     private static final String RESET_PASSWORD_PATH = "/reset-password?token=";
 
     private final FrontendProperties frontend;

@@ -156,7 +156,7 @@ public class GiosAirQualityAdapter implements AirQualityProviderPort {
         try {
             Duration requested = Duration.ofSeconds(Long.parseLong(value.strip()));
             return requested.compareTo(MAX_RETRY_AFTER) > 0 ? MAX_RETRY_AFTER : requested;
-        } catch (NumberFormatException httpDate) {
+        } catch (NumberFormatException _) {
             return MAX_RETRY_AFTER;
         }
     }

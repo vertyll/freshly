@@ -35,6 +35,7 @@ public class SecurityConfig {
     };
 
     @Bean
+    @SuppressWarnings("java:S4502")
     SecurityFilterChain securityFilterChain(
         HttpSecurity http,
         CorsConfigurationSource corsConfigurationSource,

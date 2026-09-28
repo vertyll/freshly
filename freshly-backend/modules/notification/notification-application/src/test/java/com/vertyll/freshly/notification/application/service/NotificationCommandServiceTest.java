@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.vertyll.freshly.lang.error.DomainException;
-import com.vertyll.freshly.lang.logging.UseCaseLogger;
+import com.vertyll.freshly.lang.logging.RecordingUseCaseLogger;
 import com.vertyll.freshly.notification.application.command.SendEmailCommand;
 import com.vertyll.freshly.notification.application.port.outbound.EmailDispatchPort;
 import com.vertyll.freshly.notification.domain.error.NotificationError;
@@ -30,7 +30,7 @@ class NotificationCommandServiceTest {
     @BeforeEach
     void setUp() {
         dispatch = new RecordingDispatch();
-        service = new NotificationCommandService(dispatch, new NoOpLogger());
+        service = new NotificationCommandService(dispatch, new RecordingUseCaseLogger());
     }
 
     @Test
@@ -94,24 +94,6 @@ class NotificationCommandServiceTest {
                 throw failure;
             }
             dispatched.add(notification);
-        }
-    }
-
-    private static final class NoOpLogger implements UseCaseLogger {
-        @Override
-        public void debug(String message, Object... args) {
-        }
-
-        @Override
-        public void info(String message, Object... args) {
-        }
-
-        @Override
-        public void warn(String message, Object... args) {
-        }
-
-        @Override
-        public void error(String message, Object... args) {
         }
     }
 }

@@ -21,7 +21,7 @@ import com.vertyll.freshly.authz.PermissionDescriptor;
 import com.vertyll.freshly.authz.PermissionScope;
 import com.vertyll.freshly.authz.StockRole;
 import com.vertyll.freshly.lang.error.DomainException;
-import com.vertyll.freshly.lang.logging.UseCaseLogger;
+import com.vertyll.freshly.lang.logging.RecordingUseCaseLogger;
 import com.vertyll.freshly.permission.application.command.ReplaceRoleAuthorityCommand;
 import com.vertyll.freshly.permission.application.service.command.RoleAuthorityCommandService;
 import com.vertyll.freshly.permission.application.service.query.PermissionQueryService;
@@ -47,7 +47,7 @@ class PermissionServicesTest {
         roles = new InMemoryRoles();
         List<PermissionCatalogue> catalogues = List.of(new FakeCatalogue(Set.of(READ, DELETE)));
         queries = new PermissionQueryService(roles, catalogues);
-        commands = new RoleAuthorityCommandService(roles, catalogues, new NoOpLogger());
+        commands = new RoleAuthorityCommandService(roles, catalogues, new RecordingUseCaseLogger());
     }
 
     @Nested
@@ -274,24 +274,6 @@ class PermissionServicesTest {
         @Override
         public void deleteByRole(String role) {
             stored.remove(role);
-        }
-    }
-
-    private static final class NoOpLogger implements UseCaseLogger {
-        @Override
-        public void debug(String message, Object... args) {
-        }
-
-        @Override
-        public void info(String message, Object... args) {
-        }
-
-        @Override
-        public void warn(String message, Object... args) {
-        }
-
-        @Override
-        public void error(String message, Object... args) {
         }
     }
 }

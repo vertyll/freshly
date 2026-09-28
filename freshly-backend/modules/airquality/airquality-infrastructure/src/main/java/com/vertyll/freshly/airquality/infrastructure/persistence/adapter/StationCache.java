@@ -31,6 +31,7 @@ public class StationCache {
     }
 
     @CacheEvict(value = STATIONS_CACHE, allEntries = true)
+    @SuppressWarnings("java:S1186")
     public void refresh() {
     }
 

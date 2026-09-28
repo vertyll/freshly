@@ -22,6 +22,7 @@ public class CachedTranslationBundles {
     }
 
     @CacheEvict(value = BUNDLES_CACHE, allEntries = true)
+    @SuppressWarnings("java:S1186")
     public void invalidate() {
     }
 }

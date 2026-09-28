@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 final class KeycloakPasswordCheck {
+    @SuppressWarnings("java:S1075")
     private static final String TOKEN_PATH = "/realms/{realm}/protocol/openid-connect/token";
 
     private KeycloakPasswordCheck() {

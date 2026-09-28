@@ -1,9 +1,7 @@
-package com.vertyll.freshly.useraccess.application;
+package com.vertyll.freshly.lang.logging;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.vertyll.freshly.lang.logging.UseCaseLogger;
 
 public class RecordingUseCaseLogger implements UseCaseLogger {
     private final List<String> messages = new ArrayList<>();

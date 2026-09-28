@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import com.vertyll.freshly.i18n.IcuMessages;
 import com.vertyll.freshly.lang.i18n.TranslationMigration;
 import com.vertyll.freshly.lang.i18n.TranslationMigrationOperations;
-import com.vertyll.freshly.lang.logging.UseCaseLogger;
+import com.vertyll.freshly.lang.logging.RecordingUseCaseLogger;
 import com.vertyll.freshly.lang.page.PageRequest;
 import com.vertyll.freshly.lang.page.PageResult;
 import com.vertyll.freshly.translation.application.service.command.TranslationMigrationService;
@@ -58,7 +58,7 @@ class TranslationMigrationServiceTest {
             TranslationKey
                 .declare(OLD_KEY, "auth", Map.of("en", "This link has expired.", "pl", "Link wygasł."), GRAMMAR)
         );
-        service = new TranslationMigrationService(translations, applied, new NoOpLogger());
+        service = new TranslationMigrationService(translations, applied, new RecordingUseCaseLogger());
     }
 
     @Test
@@ -252,24 +252,6 @@ class TranslationMigrationServiceTest {
         @Override
         public PageResult<TranslationKey> search(String fragment, PageRequest pageRequest) {
             return PageResult.empty(pageRequest);
-        }
-    }
-
-    private static final class NoOpLogger implements UseCaseLogger {
-        @Override
-        public void debug(String message, Object... args) {
-        }
-
-        @Override
-        public void info(String message, Object... args) {
-        }
-
-        @Override
-        public void warn(String message, Object... args) {
-        }
-
-        @Override
-        public void error(String message, Object... args) {
         }
     }
 }

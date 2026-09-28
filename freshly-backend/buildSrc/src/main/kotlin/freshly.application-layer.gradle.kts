@@ -10,6 +10,7 @@ dependencies {
     api(project(":platform:shared-authz"))
 
     testImplementation(libs.findBundle("test-unit").get())
+    testImplementation(testFixtures(project(":platform:shared-lang")))
 }
 
 HexagonalClasspathCheck.register(project, "application layer")

@@ -24,7 +24,7 @@ import com.vertyll.freshly.auth.domain.error.AuthError;
 import com.vertyll.freshly.auth.domain.model.TokenPurpose;
 import com.vertyll.freshly.auth.domain.model.VerificationToken;
 import com.vertyll.freshly.lang.error.DomainException;
-import com.vertyll.freshly.lang.logging.UseCaseLogger;
+import com.vertyll.freshly.lang.logging.RecordingUseCaseLogger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -54,7 +54,7 @@ class CredentialsServiceTest {
             notifications,
             tokens,
             new FakeLinks(),
-            new NoOpLogger()
+            new RecordingUseCaseLogger()
         );
     }
 
@@ -310,24 +310,6 @@ class CredentialsServiceTest {
         @Override
         public String passwordResetLink(String token) {
             return "https://example.test/r?t=" + token;
-        }
-    }
-
-    private static final class NoOpLogger implements UseCaseLogger {
-        @Override
-        public void debug(String message, Object... args) {
-        }
-
-        @Override
-        public void info(String message, Object... args) {
-        }
-
-        @Override
-        public void warn(String message, Object... args) {
-        }
-
-        @Override
-        public void error(String message, Object... args) {
         }
     }
 }

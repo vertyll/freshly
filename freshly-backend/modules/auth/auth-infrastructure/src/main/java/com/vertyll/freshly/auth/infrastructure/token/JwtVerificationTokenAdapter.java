@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+@SuppressWarnings("java:S2143")
 public final class JwtVerificationTokenAdapter implements VerificationTokenPort {
     private static final String EMAIL_CLAIM = "email";
     private static final String PURPOSE_CLAIM = "type";

@@ -25,7 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
+    @SuppressWarnings("java:S1075")
     private static final String TOKEN_PATH = "/realms/{realm}/protocol/openid-connect/token";
+    @SuppressWarnings("java:S1075")
     private static final String LOGOUT_PATH = "/realms/{realm}/protocol/openid-connect/logout";
 
     private static final String GRANT_TYPE = "grant_type";

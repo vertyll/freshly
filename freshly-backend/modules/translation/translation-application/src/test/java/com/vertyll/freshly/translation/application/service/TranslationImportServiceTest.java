@@ -13,7 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.vertyll.freshly.i18n.IcuMessages;
-import com.vertyll.freshly.lang.logging.UseCaseLogger;
+import com.vertyll.freshly.lang.logging.RecordingUseCaseLogger;
 import com.vertyll.freshly.lang.page.PageRequest;
 import com.vertyll.freshly.lang.page.PageResult;
 import com.vertyll.freshly.translation.application.command.ImportTranslationsCommand;
@@ -55,7 +55,7 @@ class TranslationImportServiceTest {
         );
         translations
             .save(TranslationKey.declare(SIZE_KEY, "web", Map.of("en", "From {min} to {max} characters."), GRAMMAR));
-        service = new TranslationImportService(translations, GRAMMAR, new NoOpLogger());
+        service = new TranslationImportService(translations, GRAMMAR, new RecordingUseCaseLogger());
     }
 
     @Test
@@ -218,24 +218,6 @@ class TranslationImportServiceTest {
         @Override
         public PageResult<TranslationKey> search(String fragment, PageRequest pageRequest) {
             return PageResult.empty(pageRequest);
-        }
-    }
-
-    private static final class NoOpLogger implements UseCaseLogger {
-        @Override
-        public void debug(String message, Object... args) {
-        }
-
-        @Override
-        public void info(String message, Object... args) {
-        }
-
-        @Override
-        public void warn(String message, Object... args) {
-        }
-
-        @Override
-        public void error(String message, Object... args) {
         }
     }
 }

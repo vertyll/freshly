@@ -112,7 +112,7 @@ public class KeycloakIdentityProviderAdapter implements IdentityProviderPort {
     public Optional<IdentityUser> findById(UUID userId) {
         try {
             return Optional.of(toIdentityUser(users().get(userId.toString()).toRepresentation()));
-        } catch (NotFoundException e) {
+        } catch (NotFoundException _) {
             return Optional.empty();
         }
     }
