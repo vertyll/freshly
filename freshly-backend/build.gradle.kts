@@ -134,6 +134,10 @@ subprojects {
     }
 }
 
+tasks.named("sonar") {
+    dependsOn("testCodeCoverageReport")
+}
+
 sonar {
     properties {
         property("sonar.projectKey", "freshly")
