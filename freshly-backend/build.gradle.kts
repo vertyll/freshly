@@ -1,9 +1,15 @@
 plugins {
     base
+    `jacoco-report-aggregation`
     id("com.diffplug.spotless")
+    id("org.sonarqube")
 }
 
 description = "Air Quality Monitoring System - API"
+
+repositories {
+    mavenCentral()
+}
 
 spotless {
     format("buildLogic") {
@@ -96,5 +102,52 @@ tasks.register("docs") {
                 .replace("@@SPRING@@", cards(libraries.filterNot { it.frameworkFree }))
         )
         logger.lifecycle("Javadoc: ${landingPage.toURI()}")
+    }
+}
+
+dependencies {
+    jacocoAggregation(platform(libs.spring.boot.dependencies))
+    subprojects.filter { it.buildFile.exists() }.forEach { jacocoAggregation(it) }
+}
+
+reporting {
+    reports {
+        register<JacocoCoverageReport>("testCodeCoverageReport") {
+            testSuiteName = "test"
+        }
+    }
+}
+
+val aggregatedCoverage = layout.buildDirectory.file("reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml")
+
+tasks.named<JacocoReport>("testCodeCoverageReport") {
+    reports {
+        xml.required = true
+    }
+}
+
+subprojects {
+    sonar {
+        properties {
+            property("sonar.coverage.jacoco.xmlReportPaths", aggregatedCoverage.get().asFile.path)
+        }
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "freshly")
+        property("sonar.projectName", "freshly")
+        property("sonar.issue.ignore.multicriteria", "emailTables,emailAttributes,localSecrets,uploadLimitsYaml,jjwtDates")
+        property("sonar.issue.ignore.multicriteria.emailTables.ruleKey", "Web:S5257")
+        property("sonar.issue.ignore.multicriteria.emailTables.resourceKey", "**/templates/**/*.html")
+        property("sonar.issue.ignore.multicriteria.emailAttributes.ruleKey", "Web:S1827")
+        property("sonar.issue.ignore.multicriteria.emailAttributes.resourceKey", "**/templates/**/*.html")
+        property("sonar.issue.ignore.multicriteria.localSecrets.ruleKey", "java:S6437")
+        property("sonar.issue.ignore.multicriteria.localSecrets.resourceKey", "**/application-local.*")
+        property("sonar.issue.ignore.multicriteria.uploadLimitsYaml.ruleKey", "java:S5693")
+        property("sonar.issue.ignore.multicriteria.uploadLimitsYaml.resourceKey", "**/application*.yml")
+        property("sonar.issue.ignore.multicriteria.jjwtDates.ruleKey", "java:S2143")
+        property("sonar.issue.ignore.multicriteria.jjwtDates.resourceKey", "**/*Jwt*.java")
     }
 }

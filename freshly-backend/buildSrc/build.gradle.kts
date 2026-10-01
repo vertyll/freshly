@@ -13,4 +13,5 @@ dependencies {
     implementation(libs.errorprone.gradle.plugin)
     implementation(libs.nullaway.gradle.plugin)
     implementation(libs.spotbugs.gradle.plugin)
+    implementation(libs.sonarqube.gradle.plugin)
 }

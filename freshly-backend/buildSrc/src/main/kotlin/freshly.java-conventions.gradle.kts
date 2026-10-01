@@ -10,6 +10,7 @@ import net.ltgt.gradle.errorprone.errorprone
 plugins {
     java
     pmd
+    jacoco
     id("io.spring.dependency-management")
     id("com.diffplug.spotless")
     id("net.ltgt.errorprone")
@@ -29,6 +30,17 @@ val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(libs.findVersion("java").get().requiredVersion))
+    }
+}
+
+jacoco {
+    toolVersion = libs.findVersion("jacoco").get().requiredVersion
+}
+
+tasks.withType<JacocoReport>().configureEach {
+    dependsOn(tasks.withType<Test>())
+    reports {
+        xml.required = true
     }
 }
 
