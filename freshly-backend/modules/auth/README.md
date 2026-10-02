@@ -24,15 +24,12 @@ controller therefore sees the same thing it saw before — a Keycloak JWT checke
 resource server — whether the caller is a browser with a session or a client with a bearer
 token.
 
-This is the shape of the VEDS gateway (`/auth/authorize`, `/auth/callback`, `/auth/session`,
-`/auth/logout` and a token relay), in a servlet application rather than a reactive gateway.
-
 ## The shape
 
-| Layer          | What lives there                                                         |
-|----------------|--------------------------------------------------------------------------|
-| domain         | `AuthSession` (who, which roles, the tokens, when the access token expires), `AuthError` |
-| application    | `SessionUseCase` and `SessionService`; ports `TokenIssuerPort`, `UserProvisioningPort` |
+| Layer          | What lives there                                                                                                      |
+|----------------|-----------------------------------------------------------------------------------------------------------------------|
+| domain         | `AuthSession` (who, which roles, the tokens, when the access token expires), `AuthError`                              |
+| application    | `SessionUseCase` and `SessionService`; ports `TokenIssuerPort`, `UserProvisioningPort`                                |
 | infrastructure | `KeycloakTokenIssuerAdapter`, `AuthController`, `BrowserSessions`, `SessionTokenRelayFilter`, the ACL to `useraccess` |
 
 `useraccess` is the only neighbour, reached through `infrastructure/acl`.
