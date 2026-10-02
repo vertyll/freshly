@@ -15,7 +15,5 @@ public interface UserAccessCommandUseCase {
 
     void deactivateUser(UUID userId, UUID actorId, @Nullable Long expectedVersion);
 
-    void deactivateUser(UUID userId, @Nullable Long expectedVersion);
-
     UserResponse replaceUserRoles(ReplaceUserRolesCommand command);
 }

@@ -22,19 +22,19 @@ spring:
         gios:
           truststore:
             certificate: classpath:certs/certum-trusted-root-ca.pem
-  mail:
-    properties:
-      mail:
-        smtp:
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
 
 server:
   port: 8080
   shutdown: graceful
   servlet:
     context-path: /api/v1
+    session:
+      timeout: 10h
+      cookie:
+        name: FRESHLY_SESSION
+        http-only: true
+        secure: true
+        same-site: lax
 
 management:
   endpoints:
@@ -55,10 +55,6 @@ springdoc:
     enabled: false
 
 application:
-  jwt:
-    expiration:
-      email-verification: 24h
-      password-reset: 30m
   airquality:
     gios:
       base-url: https://api.gios.gov.pl/pjp-api/v1/rest

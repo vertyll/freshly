@@ -13,10 +13,11 @@ on everything it holds. The criteria below are what keep `platform/` from becomi
 > A type belongs in the platform only if **two or more contexts genuinely need the same
 > one**, and it carries **no domain meaning**.
 
-"Could plausibly be shared" is not the bar. `Email` stayed in `notification` even though
-`auth` also handles addresses, because they are not the same concept: one is a delivery
-target, the other an identity attribute. Merging them would create exactly the coupling
-this rule exists to prevent, and the merged type would immediately need to satisfy both.
+"Could plausibly be shared" is not the bar. `auth`'s `AuthSession` and `useraccess`'s
+`SystemUser` both describe a person and both carry roles, and they stay apart because they are
+not the same concept: one is a signed-in browser and its tokens, the other a standing inside
+the application. Merging them would create exactly the coupling this rule exists to prevent,
+and the merged type would immediately need to satisfy both.
 
 ---
 
@@ -63,8 +64,7 @@ Framework-free, so it can appear in an application layer's signature.
 It carries `IcuMessages` — compile-check a message pattern, report its placeholders, render
 it — and the ICU4J dependency that makes those possible.
 
-Two projects use it: `shared-web`, which renders every problem detail and every e-mail
-subject, and `translation-infrastructure`, which supplies the `MessageGrammar` the aggregate
+Two projects use it: `shared-web`, which renders every problem detail, and `translation-infrastructure`, which supplies the `MessageGrammar` the aggregate
 validates against. Neither is a bounded context's inner layer, so the obvious alternative is
 to put the class in `shared-web` and have the translation context depend on the web platform
 for it. That reads wrong the moment it is written down: nothing about compiling a message
@@ -142,7 +142,7 @@ own defaults without anything central to edit.
 A role scope — `GLOBAL` against `PROJECT`, say — is per **resource**, not per bounded
 context: it earns its place when a person can manage one project and merely watch another.
 Freshly has no such resource — a measuring
-station has no owner, a notification has no team — so a scope discriminator would be a field
+station has no owner, a measurement has no team — so a scope discriminator would be a field
 in the key of every authorization lookup for a requirement that does not exist.
 
 Roles stay global and stay in Keycloak, because a role is a statement about a *person*
@@ -165,10 +165,10 @@ capabilities — be dismantled.
 
 ## What deliberately stays unshared
 
-**Configuration properties.** `KeycloakProperties`, `JwtProperties`, `MailProperties` and
-`GiosProperties` each live in the infrastructure of the one module that reads them. Held
-centrally they would be reachable by every module, which puts the identity-provider admin
-secret and the SMTP password on the compile path of code that draws charts.
+**Configuration properties.** `KeycloakProperties`, `AuthProperties` and `GiosProperties`
+each live in the infrastructure of the one module that reads them. Held centrally they would
+be reachable by every module, which puts the identity-provider client secret on the compile
+path of code that draws charts.
 
 `useraccess` declaring its own `KeycloakRealmProperties` over the same prefix as `auth`'s is
 this rule working, not duplication to remove: the two modules read the provider for
@@ -188,7 +188,7 @@ differ in exactly the thing that matters — which ports exist and which are tra
 so a shared abstraction over them would be a configuration format for something that is
 already configuration.
 
-**Domain value objects.** `Email` is in `notification`. `Station` is in `airquality`. Two
+**Domain value objects.** `AuthSession` is in `auth`. `Station` is in `airquality`. Two
 contexts modeling a similar-sounding thing differently is the point of bounded contexts,
 not a duplication to eliminate.
 

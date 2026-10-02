@@ -18,16 +18,10 @@ import lombok.RequiredArgsConstructor;
  * A {@code MessageSource} backed by the translation store.
  *
  * <p>
- * There are no {@code messages_*.properties} in this application, and the Thymeleaf
- * e-mail templates resolve {@code #{email.verification.title}} through Spring's
- * {@code MessageSource} without knowing anything about this application's ports. Without
- * this bridge, thirty-three such expressions across three templates render silently as
- * {@code ??email.verification.title_pl??}.
- *
- * <p>
- * Registered as the primary {@code MessageSource}, which also means anything else in the
- * application reaching for one — a Spring internal, a library — gets the same text an
- * administrator edits, rather than a second source of truth nobody remembers exists.
+ * There are no {@code messages_*.properties} in this application. Registered as the primary
+ * {@code MessageSource}, this means anything reaching for one — a Spring internal, a
+ * library — gets the same text an administrator edits, rather than a second source of
+ * truth nobody remembers exists.
  *
  * <p>
  * Implements the interface rather than extending {@code AbstractMessageSource}, whose

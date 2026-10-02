@@ -34,6 +34,12 @@ class FreshlyApplicationTest {
     }
 
     @Test
+    void servesTheLegalPagesWithoutToken() throws Exception {
+        mockMvc.perform(get("/legal/terms.html")).andExpect(status().isOk());
+        mockMvc.perform(get("/legal/privacy.html")).andExpect(status().isOk());
+    }
+
+    @Test
     void rejectsProtectedEndpointsWithoutToken() throws Exception {
         mockMvc.perform(get("/users")).andExpect(status().isUnauthorized());
     }

@@ -15,18 +15,6 @@ spring:
         internal-ca:
           truststore:
             certificate: ${INTERNAL_CA_CERT}
-  mail:
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
   security:
     oauth2:
       resourceserver:
@@ -34,12 +22,9 @@ spring:
           issuer-uri: ${KEYCLOAK_ISSUER_URI}
 
 application:
-  mail:
-    from: ${MAIL_FROM}
-  jwt:
-    secret: ${JWT_SECRET}
-  frontend:
-    url: ${FRONTEND_URL}
+  auth:
+    callback-url: ${AUTH_CALLBACK_URL}
+    post-login-url: ${AUTH_POST_LOGIN_URL}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS}
   airquality:

@@ -1,6 +1,6 @@
 # Freshly — backend
 
-Air quality monitoring. A **modular monolith**: one process, six bounded contexts, each
+Air quality monitoring. A **modular monolith**: one process, five bounded contexts, each
 internally a hexagon.
 
 ## Layout
@@ -18,11 +18,10 @@ freshly-backend/
 │   └── shared-archunit/         the rules, as tests
 ├── modules/
 │   ├── useraccess/              ← reference module; clone this shape
-│   ├── notification/
 │   ├── permission/
 │   ├── airquality/
 │   ├── translation/             editable UI text; see docs/translations.md
-│   └── auth/
+│   └── auth/                    browser sessions on Keycloak's hosted sign-in pages
 └── bootstrap/                   the only bootJar; owns application*.yml and i18n profiles: `local` (default) and `prod`
 ```
 
@@ -41,12 +40,19 @@ registrar populate their collections on first boot.
 a transaction, and multi-document transactions are not available on a standalone server — so a
 standalone one starts and then fails at the first write. `docker-compose.local.yml` starts it as
 one, together with Keycloak (realm and client secrets from `docker/keycloak/realm-export.json`)
-and maildev:
+and maildev, which receives Keycloak's e-mails:
 
 ```bash
 docker compose -f ../docker-compose.local.yml up -d   # Mongo :27017, Keycloak :9000, maildev :1025/:1080
 ./gradlew :bootstrap:bootRun
 ```
+
+Sign in at <http://localhost:8080/api/v1/auth/authorize> (register with
+`?register=true`); Keycloak's pages handle the rest and send you back to Swagger UI with a
+session, so its requests carry your token. The local realm has `admin@freshly.local` (`ADMIN`)
+and `user@freshly.local`, both with the password `freshly-local`; e-mails land in maildev at
+<http://localhost:1080>. The terms and the privacy policy are served at `/api/v1/legal/terms.html`
+and `/api/v1/legal/privacy.html`, and Keycloak links them from the terms every new account accepts.
 
 `application-local.yml` holds every value the local profile needs; `application-prod.yml`
 holds only `${...}` references to the environment.
@@ -94,9 +100,9 @@ code cannot state live in the module READMEs and `docs/`.
 A module may reach another **only** through that module's inbound ports, and **only**
 from its own infrastructure layer, where an anti-corruption adapter translates.
 
-Today `auth` is the only context that reaches others — `useraccess` and `notification` —
-via `auth-infrastructure/acl`. `AuthArchitectureTest` declares those neighbours and the
-rules enforce the boundary.
+Today `auth` is the only context that reaches another — `useraccess` — via
+`auth-infrastructure/acl`. `AuthArchitectureTest` declares that neighbour and the rules
+enforce the boundary.
 
 ## Where to start reading
 
@@ -104,7 +110,7 @@ rules enforce the boundary.
 |----------------------------------------|--------------------------------------|
 | The shape every module follows         | `modules/useraccess/` and its README |
 | Why the inner layers have no Spring    | `docs/hexagonal-layering.md`         |
-| The hardest module                     | `modules/auth/README.md`             |
+| How a browser signs in                 | `modules/auth/README.md`             |
 | What is shared, and why                | `docs/shared-modules.md`             |
 | How text is stored and edited          | `docs/translations.md`               |
 | What is not verified, and what is next | `docs/open-items.md`                 |

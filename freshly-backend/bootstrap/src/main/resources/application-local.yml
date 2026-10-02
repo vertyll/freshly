@@ -1,9 +1,6 @@
 spring:
   mongodb:
     uri: mongodb://localhost:27017/freshly
-  mail:
-    host: localhost
-    port: 1025
   security:
     oauth2:
       resourceserver:
@@ -16,13 +13,16 @@ springdoc:
   swagger-ui:
     enabled: true
 
+server:
+  servlet:
+    session:
+      cookie:
+        secure: false
+
 application:
-  mail:
-    from: no-reply@freshly.local
-  jwt:
-    secret: bG9jYWwtb25seS1kZXZlbG9wbWVudC1rZXktbm90LWEtc2VjcmV0
-  frontend:
-    url: http://localhost:8080/api/v1/auth
+  auth:
+    callback-url: http://localhost:8080/api/v1/auth/callback
+    post-login-url: http://localhost:8080/api/v1/swagger-ui.html
   cors:
     allowed-origins: http://localhost:8080
   airquality:

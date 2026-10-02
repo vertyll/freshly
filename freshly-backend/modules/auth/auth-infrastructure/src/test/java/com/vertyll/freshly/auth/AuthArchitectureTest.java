@@ -10,8 +10,7 @@ class AuthArchitectureTest extends FreshlyArchitectureTest {
     @Override
     protected String[] neighbouringModules() {
         return new String[] {
-            "com.vertyll.freshly.useraccess",
-            "com.vertyll.freshly.notification"
+            "com.vertyll.freshly.useraccess"
         };
     }
 }

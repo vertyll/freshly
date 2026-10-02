@@ -142,16 +142,10 @@ sonar {
     properties {
         property("sonar.projectKey", "freshly")
         property("sonar.projectName", "freshly")
-        property("sonar.issue.ignore.multicriteria", "emailTables,emailAttributes,localSecrets,uploadLimitsYaml,jjwtDates")
-        property("sonar.issue.ignore.multicriteria.emailTables.ruleKey", "Web:S5257")
-        property("sonar.issue.ignore.multicriteria.emailTables.resourceKey", "**/templates/**/*.html")
-        property("sonar.issue.ignore.multicriteria.emailAttributes.ruleKey", "Web:S1827")
-        property("sonar.issue.ignore.multicriteria.emailAttributes.resourceKey", "**/templates/**/*.html")
+        property("sonar.issue.ignore.multicriteria", "localSecrets,uploadLimitsYaml")
         property("sonar.issue.ignore.multicriteria.localSecrets.ruleKey", "java:S6437")
         property("sonar.issue.ignore.multicriteria.localSecrets.resourceKey", "**/application-local.*")
         property("sonar.issue.ignore.multicriteria.uploadLimitsYaml.ruleKey", "java:S5693")
         property("sonar.issue.ignore.multicriteria.uploadLimitsYaml.resourceKey", "**/application*.yml")
-        property("sonar.issue.ignore.multicriteria.jjwtDates.ruleKey", "java:S2143")
-        property("sonar.issue.ignore.multicriteria.jjwtDates.resourceKey", "**/*Jwt*.java")
     }
 }

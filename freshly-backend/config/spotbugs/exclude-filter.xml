@@ -42,4 +42,10 @@
     <Match>
         <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
     </Match>
+
+    <!-- FindSecBugs: the relay reads Authorization and Sec-Fetch-Site to decide whether to add the session token, never to trust them -->
+    <Match>
+        <Class name="com.vertyll.freshly.auth.infrastructure.web.session.SessionTokenRelayFilter"/>
+        <Bug pattern="SERVLET_HEADER"/>
+    </Match>
 </FindBugsFilter>

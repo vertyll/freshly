@@ -32,13 +32,15 @@ class UserAccessCommandServiceTest {
 
     private InMemorySystemUserRepository users;
     private RecordingUseCaseLogger logger;
+    private FakeRoleDirectory directory;
     private UserAccessCommandService service;
 
     @BeforeEach
     void setUp() {
         users = new InMemorySystemUserRepository();
         logger = new RecordingUseCaseLogger();
-        service = new UserAccessCommandService(users, new FakeRoleDirectory(Set.of("USER", "ADMIN")), logger);
+        directory = new FakeRoleDirectory(Set.of("USER", "ADMIN"));
+        service = new UserAccessCommandService(users, directory, logger);
     }
 
     @Nested
@@ -102,6 +104,7 @@ class UserAccessCommandServiceTest {
             users.seed(SystemUser.reconstitute(USER, false, ROLES, 4L));
 
             assertThatCode(() -> service.activateUser(USER, 4L)).doesNotThrowAnyException();
+            assertThat(directory.enabledOf(USER)).isTrue();
         }
 
         @Test
@@ -138,13 +141,24 @@ class UserAccessCommandServiceTest {
         }
 
         @Test
-        @DisplayName("deactivates somebody else")
+        @DisplayName("deactivates somebody else and disables them at the identity provider")
         void deactivatesAnother() {
             users.seed(SystemUser.create(USER, true, ROLES));
 
             service.deactivateUser(USER, ADMIN, null);
 
             assertThat(users.findByKeycloakUserId(USER)).get().extracting(SystemUser::isActive).isEqualTo(false);
+            assertThat(directory.enabledOf(USER)).isFalse();
+        }
+
+        @Test
+        @DisplayName("a refused deactivation leaves the identity provider untouched")
+        void refusalDoesNotDisable() {
+            users.seed(SystemUser.create(ADMIN, true, ROLES));
+
+            assertThatThrownBy(() -> service.deactivateUser(ADMIN, ADMIN, null)).isInstanceOf(DomainException.class);
+
+            assertThat(directory.enabledOf(ADMIN)).isNull();
         }
 
         @Test
@@ -153,16 +167,6 @@ class UserAccessCommandServiceTest {
             assertThatThrownBy(() -> service.deactivateUser(USER, ADMIN, null))
                 .extracting(e -> ((DomainException) e).error())
                 .isEqualTo(UserAccessError.USER_NOT_FOUND);
-        }
-
-        @Test
-        @DisplayName("the no-actor form deactivates the subject, self-deactivation notwithstanding")
-        void deactivatesWithoutAnActor() {
-            users.seed(SystemUser.create(USER, true, ROLES));
-
-            service.deactivateUser(USER, null);
-
-            assertThat(users.findByKeycloakUserId(USER)).get().extracting(SystemUser::isActive).isEqualTo(false);
         }
     }
 

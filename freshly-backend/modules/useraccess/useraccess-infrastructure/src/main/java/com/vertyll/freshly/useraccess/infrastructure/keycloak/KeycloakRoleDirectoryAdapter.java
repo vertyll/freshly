@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RoleMappingResource;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -60,6 +62,17 @@ public class KeycloakRoleDirectoryAdapter implements RoleDirectoryPort {
         }
         if (!toAdd.isEmpty()) {
             mappings.realmLevel().add(toAdd);
+        }
+    }
+
+    @Override
+    public void setEnabled(UUID keycloakUserId, boolean enabled) {
+        UserResource user = keycloak.realm(realm).users().get(keycloakUserId.toString());
+        UserRepresentation representation = user.toRepresentation();
+        representation.setEnabled(enabled);
+        user.update(representation);
+        if (!enabled) {
+            user.logout();
         }
     }
 

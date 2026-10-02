@@ -1,20 +1,30 @@
 package com.vertyll.freshly.auth.infrastructure.keycloak;
 
+import java.time.Instant;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
-import com.vertyll.freshly.auth.application.dto.AuthTokens;
 import com.vertyll.freshly.auth.application.port.outbound.TokenIssuerPort;
 import com.vertyll.freshly.auth.domain.error.AuthError;
+import com.vertyll.freshly.auth.domain.model.AuthSession;
+import com.vertyll.freshly.auth.infrastructure.config.AuthProperties;
 import com.vertyll.freshly.auth.infrastructure.config.KeycloakProperties;
 import com.vertyll.freshly.lang.error.DomainException;
 
@@ -25,46 +35,56 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
-    @SuppressWarnings("java:S1075")
-    private static final String TOKEN_PATH = "/realms/{realm}/protocol/openid-connect/token";
-    @SuppressWarnings("java:S1075")
-    private static final String LOGOUT_PATH = "/realms/{realm}/protocol/openid-connect/logout";
-
     private static final String GRANT_TYPE = "grant_type";
     private static final String CLIENT_ID = "client_id";
     private static final String CLIENT_SECRET = "client_secret";
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "password";
+    private static final String AUTHORIZATION_CODE = "authorization_code";
+    private static final String CODE = "code";
+    private static final String CODE_VERIFIER = "code_verifier";
+    private static final String REDIRECT_URI = "redirect_uri";
     private static final String REFRESH_TOKEN = "refresh_token";
 
+    private static final String EMAIL_CLAIM = "email";
+    private static final String REALM_ACCESS_CLAIM = "realm_access";
+    private static final String ROLES_KEY = "roles";
+    private static final String DEFAULT_ROLES_PREFIX = "default-roles-";
+    private static final Set<String> BUILT_IN_ROLES = Set.of("offline_access", "uma_authorization");
+
     private final RestClient restClient;
-    private final KeycloakProperties properties;
+    private final KeycloakProperties keycloak;
+    private final AuthProperties auth;
+    private final JwtDecoder jwtDecoder;
 
     public KeycloakTokenIssuerAdapter(
         @Qualifier(KeycloakConfig.KEYCLOAK_REST_CLIENT) RestClient keycloakRestClient,
-        KeycloakProperties properties
+        KeycloakProperties keycloak,
+        AuthProperties auth,
+        JwtDecoder jwtDecoder
     ) {
         this.restClient = keycloakRestClient;
-        this.properties = properties;
+        this.keycloak = keycloak;
+        this.auth = auth;
+        this.jwtDecoder = jwtDecoder;
     }
 
     @Override
-    public AuthTokens issue(String username, String password) {
+    public AuthSession exchange(String code, String codeVerifier) {
         MultiValueMap<String, String> form = clientForm();
-        form.add(GRANT_TYPE, PASSWORD);
-        form.add(USERNAME, username);
-        form.add(PASSWORD, password);
+        form.add(GRANT_TYPE, AUTHORIZATION_CODE);
+        form.add(CODE, code);
+        form.add(CODE_VERIFIER, codeVerifier);
+        form.add(REDIRECT_URI, auth.callbackUrl());
 
-        return post(form, AuthError.INVALID_CREDENTIALS);
+        return post(form, AuthError.SIGN_IN_REJECTED);
     }
 
     @Override
-    public AuthTokens refresh(String refreshToken) {
+    public AuthSession refresh(String refreshToken) {
         MultiValueMap<String, String> form = clientForm();
         form.add(GRANT_TYPE, REFRESH_TOKEN);
         form.add(REFRESH_TOKEN, refreshToken);
 
-        return post(form, AuthError.REFRESH_TOKEN_INVALID);
+        return post(form, AuthError.SESSION_EXPIRED);
     }
 
     @Override
@@ -74,59 +94,80 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
 
         try {
             restClient.post()
-                .uri(LOGOUT_PATH, properties.realm())
+                .uri(keycloak.endpoint("logout"))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body(form)
                 .retrieve()
                 .toBodilessEntity();
-        } catch (RestClientResponseException e) {
-            log.warn("Keycloak refused a logout with status {}", e.getStatusCode());
+        } catch (RestClientException e) {
+            log.warn("Keycloak did not end the session: {}", e.getMessage());
         }
     }
 
     private MultiValueMap<String, String> clientForm() {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add(CLIENT_ID, properties.userClientId());
-        form.add(CLIENT_SECRET, properties.userClientSecret());
+        form.add(CLIENT_ID, keycloak.userClientId());
+        form.add(CLIENT_SECRET, keycloak.userClientSecret());
         return form;
     }
 
-    private AuthTokens post(MultiValueMap<String, String> form, AuthError onRejection) {
+    private AuthSession post(MultiValueMap<String, String> form, AuthError onRejection) {
+        KeycloakTokenResponse response;
         try {
-            KeycloakTokenResponse response = restClient.post()
-                .uri(TOKEN_PATH, properties.realm())
+            response = restClient.post()
+                .uri(keycloak.endpoint("token"))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body(form)
                 .retrieve()
                 .body(KeycloakTokenResponse.class);
-
-            if (response == null) {
-                throw new DomainException(AuthError.IDENTITY_PROVIDER_UNAVAILABLE);
-            }
-
-            return new AuthTokens(
-                response.accessToken(),
-                response.refreshToken(),
-                response.tokenType(),
-                response.expiresIn(),
-                response.refreshExpiresIn()
-            );
-
         } catch (RestClientResponseException e) {
             if (e.getStatusCode().is4xxClientError()) {
                 throw new DomainException(onRejection, Map.of(), e);
             }
             log.error("Keycloak token endpoint failed with {}", e.getStatusCode(), e);
             throw new DomainException(AuthError.IDENTITY_PROVIDER_UNAVAILABLE, Map.of(), e);
+        } catch (RestClientException e) {
+            throw new DomainException(AuthError.IDENTITY_PROVIDER_UNAVAILABLE, Map.of(), e);
         }
+
+        if (response == null || response.refreshToken() == null) {
+            throw new DomainException(AuthError.IDENTITY_PROVIDER_UNAVAILABLE);
+        }
+        return toSession(response.accessToken(), response.refreshToken(), onRejection);
+    }
+
+    private AuthSession toSession(String accessToken, String refreshToken, AuthError onRejection) {
+        Jwt jwt;
+        try {
+            jwt = jwtDecoder.decode(accessToken);
+        } catch (JwtException e) {
+            throw new DomainException(onRejection, Map.of(), e);
+        }
+
+        String subject = jwt.getSubject();
+        String email = jwt.getClaimAsString(EMAIL_CLAIM);
+        Instant expiresAt = jwt.getExpiresAt();
+        if (subject == null || email == null || expiresAt == null) {
+            throw new DomainException(onRejection);
+        }
+        return new AuthSession(UUID.fromString(subject), email, roles(jwt), accessToken, refreshToken, expiresAt);
+    }
+
+    private static Set<String> roles(Jwt jwt) {
+        if (!(jwt.getClaims().get(REALM_ACCESS_CLAIM) instanceof Map<?, ?> realmAccess)
+                || !(realmAccess.get(ROLES_KEY) instanceof Collection<?> roles)) {
+            return Set.of();
+        }
+        return roles.stream()
+            .filter(String.class::isInstance)
+            .map(String.class::cast)
+            .filter(role -> !BUILT_IN_ROLES.contains(role) && !role.startsWith(DEFAULT_ROLES_PREFIX))
+            .collect(Collectors.toUnmodifiableSet());
     }
 
     private record KeycloakTokenResponse(
         @JsonProperty("access_token") String accessToken,
-        @JsonProperty("refresh_token") @Nullable String refreshToken,
-        @JsonProperty("token_type") String tokenType,
-        @JsonProperty("expires_in") long expiresIn,
-        @JsonProperty("refresh_expires_in") long refreshExpiresIn
+        @JsonProperty("refresh_token") @Nullable String refreshToken
     ) {
     }
 }

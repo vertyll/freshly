@@ -196,7 +196,6 @@ Each context owns one, in `domain/error/`:
 |----------------|---------------------|
 | `useraccess`   | `UserAccessError`   |
 | `auth`         | `AuthError`         |
-| `notification` | `NotificationError` |
 | `permission`   | `PermissionError`   |
 | `airquality`   | `AirQualityError`   |
 
@@ -209,12 +208,12 @@ Every refusal answers as an **RFC 9457 problem document** (`application/problem+
 
 ```json
 {
-  "type":     "urn:freshly:error:error.auth.invalidCredentials",
-  "title":    "Unauthorized",
-  "status":   401,
-  "detail":   "Incorrect username or password.",
-  "instance": "/api/v1/auth/login",
-  "code":     "error.auth.invalidCredentials"
+  "type":     "urn:freshly:error:error.useraccess.userNotFound",
+  "title":    "Not Found",
+  "status":   404,
+  "detail":   "No such user.",
+  "instance": "/api/v1/users/7d1c9a52-3a43-4c34-9a8f-2f5d7c6f1b10",
+  "code":     "error.useraccess.userNotFound"
 }
 ```
 
@@ -264,15 +263,14 @@ If the calling module owns it, call the other module's inbound port through an
 anti-corruption adapter. If a *different* module owns it, publish an event and let that
 module subscribe.
 
-Both cross-module calls in this application are the first kind. "When a user registers, send
-them a welcome message" is `auth`'s policy: `notification` knows how to send mail and has no
-business knowing what registration is. A generic capability must not depend on a core
-context.
+The cross-module call in this application is the first kind. "When someone signs in for the
+first time, give them an account" is `auth`'s policy: `useraccess` keeps accounts and has no
+business knowing what a sign-in is.
 
 So it is a direct call through an outbound port, not a domain event. An event would be
 ceremony: `auth` publishing it and a listener in `auth-infrastructure` consuming it is a
 round trip through the event bus inside one module, buying no decoupling and costing a
-reader the ability to see what registration triggers.
+reader the ability to see what a sign-in triggers.
 
 There is no `DomainEventPublisher` port either. An abstraction with no implementer and no
 caller is speculative generality; when a reaction genuinely lands in another module, the port

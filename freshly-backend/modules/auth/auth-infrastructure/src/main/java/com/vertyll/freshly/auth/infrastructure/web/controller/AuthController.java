@@ -1,187 +1,134 @@
 package com.vertyll.freshly.auth.infrastructure.web.controller;
 
-import java.net.URI;
-import java.time.Duration;
+import java.util.Locale;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Set;
 
-import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.jspecify.annotations.Nullable;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import com.vertyll.freshly.auth.application.dto.AuthTokens;
-import com.vertyll.freshly.auth.application.port.inbound.command.CredentialsUseCase;
-import com.vertyll.freshly.auth.application.port.inbound.command.RegistrationUseCase;
 import com.vertyll.freshly.auth.application.port.inbound.command.SessionUseCase;
-import com.vertyll.freshly.auth.infrastructure.web.dto.ChangeEmailRequestDto;
-import com.vertyll.freshly.auth.infrastructure.web.dto.ChangePasswordRequestDto;
-import com.vertyll.freshly.auth.infrastructure.web.dto.ForgotPasswordRequestDto;
-import com.vertyll.freshly.auth.infrastructure.web.dto.LoginRequestDto;
-import com.vertyll.freshly.auth.infrastructure.web.dto.RegisterUserRequestDto;
-import com.vertyll.freshly.auth.infrastructure.web.dto.ResetPasswordRequestDto;
-import com.vertyll.freshly.auth.infrastructure.web.dto.TokenResponseDto;
+import com.vertyll.freshly.auth.domain.model.AuthSession;
+import com.vertyll.freshly.auth.infrastructure.config.AuthProperties;
+import com.vertyll.freshly.auth.infrastructure.config.KeycloakProperties;
+import com.vertyll.freshly.auth.infrastructure.web.dto.SessionResponseDto;
+import com.vertyll.freshly.auth.infrastructure.web.session.BrowserSessions;
+import com.vertyll.freshly.auth.infrastructure.web.session.Pkce;
+import com.vertyll.freshly.auth.infrastructure.web.session.SignInTransaction;
+import com.vertyll.freshly.lang.error.DomainException;
 import com.vertyll.freshly.web.security.PublicEndpoint;
-import com.vertyll.freshly.web.security.ScopedToCaller;
 
 import lombok.RequiredArgsConstructor;
-
-import static java.util.Objects.requireNonNull;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
-    private static final String REFRESH_COOKIE = "refresh_token";
-    private static final String AUTH_PATH = "/auth";
-    private static final String SUBJECT_CLAIM = "sub";
+    private static final String SCOPE = "openid profile email";
+    private static final String ERROR_PARAM = "error";
+    private static final String SIGN_IN_FAILED = "sign_in_failed";
+    private static final String STATE_MISMATCH = "state_mismatch";
+    private static final Set<String> ALLOWED_ACTIONS = Set.of("CONFIGURE_TOTP", "UPDATE_PASSWORD", "delete_credential");
+    private static final Set<String> UI_LOCALES = Set.of("pl", "en");
 
-    private final RegistrationUseCase registration;
     private final SessionUseCase sessions;
-    private final CredentialsUseCase credentials;
+    private final BrowserSessions browserSessions;
+    private final KeycloakProperties keycloak;
+    private final AuthProperties auth;
 
-    @PostMapping("/register")
-    @PublicEndpoint("registration is how an account first comes to exist")
-    public ResponseEntity<RegisteredUser> register(@Valid @RequestBody RegisterUserRequestDto request) {
-        UUID userId = registration.register(request.toCommand(callerLanguage()));
-
-        return ResponseEntity.created(URI.create("/users/" + userId)).body(new RegisteredUser(userId));
-    }
-
-    @GetMapping("/verify-email")
-    @PublicEndpoint("the link is the credential; the recipient is not signed in yet")
-    public ResponseEntity<Void> verifyEmail(@RequestParam String token) {
-        registration.verifyEmail(token);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/login")
-    @PublicEndpoint("signing in cannot require being signed in")
-    public ResponseEntity<TokenResponseDto> login(@Valid @RequestBody LoginRequestDto request) {
-        AuthTokens tokens = sessions.login(request.username(), request.password());
-
-        ResponseEntity.BodyBuilder response = ResponseEntity.ok();
-        refreshCookie(tokens).ifPresent(cookie -> response.header(HttpHeaders.SET_COOKIE, cookie.toString()));
-
-        return response.body(TokenResponseDto.from(tokens));
-    }
-
-    @PostMapping("/refresh")
-    @PublicEndpoint("the refresh cookie is the credential; the access token has expired")
-    public ResponseEntity<TokenResponseDto> refresh(
-        @CookieValue(name = REFRESH_COOKIE, required = false) @Nullable String refreshToken
+    @GetMapping("/authorize")
+    @PublicEndpoint("the start of sign-in: there is no token yet, and this only builds the Keycloak redirect")
+    public ResponseEntity<Void> authorize(
+        HttpServletRequest request,
+        Locale locale,
+        @RequestParam(name = "kc_action", required = false) @Nullable String kcAction,
+        @RequestParam(defaultValue = "false") boolean register
     ) {
-        AuthTokens tokens = sessions.refresh(refreshToken);
+        SignInTransaction transaction = browserSessions.begin(request);
 
-        ResponseEntity.BodyBuilder response = ResponseEntity.ok();
-        refreshCookie(tokens).ifPresent(cookie -> response.header(HttpHeaders.SET_COOKIE, cookie.toString()));
+        UriComponentsBuilder uri = UriComponentsBuilder.fromUriString(keycloak.endpoint("auth"))
+            .queryParam("client_id", keycloak.userClientId())
+            .queryParam("redirect_uri", auth.callbackUrl())
+            .queryParam("response_type", "code")
+            .queryParam("scope", SCOPE)
+            .queryParam("state", transaction.state())
+            .queryParam("code_challenge", Pkce.challengeOf(transaction.codeVerifier()))
+            .queryParam("code_challenge_method", Pkce.CHALLENGE_METHOD);
+        if (UI_LOCALES.contains(locale.getLanguage())) {
+            uri.queryParam("ui_locales", locale.getLanguage());
+        }
+        if (kcAction != null && ALLOWED_ACTIONS.contains(kcAction)) {
+            uri.queryParam("kc_action", kcAction);
+        }
+        if (register) {
+            uri.queryParam("prompt", "create");
+        }
 
-        return response.body(TokenResponseDto.from(tokens));
+        return ResponseEntity.status(HttpStatus.FOUND).location(uri.encode().build().toUri()).build();
+    }
+
+    @GetMapping("/callback")
+    @PublicEndpoint("Keycloak redirects the browser back here with a code; the code, not a token, is the credential")
+    public ResponseEntity<Void> callback(
+        HttpServletRequest request,
+        @RequestParam(required = false) @Nullable String code,
+        @RequestParam(required = false) @Nullable String state,
+        @RequestParam(name = ERROR_PARAM, required = false) @Nullable String error
+    ) {
+        Optional<SignInTransaction> transaction = browserSessions.takeTransaction(request);
+
+        if (error != null) {
+            log.debug("Keycloak returned an authorization error: {}", error);
+            return redirectToApp(SIGN_IN_FAILED);
+        }
+        if (code == null || state == null || transaction.isEmpty()
+                || !Pkce.sameState(transaction.get().state(), state)) {
+            log.warn("Rejecting a sign-in callback whose state was not issued to this browser");
+            return redirectToApp(STATE_MISMATCH);
+        }
+
+        try {
+            AuthSession session = sessions.signIn(code, transaction.get().codeVerifier());
+            browserSessions.establish(request, session);
+            return redirectToApp(null);
+        } catch (DomainException e) {
+            log.warn("Sign-in could not be completed: {}", e.error());
+            return redirectToApp(SIGN_IN_FAILED);
+        }
+    }
+
+    @GetMapping("/session")
+    @PublicEndpoint("answers 204 to a browser without a session, so it cannot require one")
+    public ResponseEntity<SessionResponseDto> session(HttpServletRequest request) {
+        return browserSessions.current(request)
+            .map(session -> ResponseEntity.ok(SessionResponseDto.from(session)))
+            .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @PostMapping("/logout")
-    @PublicEndpoint("logging out must work even with an expired access token")
-    public ResponseEntity<Void> logout(
-        @CookieValue(name = REFRESH_COOKIE, required = false) @Nullable String refreshToken
-    ) {
-        sessions.logout(refreshToken);
-
-        return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, expiredRefreshCookie().toString()).build();
-    }
-
-    @PostMapping("/forgot-password")
-    @PublicEndpoint("someone who has forgotten their password cannot sign in to ask")
-    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDto request) {
-        credentials.initiatePasswordReset(request.email(), callerLanguage());
-
-        return ResponseEntity.accepted().build();
-    }
-
-    @PostMapping("/reset-password")
-    @PublicEndpoint("the reset token is the credential")
-    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequestDto request) {
-        credentials.resetPassword(request.toCommand());
+    @PublicEndpoint("ends the session the browser holds, which an expired access token must not prevent")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        browserSessions.current(request).ifPresent(sessions::signOut);
+        browserSessions.end(request);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/change-password")
-    @ScopedToCaller("changes only the calling user's own password")
-    public ResponseEntity<Void> changePassword(
-        @AuthenticationPrincipal Jwt jwt,
-        @Valid @RequestBody ChangePasswordRequestDto request
-    ) {
-        credentials.changePassword(request.toCommand(callerId(jwt)));
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/change-email")
-    @ScopedToCaller("changes only the calling user's own address")
-    public ResponseEntity<Void> changeEmail(
-        @AuthenticationPrincipal Jwt jwt,
-        @Valid @RequestBody ChangeEmailRequestDto request
-    ) {
-        credentials.changeEmail(request.toCommand(callerId(jwt), callerLanguage()));
-
-        return ResponseEntity.accepted().build();
-    }
-
-    private static Optional<ResponseCookie> refreshCookie(AuthTokens tokens) {
-        String value = tokens.refreshToken();
-        if (value == null) {
-            return Optional.empty();
+    private ResponseEntity<Void> redirectToApp(@Nullable String errorCode) {
+        UriComponentsBuilder uri = UriComponentsBuilder.fromUriString(auth.postLoginUrl());
+        if (errorCode != null) {
+            uri.queryParam(ERROR_PARAM, errorCode);
         }
-
-        return Optional.of(
-            ResponseCookie.from(REFRESH_COOKIE, value)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Lax")
-                .path(refreshCookiePath())
-                .maxAge(Duration.ofSeconds(tokens.refreshExpiresInSeconds()))
-                .build()
-        );
-    }
-
-    private static String refreshCookiePath() {
-        return requireNonNull(ServletUriComponentsBuilder.fromCurrentContextPath().path(AUTH_PATH).build().getPath());
-    }
-
-    private static ResponseCookie expiredRefreshCookie() {
-        return ResponseCookie.from(REFRESH_COOKIE, "")
-            .httpOnly(true)
-            .secure(true)
-            .sameSite("Lax")
-            .path(refreshCookiePath())
-            .maxAge(Duration.ZERO)
-            .build();
-    }
-
-    public record RegisteredUser(UUID userId) {
-    }
-
-    private static String callerLanguage() {
-        return LocaleContextHolder.getLocale().toLanguageTag();
-    }
-
-    private static UUID callerId(Jwt jwt) {
-        String subject = jwt.getClaimAsString(SUBJECT_CLAIM);
-        if (subject == null) {
-            throw new AuthenticationCredentialsNotFoundException("Token carries no subject");
-        }
-        return UUID.fromString(subject);
+        return ResponseEntity.status(HttpStatus.FOUND).location(uri.build().toUri()).build();
     }
 }

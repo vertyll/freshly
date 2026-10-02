@@ -84,10 +84,10 @@ public final class IcuMessages {
     }
 
     /**
-     * Renders with positional arguments, which is what Thymeleaf's {@code #{key(a, b)}} passes.
+     * Renders with positional arguments, which is what a Spring {@code MessageSource} caller passes.
      *
      * <p>
-     * An argument may be null: a template can pass a variable that has no value, and ICU
+     * An argument may be null: a caller can pass a variable that has no value, and ICU
      * renders it as {@code "null"} rather than failing the whole message.
      */
     public static String formatPositional(String languageTag, String pattern, @Nullable Object... arguments) {

@@ -8,4 +8,6 @@ public interface RoleDirectoryPort {
     Set<String> availableRoles();
 
     void replaceRoles(UUID keycloakUserId, Set<String> roles);
+
+    void setEnabled(UUID keycloakUserId, boolean enabled);
 }

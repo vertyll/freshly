@@ -1,11 +1,11 @@
 package com.vertyll.freshly.auth.application.port.outbound;
 
-import com.vertyll.freshly.auth.application.dto.AuthTokens;
+import com.vertyll.freshly.auth.domain.model.AuthSession;
 
 public interface TokenIssuerPort {
-    AuthTokens issue(String username, String password);
+    AuthSession exchange(String code, String codeVerifier);
 
-    AuthTokens refresh(String refreshToken);
+    AuthSession refresh(String refreshToken);
 
     void revoke(String refreshToken);
 }

@@ -12,7 +12,6 @@ dependencies {
     implementation(project(":platform:shared-security"))
 
     implementation(project(":modules:useraccess:useraccess-infrastructure"))
-    implementation(project(":modules:notification:notification-infrastructure"))
     implementation(project(":modules:permission:permission-infrastructure"))
     implementation(project(":modules:airquality:airquality-infrastructure"))
     implementation(project(":modules:translation:translation-infrastructure"))

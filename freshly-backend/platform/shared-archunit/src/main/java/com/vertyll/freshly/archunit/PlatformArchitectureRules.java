@@ -38,7 +38,6 @@ public final class PlatformArchitectureRules {
 
     private static final String[] MODULES = {
         "com.vertyll.freshly.useraccess..",
-        "com.vertyll.freshly.notification..",
         "com.vertyll.freshly.permission..",
         "com.vertyll.freshly.airquality..",
         "com.vertyll.freshly.auth..",

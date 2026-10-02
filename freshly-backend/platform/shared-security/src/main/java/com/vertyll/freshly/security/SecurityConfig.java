@@ -34,6 +34,10 @@ public class SecurityConfig {
         "/actuator/health/**"
     };
 
+    private static final String[] PUBLIC_PAGES = {
+        "/legal/**"
+    };
+
     @Bean
     @SuppressWarnings("java:S4502")
     SecurityFilterChain securityFilterChain(
@@ -48,6 +52,8 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(
                 auth -> auth.requestMatchers(INFRASTRUCTURE_PATHS)
+                    .permitAll()
+                    .requestMatchers(PUBLIC_PAGES)
                     .permitAll()
                     .requestMatchers(publicEndpoints.matchers().toArray(RequestMatcher[]::new))
                     .permitAll()

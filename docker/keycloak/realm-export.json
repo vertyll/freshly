@@ -30,12 +30,12 @@
   "registrationAllowed": true,
   "registrationEmailAsUsername": true,
   "rememberMe": false,
-  "verifyEmail": false,
+  "verifyEmail": true,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": true,
   "editUsernameAllowed": false,
-  "bruteForceProtected": false,
+  "bruteForceProtected": true,
   "permanentLockout": false,
   "maxTemporaryLockouts": 0,
   "bruteForceStrategy": "MULTIPLE",
@@ -44,7 +44,7 @@
   "waitIncrementSeconds": 60,
   "quickLoginCheckMilliSeconds": 1000,
   "maxDeltaTimeSeconds": 43200,
-  "failureFactor": 30,
+  "failureFactor": 5,
   "roles": {
     "realm": [
       {
@@ -449,7 +449,16 @@
     "totpAppGoogleName",
     "totpAppMicrosoftAuthenticatorName"
   ],
-  "localizationTexts": {},
+  "localizationTexts": {
+    "pl": {
+      "termsTitle": "Regulamin Freshly",
+      "termsText": "<p>Freshly to projekt demonstracyjny, stworzony w celach nauki i portfolio. Twoje dane są przechowywane w bazach danych na prywatnym serwerze autora w Unii Europejskiej.</p><p>Akceptując, potwierdzasz, że przeczytałeś <a href=\"http://localhost:8080/api/v1/legal/terms.html#pl\" target=\"_blank\" rel=\"noopener\">regulamin</a> i <a href=\"http://localhost:8080/api/v1/legal/privacy.html#pl\" target=\"_blank\" rel=\"noopener\">politykę prywatności</a> i akceptujesz regulamin.</p>"
+    },
+    "en": {
+      "termsTitle": "Freshly terms of use",
+      "termsText": "<p>Freshly is a demo project built for learning and as a portfolio piece. Your data is stored in databases on the author's private server in the European Union.</p><p>By accepting, you confirm that you have read the <a href=\"http://localhost:8080/api/v1/legal/terms.html#en\" target=\"_blank\" rel=\"noopener\">terms of use</a> and the <a href=\"http://localhost:8080/api/v1/legal/privacy.html#en\" target=\"_blank\" rel=\"noopener\">privacy policy</a>, and you accept the terms of use.</p>"
+    }
+  },
   "webAuthnPolicyRpEntityName": "keycloak",
   "webAuthnPolicySignatureAlgorithms": [
     "ES256",
@@ -499,6 +508,55 @@
       },
       "notBefore": 0,
       "groups": []
+    },
+    {
+      "username": "admin@freshly.local",
+      "email": "admin@freshly.local",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "System",
+      "lastName": "Administrator",
+      "attributes": {
+        "terms_and_conditions": [
+          "1790973633"
+        ]
+      },
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "freshly-local",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-freshly",
+        "ADMIN"
+      ]
+    },
+    {
+      "username": "user@freshly.local",
+      "email": "user@freshly.local",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Jan",
+      "lastName": "Kowalski",
+      "attributes": {
+        "terms_and_conditions": [
+          "1790973633"
+        ]
+      },
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "freshly-local",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-freshly"
+      ]
     }
   ],
   "scopeMappings": [
@@ -718,28 +776,24 @@
       "clientId": "freshly-app-client",
       "name": "Freshly App Client",
       "description": "Freshly App Client for application authentication",
-      "rootUrl": "http://localhost:8080",
+      "rootUrl": "",
       "adminUrl": "",
-      "baseUrl": "http://localhost:8080",
+      "baseUrl": "",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "local-app-client-secret",
       "redirectUris": [
-        "http://localhost:8080/*",
-        "http://localhost:4200/*"
+        "http://localhost:8080/api/v1/auth/callback"
       ],
-      "webOrigins": [
-        "+",
-        "http://localhost:4200"
-      ],
+      "webOrigins": [],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": true,
+      "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": false,
       "publicClient": false,
       "frontchannelLogout": true,
@@ -748,7 +802,6 @@
         "access.token.lifespan": "300",
         "request.object.signature.alg": "any",
         "frontchannel.logout.session.required": "true",
-        "post.logout.redirect.uris": "http://localhost:8080/*##http://localhost:4200/*",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
         "use.refresh.tokens": "true",
@@ -772,7 +825,8 @@
         "acr.loa.map": "{}",
         "tls.client.certificate.bound.access.tokens": "false",
         "display.on.consent.screen": "false",
-        "token.response.type.bearer.lower-case": "false"
+        "token.response.type.bearer.lower-case": "false",
+        "pkce.code.challenge.method": "S256"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
@@ -1733,7 +1787,7 @@
     "starttls": "false",
     "auth": "",
     "port": "1025",
-    "host": "mail-dev",
+    "host": "maildev",
     "replyTo": "",
     "from": "no-reply@freshly.local",
     "fromDisplayName": "Freshly",
@@ -1908,9 +1962,20 @@
           ]
         }
       }
+    ],
+    "org.keycloak.userprofile.UserProfileProvider": [
+      {
+        "providerId": "declarative-user-profile",
+        "subComponents": {},
+        "config": {
+          "kc.user.profile.config": [
+            "{\"attributes\":[{\"name\":\"username\",\"displayName\":\"${username}\",\"validations\":{\"length\":{\"min\":3,\"max\":255},\"username-prohibited-characters\":{},\"up-username-not-idn-homograph\":{}},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"email\",\"displayName\":\"${email}\",\"validations\":{\"email\":{},\"length\":{\"max\":255}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"firstName\",\"displayName\":\"${firstName}\",\"validations\":{\"length\":{\"max\":255},\"person-name-prohibited-characters\":{}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"lastName\",\"displayName\":\"${lastName}\",\"validations\":{\"length\":{\"max\":255},\"person-name-prohibited-characters\":{}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"terms_and_conditions\",\"displayName\":\"${termsTitle}\",\"permissions\":{\"view\":[\"admin\"],\"edit\":[\"admin\"]},\"multivalued\":false,\"annotations\":{},\"validations\":{}}],\"groups\":[{\"name\":\"user-metadata\",\"displayHeader\":\"User metadata\",\"displayDescription\":\"Attributes, which refer to user metadata\"}]}"
+          ]
+        }
+      }
     ]
   },
-  "internationalizationEnabled": false,
+  "internationalizationEnabled": true,
   "authenticationFlows": [
     {
       "id": "3ebdfac7-1f56-4157-a5d4-dffeadb83db6",
@@ -2535,30 +2600,12 @@
   ],
   "requiredActions": [
     {
-      "alias": "CONFIGURE_TOTP",
-      "name": "Configure OTP",
-      "providerId": "CONFIGURE_TOTP",
-      "enabled": true,
-      "defaultAction": false,
-      "priority": 10,
-      "config": {}
-    },
-    {
       "alias": "TERMS_AND_CONDITIONS",
       "name": "Terms and Conditions",
       "providerId": "TERMS_AND_CONDITIONS",
-      "enabled": false,
-      "defaultAction": false,
-      "priority": 20,
-      "config": {}
-    },
-    {
-      "alias": "UPDATE_PASSWORD",
-      "name": "Update Password",
-      "providerId": "UPDATE_PASSWORD",
       "enabled": true,
-      "defaultAction": false,
-      "priority": 30,
+      "defaultAction": true,
+      "priority": 20,
       "config": {}
     },
     {
@@ -2577,6 +2624,24 @@
       "enabled": true,
       "defaultAction": false,
       "priority": 50,
+      "config": {}
+    },
+    {
+      "alias": "CONFIGURE_TOTP",
+      "name": "Configure OTP",
+      "providerId": "CONFIGURE_TOTP",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 54,
+      "config": {}
+    },
+    {
+      "alias": "UPDATE_PASSWORD",
+      "name": "Update Password",
+      "providerId": "UPDATE_PASSWORD",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 57,
       "config": {}
     },
     {
@@ -2688,5 +2753,11 @@
   },
   "clientPolicies": {
     "policies": []
-  }
+  },
+  "passwordPolicy": "length(8) and notEmail and notUsername",
+  "defaultLocale": "pl",
+  "supportedLocales": [
+    "pl",
+    "en"
+  ]
 }

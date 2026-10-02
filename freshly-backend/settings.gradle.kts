@@ -17,10 +17,6 @@ include(
     "modules:useraccess:useraccess-application",
     "modules:useraccess:useraccess-infrastructure",
 
-    "modules:notification:notification-domain",
-    "modules:notification:notification-application",
-    "modules:notification:notification-infrastructure",
-
     "modules:permission:permission-domain",
     "modules:permission:permission-application",
     "modules:permission:permission-infrastructure",

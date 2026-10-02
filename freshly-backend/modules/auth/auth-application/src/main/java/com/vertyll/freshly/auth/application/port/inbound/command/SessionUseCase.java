@@ -1,13 +1,11 @@
 package com.vertyll.freshly.auth.application.port.inbound.command;
 
-import org.jspecify.annotations.Nullable;
-
-import com.vertyll.freshly.auth.application.dto.AuthTokens;
+import com.vertyll.freshly.auth.domain.model.AuthSession;
 
 public interface SessionUseCase {
-    AuthTokens login(String username, String password);
+    AuthSession signIn(String code, String codeVerifier);
 
-    AuthTokens refresh(@Nullable String refreshToken);
+    AuthSession refresh(AuthSession session);
 
-    void logout(@Nullable String refreshToken);
+    void signOut(AuthSession session);
 }

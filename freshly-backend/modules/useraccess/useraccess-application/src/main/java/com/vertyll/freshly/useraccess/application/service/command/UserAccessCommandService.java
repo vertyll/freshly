@@ -51,6 +51,7 @@ public class UserAccessCommandService implements UserAccessCommandUseCase {
         guardVersion(user, expectedVersion);
 
         user.activate();
+        directory.setEnabled(userId, true);
         users.save(user);
 
         logger.info("User {} activated", userId);
@@ -62,20 +63,10 @@ public class UserAccessCommandService implements UserAccessCommandUseCase {
         guardVersion(user, expectedVersion);
 
         user.deactivateBy(actorId);
+        directory.setEnabled(userId, false);
         users.save(user);
 
         logger.info("User {} deactivated by {}", userId, actorId);
-    }
-
-    @Override
-    public void deactivateUser(UUID userId, @Nullable Long expectedVersion) {
-        SystemUser user = require(userId);
-        guardVersion(user, expectedVersion);
-
-        user.deactivate();
-        users.save(user);
-
-        logger.info("User {} deactivated by the application", userId);
     }
 
     @Override
