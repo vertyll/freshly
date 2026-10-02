@@ -1,8 +1,8 @@
 package com.vertyll.freshly;
 
-import static java.util.Objects.requireNonNull;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import static java.util.Objects.requireNonNull;
 
 @ConfigurationProperties(prefix = "application.mail")
 public record MailProperties(String from) {
