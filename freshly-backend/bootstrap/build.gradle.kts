@@ -20,6 +20,7 @@ dependencies {
     implementation(libs.bundles.spring.boot.starters.common)
     implementation(libs.bundles.spring.boot.starters.aop)
     implementation(libs.spring.boot.starter.actuator)
+    implementation(libs.spring.boot.starter.mail)
     implementation(libs.springdoc.openapi.starter.webmvc.ui)
 
     compileOnly(libs.lombok)

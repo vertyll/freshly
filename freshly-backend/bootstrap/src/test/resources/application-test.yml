@@ -6,6 +6,8 @@ spring:
           issuer-uri: http://localhost:9000/realms/freshly
 
 application:
+  mail:
+    from: test@freshly.local
   auth:
     callback-url: http://localhost:8080/api/v1/auth/callback
     post-login-url: http://localhost:8080/api/v1/swagger-ui.html

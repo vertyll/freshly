@@ -2,6 +2,7 @@ package com.vertyll.freshly;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -15,6 +16,7 @@ import com.vertyll.freshly.useraccess.infrastructure.config.UserAccessModuleConf
 import com.vertyll.freshly.web.WebPlatformConfig;
 
 @SpringBootApplication
+@EnableConfigurationProperties(MailProperties.class)
 @EnableScheduling
 @Import(
     {
