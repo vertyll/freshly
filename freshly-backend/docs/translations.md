@@ -242,7 +242,7 @@ platform/shared-lang/i18n/
 
 platform/shared-web/i18n/
 ├── MessageResolver         what application code uses
-├── TranslationMessageSource  bridges Thymeleaf and anything else asking Spring
+├── TranslationMessageSource  answers anything that asks Spring for a MessageSource
 └── PlatformTranslationCatalogue  the platform's own keys
 
 modules/translation/
@@ -360,11 +360,11 @@ Each rejected field carries a key instead:
 
 **Positional arguments and named ones cannot be mixed.** ICU renders a pattern either way,
 but not both: a pattern written with `{min}` cannot be rendered with a positional argument
-list, and the render fails quietly back to the raw pattern. Today every Thymeleaf expression
-in the e-mail templates is a bare `#{key}` with no arguments, so it does not arise. The first
-one written as `#{email.verification.greeting(${username})}` against a named-argument default
-would print the pattern, braces and all, with nothing in the log. Pass values as Thymeleaf
-variables, or keep the key's placeholders positional.
+list, and the render fails quietly back to the raw pattern. Application code goes through
+`MessageResolver`, which passes named arguments, so it does not arise there. A caller that
+reaches `TranslationMessageSource` with positional arguments against a named-argument default
+would print the pattern, braces and all, with nothing in the log. Keep such a key's
+placeholders positional.
 
 **Keys are derived from the constraint type, not written on the annotation.** The obvious
 approach is `@Size(message = "{validation.username.tooLong}")`, and it permanently excludes

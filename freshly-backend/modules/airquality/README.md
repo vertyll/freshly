@@ -101,8 +101,8 @@ the per-station isolation the use case is built around.
 ### One station's failure does not abandon the run
 
 Each station is attempted independently and failures are counted into a `SyncReport`.
-That is the opposite of `notification`, and the difference is who can act: there the
-caller had a rollback to perform, here nobody is waiting. The report also makes "every
+That is the opposite of sign-in in `auth`, and the difference is who can act: there the
+caller has a session to revoke when provisioning fails, here nobody is waiting. The report also makes "every
 station failed" distinguishable from a quiet success, which is the one case worth
 paging someone for.
 

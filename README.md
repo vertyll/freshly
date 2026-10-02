@@ -16,7 +16,6 @@ Application with air quality data from IoT sensors.
 - Spring Security.
 - Spring Data MongoDB.
 - Spring Web.
-- Spring Mail.
 - OpenAPI (Swagger).
 
 ### Authentication:

@@ -23,8 +23,9 @@ clone it rather than inventing a variant.
 them by `keycloakUserId` and has no password column by design, which is what keeps
 the context small enough to state its invariants in one class.
 
-**Provisioning.** `auth` decides when a user should exist and calls
-`UserAccessCommandUseCase.createUser`. This module does not know Keycloak exists.
+**Provisioning.** `auth` decides when a user should exist — at their first sign-in — and
+calls `UserAccessCommandUseCase.createUser`. This module reaches Keycloak only through
+`RoleDirectoryPort`, for roles and for whether an account may sign in.
 
 **Which permissions a role grants.** `permission` stores that. This module only
 declares which permissions it will enforce.
@@ -124,3 +125,11 @@ The order inside the use case is deliberate: the aggregate's own rule runs first
 set costs no round trip; then the realm check; then the provider; then the save. A failure at
 any step leaves the previous ones either undone or harmless — the local write is last, and it
 is the only one inside the transaction.
+
+## Deactivation reaches the identity provider
+
+`PATCH /users/{id}/deactivate` and `/activate` go through `RoleDirectoryPort.setEnabled` as well
+as the aggregate. Sign-in happens on Keycloak's pages, which never consult this module, so a
+deactivation recorded only here would leave the person able to sign in and holding valid
+tokens. Disabling the Keycloak account also ends its sessions. The order is the same as for
+roles: the aggregate's rule, then the provider, then the save.
