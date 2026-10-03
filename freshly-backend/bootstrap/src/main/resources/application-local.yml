@@ -9,17 +9,17 @@ spring:
     host: localhost
     port: 1025
 
-springdoc:
-  api-docs:
-    enabled: true
-  swagger-ui:
-    enabled: true
-
 server:
   servlet:
     session:
       cookie:
         secure: false
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
 
 application:
   mail:
