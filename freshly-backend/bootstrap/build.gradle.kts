@@ -21,6 +21,7 @@ dependencies {
     implementation(libs.bundles.spring.boot.starters.aop)
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.spring.boot.starter.mail)
+    implementation(libs.spring.boot.starter.session.data.redis)
     implementation(libs.springdoc.openapi.starter.webmvc.ui)
 
     compileOnly(libs.lombok)

@@ -16,6 +16,16 @@ spring:
   data:
     mongodb:
       auto-index-creation: true
+  session:
+    data:
+      redis:
+        namespace: freshly:session
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          audiences:
+            - freshly-api
   mail:
     properties:
       mail:

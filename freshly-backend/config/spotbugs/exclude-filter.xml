@@ -48,4 +48,10 @@
         <Class name="com.vertyll.freshly.auth.infrastructure.web.session.SessionTokenRelayFilter"/>
         <Bug pattern="SERVLET_HEADER"/>
     </Match>
+
+    <!-- FindSecBugs: the sign-in test carries the session cookie between requests, as a browser does -->
+    <Match>
+        <Class name="~com\.vertyll\.freshly\.HostedSignInTest(\$.*)?"/>
+        <Bug pattern="COOKIE_USAGE"/>
+    </Match>
 </FindBugsFilter>

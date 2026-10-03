@@ -2,11 +2,13 @@ package com.vertyll.freshly;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
+import jakarta.servlet.http.Cookie;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -39,7 +40,12 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(MongoTestContainer.class)
+@Import(
+    {
+        MongoTestContainer.class,
+        RedisTestContainer.class
+    }
+)
 class HostedSignInTest {
     private static final String ACCESS_TOKEN = "access-token";
     private static final String REFRESH_TOKEN = "refresh-token";
@@ -78,11 +84,10 @@ class HostedSignInTest {
 
     @Test
     void callbackRefusesAStateThisBrowserWasNotGiven() {
-        MockHttpSession browser = new MockHttpSession();
+        Browser browser = new Browser();
         stateIssuedTo(browser);
 
-        MvcTestResult result =
-                mvc.get().uri("/auth/callback").session(browser).param(CODE, CODE).param("state", "forged").exchange();
+        MvcTestResult result = browser.send(mvc.get().uri("/auth/callback").param(CODE, CODE).param("state", "forged"));
 
         assertThat(result).hasStatus(HttpStatus.FOUND);
         assertThat(result.getResponse().getRedirectedUrl()).endsWith("error=state_mismatch");
@@ -92,62 +97,86 @@ class HostedSignInTest {
     void signInProvisionsTheUserAndRelaysTheTokenFromTheSession() {
         when(jwtDecoder.decode(ACCESS_TOKEN)).thenReturn(jwt());
 
-        MockHttpSession browser = signedIn(session(Instant.now().plusSeconds(300)));
+        Browser browser = signedIn(session(Instant.now().plusSeconds(300)));
 
         assertThat(users.findUser(SUBJECT)).isPresent();
-        assertThat(mvc.get().uri("/auth/session").session(browser)).hasStatusOk()
+        assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatusOk()
             .bodyJson()
             .extractingPath("$.email")
             .isEqualTo("ada@freshly.local");
-        assertThat(mvc.get().uri(USER_PATH).session(browser)).hasStatusOk();
+        assertThat(browser.send(mvc.get().uri(USER_PATH))).hasStatusOk();
         assertThat(mvc.get().uri(USER_PATH)).hasStatus(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
     void anExpiredSessionThatCannotBeRefreshedEnds() {
         when(tokenIssuer.refresh(anyString())).thenThrow(new DomainException(AuthError.SESSION_EXPIRED));
-        MockHttpSession browser = signedIn(session(Instant.now().minusSeconds(5)));
+        Browser browser = signedIn(session(Instant.now().minusSeconds(5)));
 
-        assertThat(mvc.get().uri(USER_PATH).session(browser)).hasStatus(HttpStatus.UNAUTHORIZED);
-        assertThat(browser.isInvalid()).isTrue();
+        assertThat(browser.send(mvc.get().uri(USER_PATH))).hasStatus(HttpStatus.UNAUTHORIZED);
+        assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
     void aCrossSiteWriteIsNotGivenTheSessionToken() {
         when(jwtDecoder.decode(ACCESS_TOKEN)).thenReturn(jwt());
-        MockHttpSession browser = signedIn(session(Instant.now().plusSeconds(300)));
+        Browser browser = signedIn(session(Instant.now().plusSeconds(300)));
 
-        assertThat(mvc.post().uri("/users").session(browser).header("Sec-Fetch-Site", "cross-site"))
+        assertThat(browser.send(mvc.post().uri("/users").header("Sec-Fetch-Site", "cross-site")))
             .hasStatus(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
     void logoutRevokesTheRefreshTokenAndEndsTheSession() {
-        MockHttpSession browser = signedIn(session(Instant.now().plusSeconds(300)));
+        Browser browser = signedIn(session(Instant.now().plusSeconds(300)));
 
-        assertThat(mvc.post().uri("/auth/logout").session(browser)).hasStatus(HttpStatus.NO_CONTENT);
+        assertThat(browser.send(mvc.post().uri("/auth/logout"))).hasStatus(HttpStatus.NO_CONTENT);
         verify(tokenIssuer).revoke(REFRESH_TOKEN);
-        assertThat(browser.isInvalid()).isTrue();
+        assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.NO_CONTENT);
     }
 
-    private String stateIssuedTo(MockHttpSession browser) {
-        String state = queryOf(mvc.get().uri("/auth/authorize").session(browser).exchange()).getFirst("state");
+    private String stateIssuedTo(Browser browser) {
+        String state = queryOf(browser.send(mvc.get().uri("/auth/authorize"))).getFirst("state");
         assertThat(state).isNotNull();
         return state;
     }
 
-    private MockHttpSession signedIn(AuthSession authSession) {
+    private Browser signedIn(AuthSession authSession) {
         when(tokenIssuer.exchange(eq(CODE), anyString())).thenReturn(authSession);
-        MockHttpSession browser = new MockHttpSession();
+        Browser browser = new Browser();
         String state = stateIssuedTo(browser);
+        List<String> preLoginSession = browser.sessionValues();
 
-        MvcTestResult callback =
-                mvc.get().uri("/auth/callback").session(browser).param(CODE, CODE).param("state", state).exchange();
+        MvcTestResult callback = browser.send(mvc.get().uri("/auth/callback").param(CODE, CODE).param("state", state));
 
         assertThat(callback).hasStatus(HttpStatus.FOUND);
         assertThat(callback.getResponse().getRedirectedUrl()).doesNotContain("error");
-        assertThat(browser.isInvalid()).as("the pre-login session is replaced").isTrue();
-        return (MockHttpSession) Objects.requireNonNull(callback.getRequest().getSession(false));
+        assertThat(browser.sessionValues()).as("the pre-login session is replaced")
+            .doesNotContainAnyElementsOf(preLoginSession);
+        return browser;
+    }
+
+    private static final class Browser {
+        private final Map<String, Cookie> cookies = new LinkedHashMap<>();
+
+        MvcTestResult send(MockMvcTester.MockMvcRequestBuilder request) {
+            if (!cookies.isEmpty()) {
+                request.cookie(cookies.values().toArray(Cookie[]::new));
+            }
+            MvcTestResult result = request.exchange();
+            for (Cookie issued : result.getResponse().getCookies()) {
+                if (issued.getMaxAge() == 0) {
+                    cookies.remove(issued.getName());
+                } else {
+                    cookies.put(issued.getName(), issued);
+                }
+            }
+            return result;
+        }
+
+        List<String> sessionValues() {
+            return cookies.values().stream().map(Cookie::getValue).toList();
+        }
     }
 
     private static AuthSession session(Instant expiresAt) {

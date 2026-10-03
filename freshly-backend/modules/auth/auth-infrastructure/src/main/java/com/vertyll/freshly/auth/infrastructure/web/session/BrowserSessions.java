@@ -1,8 +1,6 @@
 package com.vertyll.freshly.auth.infrastructure.web.session;
 
 import java.util.Optional;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -15,7 +13,6 @@ import com.vertyll.freshly.auth.domain.model.AuthSession;
 public class BrowserSessions {
     private static final String TRANSACTION = BrowserSessions.class.getName() + ".transaction";
     private static final String SESSION = BrowserSessions.class.getName() + ".session";
-    private static final String REFRESH_LOCK = BrowserSessions.class.getName() + ".refreshLock";
 
     public SignInTransaction begin(HttpServletRequest request) {
         SignInTransaction transaction = new SignInTransaction(Pkce.newState(), Pkce.newCodeVerifier());
@@ -35,7 +32,6 @@ public class BrowserSessions {
     public void establish(HttpServletRequest request, AuthSession authSession) {
         end(request);
         HttpSession session = request.getSession();
-        session.setAttribute(REFRESH_LOCK, new ReentrantLock());
         session.setAttribute(SESSION, StoredSession.of(authSession));
     }
 
@@ -52,14 +48,6 @@ public class BrowserSessions {
         if (session != null) {
             session.setAttribute(SESSION, StoredSession.of(authSession));
         }
-    }
-
-    public Optional<Lock> refreshLock(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || !(session.getAttribute(REFRESH_LOCK) instanceof Lock lock)) {
-            return Optional.empty();
-        }
-        return Optional.of(lock);
     }
 
     public void end(HttpServletRequest request) {

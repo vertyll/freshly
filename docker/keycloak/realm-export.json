@@ -862,6 +862,20 @@
             "jsonType.label": "String",
             "multivalued": "true"
           }
+        },
+        {
+          "name": "freshly-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.custom.audience": "freshly-api",
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true",
+            "lightweight.claim": "false",
+            "userinfo.token.claim": "false"
+          }
         }
       ],
       "defaultClientScopes": [

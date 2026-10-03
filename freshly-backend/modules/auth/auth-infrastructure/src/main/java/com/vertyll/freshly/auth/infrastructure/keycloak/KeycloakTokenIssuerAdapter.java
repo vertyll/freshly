@@ -1,10 +1,14 @@
 package com.vertyll.freshly.auth.infrastructure.keycloak;
 
+import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
@@ -49,11 +53,14 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
     private static final String ROLES_KEY = "roles";
     private static final String DEFAULT_ROLES_PREFIX = "default-roles-";
     private static final Set<String> BUILT_IN_ROLES = Set.of("offline_access", "uma_authorization");
+    private static final Duration REUSE_WINDOW = Duration.ofSeconds(30);
 
     private final RestClient restClient;
     private final KeycloakProperties keycloak;
     private final AuthProperties auth;
     private final JwtDecoder jwtDecoder;
+    private final Clock clock = Clock.systemUTC();
+    private final Map<String, Refresh> refreshes = new ConcurrentHashMap<>();
 
     public KeycloakTokenIssuerAdapter(
         @Qualifier(KeycloakConfig.KEYCLOAK_REST_CLIENT) RestClient keycloakRestClient,
@@ -80,11 +87,49 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
 
     @Override
     public AuthSession refresh(String refreshToken) {
+        forgetOldRefreshes();
+        Refresh mine = new Refresh();
+        Refresh running = refreshes.putIfAbsent(refreshToken, mine);
+        if (running != null) {
+            Outcome outcome = running.await();
+            AuthSession shared = outcome.session();
+            if (shared != null) {
+                return shared;
+            }
+            DomainException failure = outcome.failure();
+            if (failure != null) {
+                throw new DomainException(failure.error(), Map.of(), failure);
+            }
+            return requestRefresh(refreshToken);
+        }
+
+        try {
+            AuthSession session = requestRefresh(refreshToken);
+            mine.finish(new Outcome(session, null, clock.instant()));
+            return session;
+        } catch (DomainException e) {
+            refreshes.remove(refreshToken, mine);
+            mine.finish(new Outcome(null, e, clock.instant()));
+            throw e;
+        } finally {
+            if (!mine.isFinished()) {
+                refreshes.remove(refreshToken, mine);
+                mine.finish(new Outcome(null, null, clock.instant()));
+            }
+        }
+    }
+
+    private AuthSession requestRefresh(String refreshToken) {
         MultiValueMap<String, String> form = clientForm();
         form.add(GRANT_TYPE, REFRESH_TOKEN);
         form.add(REFRESH_TOKEN, refreshToken);
 
         return post(form, AuthError.SESSION_EXPIRED);
+    }
+
+    private void forgetOldRefreshes() {
+        Instant oldest = clock.instant().minus(REUSE_WINDOW);
+        refreshes.values().removeIf(refresh -> refresh.finishedBefore(oldest));
     }
 
     @Override
@@ -163,6 +208,30 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
             .map(String.class::cast)
             .filter(role -> !BUILT_IN_ROLES.contains(role) && !role.startsWith(DEFAULT_ROLES_PREFIX))
             .collect(Collectors.toUnmodifiableSet());
+    }
+
+    private record Outcome(@Nullable AuthSession session, @Nullable DomainException failure, Instant at) {
+    }
+
+    private static final class Refresh {
+        private final CompletableFuture<Outcome> result = new CompletableFuture<>();
+
+        void finish(Outcome outcome) {
+            result.complete(outcome);
+        }
+
+        boolean isFinished() {
+            return result.isDone();
+        }
+
+        Outcome await() {
+            return result.join();
+        }
+
+        boolean finishedBefore(Instant instant) {
+            Outcome outcome = result.getNow(null);
+            return outcome != null && outcome.at().isBefore(instant);
+        }
     }
 
     private record KeycloakTokenResponse(

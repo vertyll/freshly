@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -63,20 +62,11 @@ public class SessionTokenRelayFilter extends OncePerRequestFilter {
     }
 
     private @Nullable AuthSession freshen(HttpServletRequest request) {
-        Lock lock = browserSessions.refreshLock(request).orElse(null);
-        if (lock == null) {
-            return null;
+        AuthSession current = browserSessions.current(request).orElse(null);
+        if (current == null || !current.needsRefreshAt(clock.instant(), REFRESH_SKEW)) {
+            return current;
         }
-        lock.lock();
-        try {
-            AuthSession current = browserSessions.current(request).orElse(null);
-            if (current == null || !current.needsRefreshAt(clock.instant(), REFRESH_SKEW)) {
-                return current;
-            }
-            return refreshed(request, current);
-        } finally {
-            lock.unlock();
-        }
+        return refreshed(request, current);
     }
 
     private @Nullable AuthSession refreshed(HttpServletRequest request, AuthSession current) {

@@ -71,24 +71,37 @@ The session cookie is `SameSite=Lax`, which already keeps it off cross-site `POS
 relay also reads `Sec-Fetch-Site`: an unsafe method sent from anywhere other than this origin
 gets no token and is answered 401.
 
-### One refresh at a time per session
+### One refresh per refresh token
 
 Keycloak rotates refresh tokens and refuses a reused one, so two requests refreshing the same
-session at once would sign the person out. Each session holds its own lock; the second request
-waits and then uses the token the first one obtained. A refresh Keycloak refuses ends the
-session; one that fails because Keycloak is unreachable leaves it for the next request.
+session at once would sign the person out. `KeycloakTokenIssuerAdapter` runs a single refresh
+per refresh token: a second request with the same token waits for the first and receives its
+result, and for thirty seconds afterwards a request still holding the old token — one that read
+its session before the new one was saved — receives the same result instead of reaching
+Keycloak. A refresh Keycloak refuses ends the session and is not remembered; one that fails
+because Keycloak is unreachable leaves the session for the next request.
 
-### Sessions live in memory
+The single flight is per process. With several replicas, two of them could still refresh the
+same token at once; a lock in Redis would close that gap.
 
-The deployment runs one replica, and a restart signs everyone out, which for this application
-is acceptable. More replicas would need a shared session store (Spring Session on MongoDB) —
-until then the session attribute holds a small `Serializable` snapshot, so adding one does not
-change this module.
+### Sessions live in Redis
+
+Spring Session keeps them under the `freshly:session` key namespace, so the application holds
+no state of its own: a restart signs nobody out and replicas can be added. The session holds a
+small `Serializable` snapshot of the tokens, never the domain object.
+
+### The API accepts only its own tokens
+
+Besides the signature, the issuer and the expiry, the resource server requires `freshly-api` in
+the token's `aud` claim (`spring.security.oauth2.resourceserver.jwt.audiences`). The realm adds
+it to tokens issued to `freshly-app-client`; a token Keycloak issued to any other client of the
+realm is refused.
 
 ## Testing
 
-| Tier        | Where                                    |
-|-------------|------------------------------------------|
-| Domain      | `AuthSessionTest`: refresh timing, masked `toString` |
-| Application | `SessionServiceTest`: provisioning, revocation when provisioning fails |
-| Integration | `bootstrap/.../HostedSignInTest`: authorize, state check, sign-in with provisioning, relay, refresh failure, cross-site write, logout |
+| Tier        | Where                                                                                                                                                                   |
+|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Domain      | `AuthSessionTest`: refresh timing, masked `toString`                                                                                                                    |
+| Application | `SessionServiceTest`: provisioning, revocation when provisioning fails                                                                                                  |
+| Adapter     | `KeycloakTokenIssuerAdapterTest`: one refresh per token, stale sessions served the issued tokens, refusals not remembered                                               |
+| Integration | `bootstrap/.../HostedSignInTest`: authorize, state check, sign-in with provisioning, relay, refresh failure, cross-site write, logout — on MongoDB and Redis containers |
