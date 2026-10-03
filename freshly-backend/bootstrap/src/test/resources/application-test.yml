@@ -1,10 +1,3 @@
-spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:9000/realms/freshly
-
 application:
   mail:
     from: test@freshly.local
@@ -17,9 +10,7 @@ application:
     sync:
       enabled: false
   keycloak:
-    server-url: http://localhost:9000
-    realm: freshly
-    admin-client-id: test-admin
-    admin-client-secret: test-admin-secret
-    user-client-id: test-user
-    user-client-secret: test-user-secret
+    realm-url: http://localhost:9000/realms/freshly
+    client-secret: test-user-secret
+    admin:
+      client-secret: test-admin-secret

@@ -22,6 +22,7 @@ import com.vertyll.freshly.auth.infrastructure.config.AuthProperties;
 import com.vertyll.freshly.auth.infrastructure.config.KeycloakProperties;
 import com.vertyll.freshly.auth.infrastructure.web.dto.SessionResponseDto;
 import com.vertyll.freshly.auth.infrastructure.web.session.BrowserSessions;
+import com.vertyll.freshly.auth.infrastructure.web.session.FetchMetadata;
 import com.vertyll.freshly.auth.infrastructure.web.session.Pkce;
 import com.vertyll.freshly.auth.infrastructure.web.session.SignInTransaction;
 import com.vertyll.freshly.lang.error.DomainException;
@@ -31,10 +32,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping(AuthController.PATH)
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
+    public static final String PATH = "/auth";
+
     private static final String SCOPE = "openid profile email";
     private static final String ERROR_PARAM = "error";
     private static final String SIGN_IN_FAILED = "sign_in_failed";
@@ -58,7 +61,7 @@ public class AuthController {
         SignInTransaction transaction = browserSessions.begin(request);
 
         UriComponentsBuilder uri = UriComponentsBuilder.fromUriString(keycloak.endpoint("auth"))
-            .queryParam("client_id", keycloak.userClientId())
+            .queryParam("client_id", keycloak.clientId())
             .queryParam("redirect_uri", auth.callbackUrl())
             .queryParam("response_type", "code")
             .queryParam("scope", SCOPE)
@@ -119,6 +122,9 @@ public class AuthController {
     @PostMapping("/logout")
     @PublicEndpoint("ends the session the browser holds, which an expired access token must not prevent")
     public ResponseEntity<Void> logout(HttpServletRequest request) {
+        if (!FetchMetadata.sentFromThisOrigin(request)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         browserSessions.current(request).ifPresent(sessions::signOut);
         browserSessions.end(request);
         return ResponseEntity.noContent().build();

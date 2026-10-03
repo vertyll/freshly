@@ -107,7 +107,7 @@ tasks.register("docs") {
 
 dependencies {
     jacocoAggregation(platform(libs.spring.boot.dependencies))
-    subprojects.filter { it.buildFile.exists() }.forEach { jacocoAggregation(it) }
+    subprojects.filter { it.buildFile.exists() }.forEach { jacocoAggregation(project(it.path)) }
 }
 
 reporting {

@@ -5,22 +5,20 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import static java.util.Objects.requireNonNull;
 
 @ConfigurationProperties(prefix = "application.keycloak")
-public record KeycloakProperties(String serverUrl, String realm, String userClientId, String userClientSecret) {
+public record KeycloakProperties(String realmUrl, String clientId, String clientSecret) {
 
     public KeycloakProperties {
-        requireNonNull(serverUrl, "application.keycloak.server-url must be configured");
-        requireNonNull(realm, "application.keycloak.realm must be configured");
-        requireNonNull(userClientId, "application.keycloak.user-client-id must be configured");
-        requireNonNull(userClientSecret, "application.keycloak.user-client-secret must be configured");
+        requireNonNull(realmUrl, "application.keycloak.realm-url must be configured");
+        requireNonNull(clientId, "application.keycloak.client-id must be configured");
+        requireNonNull(clientSecret, "application.keycloak.client-secret must be configured");
     }
 
     public String endpoint(String name) {
-        return serverUrl + "/realms/" + realm + "/protocol/openid-connect/" + name;
+        return realmUrl + "/protocol/openid-connect/" + name;
     }
 
     @Override
     public String toString() {
-        return "KeycloakProperties[serverUrl=" + serverUrl + ", realm=" + realm + ", userClientId=" + userClientId
-                + ", userClientSecret=***]";
+        return "KeycloakProperties[realmUrl=" + realmUrl + ", clientId=" + clientId + ", clientSecret=***]";
     }
 }

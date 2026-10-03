@@ -35,11 +35,6 @@ spring:
           starttls:
             enable: true
             required: true
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${KEYCLOAK_ISSUER_URI}
 
 application:
   mail:
@@ -53,12 +48,10 @@ application:
     sync:
       enabled: ${AIRQUALITY_SYNC_ENABLED}
   keycloak:
-    server-url: ${KEYCLOAK_SERVER_URL}
-    realm: ${KEYCLOAK_REALM}
-    admin-client-id: ${KEYCLOAK_ADMIN_CLIENT_ID}
-    admin-client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
-    user-client-id: ${KEYCLOAK_USER_CLIENT_ID}
-    user-client-secret: ${KEYCLOAK_USER_CLIENT_SECRET}
+    realm-url: ${KEYCLOAK_REALM_URL}
+    client-secret: ${KEYCLOAK_CLIENT_SECRET}
+    admin:
+      client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
 
 logging:
   level:

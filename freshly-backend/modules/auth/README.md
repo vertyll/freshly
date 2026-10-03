@@ -69,7 +69,8 @@ Roles come from the access token, minus Keycloak's built-ins (`default-roles-*`,
 The session cookie is `SameSite=Lax`, which already keeps it off cross-site `POST`, `PUT`,
 `PATCH` and `DELETE`. Lax still treats another subdomain of the same site as same-site, so the
 relay also reads `Sec-Fetch-Site`: an unsafe method sent from anywhere other than this origin
-gets no token and is answered 401.
+gets no token and is answered 401. `POST /auth/logout` applies the same rule and answers 403, so
+another page cannot sign the person out.
 
 ### One refresh per refresh token
 
@@ -99,9 +100,9 @@ realm is refused.
 
 ## Testing
 
-| Tier        | Where                                                                                                                                                                   |
-|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Domain      | `AuthSessionTest`: refresh timing, masked `toString`                                                                                                                    |
-| Application | `SessionServiceTest`: provisioning, revocation when provisioning fails                                                                                                  |
-| Adapter     | `KeycloakTokenIssuerAdapterTest`: one refresh per token, stale sessions served the issued tokens, refusals not remembered                                               |
-| Integration | `bootstrap/.../HostedSignInTest`: authorize, state check, sign-in with provisioning, relay, refresh failure, cross-site write, logout — on MongoDB and Redis containers |
+| Tier        | Where                                                                                                                                                                              |
+|-------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Domain      | `AuthSessionTest`: refresh timing, masked `toString`                                                                                                                               |
+| Application | `SessionServiceTest`: provisioning, revocation when provisioning fails                                                                                                             |
+| Adapter     | `KeycloakTokenIssuerAdapterTest`: one refresh per token, stale sessions served the issued tokens, refusals not remembered                                                          |
+| Integration | `bootstrap/.../HostedSignInTest`: authorize, state check, sign-in with provisioning, relay, refresh failure, cross-site write and logout, logout — on MongoDB and Redis containers |

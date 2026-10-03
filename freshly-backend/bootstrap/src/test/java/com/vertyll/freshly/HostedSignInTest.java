@@ -34,6 +34,7 @@ import com.vertyll.freshly.useraccess.application.port.inbound.query.UserAccessQ
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -133,6 +134,16 @@ class HostedSignInTest {
         assertThat(browser.send(mvc.post().uri("/auth/logout"))).hasStatus(HttpStatus.NO_CONTENT);
         verify(tokenIssuer).revoke(REFRESH_TOKEN);
         assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void logoutSentFromAnotherSiteLeavesTheSession() {
+        Browser browser = signedIn(session(Instant.now().plusSeconds(300)));
+
+        assertThat(browser.send(mvc.post().uri("/auth/logout").header("Sec-Fetch-Site", "same-site")))
+            .hasStatus(HttpStatus.FORBIDDEN);
+        verify(tokenIssuer, never()).revoke(REFRESH_TOKEN);
+        assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.OK);
     }
 
     private String stateIssuedTo(Browser browser) {

@@ -21,6 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.vertyll.freshly.auth.application.port.inbound.command.SessionUseCase;
 import com.vertyll.freshly.auth.domain.error.AuthError;
 import com.vertyll.freshly.auth.domain.model.AuthSession;
+import com.vertyll.freshly.auth.infrastructure.web.controller.AuthController;
 import com.vertyll.freshly.lang.error.DomainException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SessionTokenRelayFilter extends OncePerRequestFilter {
     private static final Duration REFRESH_SKEW = Duration.ofSeconds(30);
-    private static final String AUTH_PATH = "/auth/";
     private static final String BEARER_PREFIX = "Bearer ";
-    private static final String FETCH_SITE_HEADER = "Sec-Fetch-Site";
-    private static final Set<String> SAFE_METHODS = Set.of("GET", "HEAD", "OPTIONS");
-    private static final Set<String> TRUSTED_FETCH_SITES = Set.of("same-origin", "none");
 
     private final BrowserSessions browserSessions;
     private final SessionUseCase sessions;
@@ -47,8 +44,8 @@ public class SessionTokenRelayFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getRequestURI().startsWith(request.getContextPath() + AUTH_PATH)
-                || request.getHeader(HttpHeaders.AUTHORIZATION) != null || !sentBySameOrigin(request);
+        return request.getRequestURI().startsWith(request.getContextPath() + AuthController.PATH + "/")
+                || request.getHeader(HttpHeaders.AUTHORIZATION) != null || !FetchMetadata.sentFromThisOrigin(request);
     }
 
     @Override
@@ -82,14 +79,6 @@ public class SessionTokenRelayFilter extends OncePerRequestFilter {
             }
             return null;
         }
-    }
-
-    private static boolean sentBySameOrigin(HttpServletRequest request) {
-        if (SAFE_METHODS.contains(request.getMethod())) {
-            return true;
-        }
-        String fetchSite = request.getHeader(FETCH_SITE_HEADER);
-        return fetchSite == null || TRUSTED_FETCH_SITES.contains(fetchSite);
     }
 
     private static final class BearerRequest extends HttpServletRequestWrapper {

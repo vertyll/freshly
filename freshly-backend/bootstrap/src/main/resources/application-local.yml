@@ -8,11 +8,6 @@ spring:
   mail:
     host: localhost
     port: 1025
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:9000/realms/freshly
 
 springdoc:
   api-docs:
@@ -38,12 +33,10 @@ application:
     sync:
       enabled: true
   keycloak:
-    server-url: http://localhost:9000
-    realm: freshly
-    admin-client-id: freshly-service-account
-    admin-client-secret: local-service-account-secret
-    user-client-id: freshly-app-client
-    user-client-secret: local-app-client-secret
+    realm-url: http://localhost:9000/realms/freshly
+    client-secret: local-app-client-secret
+    admin:
+      client-secret: local-service-account-secret
 
 logging:
   level:

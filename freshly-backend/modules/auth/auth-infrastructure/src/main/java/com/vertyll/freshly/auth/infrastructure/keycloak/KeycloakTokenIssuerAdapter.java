@@ -151,8 +151,8 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
 
     private MultiValueMap<String, String> clientForm() {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add(CLIENT_ID, keycloak.userClientId());
-        form.add(CLIENT_SECRET, keycloak.userClientSecret());
+        form.add(CLIENT_ID, keycloak.clientId());
+        form.add(CLIENT_SECRET, keycloak.clientSecret());
         return form;
     }
 

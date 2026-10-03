@@ -18,8 +18,8 @@ public class KeycloakRoleDirectoryConfig {
             .serverUrl(properties.serverUrl())
             .realm(properties.realm())
             .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-            .clientId(properties.adminClientId())
-            .clientSecret(properties.adminClientSecret())
+            .clientId(properties.admin().clientId())
+            .clientSecret(properties.admin().clientSecret())
             .build();
     }
 }

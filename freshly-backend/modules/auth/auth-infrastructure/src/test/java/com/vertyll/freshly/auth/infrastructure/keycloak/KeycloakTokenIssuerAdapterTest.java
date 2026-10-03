@@ -41,7 +41,7 @@ class KeycloakTokenIssuerAdapterTest {
     private final MockRestServiceServer keycloak = MockRestServiceServer.bindTo(builder).build();
     private final KeycloakTokenIssuerAdapter adapter = new KeycloakTokenIssuerAdapter(
         builder.build(),
-        new KeycloakProperties("http://keycloak.test", "freshly", "freshly-app-client", "secret"),
+        new KeycloakProperties("http://keycloak.test/realms/freshly", "freshly-app-client", "secret"),
         new AuthProperties("http://app.test/auth/callback", "http://app.test/"),
         token -> Jwt.withTokenValue(token)
             .header("alg", "RS256")
@@ -101,7 +101,7 @@ class KeycloakTokenIssuerAdapterTest {
     private static void awaitQuietly(CountDownLatch latch) {
         try {
             assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException _) {
             Thread.currentThread().interrupt();
         }
     }

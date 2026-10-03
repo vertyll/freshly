@@ -43,9 +43,9 @@
         <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
     </Match>
 
-    <!-- FindSecBugs: the relay reads Authorization and Sec-Fetch-Site to decide whether to add the session token, never to trust them -->
+    <!-- FindSecBugs: Authorization and Sec-Fetch-Site decide whether the session may act, never whom to trust -->
     <Match>
-        <Class name="com.vertyll.freshly.auth.infrastructure.web.session.SessionTokenRelayFilter"/>
+        <Class name="~com\.vertyll\.freshly\.auth\.infrastructure\.web\.session\.(SessionTokenRelayFilter|FetchMetadata)"/>
         <Bug pattern="SERVLET_HEADER"/>
     </Match>
 

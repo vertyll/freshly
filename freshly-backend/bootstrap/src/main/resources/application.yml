@@ -24,6 +24,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
+          issuer-uri: ${application.keycloak.realm-url}
           audiences:
             - freshly-api
   mail:
@@ -72,6 +73,10 @@ springdoc:
     enabled: false
 
 application:
+  keycloak:
+    client-id: freshly-app-client
+    admin:
+      client-id: freshly-service-account
   airquality:
     gios:
       base-url: https://api.gios.gov.pl/pjp-api/v1/rest
