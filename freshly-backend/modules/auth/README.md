@@ -39,8 +39,8 @@ token.
 ### Keycloak owns every page that touches a credential
 
 The module never sees a password. Keycloak's pages carry its brute-force protection,
-password policy, e-mail verification, terms of use and two-factor setup, which the old
-password grant bypassed or made the application re-implement. The realm allows no password
+password policy, e-mail verification, terms of use and two-factor setup, which a password
+grant would bypass or make the application re-implement. The realm allows no password
 grant for `freshly-app-client`, only the authorization code flow with PKCE.
 
 With e-mail verification on, Keycloak 26.7 asks for no password at registration: the account

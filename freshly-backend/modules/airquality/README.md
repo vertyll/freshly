@@ -120,8 +120,7 @@ permissions.
 
 ## The GIOŚ API
 
-Version 1 of the public API, `https://api.gios.gov.pl/pjp-api/v1/rest`. The previous
-version was withdrawn on 30 June 2025.
+Version 1 of the public API, `https://api.gios.gov.pl/pjp-api/v1/rest`.
 
 The responses are JSON-LD with Polish keys — `"Identyfikator stacji"`, `"WGS84 φ N"`,
 `"Lista danych pomiarowych"` — mapped verbatim in `GiosResponses`. Lists come wrapped and paged:

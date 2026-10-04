@@ -81,8 +81,7 @@ one module reaching into another's internals.
 
 The third guards a different kind of failure. NullAway checks exactly what JSpecify marks,
 and a package does not mark its subpackages — so a package added without a
-`package-info.java` is silently not checked, and the build stays green. See
-`docs/open-items.md`.
+`package-info.java` is silently not checked, and the build stays green.
 
 See `docs/hexagonal-layering.md` for the rules and what the framework-free constraint
 buys.
@@ -106,13 +105,13 @@ enforce the boundary.
 
 ## Where to start reading
 
-| If you want to understand              | Read                                 |
-|----------------------------------------|--------------------------------------|
-| The shape every module follows         | `modules/useraccess/` and its README |
-| Why the inner layers have no Spring    | `docs/hexagonal-layering.md`         |
-| How a browser signs in                 | `modules/auth/README.md`             |
-| What is shared, and why                | `docs/shared-modules.md`             |
-| How text is stored and edited          | `docs/translations.md`               |
-| What is not verified, and what is next | `docs/open-items.md`                 |
+| If you want to understand           | Read                                 |
+|-------------------------------------|--------------------------------------|
+| The shape every module follows      | `modules/useraccess/` and its README |
+| Why the inner layers have no Spring | `docs/hexagonal-layering.md`         |
+| How a browser signs in              | `modules/auth/README.md`             |
+| What is shared, and why             | `docs/shared-modules.md`             |
+| How text is stored and edited       | `docs/translations.md`               |
+| What is missing, and what is next   | `docs/open-items.md`                 |
 
 Every module has a README covering the decisions specific to it.

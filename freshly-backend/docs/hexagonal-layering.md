@@ -192,12 +192,12 @@ decorative.
 
 Each context owns one, in `domain/error/`:
 
-| Module         | Catalogue           |
-|----------------|---------------------|
-| `useraccess`   | `UserAccessError`   |
-| `auth`         | `AuthError`         |
-| `permission`   | `PermissionError`   |
-| `airquality`   | `AirQualityError`   |
+| Module       | Catalogue         |
+|--------------|-------------------|
+| `useraccess` | `UserAccessError` |
+| `auth`       | `AuthError`       |
+| `permission` | `PermissionError` |
+| `airquality` | `AirQualityError` |
 
 Each entry names a translation key and an `ErrorKind`. One handler —
 `shared-web`'s `DomainExceptionHandler` — serves every module and knows none of
