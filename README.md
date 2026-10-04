@@ -29,7 +29,23 @@ Application with air quality data from IoT sensors.
 
 ### Authentication:
 
-- Keycloak.
+- **Identity provider**: Keycloak (realm `freshly`) owns every page that touches a credential: sign-up, sign-in, email
+  verification, password reset, two-factor authentication and acceptance of the terms of use. The application never sees
+  a password.
+- **Pattern**: BFF. The back-end signs users in with the authorization code flow and PKCE and keeps the tokens in its
+  session; the browser holds only the `FRESHLY_SESSION` cookie (`HttpOnly`, `SameSite=Lax`, `Secure` in production). No
+  token reaches JavaScript.
+- **Session store**: Redis (Spring Session, `freshly:session` namespace), so the back-end holds no state of its own and
+  a restart signs nobody out.
+- **JWT**: for a request with a session, the back-end attaches the access token itself and checks it like any other: the
+  API is a stateless OAuth2 resource server verifying signature, issuer, expiry and audience (`freshly-api`). A client
+  with its own token calls it with `Authorization: Bearer`.
+- **Token lifecycle**: access tokens live five minutes; every refresh returns a new refresh token and invalidates the
+  old one, and concurrent requests of one session share a single refresh. Signing out revokes the refresh token at
+  Keycloak.
+- **Cross-site requests**: `SameSite=Lax` plus `Sec-Fetch-Site`, so a write or a logout sent from another site gets no
+  token and is refused.
+- **Accounts**: created in MongoDB at the first sign-in; permissions are granted to Keycloak roles.
 
 ### Core back-end:
 
