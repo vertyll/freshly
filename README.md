@@ -42,8 +42,8 @@ Application with air quality data from IoT sensors.
 - **State**: the back-end is stateless: every request is authorized by the JWT alone, so any instance can serve it. The
   only state is the browser session, and it lives in Redis, outside the application.
 - **Token lifecycle**: access tokens live five minutes; every refresh returns a new refresh token and invalidates the
-  old one, and concurrent requests of one session share a single refresh. Signing out revokes the refresh token at
-  Keycloak.
+  old one, and concurrent requests of one session share a single refresh, across replicas too (a lock in Redis). Signing
+  out revokes the refresh token at Keycloak.
 - **Cross-site requests**: `SameSite=Lax` plus `Sec-Fetch-Site`, so a write or a logout sent from another site gets no
   token and is refused.
 - **Accounts**: created in MongoDB at the first sign-in; permissions are granted to Keycloak roles.

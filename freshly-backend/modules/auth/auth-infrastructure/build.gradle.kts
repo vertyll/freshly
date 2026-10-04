@@ -9,5 +9,6 @@ dependencies {
 
     implementation(libs.jackson.annotations)
     implementation(libs.spring.boot.starter.security)
+    implementation(libs.spring.boot.starter.data.redis)
     implementation(libs.bundles.spring.boot.starters.oauth)
 }

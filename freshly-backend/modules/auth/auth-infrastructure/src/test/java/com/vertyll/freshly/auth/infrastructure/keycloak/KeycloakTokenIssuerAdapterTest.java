@@ -50,7 +50,8 @@ class KeycloakTokenIssuerAdapterTest {
             .claim("realm_access", Map.of("roles", List.of("USER", "offline_access")))
             .issuedAt(Instant.now())
             .expiresAt(Instant.now().plusSeconds(300))
-            .build()
+            .build(),
+        SharedRefreshes.inProcessOnly()
     );
 
     @Test

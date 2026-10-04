@@ -19,7 +19,7 @@ spring:
   session:
     data:
       redis:
-        namespace: freshly:session
+        namespace: ${application.redis.key-prefix}:session
   security:
     oauth2:
       resourceserver:
@@ -73,6 +73,8 @@ springdoc:
     enabled: false
 
 application:
+  redis:
+    key-prefix: freshly
   keycloak:
     client-id: freshly-app-client
     admin:

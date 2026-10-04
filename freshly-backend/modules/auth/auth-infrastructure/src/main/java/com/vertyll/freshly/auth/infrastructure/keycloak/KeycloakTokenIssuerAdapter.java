@@ -59,6 +59,7 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
     private final KeycloakProperties keycloak;
     private final AuthProperties auth;
     private final JwtDecoder jwtDecoder;
+    private final SharedRefreshes sharedRefreshes;
     private final Clock clock = Clock.systemUTC();
     private final Map<String, Refresh> refreshes = new ConcurrentHashMap<>();
 
@@ -66,12 +67,14 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
         @Qualifier(KeycloakConfig.KEYCLOAK_REST_CLIENT) RestClient keycloakRestClient,
         KeycloakProperties keycloak,
         AuthProperties auth,
-        JwtDecoder jwtDecoder
+        JwtDecoder jwtDecoder,
+        SharedRefreshes sharedRefreshes
     ) {
         this.restClient = keycloakRestClient;
         this.keycloak = keycloak;
         this.auth = auth;
         this.jwtDecoder = jwtDecoder;
+        this.sharedRefreshes = sharedRefreshes;
     }
 
     @Override
@@ -82,7 +85,8 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
         form.add(CODE_VERIFIER, codeVerifier);
         form.add(REDIRECT_URI, auth.callbackUrl());
 
-        return post(form, AuthError.SIGN_IN_REJECTED);
+        SharedRefreshes.TokenPair tokens = requestTokens(form, AuthError.SIGN_IN_REJECTED);
+        return toSession(tokens.accessToken(), tokens.refreshToken(), AuthError.SIGN_IN_REJECTED);
     }
 
     @Override
@@ -124,7 +128,9 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
         form.add(GRANT_TYPE, REFRESH_TOKEN);
         form.add(REFRESH_TOKEN, refreshToken);
 
-        return post(form, AuthError.SESSION_EXPIRED);
+        SharedRefreshes.TokenPair tokens =
+                sharedRefreshes.refresh(refreshToken, () -> requestTokens(form, AuthError.SESSION_EXPIRED));
+        return toSession(tokens.accessToken(), tokens.refreshToken(), AuthError.SESSION_EXPIRED);
     }
 
     private void forgetOldRefreshes() {
@@ -156,7 +162,7 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
         return form;
     }
 
-    private AuthSession post(MultiValueMap<String, String> form, AuthError onRejection) {
+    private SharedRefreshes.TokenPair requestTokens(MultiValueMap<String, String> form, AuthError onRejection) {
         KeycloakTokenResponse response;
         try {
             response = restClient.post()
@@ -175,10 +181,11 @@ public class KeycloakTokenIssuerAdapter implements TokenIssuerPort {
             throw new DomainException(AuthError.IDENTITY_PROVIDER_UNAVAILABLE, Map.of(), e);
         }
 
-        if (response == null || response.refreshToken() == null) {
+        String refreshToken = response == null ? null : response.refreshToken();
+        if (response == null || refreshToken == null) {
             throw new DomainException(AuthError.IDENTITY_PROVIDER_UNAVAILABLE);
         }
-        return toSession(response.accessToken(), response.refreshToken(), onRejection);
+        return new SharedRefreshes.TokenPair(response.accessToken(), refreshToken);
     }
 
     private AuthSession toSession(String accessToken, String refreshToken, AuthError onRejection) {

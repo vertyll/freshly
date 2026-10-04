@@ -82,8 +82,12 @@ its session before the new one was saved — receives the same result instead of
 Keycloak. A refresh Keycloak refuses ends the session and is not remembered; one that fails
 because Keycloak is unreachable leaves the session for the next request.
 
-The single flight is per process. With several replicas, two of them could still refresh the
-same token at once; a lock in Redis would close that gap.
+Replicas agree through Redis (`SharedRefreshes`). After the in-process single flight, a replica
+claims `freshly:refresh-lock:<sha256 of the refresh token>` for ten seconds, calls Keycloak and
+leaves the new pair under `freshly:refresh-result:<sha256>` for thirty seconds; a replica that
+finds the lock taken waits for that result instead of presenting the token again. A refused
+refresh releases the lock and is not shared. When Redis is unreachable a replica refreshes on its
+own, so Redis never becomes a reason a request fails.
 
 ### Sessions live in Redis
 
