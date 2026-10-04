@@ -94,7 +94,8 @@ class SharedRefreshesTest {
 
     @Test
     void keysCarryTheApplicationPrefixAndNeverTheToken() {
-        new SharedRefreshes(redis, new RedisKeyProperties("test-d")).refresh("secret-refresh", () -> new TokenPair("access", "refresh"));
+        new SharedRefreshes(redis, new RedisKeyProperties("test-d"))
+            .refresh("secret-refresh", () -> new TokenPair("access", "refresh"));
 
         assertThat(redis.keys("test-d:refresh-result:*")).hasSize(1);
         assertThat(redis.keys("*secret-refresh*")).isEmpty();

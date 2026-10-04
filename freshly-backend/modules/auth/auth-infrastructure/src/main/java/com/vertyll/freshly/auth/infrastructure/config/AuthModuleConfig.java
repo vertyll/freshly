@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(
     {
         KeycloakProperties.class,
-        AuthProperties.class
+        AuthProperties.class,
+        RedisKeyProperties.class
     }
 )
 public class AuthModuleConfig {
