@@ -129,12 +129,12 @@ stations at up to 500 a page, readings at 24 (a day, newest first). `GiosAirQual
 runs against recorded v1 responses, so a change to the format fails there rather than in a
 sync.
 
-| Data | Limit GIOŚ publishes |
-|---|---|
-| readings (`/data/getData`) | 1500 requests a minute |
-| index (`/aqindex/getIndex`) | 1500 requests a minute |
-| stations and sensors | "2 and 1500 requests a minute", without saying which applies where |
-| archive, statistics, exceedances, metadata | 2 requests a minute |
+| Data                                       | Limit GIOŚ publishes                                               |
+|--------------------------------------------|--------------------------------------------------------------------|
+| readings (`/data/getData`)                 | 1500 requests a minute                                             |
+| index (`/aqindex/getIndex`)                | 1500 requests a minute                                             |
+| stations and sensors                       | "2 and 1500 requests a minute", without saying which applies where |
+| archive, statistics, exceedances, metadata | 2 requests a minute                                                |
 
 Readings and index update hourly and reach three days back; anything older is only in the
 archive. The terms also ask that the same data be fetched no more than twice an hour, which

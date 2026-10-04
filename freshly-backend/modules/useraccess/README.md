@@ -8,14 +8,14 @@ clone it rather than inventing a variant.
 
 ## What it owns
 
-| Concern            | Where                                            |
-|--------------------|--------------------------------------------------|
-| The `SystemUser` aggregate and its invariants | `useraccess-domain/model`     |
-| What this context can refuse, and why         | `useraccess-domain/error`     |
+| Concern                                       | Where                                                  |
+|-----------------------------------------------|--------------------------------------------------------|
+| The `SystemUser` aggregate and its invariants | `useraccess-domain/model`                              |
+| What this context can refuse, and why         | `useraccess-domain/error`                              |
 | The permissions it declares                   | `useraccess-application/security/UserAccessPermission` |
-| What it needs from storage                    | `useraccess-domain/repository` |
-| Its public API                                | `useraccess-application/port/inbound` |
-| MongoDB, HTTP, Spring wiring                  | `useraccess-infrastructure`   |
+| What it needs from storage                    | `useraccess-domain/repository`                         |
+| Its public API                                | `useraccess-application/port/inbound`                  |
+| MongoDB, HTTP, Spring wiring                  | `useraccess-infrastructure`                            |
 
 ## What it deliberately does not own
 
@@ -92,10 +92,10 @@ becoming unreachable.
 
 ## Testing
 
-| Tier        | Where                              | Needs   |
-|-------------|------------------------------------|---------|
-| Domain      | `useraccess-domain/src/test`       | nothing |
-| Application | `useraccess-application/src/test`  | nothing |
+| Tier                       | Where                                | Needs                            |
+|----------------------------|--------------------------------------|----------------------------------|
+| Domain                     | `useraccess-domain/src/test`         | nothing                          |
+| Application                | `useraccess-application/src/test`    | nothing                          |
 | Architecture / integration | `useraccess-infrastructure/src/test` | ArchUnit; Docker for integration |
 
 The first two run without Spring, without a database and without a container —

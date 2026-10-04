@@ -14,10 +14,10 @@ must touch exactly one of them.
 
 ## The distinction everything rests on
 
-| | Source | Overwritten at start-up |
-|---|---|---|
-| `defaults` | the owning module's `TranslationCatalogue`, in code | **yes, always** |
-| `overrides` | an administrator, through the API | **never** |
+|             | Source                                              | Overwritten at start-up |
+|-------------|-----------------------------------------------------|-------------------------|
+| `defaults`  | the owning module's `TranslationCatalogue`, in code | **yes, always**         |
+| `overrides` | an administrator, through the API                   | **never**               |
 
 Resolution is `override → default → the key itself`, in a language the request's locale has
 already been narrowed to by `SupportedLocaleConfig` (English when nothing in `Accept-Language`
