@@ -13,10 +13,10 @@ on everything it holds. The criteria below are what keep `platform/` from becomi
 > A type belongs in the platform only if **two or more contexts genuinely need the same
 > one**, and it carries **no domain meaning**.
 
-"Could plausibly be shared" is not the bar. `auth`'s `AuthSession` and `useraccess`'s
+"Could plausibly be shared" is not the bar. `auth`'s `SignedInUser` and `useraccess`'s
 `SystemUser` both describe a person and both carry roles, and they stay apart because they are
-not the same concept: one is a signed-in browser and its tokens, the other a standing inside
-the application. Merging them would create exactly the coupling this rule exists to prevent,
+not the same concept: one is who just signed in, as Keycloak's token says, the other a standing
+inside the application. Merging them would create exactly the coupling this rule exists to prevent,
 and the merged type would immediately need to satisfy both.
 
 ---
@@ -188,7 +188,7 @@ differ in exactly the thing that matters — which ports exist and which are tra
 so a shared abstraction over them would be a configuration format for something that is
 already configuration.
 
-**Domain value objects.** `AuthSession` is in `auth`. `Station` is in `airquality`. Two
+**Domain value objects.** `SignedInUser` is in `auth`. `Station` is in `airquality`. Two
 contexts modeling a similar-sounding thing differently is the point of bounded contexts,
 not a duplication to eliminate.
 

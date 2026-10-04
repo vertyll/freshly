@@ -34,6 +34,7 @@ dependencies {
     developmentOnly(libs.spring.boot.devtools)
 
     testImplementation(libs.bundles.test.starters)
+    testImplementation(libs.spring.boot.starter.security.oauth2.client)
     testImplementation(project(":platform:shared-archunit"))
     testImplementation(libs.bundles.testcontainers)
 }

@@ -1,5 +1,6 @@
 package com.vertyll.freshly;
 
+import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -22,6 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SharedRefreshesTest {
+    private static final Instant ISSUED_AT = Instant.parse("2026-01-01T00:00:00Z");
+
     private static final GenericContainer<?> REDIS = new GenericContainer<>("redis:8-alpine").withExposedPorts(6379);
 
     private static LettuceConnectionFactory connections;
@@ -54,12 +57,12 @@ class SharedRefreshesTest {
             calls.incrementAndGet();
             entered.countDown();
             await(release);
-            return new TokenPair("access-2", "refresh-2");
+            return pair("access-2", "refresh-2");
         }));
         assertThat(entered.await(5, TimeUnit.SECONDS)).isTrue();
         CompletableFuture<TokenPair> follower = CompletableFuture.supplyAsync(() -> second.refresh("refresh-1", () -> {
             calls.incrementAndGet();
-            return new TokenPair("access-3", "refresh-3");
+            return pair("access-3", "refresh-3");
         }));
         release.countDown();
 
@@ -71,7 +74,7 @@ class SharedRefreshesTest {
     @Test
     void aStaleRequestReceivesTheTokensAlreadyIssued() {
         SharedRefreshes replica = new SharedRefreshes(redis, new RedisKeyProperties("test-b"));
-        replica.refresh("refresh-1", () -> new TokenPair("access-2", "refresh-2"));
+        replica.refresh("refresh-1", () -> pair("access-2", "refresh-2"));
 
         TokenPair stale = new SharedRefreshes(redis, new RedisKeyProperties("test-b")).refresh("refresh-1", () -> {
             throw new IllegalStateException("Keycloak must not be asked twice");
@@ -87,7 +90,7 @@ class SharedRefreshesTest {
             throw new IllegalStateException("refused");
         })).isInstanceOf(IllegalStateException.class);
 
-        TokenPair retried = replica.refresh("refresh-1", () -> new TokenPair("access-2", "refresh-2"));
+        TokenPair retried = replica.refresh("refresh-1", () -> pair("access-2", "refresh-2"));
 
         assertThat(retried.refreshToken()).isEqualTo("refresh-2");
     }
@@ -95,7 +98,7 @@ class SharedRefreshesTest {
     @Test
     void keysCarryTheApplicationPrefixAndNeverTheToken() {
         new SharedRefreshes(redis, new RedisKeyProperties("test-d"))
-            .refresh("secret-refresh", () -> new TokenPair("access", "refresh"));
+            .refresh("secret-refresh", () -> pair("access", "refresh"));
 
         assertThat(redis.keys("test-d:refresh-result:*")).hasSize(1);
         assertThat(redis.keys("*secret-refresh*")).isEmpty();
@@ -107,5 +110,9 @@ class SharedRefreshesTest {
         } catch (InterruptedException _) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    private static TokenPair pair(String accessToken, String refreshToken) {
+        return new TokenPair(accessToken, refreshToken, ISSUED_AT, ISSUED_AT.plusSeconds(300));
     }
 }

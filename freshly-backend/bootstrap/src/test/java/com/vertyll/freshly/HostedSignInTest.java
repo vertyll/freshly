@@ -1,6 +1,8 @@
 package com.vertyll.freshly;
 
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,30 +12,39 @@ import java.util.UUID;
 
 import jakarta.servlet.http.Cookie;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.endpoint.OAuth2RefreshTokenGrantRequest;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoderFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.vertyll.freshly.auth.application.port.outbound.TokenIssuerPort;
-import com.vertyll.freshly.auth.domain.error.AuthError;
-import com.vertyll.freshly.auth.domain.model.AuthSession;
-import com.vertyll.freshly.lang.error.DomainException;
+import com.vertyll.freshly.auth.application.port.outbound.SessionRevocationPort;
 import com.vertyll.freshly.useraccess.application.port.inbound.query.UserAccessQueryUseCase;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,10 +60,15 @@ import static org.mockito.Mockito.when;
 )
 class HostedSignInTest {
     private static final String ACCESS_TOKEN = "access-token";
+    private static final String REFRESHED_ACCESS_TOKEN = "refreshed-access-token";
     private static final String REFRESH_TOKEN = "refresh-token";
+    private static final String ID_TOKEN = "id-token";
     private static final String CODE = "code";
+    private static final String EMAIL = "ada@freshly.local";
     private static final UUID SUBJECT = UUID.fromString("7d1c9a52-3a43-4c34-9a8f-2f5d7c6f1b10");
     private static final String USER_PATH = "/users/" + SUBJECT;
+    private static final long LIFETIME_SECONDS = 300;
+    private static final long EXPIRING_SECONDS = 5;
 
     @Autowired
     private MockMvcTester mvc;
@@ -61,15 +77,34 @@ class HostedSignInTest {
     private UserAccessQueryUseCase users;
 
     @MockitoBean
-    private TokenIssuerPort tokenIssuer;
+    private JwtDecoder jwtDecoder;
 
     @MockitoBean
-    private JwtDecoder jwtDecoder;
+    private JwtDecoderFactory<ClientRegistration> idTokenDecoders;
+
+    @MockitoBean
+    private OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> codeTokens;
+
+    @MockitoBean
+    private OAuth2AccessTokenResponseClient<OAuth2RefreshTokenGrantRequest> refreshTokens;
+
+    @MockitoBean
+    private SessionRevocationPort revocation;
+
+    @BeforeEach
+    void keycloakIssuesTokens() {
+        when(jwtDecoder.decode(ACCESS_TOKEN)).thenReturn(accessToken(ACCESS_TOKEN));
+        when(jwtDecoder.decode(REFRESHED_ACCESS_TOKEN)).thenReturn(accessToken(REFRESHED_ACCESS_TOKEN));
+    }
 
     @Test
     void authorizeRedirectsToKeycloakWithPkceAndLanguage() {
-        MvcTestResult result =
-                mvc.get().uri("/auth/authorize").param("register", "true").header("Accept-Language", "pl").exchange();
+        MvcTestResult result = mvc.get()
+            .uri("/auth/authorize")
+            .param("register", "true")
+            .param("kc_action", "UPDATE_PASSWORD")
+            .header("Accept-Language", "pl")
+            .exchange();
 
         assertThat(result).hasStatus(HttpStatus.FOUND);
         assertThat(result.getResponse().getRedirectedUrl())
@@ -80,13 +115,14 @@ class HostedSignInTest {
         assertThat(query.getFirst("state")).isNotBlank();
         assertThat(query.get("ui_locales")).containsExactly("pl");
         assertThat(query.get("prompt")).containsExactly("create");
+        assertThat(query.get("kc_action")).containsExactly("UPDATE_PASSWORD");
         assertThat(query.get("redirect_uri")).containsExactly("http://localhost:8080/api/v1/auth/callback");
     }
 
     @Test
     void callbackRefusesAStateThisBrowserWasNotGiven() {
         Browser browser = new Browser();
-        stateIssuedTo(browser);
+        browser.send(mvc.get().uri("/auth/authorize"));
 
         MvcTestResult result = browser.send(mvc.get().uri("/auth/callback").param(CODE, CODE).param("state", "forged"));
 
@@ -96,23 +132,50 @@ class HostedSignInTest {
 
     @Test
     void signInProvisionsTheUserAndRelaysTheTokenFromTheSession() {
-        when(jwtDecoder.decode(ACCESS_TOKEN)).thenReturn(jwt());
-
-        Browser browser = signedIn(session(Instant.now().plusSeconds(300)));
+        Browser browser = signedIn(LIFETIME_SECONDS);
 
         assertThat(users.findUser(SUBJECT)).isPresent();
         assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatusOk()
             .bodyJson()
             .extractingPath("$.email")
-            .isEqualTo("ada@freshly.local");
+            .isEqualTo(EMAIL);
         assertThat(browser.send(mvc.get().uri(USER_PATH))).hasStatusOk();
         assertThat(mvc.get().uri(USER_PATH)).hasStatus(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
+    void aSignInWithAnUnusableTokenRevokesTheNewSession() {
+        when(jwtDecoder.decode(ACCESS_TOKEN)).thenReturn(accessTokenWithSubject("not-a-uuid"));
+
+        Browser browser = new Browser();
+        MvcTestResult callback = completeSignIn(browser, LIFETIME_SECONDS);
+
+        assertThat(callback.getResponse().getRedirectedUrl()).endsWith("error=sign_in_failed");
+        verify(revocation).revoke(REFRESH_TOKEN);
+        assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void aClientWithItsOwnTokenCallsTheApiWithoutASession() {
+        signedIn(LIFETIME_SECONDS);
+
+        assertThat(mvc.get().uri(USER_PATH).header("Authorization", "Bearer " + ACCESS_TOKEN)).hasStatusOk();
+    }
+
+    @Test
+    void anAccessTokenAboutToExpireIsRefreshed() {
+        when(refreshTokens.getTokenResponse(any())).thenReturn(tokenResponse(REFRESHED_ACCESS_TOKEN, LIFETIME_SECONDS));
+        Browser browser = signedIn(EXPIRING_SECONDS);
+
+        assertThat(browser.send(mvc.get().uri(USER_PATH))).hasStatusOk();
+        verify(refreshTokens).getTokenResponse(any());
+    }
+
+    @Test
     void anExpiredSessionThatCannotBeRefreshedEnds() {
-        when(tokenIssuer.refresh(anyString())).thenThrow(new DomainException(AuthError.SESSION_EXPIRED));
-        Browser browser = signedIn(session(Instant.now().minusSeconds(5)));
+        when(refreshTokens.getTokenResponse(any()))
+            .thenThrow(new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_GRANT)));
+        Browser browser = signedIn(EXPIRING_SECONDS);
 
         assertThat(browser.send(mvc.get().uri(USER_PATH))).hasStatus(HttpStatus.UNAUTHORIZED);
         assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.NO_CONTENT);
@@ -120,8 +183,7 @@ class HostedSignInTest {
 
     @Test
     void aCrossSiteWriteIsNotGivenTheSessionToken() {
-        when(jwtDecoder.decode(ACCESS_TOKEN)).thenReturn(jwt());
-        Browser browser = signedIn(session(Instant.now().plusSeconds(300)));
+        Browser browser = signedIn(LIFETIME_SECONDS);
 
         assertThat(browser.send(mvc.post().uri("/users").header("Sec-Fetch-Site", "cross-site")))
             .hasStatus(HttpStatus.UNAUTHORIZED);
@@ -129,42 +191,55 @@ class HostedSignInTest {
 
     @Test
     void logoutRevokesTheRefreshTokenAndEndsTheSession() {
-        Browser browser = signedIn(session(Instant.now().plusSeconds(300)));
+        Browser browser = signedIn(LIFETIME_SECONDS);
 
         assertThat(browser.send(mvc.post().uri("/auth/logout"))).hasStatus(HttpStatus.NO_CONTENT);
-        verify(tokenIssuer).revoke(REFRESH_TOKEN);
+        verify(revocation).revoke(REFRESH_TOKEN);
         assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
     void logoutSentFromAnotherSiteLeavesTheSession() {
-        Browser browser = signedIn(session(Instant.now().plusSeconds(300)));
+        Browser browser = signedIn(LIFETIME_SECONDS);
 
         assertThat(browser.send(mvc.post().uri("/auth/logout").header("Sec-Fetch-Site", "same-site")))
             .hasStatus(HttpStatus.FORBIDDEN);
-        verify(tokenIssuer, never()).revoke(REFRESH_TOKEN);
+        verify(revocation, never()).revoke(REFRESH_TOKEN);
         assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.OK);
     }
 
-    private String stateIssuedTo(Browser browser) {
-        String state = queryOf(browser.send(mvc.get().uri("/auth/authorize"))).getFirst("state");
-        assertThat(state).isNotNull();
-        return state;
-    }
-
-    private Browser signedIn(AuthSession authSession) {
-        when(tokenIssuer.exchange(eq(CODE), anyString())).thenReturn(authSession);
+    private Browser signedIn(long accessTokenLifetimeSeconds) {
         Browser browser = new Browser();
-        String state = stateIssuedTo(browser);
+        String state = keycloakAnswers(browser, accessTokenLifetimeSeconds);
         List<String> preLoginSession = browser.sessionValues();
 
-        MvcTestResult callback = browser.send(mvc.get().uri("/auth/callback").param(CODE, CODE).param("state", state));
+        MvcTestResult callback = callback(browser, state);
 
         assertThat(callback).hasStatus(HttpStatus.FOUND);
         assertThat(callback.getResponse().getRedirectedUrl()).doesNotContain("error");
         assertThat(browser.sessionValues()).as("the pre-login session is replaced")
             .doesNotContainAnyElementsOf(preLoginSession);
         return browser;
+    }
+
+    private MvcTestResult completeSignIn(Browser browser, long accessTokenLifetimeSeconds) {
+        return callback(browser, keycloakAnswers(browser, accessTokenLifetimeSeconds));
+    }
+
+    private MvcTestResult callback(Browser browser, String state) {
+        return browser.send(mvc.get().uri("/auth/callback").param(CODE, CODE).param("state", state));
+    }
+
+    private String keycloakAnswers(Browser browser, long accessTokenLifetimeSeconds) {
+        MultiValueMap<String, String> authorization = queryOf(browser.send(mvc.get().uri("/auth/authorize")));
+        String nonce = authorization.getFirst("nonce");
+        String state = authorization.getFirst("state");
+        assertThat(nonce).isNotNull();
+        assertThat(state).isNotNull();
+        Jwt idToken = idToken(nonce);
+        when(idTokenDecoders.createDecoder(any())).thenReturn(token -> idToken);
+        when(codeTokens.getTokenResponse(any())).thenReturn(tokenResponse(ACCESS_TOKEN, accessTokenLifetimeSeconds));
+        return state;
     }
 
     private static final class Browser {
@@ -190,23 +265,59 @@ class HostedSignInTest {
         }
     }
 
-    private static AuthSession session(Instant expiresAt) {
-        return new AuthSession(SUBJECT, "ada@freshly.local", Set.of("ADMIN"), ACCESS_TOKEN, REFRESH_TOKEN, expiresAt);
+    private static OAuth2AccessTokenResponse tokenResponse(String accessToken, long lifetimeSeconds) {
+        return OAuth2AccessTokenResponse.withToken(accessToken)
+            .tokenType(OAuth2AccessToken.TokenType.BEARER)
+            .expiresIn(lifetimeSeconds)
+            .refreshToken(REFRESH_TOKEN)
+            .scopes(Set.of("openid", "profile", "email"))
+            .additionalParameters(Map.of(OidcParameterNames.ID_TOKEN, ID_TOKEN))
+            .build();
     }
 
-    private static Jwt jwt() {
-        return Jwt.withTokenValue(ACCESS_TOKEN)
+    private static Jwt idToken(String nonce) {
+        return Jwt.withTokenValue(ID_TOKEN)
             .header("alg", "RS256")
+            .issuer("http://localhost:9000/realms/freshly")
             .subject(SUBJECT.toString())
+            .audience(List.of("freshly-app-client"))
+            .claim("email", EMAIL)
+            .claim("nonce", nonce)
+            .issuedAt(Instant.now())
+            .expiresAt(Instant.now().plusSeconds(LIFETIME_SECONDS))
+            .build();
+    }
+
+    private static Jwt accessToken(String value) {
+        return accessToken(value, SUBJECT.toString());
+    }
+
+    private static Jwt accessTokenWithSubject(String subject) {
+        return accessToken(ACCESS_TOKEN, subject);
+    }
+
+    private static Jwt accessToken(String value, String subject) {
+        return Jwt.withTokenValue(value)
+            .header("alg", "RS256")
+            .subject(subject)
+            .claim("email", EMAIL)
             .claim("realm_access", Map.of("roles", List.of("ADMIN")))
             .issuedAt(Instant.now())
-            .expiresAt(Instant.now().plusSeconds(300))
+            .expiresAt(Instant.now().plusSeconds(LIFETIME_SECONDS))
             .build();
     }
 
     private static MultiValueMap<String, String> queryOf(MvcTestResult result) {
         String location = result.getResponse().getRedirectedUrl();
         assertThat(location).isNotNull();
-        return UriComponentsBuilder.fromUri(URI.create(location)).build().getQueryParams();
+        MultiValueMap<String, String> decoded = new LinkedMultiValueMap<>();
+        UriComponentsBuilder.fromUri(URI.create(location))
+            .build()
+            .getQueryParams()
+            .forEach(
+                (name, values) -> values
+                    .forEach(value -> decoded.add(name, URLDecoder.decode(value, StandardCharsets.UTF_8)))
+            );
+        return decoded;
     }
 }

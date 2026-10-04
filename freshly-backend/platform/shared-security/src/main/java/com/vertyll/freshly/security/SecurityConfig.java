@@ -1,5 +1,7 @@
 package com.vertyll.freshly.security;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -45,9 +47,10 @@ public class SecurityConfig {
         CorsConfigurationSource corsConfigurationSource,
         PublicEndpointRegistry publicEndpoints,
         ProblemAuthenticationEntryPoint problemEntryPoint,
-        Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter
+        Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter,
+        List<SecurityChainCustomizer> customizers
     ) {
-        return http.cors(cors -> cors.configurationSource(corsConfigurationSource))
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource))
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(
@@ -67,8 +70,9 @@ public class SecurityConfig {
             )
             .exceptionHandling(
                 handling -> handling.authenticationEntryPoint(problemEntryPoint).accessDeniedHandler(problemEntryPoint)
-            )
-            .build();
+            );
+        customizers.forEach(customizer -> customizer.customize(http));
+        return http.build();
     }
 
     @Bean

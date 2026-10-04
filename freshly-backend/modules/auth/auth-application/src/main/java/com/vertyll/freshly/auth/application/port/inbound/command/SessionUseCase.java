@@ -1,11 +1,9 @@
 package com.vertyll.freshly.auth.application.port.inbound.command;
 
-import com.vertyll.freshly.auth.domain.model.AuthSession;
+import com.vertyll.freshly.auth.domain.model.SignedInUser;
 
 public interface SessionUseCase {
-    AuthSession signIn(String code, String codeVerifier);
+    void signIn(SignedInUser user, String refreshToken);
 
-    AuthSession refresh(AuthSession session);
-
-    void signOut(AuthSession session);
+    void signOut(String refreshToken);
 }

@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.HexFormat;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -26,6 +27,7 @@ public class SharedRefreshes {
     private static final Duration WAIT_INTERVAL = Duration.ofMillis(100);
     private static final int WAIT_ATTEMPTS = 50;
     private static final String SEPARATOR = "\n";
+    private static final int FIELDS = 4;
 
     private final @Nullable StringRedisTemplate redis;
     private final RedisKeyProperties redisKeyProperties;
@@ -83,7 +85,7 @@ public class SharedRefreshes {
             }
         }
         try {
-            store.opsForValue().set(resultKey, pair.accessToken() + SEPARATOR + pair.refreshToken(), RESULT_TTL);
+            store.opsForValue().set(resultKey, pair.serialize(), RESULT_TTL);
         } catch (DataAccessException e) {
             log.warn("Could not share the refreshed tokens with other replicas: {}", e.getMessage());
         }
@@ -112,9 +114,7 @@ public class SharedRefreshes {
         if (value == null) {
             return Optional.empty();
         }
-        int separator = value.indexOf(SEPARATOR);
-        return separator < 0 ? Optional.empty()
-                : Optional.of(new TokenPair(value.substring(0, separator), value.substring(separator + 1)));
+        return TokenPair.parse(value);
     }
 
     private static void release(StringRedisTemplate store, String lockKey) {
@@ -134,10 +134,37 @@ public class SharedRefreshes {
         }
     }
 
-    public record TokenPair(String accessToken, String refreshToken) {
+    public record TokenPair(String accessToken, String refreshToken, Instant issuedAt, Instant expiresAt) {
+
+        static Optional<TokenPair> parse(String value) {
+            String[] parts = value.split(SEPARATOR, -1);
+            if (parts.length != FIELDS) {
+                return Optional.empty();
+            }
+            return Optional.of(
+                new TokenPair(
+                    parts[0],
+                    parts[1],
+                    Instant.ofEpochMilli(Long.parseLong(parts[2])),
+                    Instant.ofEpochMilli(Long.parseLong(parts[3]))
+                )
+            );
+        }
+
+        String serialize() {
+            return String.join(
+                SEPARATOR,
+                accessToken,
+                refreshToken,
+                Long.toString(issuedAt.toEpochMilli()),
+                Long.toString(expiresAt.toEpochMilli())
+            );
+        }
+
         @Override
         public String toString() {
-            return "TokenPair[accessToken=***, refreshToken=***]";
+            return "TokenPair[accessToken=***, refreshToken=***, issuedAt=" + issuedAt + ", expiresAt=" + expiresAt
+                    + "]";
         }
     }
 }
