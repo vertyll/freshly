@@ -29,24 +29,11 @@ Application with air quality data from IoT sensors.
 
 ### Authentication:
 
-- **Identity provider**: Keycloak (realm `freshly`) owns every page that touches a credential: sign-up, sign-in, email
-  verification, password reset, two-factor authentication and acceptance of the terms of use. The application never sees
-  a password.
-- **Pattern**: BFF with Spring Security's OAuth2 client. The back-end signs users in with the authorization code flow
-  and PKCE and keeps the tokens in its session; the browser holds only the `FRESHLY_SESSION` cookie (`HttpOnly`,
-  `SameSite=Lax`, `Secure` in production). No token reaches JavaScript.
-- **Session store**: Redis (Spring Session, `freshly:session` namespace).
-- **JWT**: for a request with a session, the back-end attaches the access token itself and checks it like any other: the
-  back-end is a stateless OAuth2 resource server verifying signature, issuer, expiry and audience (`freshly-api`). A
-  client with its own token calls it with `Authorization: Bearer`.
-- **State**: the back-end is stateless: every request is authorized by the JWT alone, so any instance can serve it. The
-  only state is the browser session, and it lives in Redis, outside the application.
-- **Token lifecycle**: access tokens live five minutes; every refresh returns a new refresh token and invalidates the
-  old one, and concurrent requests of one session share a single refresh, across replicas too (a lock in Redis). Signing
-  out revokes the refresh token at Keycloak.
-- **Cross-site requests**: `SameSite=Lax` plus `Sec-Fetch-Site`, so a write or a logout sent from another site gets no
-  token and is refused.
-- **Accounts**: created in MongoDB at the first sign-in; permissions are granted to Keycloak roles.
+- **Identity provider**: Keycloak (realm `freshly`); the application never sees a password.
+- **Pattern**: BFF with Spring Security's OAuth2 client; the browser holds only a session cookie.
+- **Session store**: Redis (Spring Session).
+- **JWT**: the back-end is a stateless resource server; a client can also call it with a Bearer token.
+- **Details**: [auth module](./freshly-backend/modules/auth/README.md).
 
 ### Core back-end:
 
