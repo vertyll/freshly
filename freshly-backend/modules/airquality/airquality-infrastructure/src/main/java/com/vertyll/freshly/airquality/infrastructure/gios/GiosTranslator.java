@@ -111,7 +111,8 @@ final class GiosTranslator {
         );
     }
 
-    @Nullable static AirQualityLevel level(@Nullable Integer indexValue) {
+    @Nullable
+    static AirQualityLevel level(@Nullable Integer indexValue) {
         if (indexValue == null || indexValue == NO_INDEX) {
             return null;
         }

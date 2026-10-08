@@ -124,7 +124,8 @@ public class TranslationImportService implements TranslationImportUseCase {
         }
     }
 
-    @Nullable private static String textOf(TranslationKey key, String language) {
+    @Nullable
+    private static String textOf(TranslationKey key, String language) {
         TranslationKey.LanguageOverride override = key.overrides().get(language);
         return override == null ? null : override.text();
     }

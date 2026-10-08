@@ -21,7 +21,8 @@ public final class SystemUser {
     private final UUID keycloakUserId;
     private boolean active;
     private Set<String> roles;
-    @Nullable private final Long version;
+    @Nullable
+    private final Long version;
 
     private SystemUser(UUID keycloakUserId, boolean active, Set<String> roles, @Nullable Long version) {
         this.keycloakUserId = requireNonNull(keycloakUserId, KEYCLOAK_USER_ID_CANNOT_BE_NULL);
@@ -80,7 +81,8 @@ public final class SystemUser {
         return Set.copyOf(roles);
     }
 
-    @Nullable public Long version() {
+    @Nullable
+    public Long version() {
         return version;
     }
 

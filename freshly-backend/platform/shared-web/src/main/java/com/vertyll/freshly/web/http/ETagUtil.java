@@ -62,7 +62,8 @@ public final class ETagUtil {
      *
      * @throws DomainException with {@link IfMatchError#MALFORMED} for an unreadable value
      */
-    @Nullable public static Long parseVersion(@Nullable String ifMatchHeader) {
+    @Nullable
+    public static Long parseVersion(@Nullable String ifMatchHeader) {
         if (ifMatchHeader == null) {
             return null;
         }

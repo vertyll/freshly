@@ -129,10 +129,11 @@ configure<SpotlessExtension> {
             "\\#java", "\\#javax", "\\#jakarta", "\\#org", "\\#com.vertyll", "\\#com", "\\#"
         )
 
+        formatAnnotations()
+
         eclipse(libs.findVersion("eclipse-jdt").get().requiredVersion)
             .configFile(rootProject.file("config/formatter/eclipse-java-custom-style.xml"))
 
-        formatAnnotations()
         trimTrailingWhitespace()
         endWithNewline()
         toggleOffOn()

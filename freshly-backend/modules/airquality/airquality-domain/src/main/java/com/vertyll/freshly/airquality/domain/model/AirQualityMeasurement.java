@@ -22,7 +22,8 @@ public final class AirQualityMeasurement {
 
     private final Map<Pollutant, AirQualityLevel> indexLevels;
     private final Map<Pollutant, Double> readings;
-    @Nullable private final AirQualityLevel overallLevel;
+    @Nullable
+    private final AirQualityLevel overallLevel;
 
     @SuppressWarnings("java:S107")
     private AirQualityMeasurement(
@@ -117,7 +118,8 @@ public final class AirQualityMeasurement {
         return recordedAt;
     }
 
-    @Nullable public AirQualityLevel overallLevel() {
+    @Nullable
+    public AirQualityLevel overallLevel() {
         return overallLevel;
     }
 

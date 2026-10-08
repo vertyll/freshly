@@ -41,7 +41,8 @@ public class TranslationMessageSource implements MessageSource {
     private final TranslationResolver translations;
 
     @Override
-    @Nullable public String getMessage(
+    @Nullable
+    public String getMessage(
         String code,
         @Nullable Object @Nullable [] args,
         @Nullable String defaultMessage,
@@ -89,7 +90,8 @@ public class TranslationMessageSource implements MessageSource {
         );
     }
 
-    @Nullable private String render(String code, @Nullable Object @Nullable [] args, @Nullable Locale locale) {
+    @Nullable
+    private String render(String code, @Nullable Object @Nullable [] args, @Nullable Locale locale) {
         String languageTag = localeOf(locale).getLanguage();
         String pattern = translations.resolve(code, languageTag).orElse(null);
 

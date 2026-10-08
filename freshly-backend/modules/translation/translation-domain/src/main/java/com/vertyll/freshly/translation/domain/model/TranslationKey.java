@@ -33,7 +33,8 @@ public final class TranslationKey {
     private final Map<String, String> defaults;
     private final Map<String, LanguageOverride> overrides;
 
-    @Nullable private final Long version;
+    @Nullable
+    private final Long version;
 
     private TranslationKey(
         String key,
@@ -165,7 +166,8 @@ public final class TranslationKey {
         return Map.copyOf(overrides);
     }
 
-    @Nullable public Long version() {
+    @Nullable
+    public Long version() {
         return version;
     }
 

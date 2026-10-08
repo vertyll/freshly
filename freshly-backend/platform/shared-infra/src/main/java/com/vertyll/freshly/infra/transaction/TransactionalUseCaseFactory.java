@@ -66,7 +66,8 @@ public class TransactionalUseCaseFactory {
     }
 
     @SuppressWarnings("PMD.UseVarargs")
-    @Nullable private static Object invoke(
+    @Nullable
+    private static Object invoke(
         Object target,
         TransactionTemplate template,
         Method method,
@@ -85,7 +86,8 @@ public class TransactionalUseCaseFactory {
         value = "THROWS_METHOD_THROWS_RUNTIMEEXCEPTION",
         justification = "Rethrows the use case's own exception unwrapped from reflection"
     )
-    @Nullable private static Object proceed(Object target, Method method, Object... arguments) {
+    @Nullable
+    private static Object proceed(Object target, Method method, Object... arguments) {
         try {
             return method.invoke(target, arguments);
         } catch (InvocationTargetException e) {

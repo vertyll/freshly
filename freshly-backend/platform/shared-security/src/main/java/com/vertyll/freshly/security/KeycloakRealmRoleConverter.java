@@ -49,7 +49,8 @@ public class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<Gra
             .toList();
     }
 
-    @Nullable private static String nonBlankString(Object candidate) {
+    @Nullable
+    private static String nonBlankString(Object candidate) {
         return candidate instanceof String value && !value.isBlank() ? value : null;
     }
 }

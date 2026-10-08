@@ -19,7 +19,8 @@ public final class RoleAuthority {
     private boolean unrestricted;
 
     private final Set<String> permissions;
-    @Nullable private final Long version;
+    @Nullable
+    private final Long version;
 
     private RoleAuthority(String role, boolean unrestricted, Set<String> permissions, @Nullable Long version) {
         this.role = normalise(role);
@@ -65,7 +66,8 @@ public final class RoleAuthority {
         return Set.copyOf(permissions);
     }
 
-    @Nullable public Long version() {
+    @Nullable
+    public Long version() {
         return version;
     }
 
