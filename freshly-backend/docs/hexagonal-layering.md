@@ -8,11 +8,11 @@ How the dependency rule is enforced in a single-process application, and what it
 infrastructure ──► application ──► domain
 ```
 
-| Layer            | May depend on                | Contains                                                                     |
-|------------------|------------------------------|------------------------------------------------------------------------------|
-| `domain`         | JDK, JSpecify, `shared-lang` | Aggregates, value objects, repository *ports*, policies, the error catalogue |
-| `application`    | `domain` plus `shared-authz` | Use cases, commands, response DTOs, inbound/outbound ports                   |
-| `infrastructure` | everything                   | MongoDB, web, HTTP clients, Spring wiring, adapters, ACL                     |
+| Layer            | May depend on                | Contains                                                                   |
+|------------------|------------------------------|----------------------------------------------------------------------------|
+| `domain`         | JDK, JSpecify, `shared-lang` | Aggregates, value objects, repository *ports*, policies, the error catalog |
+| `application`    | `domain` plus `shared-authz` | Use cases, commands, response DTOs, inbound/outbound ports                 |
+| `infrastructure` | everything                   | MongoDB, web, HTTP clients, Spring wiring, adapters, ACL                   |
 
 ## The rule, between bounded contexts
 
@@ -190,11 +190,11 @@ Not inconsistency: a document *is* a data holder, so generating its shape is
 right. An aggregate is not, and `@Data` next to an invariant makes the invariant
 decorative.
 
-## Error catalogues
+## Error catalogs
 
 Each context owns one, in `domain/error/`:
 
-| Module       | Catalogue         |
+| Module       | Catalog           |
 |--------------|-------------------|
 | `useraccess` | `UserAccessError` |
 | `auth`       | `AuthError`       |
@@ -203,7 +203,7 @@ Each context owns one, in `domain/error/`:
 
 Each entry names a translation key and an `ErrorKind`. One handler —
 `shared-web`'s `DomainExceptionHandler` — serves every module and knows none of
-their catalogues, which is what let the three per-module `*ControllerAdvice`
+their catalogs, which is what let the three per-module `*ControllerAdvice`
 classes collapse into one file.
 
 Every refusal answers as an **RFC 9457 problem document** (`application/problem+json`):

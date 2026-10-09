@@ -7,7 +7,7 @@ Full design notes in [Translations](../../docs/translations.md); this covers wha
 
 ## Why this is a bounded context and not infrastructure
 
-It has an aggregate with invariants, an error catalogue, an administration API and its own
+It has an aggregate with invariants, an error catalog, an administration API and its own
 persistence. "Look up a string" is the least interesting thing it does — the interesting part
 is that a key has two independent sets of text with different lifecycles, and that a redeploy
 must touch exactly one of them.

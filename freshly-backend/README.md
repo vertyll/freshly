@@ -100,7 +100,7 @@ A module may reach another **only** through that module's inbound ports, and **o
 from its own infrastructure layer, where an anti-corruption adapter translates.
 
 Today `auth` is the only context that reaches another — `useraccess` — via
-`auth-infrastructure/acl`. `AuthArchitectureTest` declares that neighbour and the rules
+`auth-infrastructure/acl`. `AuthArchitectureTest` declares that neighbor and the rules
 enforce the boundary.
 
 ## Where to start reading
@@ -112,6 +112,6 @@ enforce the boundary.
 | How a browser signs in              | `modules/auth/README.md`             |
 | What is shared, and why             | `docs/shared-modules.md`             |
 | How text is stored and edited       | `docs/translations.md`               |
-| What is missing, and what is next   | `docs/open-items.md`                 |
+| Known limitations of the design     | `docs/known-limitations.md`          |
 
 Every module has a README covering the decisions specific to it.

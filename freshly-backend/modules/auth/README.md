@@ -33,7 +33,7 @@ server — whether the caller is a browser with a session or a client with a bea
 | application    | `SessionUseCase` and `SessionService`; ports `UserProvisioningPort`, `SessionRevocationPort`                                     |
 | infrastructure | `BrowserSignIn` (the OAuth2 client added to the platform's chain), `SignInCompletion`, `SessionAccessTokenFilter`, Keycloak, ACL |
 
-`useraccess` is the only neighbouring module, reached through `infrastructure/acl`. The filter
+`useraccess` is the only neighboring module, reached through `infrastructure/acl`. The filter
 chain belongs to `platform/shared-security`; `BrowserSignIn` is a `SecurityChainCustomizer`
 that adds the sign-in to it instead of building a second chain.
 

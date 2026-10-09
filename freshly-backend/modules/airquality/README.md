@@ -49,7 +49,7 @@ each call site.
 
 `AnalysisWindow` offers both `ofDays`, which clamps, and `ofDaysStrict`, which refuses,
 because those are different situations: a UI slider should be clamped, while an API client
-asking for 500 days should be told the ceiling rather than handed 90 days labelled as what
+asking for 500 days should be told the ceiling rather than handed 90 days labeled as what
 it asked for.
 
 ### The statistics round the unreassuring way
@@ -61,7 +61,7 @@ level. A health-facing number should not round in the reassuring direction.
 ### Proximity search does not call GIOŚ
 
 `StationCatalogueAdapter` caches the station list through a `StationCache` bean so the
-caching proxy is actually in the path. The sync reads stations from the same catalogue, not
+caching proxy is actually in the path. The sync reads stations from the same catalog, not
 from GIOŚ, and the cache is dropped once a day: GIOŚ publishes the list yearly, and the
 station-list endpoint may be limited to two requests a minute.
 
@@ -109,7 +109,7 @@ paging someone for.
 ### Nulls are dropped, never stored as zero
 
 GIOŚ returns null for every hour a sensor was down. A zero would read as perfectly clean
-air, dragging every average towards a reassuring number precisely when the instrument
+air, dragging every average toward a reassuring number precisely when the instrument
 was not working.
 
 ### Reads are public, and say so

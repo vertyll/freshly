@@ -12,14 +12,14 @@ Each context declares its own permission enum, in its application layer's `secur
 package: it names what the use cases let a caller do, which is not a rule of the domain
 model, so no domain layer depends on `shared-authz`. The platform owns only a contract —
 `PermissionDescriptor` and `PermissionCatalogue` in `shared-authz`, framework-free —
-and this module stores grants **by string** and knows no catalogue.
+and this module stores grants **by string** and knows no catalog.
 
 A single enum in a shared module listing every context's capabilities would make that
 module the node everything passes through: adding a permission to `airquality` would be
 a change to a file `useraccess` compiles against.
 
 The cost is that `@RequirePermission` takes a `String`, so a typo does not fail to
-compile. It is bought back at runtime: saving a role refuses a permission no catalogue
+compile. It is bought back at runtime: saving a role refuses a permission no catalog
 declared, and the seeder refuses at start-up. A typo is a failed boot, not an endpoint
 nobody can reach.
 
@@ -84,7 +84,7 @@ falls back to evicting immediately when there is no transaction, which is the st
 seeder.
 
 **It is in-memory, so it is single-instance-correct only.** With two instances, eviction
-is local and instance B keeps honouring a revoked grant. The fix is a change to the
+is local and instance B keeps honoring a revoked grant. The fix is a change to the
 platform's `CacheConfig` alone — worth knowing before the second instance rather than
 after.
 

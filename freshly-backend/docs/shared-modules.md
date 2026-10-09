@@ -148,7 +148,7 @@ in the key of every authorization lookup for a requirement that does not exist.
 Roles stay global and stay in Keycloak, because a role is a statement about a *person*
 ("is an administrator"), not about a module. Roles named per context —
 `airquality-admin` beside `useraccess-admin` — would make giving somebody a job a walk
-through six lists, where one `ADMIN` role holding permissions from six catalogues says the
+through six lists, where one `ADMIN` role holding permissions from six catalogs says the
 same thing once.
 
 The boundary that *is* per context is the permission. `PermissionScope` already carries `GLOBAL | RESOURCE`, so if a
@@ -157,7 +157,7 @@ resource with an owner ever appears, the place is prepared.
 ### `PermissionCatalogue`, the same shape in the other direction
 
 Already worked this way. The platform owns the contract; each context declares its own
-permissions; `permission` assembles the catalogues without compiling against any of them.
+permissions; `permission` assembles the catalogs without compiling against any of them.
 That is what let `common.enums.Permission` — one enum holding every context's
 capabilities — be dismantled.
 
@@ -177,10 +177,10 @@ different reasons and neither owns the other's configuration.
 `CorsProperties` is the one exception, because CORS genuinely is a platform concern with
 no owning context. `platformHoldsNoModuleConfiguration` allows exactly that one class.
 
-**Error catalogues.** Each context has its own enum in `domain/error/`. Only `DomainError`
+**Error catalogs.** Each context has its own enum in `domain/error/`. Only `DomainError`
 and `ErrorKind` are shared, and neither knows what any failure means.
 
-**Permission catalogues.** Each context declares its own enum. The platform holds only the
+**Permission catalogs.** Each context declares its own enum. The platform holds only the
 contract.
 
 **`ApplicationBeansConfig`.** Five near-identical files, deliberately not extracted. They

@@ -130,7 +130,7 @@ language they were working.
 | A language column that is not supported | skipped, and listed                        |
 
 The second row is the one worth dwelling on. Export writes the effective text, so a file that
-is downloaded and re-uploaded unchanged would otherwise turn **every default in the catalogue
+is downloaded and re-uploaded unchanged would otherwise turn **every default in the catalog
 into an override** in one request. From then on, improving the source text in code would
 never reach anyone. Treating "same as the default" as "no override" is what makes a round trip
 a no-op.
@@ -159,7 +159,7 @@ it translates everything else.
 }
 ```
 
-`missing` is computed after the import across the whole catalogue, not just the uploaded rows:
+`missing` is computed after the import across the whole catalog, not just the uploaded rows:
 the question a translator is asking at that moment is what is still left to do.
 
 **Keys still cannot be created this way.** A row whose key no module declares is reported and
@@ -193,7 +193,7 @@ class RenameTokenExpired implements TranslationMigration {
 ```
 
 Declared by the module that owns the keys, discovered like its `TranslationCatalogue`,
-recorded by id in `translation_migration`, and run **before** the catalogue registrar. A
+recorded by id in `translation_migration`, and run **before** the catalog registrar. A
 rename moves the override to a name the module is about to declare, and the other order
 would leave the two disagreeing for one boot.
 
@@ -206,19 +206,19 @@ and an override already on the target wins, because the target is the name in us
 no-op when the old key is gone, so a second instance starting does not fail.
 
 **A fourth verb that writes text would be a mistake.** The same sentence would then live in
-a migration and in a catalogue, and which one is current would depend on the order things
+a migration and in a catalog, and which one is current would depend on the order things
 ran. That is the drift the defaults/overrides split exists to prevent.
 
 ## Keys nobody declares any more
 
-After every catalogue has registered, whatever is stored and was not declared is marked an
+After every catalog has registered, whatever is stored and was not declared is marked an
 orphan, and `GET /translations/orphans` lists it.
 
 Marked, not deleted: the defaults are gone but somebody's override may not be, and deleting
 it would throw away work to save a row. Retiring a key is a deliberate act — that is what
 the migration is for.
 
-The sweep is skipped when any catalogue failed to register, because marking then would call
+The sweep is skipped when any catalog failed to register, because marking then would call
 every key of the failed module an orphan and put it in front of an administrator as text
 nobody ships any more.
 
