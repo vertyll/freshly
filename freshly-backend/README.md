@@ -115,3 +115,16 @@ enforce the boundary.
 | Known limitations of the design     | `docs/known-limitations.md`          |
 
 Every module has a README covering the decisions specific to it.
+
+## Documentation checks
+
+The Markdown is formatted and linted with [mdtools](https://github.com/vertyll/mdtools), at the version the
+[Docs workflow](../.github/workflows/docs.yml) pins:
+
+```bash
+go run github.com/vertyll/mdtools/cmd/mdtools@VERSION fmt
+go run github.com/vertyll/mdtools/cmd/mdtools@VERSION run
+```
+
+`fmt` rewrites what it can; `run` reports the rest and fails on any issue, as the workflow does on every push and pull
+request. [`.mdtools.yaml`](../.mdtools.yaml) chooses the formatters and linters and what each one skips.
