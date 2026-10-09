@@ -31,11 +31,13 @@ A module that needs something from another declares its **own outbound port** an
 writes an adapter in its own infrastructure. That adapter is the anti-corruption
 layer — the counterpart of what an Avro decoder does at a Kafka boundary.
 
-```text
-auth-application                     auth-infrastructure              useraccess-application
-─────────────────                    ───────────────────              ──────────────────────
-UserProvisioningPort  ◄──implements── UserAccessProvisioningAdapter ──calls──► UserAccessCommandUseCase
-   (auth's own words)                    (translates)                            (useraccess's words)
+```mermaid
+flowchart LR
+    port["UserProvisioningPort<br/>auth-application<br/>(auth's own words)"]
+    adapter["UserAccessProvisioningAdapter<br/>auth-infrastructure<br/>(translates)"]
+    usecase["UserAccessCommandUseCase<br/>useraccess-application<br/>(useraccess's words)"]
+    adapter -- implements --> port
+    adapter -- calls --> usecase
 ```
 
 Without it, a rename in `useraccess` breaks `auth`'s compilation, and `auth`'s use
