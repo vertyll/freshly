@@ -57,3 +57,12 @@ Application with air quality data from IoT sensors.
 - NullAway for null-safety checks.
 - Error Prone for static code analysis.
 - Spotless for code formatting.
+
+## Documentation
+
+- [Back-end](./freshly-backend/README.md) – layout, running it, the architecture checks and module boundaries.
+- [auth](./freshly-backend/modules/auth/README.md) – sign-in, tokens, sessions and refreshing.
+- [useraccess](./freshly-backend/modules/useraccess/README.md) – accounts and their roles.
+- [permission](./freshly-backend/modules/permission/README.md) – what each role may do.
+- [translation](./freshly-backend/modules/translation/README.md) – shipped defaults and admin overrides.
+- [airquality](./freshly-backend/modules/airquality/README.md) – GIOŚ readings, statistics and rankings.
