@@ -262,17 +262,7 @@ declares its own permissions. Adding a key touches one module.
 
 ## The API
 
-|                                         |                                                |
-|-----------------------------------------|------------------------------------------------|
-| `GET /translations/bundles/{language}`  | the whole bundle, **public**, ETag-revalidated |
-| `GET /translations/languages`           | what a switcher can offer, public              |
-| `GET /translations?search=`             | the admin list, paged                          |
-| `GET /translations/stale`               | overrides whose source text changed            |
-| `PUT /translations/{key}/{language}`    | write an override, `If-Match`                  |
-| `DELETE /translations/{key}/{language}` | drop it, falling back to the default           |
-| `GET /translations/export`              | the catalogue as a spreadsheet                 |
-| `POST /translations/import`             | apply a spreadsheet, returns a report          |
-| `GET /translations/orphans`             | keys no module declares any more               |
+The endpoints are in the Swagger UI. Three things about them are not visible there:
 
 **The bundle is public and has to be.** The sign-in page needs its labels before anyone has
 signed in.
@@ -291,8 +281,8 @@ still refuse it, but that leaves one layer where the design intends two.
 `PublicEndpointRegistry` cannot catch this, because a pattern is correct in isolation and
 wrong beside its siblings. A public path with a variable segment is worth a second look.
 
-**Keys cannot be created through the API.** They come from the code that reads them. One
-invented in an admin screen would be a string nothing ever looks up.
+Keys cannot be created through the API at all; see
+[the module](../modules/translation/README.md#keys-cannot-be-created-through-the-api).
 
 ## Decisions worth knowing
 
@@ -314,14 +304,9 @@ each other's text on alternate boots — a fault that presents as a caching bug.
 registration and the application would boot with no translations at all. Per-context failure
 is logged and the rest proceeds.
 
-**The resolver is cached, evicted wholesale.** It is on the error path — every problem
-document resolves a key — so a round trip per refusal would make failing slower than
-succeeding. Wholesale eviction for the reason the permission cache uses it: computing which
-entries a changed key affects is more code than refilling, and a stale entry means an
-administrator's correction does not appear.
-
-**In-memory cache, so single-instance-correct only.** With two instances an edit on A does
-not evict on B. A shared cache is a change to `CacheConfig` alone.
+**Two caches, single-instance-correct.** Keys and whole bundles are cached in memory and evicted wholesale on any
+edit; why two, and why that is safe only on one instance, is in
+[the module](../modules/translation/README.md#two-caches-not-one).
 
 **`detail` stays in problem documents.** Omitting it and making the client resolve `code`
 itself would be defensible if the text lived behind another network call. It does not: the
