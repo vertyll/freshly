@@ -104,10 +104,8 @@ belongs.
 For a translator who does not want an admin screen, and for reviewing a few hundred strings
 at once.
 
-|                             |                                                         |
-|-----------------------------|---------------------------------------------------------|
-| `GET /translations/export`  | the whole catalogue as `.xlsx`, `translations:read`     |
-| `POST /translations/import` | multipart `file`, returns a report, `translations:edit` |
+`GET /translations/export` downloads it (`translations:read`) and `POST /translations/import` applies an edited copy
+(`translations:edit`); both are in the Swagger UI.
 
 The sheet is `key | module | en | pl`, one row per key, sorted by module then key. Cells carry
 the **effective** text — the override if there is one, the default otherwise — and an

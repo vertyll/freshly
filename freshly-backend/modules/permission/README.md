@@ -41,14 +41,8 @@ to ask and no `Authentication` to test.
 
 ## The API
 
-|                                    |                                                                  |
-|------------------------------------|------------------------------------------------------------------|
-| `GET /permissions/me`              | what the caller holds, for rendering controls                    |
-| `GET /permissions/declared`        | every permission, grouped by module, each with a description key |
-| `GET /permissions/roles`           | every role that holds something                                  |
-| `GET /permissions/roles/{role}`    | one role, with an ETag                                           |
-| `PUT /permissions/roles/{role}`    | replace what it holds, `If-Match`                                |
-| `DELETE /permissions/roles/{role}` | it holds nothing again                                           |
+The endpoints are in the Swagger UI: what the caller holds, every declared permission, and reading and replacing what
+a role holds (`If-Match` on the write).
 
 `GET /roles` lives in `useraccess` and lists the realm's roles — what exists, rather than
 what each one may do. A panel needs both: one fills the left column, the other the
