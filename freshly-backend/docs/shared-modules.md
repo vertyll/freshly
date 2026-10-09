@@ -64,9 +64,9 @@ Framework-free, so it can appear in an application layer's signature.
 It carries `IcuMessages` — compile-check a message pattern, report its placeholders, render
 it — and the ICU4J dependency that makes those possible.
 
-Two projects use it: `shared-web`, which renders every problem detail, and `translation-infrastructure`, which supplies the `MessageGrammar` the aggregate
-validates against. Neither is a bounded context's inner layer, so the obvious alternative is
-to put the class in `shared-web` and have the translation context depend on the web platform
+Two projects use it: `shared-web`, which renders every problem detail, and `translation-infrastructure`, which supplies
+the `MessageGrammar` the aggregate validates against. Neither is a bounded context's inner layer, so the obvious
+alternative is to put the class in `shared-web` and have the translation context depend on the web platform
 for it. That reads wrong the moment it is written down: nothing about compiling a message
 pattern is about HTTP.
 
@@ -151,8 +151,8 @@ Roles stay global and stay in Keycloak, because a role is a statement about a *p
 through six lists, where one `ADMIN` role holding permissions from six catalogues says the
 same thing once.
 
-The boundary that *is* per context is the permission. `PermissionScope` already carries `GLOBAL | RESOURCE`, so if a resource with an
-owner ever appears, the place is prepared.
+The boundary that *is* per context is the permission. `PermissionScope` already carries `GLOBAL | RESOURCE`, so if a
+resource with an owner ever appears, the place is prepared.
 
 ### `PermissionCatalogue`, the same shape in the other direction
 

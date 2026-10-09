@@ -134,8 +134,8 @@ service and call it outside a transaction.
 
 ### SLF4J → a port
 
-`UseCaseLogger` in `shared-lang`, `Slf4jUseCaseLogger` in `shared-infra`. Arguable — SLF4J is a facade, not a framework — but admitting one
-exception makes the rule a sentence with a footnote, and a build check cannot
+`UseCaseLogger` in `shared-lang`, `Slf4jUseCaseLogger` in `shared-infra`. Arguable — SLF4J is a facade, not a framework
+— but admitting one exception makes the rule a sentence with a footnote, and a build check cannot
 enforce a footnote. It also turns "did this use case log the refusal" into an
 assertion rather than console output.
 
