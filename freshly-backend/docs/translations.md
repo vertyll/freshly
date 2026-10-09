@@ -61,7 +61,7 @@ Znaleziono {count, plural, one{# stację} few{# stacje} many{# stacji} other{# s
 Two more differences earn their keep.
 
 **Arguments are named.** A translator editing `validation.size` sees `od {min} do {max}` and
-does not have to work out which of two numbers `{0}` was. Under the JDK formatter the two were
+does not have to work out which of two numbers `{0}` is. With the JDK formatter the two would be
 told apart only by the iteration order of the constraint's attribute map, which is a way to
 produce a sentence that is confidently wrong rather than obviously broken.
 

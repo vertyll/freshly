@@ -60,6 +60,7 @@ Application with air quality data from IoT sensors.
 
 ## Documentation
 
+- [Glossary](./GLOSSARY.md) – the terms, the standards they come from, and where each is explained.
 - [Back-end](./freshly-backend/README.md) – layout, running it, the architecture checks and module boundaries.
 - [auth](./freshly-backend/modules/auth/README.md) – sign-in, tokens, sessions and refreshing.
 - [useraccess](./freshly-backend/modules/useraccess/README.md) – accounts and their roles.
