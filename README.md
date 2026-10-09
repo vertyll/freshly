@@ -33,7 +33,7 @@ Application with air quality data from IoT sensors.
 - **Pattern**: BFF with Spring Security's OAuth2 client; the browser holds only a session cookie.
 - **Session store**: Redis (Spring Session).
 - **JWT**: the back-end is a stateless resource server; a client can also call it with a Bearer token.
-- **Details**: [auth module](./freshly-backend/modules/auth/README.md).
+- **Details**: [auth module](freshly-backend/modules/auth/README.md).
 
 ### Core back-end:
 
@@ -60,11 +60,6 @@ Application with air quality data from IoT sensors.
 
 ## Documentation
 
-- [Glossary](./GLOSSARY.md) – every term the docs use, and where it is explained.
-- [Standards](./STANDARDS.md) – the RFCs and specifications the code implements or depends on.
-- [Back-end](./freshly-backend/README.md) – layout, running it, the architecture checks and module boundaries.
-- [auth](./freshly-backend/modules/auth/README.md) – sign-in, tokens, sessions and refreshing.
-- [useraccess](./freshly-backend/modules/useraccess/README.md) – accounts and their roles.
-- [permission](./freshly-backend/modules/permission/README.md) – what each role may do.
-- [translation](./freshly-backend/modules/translation/README.md) – shipped defaults and admin overrides.
-- [airquality](./freshly-backend/modules/airquality/README.md) – GIOŚ readings, statistics and rankings.
+- [Contents](CONTENTS.md) – every document in the repository, the module it belongs to, and what it covers.
+- [Glossary](GLOSSARY.md) – every term the docs use, and where it is explained.
+- [Standards](STANDARDS.md) – the RFCs and specifications the code implements or depends on.

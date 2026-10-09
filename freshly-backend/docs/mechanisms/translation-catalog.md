@@ -1,4 +1,4 @@
-# Translations
+# Translation catalog
 
 Text is data, not a build artifact. Modules declare defaults in code; an administrator
 overrides them at runtime; a redeployment never touches an override.
@@ -101,113 +101,12 @@ belongs.
 
 ## Spreadsheet import and export
 
-For a translator who does not want an admin screen, and for reviewing a few hundred strings
-at once.
-
-`GET /translations/export` downloads it (`translations:read`) and `POST /translations/import` applies an edited copy
-(`translations:edit`); both are in the Swagger UI.
-
-The sheet is `key | module | en | pl`, one row per key, sorted by module then key. Cells carry
-the **effective** text — the override if there is one, the default otherwise — and an
-overridden cell is shaded, so a reviewer can see what has been edited without a second column
-saying so. The header row and the key column are frozen.
-
-**Language columns are headed by the tag, not by a language name.** A re-import reads the
-column back by that heading, so it must not depend on who exported the file or in what
-language they were working.
-
-### What the import does with a cell
-
-| Cell                                    | Outcome                                    |
-|-----------------------------------------|--------------------------------------------|
-| Blank                                   | ignored                                    |
-| Equal to the current default            | the override is **cleared**, not rewritten |
-| Equal to the current override           | unchanged                                  |
-| Anything else                           | saved as an override                       |
-| Not a compilable ICU pattern            | rejected, with the reason                  |
-| Different placeholders from the default | rejected, with both sets                   |
-| A key no module declares                | skipped, and listed                        |
-| A language column that is not supported | skipped, and listed                        |
-
-The second row is the one worth dwelling on. Export writes the effective text, so a file that
-is downloaded and re-uploaded unchanged would otherwise turn **every default in the catalog
-into an override** in one request. From then on, improving the source text in code would
-never reach anyone. Treating "same as the default" as "no override" is what makes a round trip
-a no-op.
-
-Nothing is applied halfway: the import runs in one transaction, and a rejected row is reported
-rather than thrown, so one bad cell does not cost the other four hundred.
-
-The report names rows by the number the spreadsheet shows, so a rejection points at a row the
-person can go and look at. Rejections carry a `code` and its parameters rather than a
-sentence, like every other error in this API, so an admin screen translates them the same way
-it translates everything else.
-
-```json
-{
-  "applied": 12,
-  "cleared": 2,
-  "unchanged": 391,
-  "unknownKeys": ["error.auth.somethingRemoved"],
-  "unknownLanguages": [],
-  "rejected": [
-    { "rowNumber": 57, "key": "validation.size", "language": "pl",
-      "code": "error.translation.placeholderMismatch",
-      "params": { "expected": "[max, min]", "actual": "[max]" } }
-  ],
-  "missing": [{ "key": "error.airquality.stationRetired", "language": "pl" }]
-}
-```
-
-`missing` is computed after the import across the whole catalog, not just the uploaded rows:
-the question a translator is asking at that moment is what is still left to do.
-
-**Keys still cannot be created this way.** A row whose key no module declares is reported and
-skipped, exactly as an invented key would be refused by `PUT`.
+A translator can export the catalog to a spreadsheet and import it back: [Translation
+spreadsheet](translation-spreadsheet.md).
 
 ## Migrations: the three things registration cannot do
 
-Registration is declarative. A module states its defaults, and they are written from nothing
-at every start-up, so adding and changing text needs no migration and never will.
-
-Three operations are not like that, because they **transform** what is already stored:
-
-|                              | Why registration cannot do it                                                |
-|------------------------------|------------------------------------------------------------------------------|
-| Rename a key                 | The old document stays behind, holding somebody's override                   |
-| Retire a key                 | Nothing ever removes it                                                      |
-| Move a key to another module | `refreshDefaults` refuses it — a key belongs to the context that declared it |
-
-So there is a small ordered mechanism for exactly those, and nothing else:
-
-```java
-@Component
-class RenameTokenExpired implements TranslationMigration {
-    public String id()      { return "2026-09-auth-rename-token-expired"; }
-    public String context() { return "auth"; }
-
-    public void apply(TranslationMigrationOperations operations) {
-        operations.rename("error.auth.tokenExpired", "error.auth.linkExpired");
-    }
-}
-```
-
-Declared by the module that owns the keys, discovered like its `TranslationCatalogue`,
-recorded by id in `translation_migration`, and run **before** the catalog registrar. A
-rename moves the override to a name the module is about to declare, and the other order
-would leave the two disagreeing for one boot.
-
-Each runs in its own transaction, and the id is recorded inside it, so a migration that
-threw halfway is retried whole rather than remembered as done. Ids sort, which is what makes
-the order the same on every instance; bean discovery order is not.
-
-`rename` carries overrides but not defaults — the owning module writes those moments later —
-and an override already on the target wins, because the target is the name in use. It is a
-no-op when the old key is gone, so a second instance starting does not fail.
-
-**A fourth verb that writes text would be a mistake.** The same sentence would then live in
-a migration and in a catalog, and which one is current would depend on the order things
-ran. That is the drift the defaults/overrides split exists to prevent.
+Renaming, retiring or moving a key between modules is a migration: [Translation migrations](translation-migrations.md).
 
 ## Keys nobody declares any more
 
@@ -224,7 +123,7 @@ nobody ships any more.
 
 One key being refused does not cost its module the other forty: registration collects
 refusals per key, logs each, and saves the rest. The usual cause of a refusal is a key that
-moved between modules, which is the migration above.
+moved between modules, which is a [migration](translation-migrations.md).
 
 ## Shape
 
@@ -280,7 +179,7 @@ still refuse it, but that leaves one layer where the design intends two.
 wrong beside its siblings. A public path with a variable segment is worth a second look.
 
 Keys cannot be created through the API at all; see
-[the module](../modules/translation/README.md#keys-cannot-be-created-through-the-api).
+[the module](../../modules/translation/README.md#keys-cannot-be-created-through-the-api).
 
 ## Decisions worth knowing
 
@@ -304,7 +203,7 @@ is logged and the rest proceeds.
 
 **Two caches, single-instance-correct.** Keys and whole bundles are cached in memory and evicted wholesale on any
 edit; why two, and why that is safe only on one instance, is in
-[the module](../modules/translation/README.md#two-caches-not-one).
+[the module](../../modules/translation/docs/mechanisms/translation-caches.md).
 
 **`detail` stays in problem documents.** Omitting it and making the client resolve `code`
 itself would be defensible if the text lived behind another network call. It does not: the
@@ -320,49 +219,4 @@ a migration — the honest cost, written down.
 
 ## Field validation carries keys too
 
-Left to Hibernate Validator, a rejected field answers with its default message —
-`"size must be between 3 and 50"`. English regardless of `Accept-Language`, absent from the
-store so nobody can edit it, and unbranchable without matching prose against it. Half the API
-would return keys and half sentences.
-
-Each rejected field carries a key instead:
-
-```json
-{
-  "type":   "urn:freshly:error:error.common.validationFailed",
-  "status": 400,
-  "code":   "error.common.validationFailed",
-  "fields": [
-    { "field": "username", "code": "validation.size",
-      "message": "Musi mieć od 3 do 50 znaków.", "params": { "min": 3, "max": 50 } },
-    { "field": "email", "code": "validation.email",
-      "message": "To nie jest poprawny adres e-mail.", "params": {} }
-  ]
-}
-```
-
-**Positional arguments and named ones cannot be mixed.** ICU renders a pattern either way,
-but not both: a pattern written with `{min}` cannot be rendered with a positional argument
-list, and the render fails quietly back to the raw pattern. Application code goes through
-`MessageResolver`, which passes named arguments, so it does not arise there. A caller that
-reaches `TranslationMessageSource` with positional arguments against a named-argument default
-would print the pattern, braces and all, with nothing in the log. Keep such a key's
-placeholders positional.
-
-**Keys are derived from the constraint type, not written on the annotation.** The obvious
-approach is `@Size(message = "{validation.username.tooLong}")`, and it permanently excludes
-that text from the store: Hibernate Validator resolves `{...}` through its own
-`ResourceBundle`, not Spring's `MessageSource`. It also means a key per field per
-constraint, hundreds of them, each written by hand.
-
-Deriving gives one key per constraint kind interpolated with the constraint's own
-attributes. `validation.size` with `min` and `max` covers every `@Size` in the application.
-
-The cost is that a field cannot have bespoke wording. If one ever needs it, the fix is a key
-derived from the field name falling back to the generic one — not a message attribute.
-
-`params` travels alongside so a client can render its own sentence, and so a translation
-interpolates the numbers rather than hard-coding them.
-
-No annotation carries a `message` attribute, so there is no
-`ValidationMessages_*.properties` to keep in step with anything.
+A rejected field carries a key too: [Error responses](error-responses.md).
