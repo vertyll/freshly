@@ -8,7 +8,7 @@ the code exchange, the ID token check and the refresh — is Spring Security's O
 
 ## The flow
 
-```
+```text
 GET  /auth/authorize   ->  302 to Keycloak with state, PKCE challenge, ui_locales
                            (?register=true adds prompt=create, ?kc_action=... a whitelisted action)
 GET  /auth/callback    <-  Keycloak returns a code; Spring checks the state against this browser,

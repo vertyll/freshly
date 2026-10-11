@@ -53,7 +53,7 @@ A Gradle task registered by the `freshly.domain-layer` and
 `freshly.application-layer` convention plugins. It reads the **resolved**
 `compileClasspath` and fails the build if any of these appear:
 
-```
+```text
 org.springframework   jakarta.persistence   jakarta.validation   jakarta.servlet
 org.hibernate         com.fasterxml.jackson tools.jackson        org.slf4j
 org.apache.logging    org.mongodb           org.mapstruct        org.projectlombok

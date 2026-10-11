@@ -54,7 +54,7 @@ digits — 1 stacja, 2 stacje, 5 stacji, 22 stacje — and the JDK's `ChoiceForm
 by numeric threshold, so the rule has to be written out by hand and is still wrong at 22. ICU
 carries the CLDR rules:
 
-```
+```text
 Znaleziono {count, plural, one{# stację} few{# stacje} many{# stacji} other{# stacji}}.
 ```
 
@@ -127,7 +127,7 @@ moved between modules, which is a [migration](translation-migrations.md).
 
 ## Shape
 
-```
+```text
 platform/shared-i18n/
 └── IcuMessages             validate, placeholders, render — the only place ICU is named
 

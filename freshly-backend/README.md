@@ -5,7 +5,7 @@ internally a hexagon.
 
 ## Layout
 
-```
+```text
 freshly-backend/
 ├── buildSrc/                    convention plugins + HexagonalClasspathCheck
 ├── platform/                    not bounded contexts
@@ -27,7 +27,7 @@ freshly-backend/
 
 Each context is **three Gradle projects**, not one:
 
-```
+```text
 <context>-infrastructure ──► <context>-application ──► <context>-domain
 ```
 
