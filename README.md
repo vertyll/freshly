@@ -7,13 +7,15 @@
     <img alt="" src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white">
 </p>
 
+# Freshly
+
 ## Project Assumptions
 
 Application with air quality data from IoT sensors.
 
 ## Technology Stack
 
-### Back-end:
+### Back-end
 
 - Spring Boot.
 - Java.
@@ -27,7 +29,7 @@ Application with air quality data from IoT sensors.
 - Spring Web.
 - OpenAPI (Swagger).
 
-### Authentication:
+### Authentication
 
 - **Identity provider**: Keycloak (realm `freshly`); the application never sees a password.
 - **Pattern**: BFF with Spring Security's OAuth2 client; the browser holds only a session cookie.
@@ -35,7 +37,7 @@ Application with air quality data from IoT sensors.
 - **JWT**: the back-end is a stateless resource server; a client can also call it with a Bearer token.
 - **Details**: [auth module](freshly-backend/modules/auth/README.md).
 
-### Core back-end:
+### Core back-end
 
 - Gradle build system.
 - The application has an exception handling mechanism.
@@ -48,7 +50,7 @@ Application with air quality data from IoT sensors.
 - Optimistic locking for concurrent updates with Etag and If-Match header.
 - And many other features that can be found in the application code.
 
-### Other:
+### Other
 
 - Docker for development environment.
 - PMD for static code analysis.
