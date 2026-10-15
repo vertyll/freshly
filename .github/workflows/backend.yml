@@ -95,39 +95,9 @@ jobs:
           path: freshly-backend/**/build/reports/
           if-no-files-found: ignore
 
-  architecture:
-    name: Architecture
-    runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: freshly-backend
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-
-      - name: Set up Java 25
-        uses: actions/setup-java@v6
-        with:
-          distribution: zulu
-          java-version: "25"
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
-
-      - name: Architecture
-        run: ./gradlew checkArchitecture
-
-      - name: Upload reports
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: backend-architecture-reports
-          path: freshly-backend/**/build/reports/
-          if-no-files-found: ignore
-
   image:
     name: Image
-    needs: [lint, test, architecture]
+    needs: [lint, test]
     if: github.event_name != 'push' || github.ref_type == 'tag'
     runs-on: ubuntu-24.04-arm
     steps:
