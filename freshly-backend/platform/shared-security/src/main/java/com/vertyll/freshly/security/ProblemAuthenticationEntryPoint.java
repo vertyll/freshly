@@ -32,7 +32,7 @@ import tools.jackson.databind.json.JsonMapper;
  * problem document — the same failure in two shapes depending on where it was noticed.
  *
  * <p>
- * Serialises with the application's {@code JsonMapper} rather than the message
+ * Serializes with the application's {@code JsonMapper} rather than the message
  * converters, because at this point in the chain there is no {@code HandlerAdapter} to run
  * them.
  */

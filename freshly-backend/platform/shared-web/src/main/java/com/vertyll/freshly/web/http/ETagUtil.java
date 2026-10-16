@@ -57,7 +57,7 @@ public final class ETagUtil {
      * <p>
      * Anything else that is not one entity-tag is refused rather than ignored. A client
      * that sent {@code If-Match} asked for a precondition, and treating an unreadable one
-     * as absent would let to write through unchecked — the one outcome the header exists
+     * as absent would let a write through unchecked — the one outcome the header exists
      * to prevent. Matched whole, so {@code "1"junk} is refused rather than read as 1.
      *
      * @throws DomainException with {@link IfMatchError#MALFORMED} for an unreadable value

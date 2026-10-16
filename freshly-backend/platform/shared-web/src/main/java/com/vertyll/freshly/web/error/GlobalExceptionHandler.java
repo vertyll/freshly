@@ -171,7 +171,7 @@ public class GlobalExceptionHandler {
      * <p>
      * No field list: the parse failed, so there is nothing reliable to name, and
      * Jackson's own message can quote the offending input back — which is a way to
-     * reflect un sanitised request content into a response.
+     * reflect unsanitized request content into a response.
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail handleUnreadableBody(HttpMessageNotReadableException exception, WebRequest request) {

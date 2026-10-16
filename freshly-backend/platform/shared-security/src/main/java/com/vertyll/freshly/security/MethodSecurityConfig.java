@@ -28,7 +28,7 @@ import com.vertyll.freshly.web.security.RequirePermission;
  * Note the injected type: {@link PermissionEvaluator}, the platform's own SPI, not the
  * permission context's query port. That is what keeps this file — and the whole platform
  * — compilable without any bounded context on the path. Spring resolves it to whichever
- * bean implements it, which today is `permission`'s `PermissionQueryUseCase`.
+ * bean implements it: the {@code permission} module's {@code PermissionQueryUseCase}.
  */
 @Configuration
 @EnableMethodSecurity

@@ -27,7 +27,7 @@ import java.util.Set;
  * With this SPI the platform declares what it needs, {@code permission-infrastructure}
  * supplies it as a bean, and the dependency runs context → platform like every other one.
  * It is the same shape as {@link PermissionCatalogue} in the other direction — the
- * platform holds the contract, the context holds the behaviour.
+ * platform holds the contract, the context holds the behavior.
  *
  * <p>
  * Framework-free, so an application layer could also depend on it without pulling

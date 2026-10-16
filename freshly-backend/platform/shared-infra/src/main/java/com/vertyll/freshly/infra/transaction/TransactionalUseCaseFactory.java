@@ -97,6 +97,7 @@ public class TransactionalUseCaseFactory {
         }
     }
 
+    // Erased at run time, so the cast checks nothing: the throwable is rethrown as it is.
     @SuppressWarnings("unchecked")
     private static <E extends Throwable> RuntimeException sneakyThrow(Throwable t) throws E {
         throw (E) t;

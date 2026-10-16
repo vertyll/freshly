@@ -129,7 +129,7 @@ public abstract class FreshlyArchitectureTest {
     }
 
     /**
-     * Overridden by a module that has neighbours, naming their base packages.
+     * Overridden by a module that has neighbors, naming their base packages.
      *
      * <p>
      * Default is empty rather than abstract so that adding a module does not
