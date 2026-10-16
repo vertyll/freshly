@@ -165,9 +165,8 @@ public final class FreshlyArchitectureRules {
      * generated all-args constructor or a generated setter.
      *
      * <p>
-     * {@code SystemUser} already gets this right by hand. The rule is what stops
-     * the next aggregate from starting life as {@code @Data} and quietly becoming a
-     * struct that the application layer mutates field by field.
+     * The rule stops an aggregate from starting life as {@code @Data} and quietly
+     * becoming a struct that the application layer mutates field by field.
      */
     public static ArchRule domainDoesNotUseLombok(String base) {
         return noClasses().that()

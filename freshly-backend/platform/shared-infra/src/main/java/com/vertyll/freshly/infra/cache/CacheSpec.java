@@ -4,11 +4,9 @@ package com.vertyll.freshly.infra.cache;
  * A cache one bounded context needs, declared by that context.
  *
  * <p>
- * This SPI exists because of a real collision. Both {@code permission} and
- * {@code airquality} defined their own {@code CacheManager} bean, each building a
- * {@code SimpleCacheManager} over its own caches. Spring needs exactly one primary
- * {@code CacheManager}, so the context would either fail to start or — worse, depending
- * on resolution order — start with one module's caches registered and the other's
+ * Spring needs exactly one primary {@code CacheManager}. Two modules each building
+ * their own over their own caches would either fail to start or — worse, depending on
+ * resolution order — start with one module's caches registered and the other's
  * silently absent. A {@code @Cacheable} naming a cache that does not exist throws at the
  * first call, which is a start-up problem discovered at request time.
  *

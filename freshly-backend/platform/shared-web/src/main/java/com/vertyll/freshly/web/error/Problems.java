@@ -12,7 +12,7 @@ import org.springframework.http.ProblemDetail;
  *
  * <p>
  * One place decides the shape, so a refusal from any module looks the same to a
- * client and the front end handles all of them one way. What changes is the key.
+ * client and the front-end handles all of them one way. What changes is the key.
  *
  * <p>
  * The members and why each is there:

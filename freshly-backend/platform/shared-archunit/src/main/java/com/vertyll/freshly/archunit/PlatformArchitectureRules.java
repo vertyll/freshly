@@ -158,10 +158,9 @@ public final class PlatformArchitectureRules {
      * Configuration properties belong to the module that reads them.
      *
      * <p>
-     * {@code common} held {@code KeycloakProperties}, {@code JwtProperties} and
-     * {@code MailProperties}, so the identity-provider admin secret, the token signing key
-     * and the SMTP password were on the compile path of every module — including the ones
-     * that draw charts. Nothing abused it; nothing prevented it either.
+     * A properties class in the platform is on the compile path of every module, so the
+     * identity-provider admin secret, the token signing key or the SMTP password would reach
+     * even the modules that draw charts.
      *
      * <p>
      * {@code CorsProperties} is the single exception, because CORS genuinely is a
