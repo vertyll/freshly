@@ -1,6 +1,9 @@
 {
   "id": "a9bfe2aa-4317-4ae0-abc1-450033fb8566",
   "realm": "freshly",
+  "displayName": "Freshly",
+  "loginTheme": "freshly",
+  "emailTheme": "freshly",
   "notBefore": 0,
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": true,
@@ -452,11 +455,11 @@
   "localizationTexts": {
     "pl": {
       "termsTitle": "Regulamin Freshly",
-      "termsText": "<p>Freshly to projekt demonstracyjny, stworzony w celach nauki i portfolio. Twoje dane są przechowywane w bazach danych na prywatnym serwerze autora w Unii Europejskiej.</p><p>Akceptując, potwierdzasz, że przeczytałeś <a href=\"http://localhost:8080/api/v1/legal/terms.html#pl\" target=\"_blank\" rel=\"noopener\">regulamin</a> i <a href=\"http://localhost:8080/api/v1/legal/privacy.html#pl\" target=\"_blank\" rel=\"noopener\">politykę prywatności</a> i akceptujesz regulamin.</p>"
+      "termsText": "<p>Freshly to projekt demonstracyjny, stworzony do nauki i jako portfolio.</p><p>Akceptując, potwierdzasz, że:</p><ul><li>akceptujesz <a href=\"http://localhost:8080/api/v1/legal/terms.html#pl\" target=\"_blank\" rel=\"noopener\">regulamin</a>;</li><li>znasz <a href=\"http://localhost:8080/api/v1/legal/privacy.html#pl\" target=\"_blank\" rel=\"noopener\">politykę prywatności</a>;</li><li>wiesz, że Twoje dane są przechowywane na prywatnym serwerze autora w Unii Europejskiej.</li></ul>"
     },
     "en": {
       "termsTitle": "Freshly terms of use",
-      "termsText": "<p>Freshly is a demo project built for learning and as a portfolio piece. Your data is stored in databases on the author's private server in the European Union.</p><p>By accepting, you confirm that you have read the <a href=\"http://localhost:8080/api/v1/legal/terms.html#en\" target=\"_blank\" rel=\"noopener\">terms of use</a> and the <a href=\"http://localhost:8080/api/v1/legal/privacy.html#en\" target=\"_blank\" rel=\"noopener\">privacy policy</a>, and you accept the terms of use.</p>"
+      "termsText": "<p>Freshly is a demo project built for learning and as a portfolio piece.</p><p>By accepting, you confirm that you:</p><ul><li>accept the <a href=\"http://localhost:8080/api/v1/legal/terms.html#en\" target=\"_blank\" rel=\"noopener\">terms of use</a>;</li><li>have read the <a href=\"http://localhost:8080/api/v1/legal/privacy.html#en\" target=\"_blank\" rel=\"noopener\">privacy policy</a>;</li><li>know that your data is stored on the author’s private server in the European Union.</li></ul>"
     }
   },
   "webAuthnPolicyRpEntityName": "keycloak",
@@ -778,7 +781,7 @@
       "description": "Freshly App Client for application authentication",
       "rootUrl": "",
       "adminUrl": "",
-      "baseUrl": "",
+      "baseUrl": "http://localhost:8080/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
