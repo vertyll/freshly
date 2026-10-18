@@ -11,6 +11,7 @@ import org.testcontainers.containers.GenericContainer;
 class RedisTestContainer {
 
     @Bean
+    @SuppressWarnings("resource")
     @ServiceConnection(name = "redis")
     GenericContainer<?> redisContainer() {
         return new GenericContainer<>("redis:8-alpine").withStartupTimeout(Duration.ofMinutes(2))

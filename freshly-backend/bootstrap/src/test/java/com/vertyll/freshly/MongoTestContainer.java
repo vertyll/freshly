@@ -11,6 +11,7 @@ import org.testcontainers.mongodb.MongoDBContainer;
 class MongoTestContainer {
 
     @Bean
+    @SuppressWarnings("resource")
     @ServiceConnection
     MongoDBContainer mongoDbContainer() {
         return new MongoDBContainer("mongo:8").withStartupTimeout(Duration.ofMinutes(2))

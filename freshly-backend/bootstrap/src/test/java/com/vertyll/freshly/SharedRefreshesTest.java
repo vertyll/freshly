@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class SharedRefreshesTest {
     private static final Instant ISSUED_AT = Instant.parse("2026-01-01T00:00:00Z");
 
+    @SuppressWarnings("resource")
     private static final GenericContainer<?> REDIS =
             new GenericContainer<>("redis:8-alpine").withStartupTimeout(Duration.ofMinutes(2))
                 .withStartupAttempts(3)
