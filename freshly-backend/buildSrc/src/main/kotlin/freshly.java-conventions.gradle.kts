@@ -46,7 +46,13 @@ tasks.withType<JacocoReport>().configureEach {
 
 configure<DependencyManagementExtension> {
     imports {
-        mavenBom(libs.findLibrary("spring-boot-dependencies").get().get().toString())
+        mavenBom(
+            libs
+                .findLibrary("spring-boot-dependencies")
+                .get()
+                .get()
+                .toString(),
+        )
     }
 }
 
@@ -125,8 +131,20 @@ configure<SpotlessExtension> {
         removeUnusedImports()
 
         importOrder(
-            "java", "javax", "jakarta", "org", "com.vertyll", "com", "",
-            "\\#java", "\\#javax", "\\#jakarta", "\\#org", "\\#com.vertyll", "\\#com", "\\#"
+            "java",
+            "javax",
+            "jakarta",
+            "org",
+            "com.vertyll",
+            "com",
+            "",
+            "\\#java",
+            "\\#javax",
+            "\\#jakarta",
+            "\\#org",
+            "\\#com.vertyll",
+            "\\#com",
+            "\\#",
         )
 
         formatAnnotations()
@@ -139,12 +157,13 @@ configure<SpotlessExtension> {
         toggleOffOn()
     }
 
-    format("gradle") {
+    kotlinGradle {
         target("*.gradle.kts", "**/*.gradle.kts")
+        ktlint(libs.findVersion("ktlint").get().requiredVersion)
         replaceRegex(
             "IDE-generated Kotlin DSL accessor import",
             "(?m)^import gradle\\.kotlin\\.dsl\\.accessors\\._[0-9a-f]+\\.\\*\\R",
-            ""
+            "",
         )
         trimTrailingWhitespace()
         leadingTabsToSpaces(4)

@@ -12,23 +12,30 @@ repositories {
 }
 
 spotless {
-    format("buildLogic") {
-        target("*.gradle.kts", "buildSrc/*.gradle.kts", "buildSrc/src/**/*.gradle.kts", "buildSrc/src/**/*.kt")
+    lineEndings = com.diffplug.spotless.LineEnding.UNIX
+    kotlinGradle {
+        target("*.gradle.kts", "buildSrc/*.gradle.kts", "buildSrc/src/**/*.gradle.kts")
         targetExclude("**/build/**")
+        ktlint(libs.versions.ktlint.get())
         replaceRegex(
             "IDE-generated Kotlin DSL accessor import",
             "(?m)^import gradle\\.kotlin\\.dsl\\.accessors\\._[0-9a-f]+\\.\\*\\R",
-            ""
+            "",
         )
-        trimTrailingWhitespace()
-        leadingTabsToSpaces(4)
+        endWithNewline()
+    }
+    kotlin {
+        target("buildSrc/src/**/*.kt")
+        targetExclude("**/build/**")
+        ktlint(libs.versions.ktlint.get())
         endWithNewline()
     }
 }
 
-val innerLayers = subprojects.filter {
-    it.name.endsWith("-domain") || it.name.endsWith("-application")
-}
+val innerLayers =
+    subprojects.filter {
+        it.name.endsWith("-domain") || it.name.endsWith("-application")
+    }
 
 tasks.register("checkHexagonalDependencies") {
     group = "verification"
@@ -44,7 +51,7 @@ tasks.register("checkArchitecture") {
     dependsOn(
         subprojects
             .filter { it.name.endsWith("-infrastructure") }
-            .map { "${it.path}:test" }
+            .map { "${it.path}:test" },
     )
 
     dependsOn(":bootstrap:test")
@@ -54,17 +61,26 @@ tasks.named("check") {
     dependsOn("checkHexagonalDependencies")
 }
 
-data class DocumentedLibrary(val name: String, val blurb: String, val frameworkFree: Boolean)
-
-val documentedLibraries = listOf(
-    DocumentedLibrary("shared-lang", "Errors, paging, version guard and the ports every module shares", true),
-    DocumentedLibrary("shared-authz", "The permission vocabulary and the authorization SPI", true),
-    DocumentedLibrary("shared-i18n", "ICU message patterns: writing, checking and rendering them", true),
-    DocumentedLibrary("shared-infra", "Transaction proxy, use-case logger and cache manager", false),
-    DocumentedLibrary("shared-web", "Problem details, ETag handling, the paging response and the web annotations", false),
-    DocumentedLibrary("shared-security", "Filter chain, method security and role extraction", false),
-    DocumentedLibrary("shared-archunit", "The architecture rules every bounded context is checked against", false)
+data class DocumentedLibrary(
+    val name: String,
+    val blurb: String,
+    val frameworkFree: Boolean,
 )
+
+val documentedLibraries =
+    listOf(
+        DocumentedLibrary("shared-lang", "Errors, paging, version guard and the ports every module shares", true),
+        DocumentedLibrary("shared-authz", "The permission vocabulary and the authorization SPI", true),
+        DocumentedLibrary("shared-i18n", "ICU message patterns: writing, checking and rendering them", true),
+        DocumentedLibrary("shared-infra", "Transaction proxy, use-case logger and cache manager", false),
+        DocumentedLibrary(
+            "shared-web",
+            "Problem details, ETag handling, the paging response and the web annotations",
+            false,
+        ),
+        DocumentedLibrary("shared-security", "Filter chain, method security and role extraction", false),
+        DocumentedLibrary("shared-archunit", "The architecture rules every bounded context is checked against", false),
+    )
 
 tasks.register("docs") {
     group = "documentation"
@@ -76,7 +92,11 @@ tasks.register("docs") {
     val site = layout.buildDirectory.dir("docs/javadoc")
     val template = layout.projectDirectory.file("gradle/docs/landing.html")
     inputs.file(template)
-    val sources = libraries.associate { it.name to project(":platform:${it.name}").layout.buildDirectory.dir("docs/javadoc") }
+    val sources =
+        libraries.associate {
+            it.name to
+                project(":platform:${it.name}").layout.buildDirectory.dir("docs/javadoc")
+        }
 
     doLast {
         val root = site.get().asFile
@@ -99,7 +119,7 @@ tasks.register("docs") {
                 .replace("@@PURE_SCOPE@@", "safe for a domain or application layer")
                 .replace("@@UNIT@@", "library")
                 .replace("@@PURE@@", cards(libraries.filter { it.frameworkFree }))
-                .replace("@@SPRING@@", cards(libraries.filterNot { it.frameworkFree }))
+                .replace("@@SPRING@@", cards(libraries.filterNot { it.frameworkFree })),
         )
         logger.lifecycle("Javadoc: ${landingPage.toURI()}")
     }
