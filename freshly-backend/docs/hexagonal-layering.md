@@ -66,20 +66,6 @@ declared-dependency check sees nothing wrong.
 
 Run it alone with `./gradlew checkHexagonalDependencies`.
 
-### PMD: `NoWildcardImports`
-
-A wildcard makes the layering rules unreadable. `import org.springframework.*` in an
-application layer is exactly what `checkHexagonalDependencies` exists to prevent, and a
-reviewer scanning imports to see which frameworks a class touches learns nothing from a
-star. With seven contexts holding deliberately similar names — `Email`,
-`PermissionCatalogue`, `ApplicationBeansConfig` — it also decides silently which package a
-name resolves to.
-
-Enforced as an XPath rule in `config/pmd`, not as a bespoke Gradle task and not in Spotless.
-Spotless cannot do it: expanding a star means knowing which types the file uses, which needs
-type resolution and a classpath a text formatter does not have. `.editorconfig` raises
-IntelliJ's collapse threshold so the rule is rarely hit in the first place.
-
 ### ArchUnit
 
 `platform/shared-archunit`, applied per module with one class:
@@ -94,7 +80,7 @@ class UserAccessArchitectureTest extends FreshlyArchitectureTest {
 |----------------------------------------------------|-----------------------------------------------------------|
 | The dependency rule points inwards                 | `infrastructure` → `application` → `domain`               |
 | Domain and application are framework-free          | at class level, where a classpath cannot see              |
-| The inside does not depend on `web`                | the exact violation `AuthService` committed               |
+| The inside does not depend on `web`                | the web is an adapter, and nothing inside reaches it      |
 | `@Document` only in `infrastructure.persistence`   | persistence stays an adapter detail                       |
 | `@RestController` only in `infrastructure.web`     | HTTP is one delivery mechanism                            |
 | Ports are interfaces                               | a port is a contract, not a class the inside instantiates |
@@ -192,19 +178,18 @@ decorative.
 
 ## Error catalogs
 
-Each context owns one, in `domain/error/`:
+Each context that refuses requests of its own owns one, in `domain/error/`:
 
-| Module       | Catalog           |
-|--------------|-------------------|
-| `useraccess` | `UserAccessError` |
-| `auth`       | `AuthError`       |
-| `permission` | `PermissionError` |
-| `airquality` | `AirQualityError` |
+| Module        | Catalog            |
+|---------------|--------------------|
+| `useraccess`  | `UserAccessError`  |
+| `permission`  | `PermissionError`  |
+| `airquality`  | `AirQualityError`  |
+| `translation` | `TranslationError` |
 
 Each entry names a translation key and an `ErrorKind`. One handler —
-`shared-web`'s `DomainExceptionHandler` — serves every module and knows none of
-their catalogs, which is what let the three per-module `*ControllerAdvice`
-classes collapse into one file.
+`shared-web`'s `GlobalExceptionHandler` — serves every module and knows none of
+their catalogs.
 
 Every refusal answers as an **RFC 9457 problem document** (`application/problem+json`):
 
