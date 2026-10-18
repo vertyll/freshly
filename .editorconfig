@@ -5,20 +5,13 @@ charset = utf-8
 end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
-
-[*.java]
 indent_style = space
 indent_size = 4
 max_line_length = 120
 
-ij_java_class_count_to_use_import_on_demand = 999
-
-ij_java_imports_layout = java.**, javax.**, jakarta.**, org.**, com.vertyll.**, com.**, *, |, $java.**, $javax.**, $jakarta.**, $org.**, $com.vertyll.**, $com.**, $*
-
-[*.{kts,gradle}]
-indent_style = space
-indent_size = 4
-
-[*.{yml,yaml,json}]
-indent_style = space
+[{*.{yml,yaml,json,sh,html,md},Dockerfile}]
 indent_size = 2
+
+[*.java]
+ij_java_class_count_to_use_import_on_demand = 999
+ij_java_imports_layout = java.**, javax.**, jakarta.**, org.**, com.vertyll.**, com.**, *, |, $java.**, $javax.**, $jakarta.**, $org.**, $com.vertyll.**, $com.**, $*

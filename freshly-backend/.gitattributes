@@ -1,10 +1,8 @@
+* text=auto eol=lf
+
 /mvnw text eol=lf
 *.cmd text eol=crlf
 
 /gradlew text eol=lf
 *.bat text eol=crlf
 *.jar binary
-
-*.properties text working-tree-encoding=UTF-8
-*.yml text
-*.yaml text
