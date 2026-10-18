@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 public interface DomainError extends Serializable {
 
-    /** Translation key naming the failure, resolved against the i18n bundles. */
+    /** Translation key naming the failure, resolved against the translation bundles. */
     String key();
 
     /** Which HTTP status the failure becomes, decided in one place. */

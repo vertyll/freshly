@@ -33,7 +33,6 @@ public final class FreshlyArchitectureRules {
     private static final String APPLICATION_PACKAGES = ".application..";
     private static final String INFRASTRUCTURE_PACKAGES = ".infrastructure..";
 
-    /** Packages a domain or application class may never touch. */
     private static final String[] FRAMEWORK_PACKAGES = {
         "org.springframework..",
         "jakarta.persistence..",

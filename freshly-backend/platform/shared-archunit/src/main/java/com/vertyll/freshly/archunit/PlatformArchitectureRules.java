@@ -150,7 +150,7 @@ public final class PlatformArchitectureRules {
             .haveSimpleNameContaining("Role")
             .because(
                 "a shared module with no admission criteria becomes the place things "
-                        + "go when nobody wants to decide where they belong — which is what " + "happened to `common`"
+                        + "go when nobody wants to decide where they belong"
             );
     }
 

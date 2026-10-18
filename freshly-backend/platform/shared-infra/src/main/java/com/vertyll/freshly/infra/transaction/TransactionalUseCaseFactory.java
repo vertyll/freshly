@@ -29,8 +29,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p>
  * Read-only mode follows the <em>port</em>, not a list of method names. A query port is
  * read-only in its entirety and a command port is not, so the caller passes a constant and
- * nothing hand-maintained can drift out of step with a rename. The version of this class
- * that takes a list of names looks more flexible and is strictly worse.
+ * nothing hand-maintained can drift out of step with a rename.
  */
 @Component
 public class TransactionalUseCaseFactory {

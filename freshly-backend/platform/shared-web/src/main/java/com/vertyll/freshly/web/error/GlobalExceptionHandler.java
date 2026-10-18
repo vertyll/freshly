@@ -38,8 +38,8 @@ import lombok.extern.slf4j.Slf4j;
  * <p>
  * Spring's own failures — an unsupported method, a missing parameter, an unknown path
  * — answer in the same shape through {@code spring.mvc.problemdetails.enabled}. The ones
- * handled here are handled because they carry something extra worth telling the caller:
- * which fields were rejected.
+ * handled here are the modules' own refusals and the failures worth answering more
+ * precisely than Spring would: which fields were rejected, or a conflict rather than a 500.
  *
  * <p>
  * Ordered ahead of Boot's advice so these win, and short of the highest precedence so
@@ -124,7 +124,7 @@ public class GlobalExceptionHandler {
             String code;
             Map<String, Object> params;
             try {
-                code = annotationNameOf(error);
+                code = constraintCodeOf(error);
                 params = attributesOf(error);
             } catch (IllegalArgumentException _) {
                 code = VALIDATION_INVALID;
@@ -305,8 +305,7 @@ public class GlobalExceptionHandler {
         return description.startsWith(URI_PREFIX) ? description.substring(URI_PREFIX.length()) : description;
     }
 
-    /** The constraint annotation behind a Spring binding error. */
-    private static String annotationNameOf(FieldError error) {
+    private static String constraintCodeOf(FieldError error) {
         return ConstraintCodes.codeOf(error.unwrap(ConstraintViolation.class));
     }
 
