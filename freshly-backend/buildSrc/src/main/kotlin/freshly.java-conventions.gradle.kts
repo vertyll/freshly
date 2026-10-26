@@ -56,6 +56,8 @@ configure<DependencyManagementExtension> {
     }
 }
 
+extra["mongodb.version"] = libs.findVersion("mongodb-driver").get().requiredVersion
+
 dependencies {
     compileOnly(libs.findLibrary("jspecify").get())
     compileOnly(libs.findLibrary("spotbugs-annotations").get())

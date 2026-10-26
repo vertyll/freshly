@@ -14,7 +14,7 @@ class MongoTestContainer {
     @SuppressWarnings("resource")
     @ServiceConnection
     MongoDBContainer mongoDbContainer() {
-        return new MongoDBContainer("mongo:8").withStartupTimeout(Duration.ofMinutes(2))
+        return new MongoDBContainer("mongo:9").withStartupTimeout(Duration.ofMinutes(2))
             .withStartupAttempts(3)
             .withReplicaSet();
     }

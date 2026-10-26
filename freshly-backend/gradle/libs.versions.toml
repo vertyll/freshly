@@ -28,6 +28,7 @@ icu4j = "79.1"
 poi = "6.0.0"
 archunit = "1.5.1"
 testcontainers = "2.0.5"
+mongodb-driver = "5.13.0"
 
 [libraries]
 netty-resolver-dns-native-macos = { module = "io.netty:netty-resolver-dns-native-macos" }
