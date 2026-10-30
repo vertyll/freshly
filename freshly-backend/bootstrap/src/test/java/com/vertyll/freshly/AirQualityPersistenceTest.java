@@ -12,7 +12,6 @@ import org.bson.UuidRepresentation;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.support.MongoRepositoryFactory;
@@ -246,7 +245,6 @@ class AirQualityPersistenceTest {
     }
 
     @Test
-    @Disabled("Fails: grouping by two fields nests them under _id, so StationLevelCountRow reads no stationId")
     void theDominantLevelIsTheMostFrequentAndATieGoesToTheWorse() {
         history.saveAll(
             List.of(

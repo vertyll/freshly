@@ -193,7 +193,8 @@ public class AirQualityAnalyticsAdapter implements AirQualityAnalyticsPort {
                     .and(OVERALL_LEVEL)
                     .ne(null)
             ),
-            Aggregation.group(STATION_ID, OVERALL_LEVEL).count().as(COUNT)
+            Aggregation.group(STATION_ID, OVERALL_LEVEL).count().as(COUNT),
+            Aggregation.project(STATION_ID, OVERALL_LEVEL, COUNT)
         );
 
         Map<Integer, Map.Entry<AirQualityLevel, Integer>> best = new HashMap<>();
