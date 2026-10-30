@@ -35,7 +35,6 @@ public enum UserAccessPermission implements PermissionDescriptor {
         return CONTEXT_NAME;
     }
 
-    @SuppressWarnings("PMD.DataClass")
     public static final class Values {
         public static final String USERS_READ = "users:read";
         public static final String USERS_CREATE = "users:create";
