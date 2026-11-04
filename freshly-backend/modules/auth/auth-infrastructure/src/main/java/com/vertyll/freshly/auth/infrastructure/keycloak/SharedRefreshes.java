@@ -101,7 +101,7 @@ public class SharedRefreshes {
                     return shared;
                 }
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException _) {
             Thread.currentThread().interrupt();
         } catch (DataAccessException e) {
             log.warn("Redis unavailable while waiting for another replica's refresh: {}", e.getMessage());

@@ -21,7 +21,8 @@ class SignedInUserTest {
 
         roles.add("ADMIN");
 
-        assertThat(user.roles()).containsExactly("USER");
-        assertThatThrownBy(() -> user.roles().add("ADMIN")).isInstanceOf(UnsupportedOperationException.class);
+        Set<String> copy = user.roles();
+        assertThat(copy).containsExactly("USER");
+        assertThatThrownBy(() -> copy.add("ADMIN")).isInstanceOf(UnsupportedOperationException.class);
     }
 }
