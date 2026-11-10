@@ -12,10 +12,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "airquality_measurement")
-@CompoundIndex(name = "uk_station_measured_at", def = "{'station_id': 1, 'measured_at': -1}", unique = true)
+@CompoundIndex(
+    name = "uk_airquality_measurement_station_id_measured_at",
+    def = "{'station_id': 1, 'measured_at': -1}",
+    unique = true
+)
 public record AirQualityMeasurementDocument(
     @Id UUID id,
-    @Field("station_id") @Indexed int stationId,
+    @Field("station_id") @Indexed(name = "idx_airquality_measurement_station_id") int stationId,
     @Field("station_name") String stationName,
     @Field("measured_at") Instant measuredAt,
     @Field("recorded_at") Instant recordedAt,

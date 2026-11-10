@@ -9,7 +9,9 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtClaimValidator;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -35,6 +37,9 @@ public class SecurityConfig {
         "/actuator/health",
         "/actuator/health/**"
     };
+
+    private static final String TOKEN_TYPE_CLAIM = "typ";
+    private static final String ACCESS_TOKEN_TYPE = "Bearer";
 
     private static final String[] PUBLIC_PAGES = {
         "/legal/**"
@@ -73,6 +78,21 @@ public class SecurityConfig {
             );
         customizers.forEach(customizer -> customizer.customize(http));
         return http.build();
+    }
+
+    /**
+     * Refuses every Keycloak token that is not an access token, an ID token above all.
+     *
+     * <p>
+     * The realm signs both with the same keys and sets the header's {@code typ} to
+     * {@code JWT} on both, as it issues no RFC 9068 {@code at+jwt} header; its own
+     * {@code typ} claim, {@code Bearer} on an access token and {@code ID} on an ID token, is
+     * what tells them apart. Spring Boot adds this validator to the resource server's
+     * issuer, audience and expiry checks.
+     */
+    @Bean
+    OAuth2TokenValidator<Jwt> accessTokenTypeValidator() {
+        return new JwtClaimValidator<>(TOKEN_TYPE_CLAIM, ACCESS_TOKEN_TYPE::equals);
     }
 
     @Bean

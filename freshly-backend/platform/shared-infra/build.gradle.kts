@@ -11,6 +11,7 @@ dependencies {
 
     api(libs.spring.tx)
     implementation(libs.spring.context)
+    implementation(libs.spring.boot.starter.data.mongodb)
     implementation(libs.slf4j.api)
 
     testImplementation(libs.bundles.spring.boot.test.common)

@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "useraccess_system_user")
 public record SystemUserDocument(
     @Id UUID keycloakUserId,
-    @Field("is_active") @Indexed boolean active,
+    @Field("is_active") @Indexed(name = "idx_useraccess_system_user_is_active") boolean active,
     @Field("roles") Set<String> roles,
     @Version @Field("version") @Nullable Long version
 ) {

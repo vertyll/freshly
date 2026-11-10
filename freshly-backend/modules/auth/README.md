@@ -17,13 +17,20 @@ GET  /auth/session         who is signed in, or 204
 POST /auth/logout          revokes the refresh token at Keycloak and ends the session
 ```
 
-After the callback the browser carries one cookie, `FRESHLY_SESSION` (`HttpOnly`, `Secure`,
-`SameSite=Lax`). The tokens stay on the server, in the session's `OAuth2AuthorizedClient`.
+After the callback the browser carries one cookie, `__Host-FRESHLY_SESSION` (`HttpOnly`, `Secure`,
+`SameSite=Lax`, `Path=/`, no `Domain`); the `__Host-` prefix makes the browser refuse it from anywhere but this host
+over HTTPS. The `local` profile, served over plain HTTP, names it `FRESHLY_SESSION` and drops `Secure`, which the
+prefix requires. The tokens stay on the server, in the session's `OAuth2AuthorizedClient`, which Spring Session keeps in
+Redis as JSON written by Spring Security's Jackson modules (`SessionStoreConfig`), never as Java serialization.
+
 `SessionAccessTokenFilter` runs inside the security chain: for a request whose session holds a
 sign-in it asks the `OAuth2AuthorizedClientManager` for the access token, refreshing it when it
 is about to expire, decodes it with the resource server's decoder and authenticates the request
 with it. Every controller therefore sees the same thing — a Keycloak JWT checked by the resource
 server — whether the caller is a browser with a session or a client with a bearer token.
+
+Every call to Keycloak — the code exchange, the refresh, the revocation, the admin client and the key sets behind the
+token decoders — has the connect and read timeouts of `application.keycloak.connect-timeout` and `read-timeout`.
 
 ## The shape
 
@@ -98,5 +105,7 @@ that serves several applications, each in its own realm, takes it as a JAR in `/
 |-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Domain      | `SignedInUserTest`: the roles are copied                                                                                                                                                |
 | Application | `SessionServiceTest`: provisioning, revocation when provisioning fails                                                                                                                  |
+| Unit        | `SessionStoreConfigTest`: the authorized client and the security context round-trip through the session serializer, and an unknown type is refused                                      |
 | Integration | `bootstrap/.../SharedRefreshesTest`: one refresh across replicas, on a Redis container                                                                                                  |
+| Integration | `bootstrap/.../SessionCookieTest`: the session cookie's name and attributes, from the embedded server                                                                                   |
 | Integration | `bootstrap/.../HostedSignInTest`: authorize, state check, sign-in with provisioning, refresh, refused refresh, bearer token, cross-site write, logout — on MongoDB and Redis containers |

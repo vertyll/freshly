@@ -28,7 +28,7 @@ and the merged type would immediately need to satisfy both.
 | `shared-lang`     | yes            | anything                                  | `DomainError`, `ErrorKind`, `DomainException`, `PageRequest`, `PageResult`, `PagedResponse`, `PaginationMeta`, `VersionGuard`, `UseCaseLogger`, `TranslationCatalogue`, `TranslationResolver` |
 | `shared-authz`    | yes            | anything                                  | `PermissionDescriptor`, `PermissionCatalogue`, `StockRole`, `PermissionScope`, `CallerRoles`, `PermissionEvaluator`                                                                           |
 | `shared-i18n`     | yes            | anything                                  | `IcuMessages`                                                                                                                                                                                 |
-| `shared-infra`    | no             | `*-infrastructure`, `bootstrap`           | `TransactionalUseCaseFactory`, `Slf4jUseCaseLogger`, `CacheConfig`, `CacheSpec`                                                                                                               |
+| `shared-infra`    | no             | `*-infrastructure`, `bootstrap`           | `TransactionalUseCaseFactory`, `Slf4jUseCaseLogger`, `CacheConfig`, `CacheSpec`, `MongoIndexes`                                                                                               |
 | `shared-web`      | no             | `*-infrastructure`, `bootstrap`           | `GlobalExceptionHandler`, `Problems`, `ErrorHttpStatusMapper`, `ETagUtil`, `MessageResolver`, the security annotations                                                                        |
 | `shared-security` | no             | `bootstrap`                               | filter chain, method security, `AuthenticationRoles`, `CallerRolesArgumentResolver`, `KeycloakRealmRoleConverter`, `PublicEndpointRegistry`, `ProblemAuthenticationEntryPoint`                |
 | `shared-archunit` | test-only      | `*-infrastructure` test, `bootstrap` test | the rules                                                                                                                                                                                     |
@@ -93,6 +93,10 @@ The decisive argument is maintenance. `TransactionalUseCaseFactory` unwraps
 `InvocationTargetException` so a `DomainException` does not reach the exception handler
 disguised as a reflection failure. That is subtle enough that a copy per context means a fix
 applied N times with nothing to notice a miss.
+
+`MongoIndexes` is here for the same reason: every context that stores documents declares its indexes on them, and the
+step that creates them under their declared names, and drops what an earlier release created on the same keys, would
+otherwise be one copy per context. See [MongoDB indexes](mechanisms/mongodb-indexes.md).
 
 ---
 

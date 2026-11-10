@@ -13,9 +13,13 @@ spring:
   mongodb:
     representation:
       uuid: standard
+  threads:
+    virtual:
+      enabled: true
   data:
-    mongodb:
-      auto-index-creation: true
+    redis:
+      timeout: 2s
+      connect-timeout: 2s
   session:
     data:
       redis:
@@ -49,7 +53,8 @@ server:
     session:
       timeout: 10h
       cookie:
-        name: FRESHLY_SESSION
+        name: __Host-FRESHLY_SESSION
+        path: /
         http-only: true
         secure: true
         same-site: lax
@@ -73,10 +78,16 @@ springdoc:
     enabled: false
 
 application:
+  mongodb:
+    connect-timeout: 5s
+    read-timeout: 30s
+    server-selection-timeout: 10s
   redis:
     key-prefix: freshly
   keycloak:
     client-id: freshly-app-client
+    connect-timeout: 5s
+    read-timeout: 10s
     admin:
       client-id: freshly-service-account
   airquality:

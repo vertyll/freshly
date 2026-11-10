@@ -13,8 +13,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "translation_key")
 public record TranslationKeyDocument(
     @Id String key,
-    @Field("context") @Indexed String context,
-    @Field("declared") @Indexed boolean declared,
+    @Field("context") @Indexed(name = "idx_translation_key_context") String context,
+    @Field("declared") @Indexed(name = "idx_translation_key_declared") boolean declared,
     @Field("defaults") Map<String, String> defaults,
     @Field("overrides") Map<String, OverrideValue> overrides,
     @Version @Field("version") @Nullable Long version

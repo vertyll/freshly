@@ -13,6 +13,7 @@ server:
   servlet:
     session:
       cookie:
+        name: FRESHLY_SESSION
         secure: false
 
 springdoc:

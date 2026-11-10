@@ -12,7 +12,7 @@ freshly-backend/
 │   ├── shared-lang/             FRAMEWORK-FREE — errors, paging, VersionGuard, ports
 │   ├── shared-authz/            FRAMEWORK-FREE — authorization published language + SPI
 │   ├── shared-i18n/             FRAMEWORK-FREE — ICU message patterns
-│   ├── shared-infra/            transaction proxy, logger adapter, cache manager
+│   ├── shared-infra/            transaction proxy, logger adapter, cache manager, MongoDB indexes
 │   ├── shared-web/              problem details, ETag, paging response, annotations
 │   ├── shared-security/         filter chain, method security, role extraction
 │   └── shared-archunit/         the rules, as tests
@@ -56,6 +56,11 @@ and `/api/v1/legal/privacy.html`, and Keycloak links them from the terms every n
 
 `application-local.yml` holds every value the local profile needs; `application-prod.yml`
 holds only `${...}` references to the environment.
+
+What the application waits for is bounded in `application.yml`: MongoDB acknowledges a write once a majority of the
+replica set holds it, and connecting, choosing a server and reading a reply have timeouts (`application.mongodb`);
+Redis commands and connections have `spring.data.redis.timeout` and `connect-timeout`; Keycloak has
+`application.keycloak.connect-timeout` and `read-timeout`. Requests run on virtual threads.
 
 ## API documentation
 

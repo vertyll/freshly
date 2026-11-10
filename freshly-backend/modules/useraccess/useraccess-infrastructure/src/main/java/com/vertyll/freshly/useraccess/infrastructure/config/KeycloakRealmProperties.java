@@ -1,16 +1,20 @@
 package com.vertyll.freshly.useraccess.infrastructure.config;
 
+import java.time.Duration;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import static java.util.Objects.requireNonNull;
 
 @ConfigurationProperties(prefix = "application.keycloak")
-public record KeycloakRealmProperties(String realmUrl, Admin admin) {
+public record KeycloakRealmProperties(String realmUrl, Admin admin, Duration connectTimeout, Duration readTimeout) {
     private static final String REALMS = "/realms/";
 
     public KeycloakRealmProperties {
         requireNonNull(realmUrl, "application.keycloak.realm-url must be configured");
         requireNonNull(admin, "application.keycloak.admin must be configured");
+        requireNonNull(connectTimeout, "application.keycloak.connect-timeout must be configured");
+        requireNonNull(readTimeout, "application.keycloak.read-timeout must be configured");
     }
 
     public String serverUrl() {
