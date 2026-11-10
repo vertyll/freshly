@@ -1,5 +1,7 @@
 package com.vertyll.freshly.auth.infrastructure.web.session;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -56,8 +58,13 @@ class SessionStoreConfigTest {
 
     @Test
     @DisplayName("the security context of a sign-in survives a round trip through the store")
-    void securityContextRoundTrips() {
-        OidcIdToken idToken = new OidcIdToken("id-token", ISSUED, EXPIRES, Map.of("sub", "ada", "iss", "https://kc"));
+    void securityContextRoundTrips() throws MalformedURLException {
+        OidcIdToken idToken = new OidcIdToken(
+            "id-token",
+            ISSUED,
+            EXPIRES,
+            Map.of("sub", "ada", "iss", URI.create("https://kc").toURL())
+        );
         DefaultOidcUser user = new DefaultOidcUser(List.of(new SimpleGrantedAuthority("OIDC_USER")), idToken);
         SecurityContextImpl context =
                 new SecurityContextImpl(new OAuth2AuthenticationToken(user, user.getAuthorities(), REGISTRATION_ID));

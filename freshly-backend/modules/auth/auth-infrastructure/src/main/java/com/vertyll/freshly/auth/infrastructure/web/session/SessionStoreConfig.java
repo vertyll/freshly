@@ -1,5 +1,7 @@
 package com.vertyll.freshly.auth.infrastructure.web.session;
 
+import java.net.URL;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
@@ -44,7 +46,9 @@ public class SessionStoreConfig {
                 .addModules(
                     SecurityJacksonModules.getModules(
                         Thread.currentThread().getContextClassLoader(),
-                        BasicPolymorphicTypeValidator.builder().allowIfSubType(JDK_IMMUTABLE_COLLECTIONS)
+                        BasicPolymorphicTypeValidator.builder()
+                            .allowIfSubType(JDK_IMMUTABLE_COLLECTIONS)
+                            .allowIfSubType(URL.class)
                     )
                 )
                 .build()
