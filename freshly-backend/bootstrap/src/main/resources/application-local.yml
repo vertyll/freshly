@@ -13,6 +13,7 @@ server:
   servlet:
     session:
       cookie:
+        # The __Host- prefix requires Secure, which plain HTTP cannot have.
         name: FRESHLY_SESSION
         secure: false
 
