@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.security.oauth2.server.resource.autoconfigure.JwkSetUriJwtDecoderBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.oauth2.client.DelegatingOAuth2AuthorizedClientProvider;
@@ -88,6 +89,9 @@ public class KeycloakConfig {
      * {@code RestOperations}, the one type its builder accepts.
      */
     @Bean
+    // Spring Security 7.2 takes only RestOperations for the key set; RestClient follows in
+    // https://github.com/spring-projects/spring-security/issues/19027
+    @SuppressWarnings("removal")
     JwkSetUriJwtDecoderBuilderCustomizer keycloakKeySetTimeouts(
         @Qualifier(KEYCLOAK_REQUEST_FACTORY) JdkClientHttpRequestFactory requestFactory
     ) {
@@ -101,6 +105,9 @@ public class KeycloakConfig {
      * set fetched through the timed client, which that factory offers no way to set.
      */
     @Bean
+    // Spring Security 7.2 takes only RestOperations for the key set; RestClient follows in
+    // https://github.com/spring-projects/spring-security/issues/19027
+    @SuppressWarnings("removal")
     JwtDecoderFactory<ClientRegistration> idTokenDecoderFactory(
         @Qualifier(KEYCLOAK_REQUEST_FACTORY) JdkClientHttpRequestFactory requestFactory
     ) {
@@ -169,13 +176,17 @@ public class KeycloakConfig {
      * token-response converters, its OAuth2 error handler — on the timed request factory.
      */
     private static RestClient tokenEndpointClient(JdkClientHttpRequestFactory requestFactory) {
+        OAuth2ErrorResponseErrorHandler oauth2Errors = new OAuth2ErrorResponseErrorHandler();
         return RestClient.builder()
             .requestFactory(requestFactory)
             .configureMessageConverters(
                 converters -> converters.addCustomConverter(new FormHttpMessageConverter())
                     .addCustomConverter(new OAuth2AccessTokenResponseHttpMessageConverter())
             )
-            .defaultStatusHandler(new OAuth2ErrorResponseErrorHandler())
+            .defaultStatusHandler(
+                HttpStatusCode::isError,
+                (request, response) -> oauth2Errors.handleError(request.getURI(), request.getMethod(), response)
+            )
             .build();
     }
 
