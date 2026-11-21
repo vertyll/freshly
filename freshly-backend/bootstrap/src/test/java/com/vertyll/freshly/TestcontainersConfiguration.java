@@ -5,17 +5,25 @@ import java.time.Duration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.mongodb.MongoDBContainer;
 
 @TestConfiguration(proxyBeanMethods = false)
-class MongoTestContainer {
+class TestcontainersConfiguration {
 
     @Bean
-    @SuppressWarnings("resource")
     @ServiceConnection
     MongoDBContainer mongoDbContainer() {
         return new MongoDBContainer("mongo:9").withStartupTimeout(Duration.ofMinutes(2))
             .withStartupAttempts(3)
             .withReplicaSet();
+    }
+
+    @Bean
+    @ServiceConnection(name = "redis")
+    GenericContainer<?> redisContainer() {
+        return new GenericContainer<>("redis:8-alpine").withStartupTimeout(Duration.ofMinutes(2))
+            .withStartupAttempts(3)
+            .withExposedPorts(6379);
     }
 }

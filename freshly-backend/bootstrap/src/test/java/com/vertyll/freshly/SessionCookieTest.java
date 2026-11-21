@@ -22,12 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Import(
-    {
-        MongoTestContainer.class,
-        RedisTestContainer.class
-    }
-)
+@Import(TestcontainersConfiguration.class)
 class SessionCookieTest {
 
     @LocalServerPort

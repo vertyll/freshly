@@ -52,12 +52,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(
-    {
-        MongoTestContainer.class,
-        RedisTestContainer.class
-    }
-)
+@Import(TestcontainersConfiguration.class)
 class HostedSignInTest {
     private static final String ACCESS_TOKEN = "access-token";
     private static final String REFRESHED_ACCESS_TOKEN = "refreshed-access-token";

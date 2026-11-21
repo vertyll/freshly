@@ -15,12 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(
-    {
-        MongoTestContainer.class,
-        RedisTestContainer.class
-    }
-)
+@Import(TestcontainersConfiguration.class)
 class FreshlyApplicationTest {
 
     @Autowired
