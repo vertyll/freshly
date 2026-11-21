@@ -19,3 +19,8 @@ replay_pid*.log
 
 ### Keycloak theme ###
 /docker/keycloak/target/
+
+### SonarQube ###
+.scannerwork/
+.sonar/
+.sonarlint/
