@@ -15,6 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.support.MongoRepositoryFactory;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mongodb.MongoDBContainer;
 
 import com.vertyll.freshly.airquality.domain.model.AirQualityLevel;
@@ -42,6 +44,7 @@ import com.mongodb.client.MongoClients;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Testcontainers
 class AirQualityPersistenceTest {
     private static final Instant NOON = Instant.parse("2026-03-01T12:00:00Z");
     private static final AnalysisWindow THE_DAY =
@@ -49,7 +52,7 @@ class AirQualityPersistenceTest {
     private static final Station KRAKOW = station(1, "Kraków");
     private static final Station WARSAW = station(2, "Warszawa");
 
-    @SuppressWarnings("resource")
+    @Container
     private static final MongoDBContainer MONGO =
             new MongoDBContainer("mongo:9").withStartupTimeout(Duration.ofMinutes(2)).withStartupAttempts(3);
 
@@ -59,8 +62,7 @@ class AirQualityPersistenceTest {
     private static AirQualityAnalyticsAdapter analytics;
 
     @BeforeAll
-    static void startMongo() {
-        MONGO.start();
+    static void connect() {
         client = MongoClients.create(
             MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(MONGO.getConnectionString()))
@@ -75,9 +77,8 @@ class AirQualityPersistenceTest {
     }
 
     @AfterAll
-    static void stopMongo() {
+    static void disconnect() {
         client.close();
-        MONGO.stop();
     }
 
     @BeforeEach

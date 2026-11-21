@@ -46,6 +46,8 @@ public class SecurityConfig {
     };
 
     @Bean
+    // No CSRF token: the SameSite session cookie and the Sec-Fetch-Site check stop forged requests,
+    // as modules/auth/docs/mechanisms/cross-site-requests.md explains.
     @SuppressWarnings("java:S4502")
     SecurityFilterChain securityFilterChain(
         HttpSecurity http,

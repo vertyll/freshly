@@ -7,6 +7,7 @@ import org.jspecify.annotations.Nullable;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+// Only a namespace for the GIOS response records, so it has no static method.
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
 final class GiosResponses {
     private GiosResponses() {

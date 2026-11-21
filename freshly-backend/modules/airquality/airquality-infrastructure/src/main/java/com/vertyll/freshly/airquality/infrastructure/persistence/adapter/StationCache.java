@@ -31,8 +31,8 @@ public class StationCache {
     }
 
     @CacheEvict(value = STATIONS_CACHE, allEntries = true)
-    @SuppressWarnings("java:S1186")
     public void refresh() {
+        // Empty: the @CacheEvict proxy clears the cache when this is called.
     }
 
     public record StationIndex(List<Station> all, Map<Integer, Station> byId) {

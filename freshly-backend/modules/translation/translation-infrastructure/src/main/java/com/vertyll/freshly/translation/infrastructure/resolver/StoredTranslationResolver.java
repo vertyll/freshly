@@ -25,7 +25,7 @@ public class StoredTranslationResolver implements TranslationResolver {
     }
 
     @CacheEvict(value = TRANSLATIONS_CACHE, allEntries = true)
-    @SuppressWarnings("java:S1186")
     public void invalidate() {
+        // Empty: the @CacheEvict proxy clears the cache when this is called.
     }
 }

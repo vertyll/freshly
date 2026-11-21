@@ -25,6 +25,7 @@ public final class AirQualityMeasurement {
     @Nullable
     private final AirQualityLevel overallLevel;
 
+    // One parameter per field of the measurement; they form no smaller concept.
     @SuppressWarnings("java:S107")
     private AirQualityMeasurement(
         UUID id,
@@ -71,6 +72,7 @@ public final class AirQualityMeasurement {
         );
     }
 
+    // Restores every field of a stored measurement; they form no smaller concept.
     @SuppressWarnings("java:S107")
     public static AirQualityMeasurement reconstitute(
         UUID id,

@@ -21,6 +21,7 @@ public class TranslationCatalogueRegistrar {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 10)
+    // Any failure of one catalogue is logged, and the others still register without stopping startup.
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     ApplicationRunner registerTranslationCatalogues(
         TranslationRegistrationUseCase registration,

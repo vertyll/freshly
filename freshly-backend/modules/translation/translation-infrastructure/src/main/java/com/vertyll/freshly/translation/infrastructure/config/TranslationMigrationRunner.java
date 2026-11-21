@@ -20,6 +20,7 @@ public class TranslationMigrationRunner {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
+    // Any failure of a migration is logged and holds back the later ones without stopping startup.
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     ApplicationRunner runTranslationMigrations(
         TranslationMigrationUseCase migrations,

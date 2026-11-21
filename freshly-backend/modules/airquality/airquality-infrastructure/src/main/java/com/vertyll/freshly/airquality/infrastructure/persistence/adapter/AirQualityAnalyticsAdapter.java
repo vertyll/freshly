@@ -217,6 +217,7 @@ public class AirQualityAnalyticsAdapter implements AirQualityAnalyticsPort {
         return dominant;
     }
 
+    // One component per column the statistics query returns.
     @SuppressWarnings("java:S107")
     record StatisticsRow(
         int count,

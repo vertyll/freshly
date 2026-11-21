@@ -16,6 +16,8 @@ import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mongodb.MongoDBContainer;
 
 import com.vertyll.freshly.airquality.infrastructure.persistence.document.AirQualityMeasurementDocument;
@@ -31,10 +33,11 @@ import com.mongodb.client.model.IndexOptions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Testcontainers
 class MongoIndexesTest {
     private static final String DATABASE = "freshly";
 
-    @SuppressWarnings("resource")
+    @Container
     private static final MongoDBContainer MONGO =
             new MongoDBContainer("mongo:9").withStartupTimeout(Duration.ofMinutes(2)).withStartupAttempts(3);
 
@@ -42,8 +45,7 @@ class MongoIndexesTest {
     private static MongoTemplate template;
 
     @BeforeAll
-    static void startMongo() {
-        MONGO.start();
+    static void connect() {
         client = MongoClients.create(
             MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(MONGO.getConnectionString()))
@@ -63,9 +65,8 @@ class MongoIndexesTest {
     }
 
     @AfterAll
-    static void stopMongo() {
+    static void disconnect() {
         client.close();
-        MONGO.stop();
     }
 
     @Test

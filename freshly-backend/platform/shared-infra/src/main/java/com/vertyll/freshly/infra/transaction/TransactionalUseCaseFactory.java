@@ -52,6 +52,7 @@ public class TransactionalUseCaseFactory {
         return wrap(contract, target, readOnly);
     }
 
+    // The proxy must be defined by the loader of the contract it implements, not the thread's.
     @SuppressWarnings("PMD.UseProperClassLoader")
     private <T> T wrap(Class<T> contract, T target, TransactionTemplate template) {
         Object proxy = Proxy.newProxyInstance(
@@ -64,13 +65,12 @@ public class TransactionalUseCaseFactory {
         return contract.cast(proxy);
     }
 
-    @SuppressWarnings("PMD.UseVarargs")
     @Nullable
     private static Object invoke(
         Object target,
         TransactionTemplate template,
         Method method,
-        Object @Nullable [] args
+        Object @Nullable... args
     ) throws IllegalAccessException, InvocationTargetException {
         Object[] arguments = args == null ? new Object[0] : args;
 

@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.vertyll.freshly.auth.infrastructure.config.RedisKeyProperties;
 import com.vertyll.freshly.auth.infrastructure.keycloak.SharedRefreshes;
@@ -23,10 +25,11 @@ import com.vertyll.freshly.auth.infrastructure.keycloak.SharedRefreshes.TokenPai
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Testcontainers
 class SharedRefreshesTest {
     private static final Instant ISSUED_AT = Instant.parse("2026-01-01T00:00:00Z");
 
-    @SuppressWarnings("resource")
+    @Container
     private static final GenericContainer<?> REDIS =
             new GenericContainer<>("redis:8-alpine").withStartupTimeout(Duration.ofMinutes(2))
                 .withStartupAttempts(3)
@@ -36,8 +39,7 @@ class SharedRefreshesTest {
     private static StringRedisTemplate redis;
 
     @BeforeAll
-    static void startRedis() {
-        REDIS.start();
+    static void connect() {
         connections = new LettuceConnectionFactory(REDIS.getHost(), REDIS.getMappedPort(6379));
         connections.afterPropertiesSet();
         connections.start();
@@ -45,9 +47,8 @@ class SharedRefreshesTest {
     }
 
     @AfterAll
-    static void stopRedis() {
+    static void disconnect() {
         connections.destroy();
-        REDIS.stop();
     }
 
     @Test

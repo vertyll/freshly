@@ -26,6 +26,7 @@ public final class DomainException extends RuntimeException {
     private final DomainError error;
 
     /** Values the translated message interpolates, e.g. the id that was not found. */
+    // A message parameter may be any value, so the map cannot require Serializable values.
     @SuppressWarnings("java:S1948")
     private final Map<String, Object> params;
 

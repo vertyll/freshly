@@ -217,10 +217,10 @@ class GlobalExceptionHandlerTest {
         assertThat(problem.getDetail()).isEqualTo("Something went wrong");
     }
 
-    @SuppressWarnings("unchecked")
     private static List<FieldViolation> fieldsOf(ProblemDetail problem) {
-        Map<String, @Nullable Object> properties = requireNonNull(problem.getProperties());
-        return (List<FieldViolation>) requireNonNull(properties.get("fields"));
+        Map<String, Object> properties = requireNonNull(problem.getProperties());
+        List<?> fields = (List<?>) requireNonNull(properties.get("fields"));
+        return fields.stream().map(FieldViolation.class::cast).toList();
     }
 
     private interface Endpoint {

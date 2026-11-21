@@ -33,6 +33,7 @@ import static com.tngtech.archunit.library.GeneralCodingRules.NO_CLASSES_SHOULD_
  * there sees the whole context. Putting it in the domain module would leave two
  * of the three layers empty and every rule would pass for the wrong reason.
  */
+// Abstract so JUnit runs it only through a subclass that names its context.
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class FreshlyArchitectureTest {
     private final String basePackage;

@@ -80,6 +80,7 @@ public class AirQualitySyncService implements AirQualitySyncUseCase {
         return removed;
     }
 
+    // Any failure of one station is logged and counted, so the other stations still sync.
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private Outcome attempt(Station station, Instant freshnessThreshold) {
         try {
