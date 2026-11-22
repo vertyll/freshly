@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import org.bson.UuidRepresentation;
 import org.junit.jupiter.api.AfterAll;
@@ -281,7 +282,7 @@ class AirQualityPersistenceTest {
     private static final class Catalogue implements StationCatalogue {
         @Override
         public Optional<Station> findById(int stationId) {
-            return List.of(KRAKOW, WARSAW).stream().filter(station -> station.id() == stationId).findFirst();
+            return Stream.of(KRAKOW, WARSAW).filter(station -> station.id() == stationId).findFirst();
         }
 
         @Override

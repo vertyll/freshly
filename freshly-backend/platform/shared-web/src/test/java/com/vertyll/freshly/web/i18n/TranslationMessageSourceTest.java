@@ -56,7 +56,7 @@ class TranslationMessageSourceTest {
                 new Object[] {
                     "Ada"
                 },
-                (Locale) null
+                null
             )
         ).isEqualTo("Witaj Ada");
     }
