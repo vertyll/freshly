@@ -101,11 +101,13 @@ that serves several applications, each in its own realm, takes it as a JAR in `/
 
 ## Testing
 
-| Tier        | Where                                                                                                                                                                                   |
-|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Domain      | `SignedInUserTest`: the roles are copied                                                                                                                                                |
-| Application | `SessionServiceTest`: provisioning, revocation when provisioning fails                                                                                                                  |
-| Unit        | `SessionStoreConfigTest`: the authorized client and the security context round-trip through the session serializer, and an unknown type is refused                                      |
-| Integration | `bootstrap/.../SharedRefreshesTest`: one refresh across replicas, on a Redis container                                                                                                  |
-| Integration | `bootstrap/.../SessionCookieTest`: the session cookie's name and attributes, from the embedded server                                                                                   |
-| Integration | `bootstrap/.../HostedSignInTest`: authorize, state check, sign-in with provisioning, refresh, refused refresh, bearer token, cross-site write, logout — on MongoDB and Redis containers |
+| Tier        | Where                                                                                                                                                                                               |
+|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Domain      | `SignedInUserTest`: the roles are copied                                                                                                                                                            |
+| Application | `SessionServiceTest`: provisioning, revocation when provisioning fails                                                                                                                              |
+| Unit        | `BearerTokenRequestsTest` (`platform/shared-security`): which requests carry a bearer token and need no CSRF token                                                                                  |
+| Unit        | `SessionStoreConfigTest`: the authorized client and the security context round-trip through the session serializer, and an unknown type is refused                                                  |
+| Integration | `bootstrap/.../SharedRefreshesTest`: one refresh across replicas, on a Redis container                                                                                                              |
+| Integration | `bootstrap/.../SessionCookieTest`: the session cookie's name and attributes, from the embedded server                                                                                               |
+| Integration | `bootstrap/.../CsrfCookieTest`: the CSRF cookie's attributes, from the embedded server                                                                                                              |
+| Integration | `bootstrap/.../HostedSignInTest`: authorize, state check, sign-in with provisioning, refresh, refused refresh, bearer token, CSRF token, cross-site write, logout — on MongoDB and Redis containers |

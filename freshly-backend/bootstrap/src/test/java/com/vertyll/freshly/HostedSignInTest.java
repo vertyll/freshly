@@ -64,6 +64,8 @@ class HostedSignInTest {
     private static final String USER_PATH = "/users/" + SUBJECT;
     private static final long LIFETIME_SECONDS = 300;
     private static final long EXPIRING_SECONDS = 5;
+    private static final String CSRF_HEADER = "X-XSRF-TOKEN";
+    private static final String LOGOUT_PATH = "/auth/logout";
 
     @Autowired
     private MockMvcTester mvc;
@@ -177,18 +179,46 @@ class HostedSignInTest {
     }
 
     @Test
+    void aWriteWithTheSessionAndWithoutTheCsrfTokenIsRefused() {
+        Browser browser = signedIn(LIFETIME_SECONDS);
+
+        assertThat(browser.send(mvc.post().uri(LOGOUT_PATH))).hasStatus(HttpStatus.FORBIDDEN);
+        verify(revocation, never()).revoke(REFRESH_TOKEN);
+        assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.OK);
+    }
+
+    @Test
+    void aWriteWithAnotherAuthorizationSchemeStillNeedsTheCsrfToken() {
+        Browser browser = signedIn(LIFETIME_SECONDS);
+
+        assertThat(browser.send(mvc.post().uri(LOGOUT_PATH).header("Authorization", "Basic YWRhOnNlY3JldA==")))
+            .hasStatus(HttpStatus.FORBIDDEN);
+        verify(revocation, never()).revoke(REFRESH_TOKEN);
+    }
+
+    @Test
+    void aClientWithItsOwnTokenWritesWithoutTheCsrfToken() {
+        assertThat(mvc.post().uri(LOGOUT_PATH).header("Authorization", "Bearer " + ACCESS_TOKEN))
+            .hasStatus(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
     void aCrossSiteWriteIsNotGivenTheSessionToken() {
         Browser browser = signedIn(LIFETIME_SECONDS);
 
-        assertThat(browser.send(mvc.post().uri("/users").header("Sec-Fetch-Site", "cross-site")))
-            .hasStatus(HttpStatus.UNAUTHORIZED);
+        assertThat(
+            browser.send(
+                mvc.post().uri("/users").header(CSRF_HEADER, browser.csrfToken()).header("Sec-Fetch-Site", "cross-site")
+            )
+        ).hasStatus(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
     void logoutRevokesTheRefreshTokenAndEndsTheSession() {
         Browser browser = signedIn(LIFETIME_SECONDS);
 
-        assertThat(browser.send(mvc.post().uri("/auth/logout"))).hasStatus(HttpStatus.NO_CONTENT);
+        assertThat(browser.send(mvc.post().uri(LOGOUT_PATH).header(CSRF_HEADER, browser.csrfToken())))
+            .hasStatus(HttpStatus.NO_CONTENT);
         verify(revocation).revoke(REFRESH_TOKEN);
         assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.NO_CONTENT);
     }
@@ -197,8 +227,14 @@ class HostedSignInTest {
     void logoutSentFromAnotherSiteLeavesTheSession() {
         Browser browser = signedIn(LIFETIME_SECONDS);
 
-        assertThat(browser.send(mvc.post().uri("/auth/logout").header("Sec-Fetch-Site", "same-site")))
-            .hasStatus(HttpStatus.FORBIDDEN);
+        assertThat(
+            browser.send(
+                mvc.post()
+                    .uri(LOGOUT_PATH)
+                    .header(CSRF_HEADER, browser.csrfToken())
+                    .header("Sec-Fetch-Site", "same-site")
+            )
+        ).hasStatus(HttpStatus.FORBIDDEN);
         verify(revocation, never()).revoke(REFRESH_TOKEN);
         assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.OK);
     }
@@ -257,6 +293,12 @@ class HostedSignInTest {
 
         List<String> sessionValues() {
             return cookies.values().stream().map(Cookie::getValue).toList();
+        }
+
+        String csrfToken() {
+            Cookie token = cookies.get("XSRF-TOKEN");
+            assertThat(token).as("the CSRF cookie").isNotNull();
+            return token.getValue();
         }
     }
 

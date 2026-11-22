@@ -76,6 +76,9 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+    # Sends the XSRF-TOKEN cookie back in X-XSRF-TOKEN, which a write with the session needs.
+    csrf:
+      enabled: true
 
 application:
   mongodb:
