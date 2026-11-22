@@ -11,15 +11,19 @@ place behind it.
 Spring Security's CSRF protection is on, with the token kept in a cookie (`CookieCsrfTokenRepository`) and read the way
 a single-page application reads it (`csrf.spa()`):
 
-- every response carries the `XSRF-TOKEN` cookie, `Path=/api/v1`, `SameSite=Lax`, and `Secure` exactly when the session
-  cookie is; it is not `HttpOnly`, since a script of this origin must read it, and it holds no credential;
+- every response carries the `__Host-XSRF-TOKEN` cookie, `Path=/`, `SameSite=Lax`, `Secure` and without `Domain`; it is
+  not `HttpOnly`, since a script of this origin must read it, and it holds no credential. The `__Host-` prefix makes the
+  browser accept it only from this host, so a sibling host under the same parent domain cannot plant a token of its
+  own. The cookie is `Secure`, and so prefixed, exactly when the session cookie is: the `local` profile, served over
+  plain HTTP, names it `XSRF-TOKEN`, as the prefix requires `Secure`;
 - a `POST`, `PUT`, `PATCH` or `DELETE` sends the cookie's value back in the `X-XSRF-TOKEN` header; without it, or with
   a value that does not match, the request is refused with `403` and the `error.security.accessDenied` problem
   document before it reaches a controller;
 - the token is replaced at sign-in, so a token known before it is worthless after it.
 
 A page of another site can make the browser send the cookie, but cannot read it, so it cannot write the header. Swagger
-UI, the one page this back end serves, sends the header itself (`springdoc.swagger-ui.csrf.enabled`).
+UI, the one page this back end serves, sends the header itself (`springdoc.swagger-ui.csrf.enabled`), reading the
+cookie named by `springdoc.swagger-ui.csrf.cookie-name`, which each profile sets to the name the filter chain gives it.
 
 ## Requests with a bearer token need none
 
@@ -33,8 +37,8 @@ without a CORS preflight, which `CorsConfig` allows only for the origins of `app
 ## Defense in depth
 
 - The session cookie is `SameSite=Lax`, which keeps it off cross-site `POST`, `PUT`, `PATCH` and `DELETE`.
-- Lax still treats another subdomain of the same site as same-site, and such a subdomain could also set an
-  `XSRF-TOKEN` cookie of its own for this host and so know its value. `SessionAccessTokenFilter` therefore also reads
+- Lax still treats another subdomain of the same site as same-site. Such a subdomain cannot plant the `__Host-` CSRF
+  cookie, but the bare cookie of the `local` profile has no such guard, and `SessionAccessTokenFilter` also reads
   `Sec-Fetch-Site`: an unsafe method sent from anywhere other than this origin is treated as anonymous and answered
   `401`, whatever token it carries. `POST /auth/logout` applies the same rule and answers `403`, so another page cannot
   sign the person out.

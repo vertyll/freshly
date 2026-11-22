@@ -8,6 +8,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
@@ -24,8 +25,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(TestcontainersConfiguration.class)
 class CsrfCookieTest {
 
+    private static final String CSRF_COOKIE = "__Host-XSRF-TOKEN";
+
     @LocalServerPort
     private int port;
+
+    @Value("${springdoc.swagger-ui.csrf.cookie-name}")
+    private String swaggerUiCookie;
 
     @Test
     void theCsrfCookieIsReadableBySameSiteScriptsOverHttpsOnly() throws IOException, InterruptedException {
@@ -38,11 +44,16 @@ class CsrfCookieTest {
             cookies = response.headers().allValues("Set-Cookie");
         }
 
-        assertThat(cookies).filteredOn(cookie -> cookie.startsWith("XSRF-TOKEN="))
+        assertThat(cookies).filteredOn(cookie -> cookie.startsWith(CSRF_COOKIE + "="))
             .singleElement()
             .satisfies(
-                cookie -> assertThat(cookie).contains("; Path=/api/v1", "; Secure", "; SameSite=Lax")
+                cookie -> assertThat(cookie).contains("; Path=/;", "; Secure", "; SameSite=Lax")
                     .doesNotContain("HttpOnly", "Domain=")
             );
+    }
+
+    @Test
+    void swaggerUiReadsTheCsrfCookieByItsName() {
+        assertThat(swaggerUiCookie).isEqualTo(CSRF_COOKIE);
     }
 }

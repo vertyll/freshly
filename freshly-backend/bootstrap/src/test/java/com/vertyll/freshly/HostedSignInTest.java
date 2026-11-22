@@ -268,7 +268,7 @@ class HostedSignInTest {
         assertThat(nonce).isNotNull();
         assertThat(state).isNotNull();
         Jwt idToken = idToken(nonce);
-        when(idTokenDecoders.createDecoder(any())).thenReturn(token -> idToken);
+        when(idTokenDecoders.createDecoder(any())).thenReturn(_ -> idToken);
         when(codeTokens.getTokenResponse(any())).thenReturn(tokenResponse(ACCESS_TOKEN, accessTokenLifetimeSeconds));
         return state;
     }
@@ -296,7 +296,7 @@ class HostedSignInTest {
         }
 
         String csrfToken() {
-            Cookie token = cookies.get("XSRF-TOKEN");
+            Cookie token = cookies.get("__Host-XSRF-TOKEN");
             assertThat(token).as("the CSRF cookie").isNotNull();
             return token.getValue();
         }

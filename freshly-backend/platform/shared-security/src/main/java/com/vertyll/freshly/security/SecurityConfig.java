@@ -43,6 +43,10 @@ public class SecurityConfig {
     private static final String TOKEN_TYPE_CLAIM = "typ";
     private static final String ACCESS_TOKEN_TYPE = "Bearer";
 
+    private static final String CSRF_COOKIE = "XSRF-TOKEN";
+
+    private static final String HOST_PREFIX = "__Host-";
+
     private static final String CSRF_COOKIE_SAME_SITE = "Lax";
 
     private static final String[] PUBLIC_PAGES = {
@@ -111,24 +115,16 @@ public class SecurityConfig {
     }
 
     /**
-     * The CSRF token in the {@code XSRF-TOKEN} cookie, which a page of this origin reads and
-     * sends back in {@code X-XSRF-TOKEN}, as modules/auth/docs/mechanisms/cross-site-requests.md
-     * explains.
-     *
-     * <p>
-     * The cookie cannot be {@code HttpOnly}, since a script must read it; it holds no
-     * credential, only the token a forged request cannot know. It is {@code Secure} exactly
-     * when the session cookie is, so the local profile over plain HTTP gets it too.
+     * Not {@code HttpOnly}, as a script must read the token, which is no credential. The
+     * {@code __Host-} prefix keeps a sibling host from planting its own token; it requires
+     * {@code Secure}, so the local profile over plain HTTP gets the bare name.
      */
     private static CookieCsrfTokenRepository csrfTokenRepository(Cookie sessionCookie) {
         CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        Boolean secure = sessionCookie.getSecure();
-        repository.setCookieCustomizer(cookie -> {
-            cookie.sameSite(CSRF_COOKIE_SAME_SITE);
-            if (secure != null) {
-                cookie.secure(secure);
-            }
-        });
+        boolean secure = Boolean.TRUE.equals(sessionCookie.getSecure());
+        repository.setCookieName(secure ? HOST_PREFIX + CSRF_COOKIE : CSRF_COOKIE);
+        repository.setCookiePath("/");
+        repository.setCookieCustomizer(cookie -> cookie.sameSite(CSRF_COOKIE_SAME_SITE).secure(secure));
         return repository;
     }
 }

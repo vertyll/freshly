@@ -54,6 +54,7 @@ server:
       timeout: 10h
       cookie:
         name: __Host-FRESHLY_SESSION
+        # The context path would otherwise be the cookie's path, which the __Host- prefix forbids.
         path: /
         http-only: true
         secure: true
@@ -76,9 +77,11 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
-    # Sends the XSRF-TOKEN cookie back in X-XSRF-TOKEN, which a write with the session needs.
+    # Sends the CSRF cookie back in X-XSRF-TOKEN, which a write with the session needs; its name follows the session
+    # cookie's Secure flag, as the filter chain sets it.
     csrf:
       enabled: true
+      cookie-name: __Host-XSRF-TOKEN
 
 application:
   mongodb:
