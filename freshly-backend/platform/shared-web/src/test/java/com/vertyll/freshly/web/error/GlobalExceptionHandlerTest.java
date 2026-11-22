@@ -13,10 +13,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -125,7 +124,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void aRejectedBodyNamesEachFieldWithItsTranslatedConstraint() throws NoSuchMethodException {
-        Form form = new Form("ab", null);
+        Form form = new Form("ab", "");
         BeanPropertyBindingResult result = new BeanPropertyBindingResult(form, "form");
         new SpringValidatorAdapter(validator).validate(form, result);
         Method method = Endpoint.class.getDeclaredMethod("accept", Form.class);
@@ -144,7 +143,7 @@ class GlobalExceptionHandlerTest {
     @Test
     void aRejectedParameterIsNamedByTheLastPartOfItsPath() {
         ConstraintViolationException exception =
-                new ConstraintViolationException(validator.validate(new Wrapper(new Form("abc", null))));
+                new ConstraintViolationException(validator.validate(new Wrapper(new Form("abc", ""))));
 
         ProblemDetail problem = handler.handleConstraintViolation(exception, request);
 
@@ -160,12 +159,13 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void aParameterThatCannotBeParsedIsNamed() {
+    void aParameterThatCannotBeParsedIsNamed() throws NoSuchMethodException {
+        Method method = Endpoint.class.getDeclaredMethod("list", Integer.class);
         MethodArgumentTypeMismatchException exception = new MethodArgumentTypeMismatchException(
             "abc",
             Integer.class,
             "page",
-            null,
+            new MethodParameter(method, 0),
             new NumberFormatException()
         );
 
@@ -223,11 +223,15 @@ class GlobalExceptionHandlerTest {
         return fields.stream().map(FieldViolation.class::cast).toList();
     }
 
-    private interface Endpoint {
+    // Not private: its methods are only looked up by reflection, which a private interface's
+    // unused-method check cannot see.
+    interface Endpoint {
         void accept(Form form);
+
+        void list(Integer page);
     }
 
-    private record Form(@Size(min = 3, max = 5) String name, @NotNull @Nullable String email) {
+    private record Form(@Size(min = 3, max = 5) String name, @NotBlank String email) {
     }
 
     private record Wrapper(@Valid Form form) {

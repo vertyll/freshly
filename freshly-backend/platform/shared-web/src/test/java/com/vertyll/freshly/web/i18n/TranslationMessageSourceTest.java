@@ -117,7 +117,7 @@ class TranslationMessageSourceTest {
 
     @Test
     void aResolvableWithNoCodesAndNoDefaultIsAnError() {
-        DefaultMessageSourceResolvable resolvable = new DefaultMessageSourceResolvable((String[]) null);
+        DefaultMessageSourceResolvable resolvable = new DefaultMessageSourceResolvable(new String[0]);
 
         assertThatThrownBy(() -> source.getMessage(resolvable, Locale.ENGLISH))
             .isInstanceOf(NoSuchMessageException.class);
